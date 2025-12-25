@@ -23,6 +23,7 @@
     "test:integration": "npm test -- --testPathPattern=test/integration",
     "test:e2e": "npm test -- --testPathPattern=test/e2e",
     "test:coverage": "npm test -- --coverage",
+    "test:dogfood": "bash test/dogfood.sh",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
     "start": "node bin/atlas.js",
