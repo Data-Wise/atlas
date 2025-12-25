@@ -1,8 +1,11 @@
 /**
  * Atlas Dashboard TUI
  *
- * Terminal-based dashboard using blessed-contrib for
- * at-a-glance project status visualization.
+ * ADHD-friendly terminal dashboard with:
+ * - Clear visual hierarchy
+ * - Always-visible keyboard shortcuts
+ * - Color-coded status indicators
+ * - Simple navigation
  */
 
 import blessed from 'blessed'
@@ -10,102 +13,134 @@ import contrib from 'blessed-contrib'
 
 /**
  * Create and run the dashboard
- *
- * @param {Atlas} atlas - Atlas instance
- * @param {Object} options - Dashboard options
  */
 export async function runDashboard(atlas, options = {}) {
   const screen = blessed.screen({
     smartCSR: true,
-    title: 'Atlas Dashboard'
+    title: 'Atlas Dashboard',
+    fullUnicode: true
   })
 
-  // Create grid layout
-  const grid = new contrib.grid({
-    rows: 12,
-    cols: 12,
-    screen: screen
-  })
+  // Color scheme
+  const colors = {
+    active: 'green',
+    paused: 'yellow',
+    stable: 'cyan',
+    border: 'blue',
+    highlight: 'white',
+    muted: 'gray'
+  }
 
   // ============================================================================
-  // WIDGETS
+  // LAYOUT: Simple 3-row design
   // ============================================================================
 
-  // Project status bar chart (top-left) - more reliable than donut
-  const statusBar = grid.set(0, 0, 4, 4, contrib.bar, {
-    label: ' Project Status ',
-    barWidth: 6,
-    barSpacing: 2,
-    xOffset: 0,
-    maxHeight: 50,
-    barBgColor: 'cyan'
-  })
-
-  // Inbox stats (top-middle)
-  const inboxBox = grid.set(0, 4, 4, 4, contrib.lcd, {
-    segmentWidth: 0.06,
-    segmentInterval: 0.11,
-    strokeWidth: 0.1,
-    elements: 4,
-    display: '0',
-    elementSpacing: 4,
-    elementPadding: 2,
-    color: 'cyan',
-    label: ' Inbox Items '
-  })
-
-  // Session timer (top-right)
-  const sessionBox = grid.set(0, 8, 4, 4, blessed.box, {
-    label: ' Current Session ',
-    border: { type: 'line' },
-    style: {
-      fg: 'white',
-      border: { fg: 'cyan' }
-    }
-  })
-
-  // Projects table (middle)
-  const projectsTable = grid.set(4, 0, 5, 8, contrib.table, {
-    keys: true,
-    fg: 'white',
-    selectedFg: 'white',
-    selectedBg: 'blue',
-    interactive: true,
-    label: ' Projects ',
+  // Row 1: Status bar (current session + quick stats)
+  const statusBar = blessed.box({
+    top: 0,
+    left: 0,
     width: '100%',
-    height: '100%',
-    border: { type: 'line', fg: 'cyan' },
-    columnSpacing: 3,
-    columnWidth: [20, 12, 10, 25]
-  })
-
-  // Recent captures log (middle-right)
-  const captureLog = grid.set(4, 8, 5, 4, contrib.log, {
-    fg: 'green',
-    selectedFg: 'green',
-    label: ' Recent Captures '
-  })
-
-  // Stats box (bottom)
-  const statsBox = grid.set(9, 0, 3, 8, blessed.box, {
-    label: ' Today ',
-    border: { type: 'line' },
+    height: 3,
+    tags: true,
     style: {
       fg: 'white',
-      border: { fg: 'cyan' }
+      bg: 'blue'
     }
   })
 
-  // Help box (bottom-right)
-  const helpBox = grid.set(9, 8, 3, 4, blessed.box, {
-    label: ' Help ',
-    border: { type: 'line' },
-    style: {
-      fg: 'gray',
-      border: { fg: 'gray' }
-    },
-    content: 'q: quit\nr: refresh'
+  // Row 2: Main content (projects table)
+  const projectsTable = contrib.table({
+    top: 3,
+    left: 0,
+    width: '70%',
+    height: '100%-6',
+    keys: true,
+    vi: true,
+    mouse: true,
+    fg: 'white',
+    selectedFg: 'black',
+    selectedBg: 'cyan',
+    interactive: true,
+    label: ' {bold}Projects{/bold} (↑↓ navigate, Enter select) ',
+    tags: true,
+    border: { type: 'line', fg: colors.border },
+    columnSpacing: 2,
+    columnWidth: [22, 10, 10, 25]
   })
+
+  // Sidebar: Quick stats + captures
+  const sidebar = blessed.box({
+    top: 3,
+    right: 0,
+    width: '30%',
+    height: '100%-6',
+    border: { type: 'line', fg: colors.border },
+    label: ' {bold}Quick View{/bold} ',
+    tags: true,
+    style: { border: { fg: colors.border } }
+  })
+
+  // Stats section in sidebar
+  const statsContent = blessed.box({
+    parent: sidebar,
+    top: 0,
+    left: 1,
+    right: 1,
+    height: 8,
+    tags: true,
+    content: '{gray-fg}Loading...{/}'
+  })
+
+  // Captures section in sidebar
+  const capturesBox = blessed.box({
+    parent: sidebar,
+    top: 9,
+    left: 1,
+    right: 1,
+    bottom: 1,
+    tags: true,
+    label: ' Recent Captures ',
+    border: { type: 'line', fg: 'gray' },
+    scrollable: true
+  })
+
+  // Row 3: Command bar (always visible!)
+  const commandBar = blessed.box({
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 3,
+    tags: true,
+    style: {
+      fg: 'white',
+      bg: 'black'
+    },
+    content: getCommandBarContent()
+  })
+
+  // Add widgets to screen
+  screen.append(statusBar)
+  screen.append(projectsTable)
+  screen.append(sidebar)
+  screen.append(commandBar)
+
+  // Focus on projects table
+  projectsTable.focus()
+
+  // ============================================================================
+  // COMMAND BAR CONTENT
+  // ============================================================================
+
+  function getCommandBarContent() {
+    return ' {bold}{cyan-fg}q{/} Quit  ' +
+           '{bold}{cyan-fg}r{/} Refresh  ' +
+           '{bold}{cyan-fg}s{/} Start Session  ' +
+           '{bold}{cyan-fg}e{/} End Session  ' +
+           '{bold}{cyan-fg}c{/} Capture  ' +
+           '{bold}{cyan-fg}?{/} Help  ' +
+           '{gray-fg}│{/} {bold}{yellow-fg}↑↓{/} Navigate  ' +
+           '{bold}{yellow-fg}Tab{/} Switch Panel'
+  }
 
   // ============================================================================
   // DATA LOADING
@@ -113,157 +148,320 @@ export async function runDashboard(atlas, options = {}) {
 
   async function loadData() {
     try {
-      // Get all projects
+      // Get projects
       const projects = await atlas.projects.list()
 
-      // Count by status
-      const statusCounts = {
-        active: 0,
-        paused: 0,
-        stable: 0,
-        other: 0
-      }
-
+      // Status counts
+      const counts = { active: 0, paused: 0, stable: 0, other: 0 }
       const projectRows = []
 
       for (const p of projects) {
-        // Normalize status
         const rawStatus = p.status || 'unknown'
-        let status = rawStatus
 
-        if (['active', 'working', 'in-progress'].includes(rawStatus)) {
-          status = 'active'
-          statusCounts.active++
+        // Categorize
+        if (['active', 'working', 'in-progress', 'testing'].includes(rawStatus)) {
+          counts.active++
         } else if (['paused', 'blocked', 'waiting'].includes(rawStatus)) {
-          status = 'paused'
-          statusCounts.paused++
-        } else if (['stable', 'complete', 'released'].includes(rawStatus)) {
-          status = 'stable'
-          statusCounts.stable++
+          counts.paused++
+        } else if (['stable', 'complete', 'released', 'ready'].includes(rawStatus)) {
+          counts.stable++
         } else {
-          statusCounts.other++
+          counts.other++
         }
 
-        // Get type string
+        // Get type string safely
         const typeStr = typeof p.type === 'object'
           ? (p.type?.value || p.type?._value || 'general')
           : (p.type || 'general')
 
-        projectRows.push({
-          name: p.name,
-          type: typeStr,
-          status: rawStatus,
-          path: p.path
-        })
-      }
+        // Status emoji
+        const statusIcon = getStatusIcon(rawStatus)
 
-      // Update status bar chart
-      statusBar.setData({
-        titles: ['Active', 'Paused', 'Stable', 'Other'],
-        data: [statusCounts.active, statusCounts.paused, statusCounts.stable, statusCounts.other]
-      })
-
-      // Update projects table - show first 15
-      projectsTable.setData({
-        headers: ['Project', 'Type', 'Status', 'Path'],
-        data: projectRows.slice(0, 15).map(p => [
-          String(p.name || '').substring(0, 18),
-          String(p.type || 'general').substring(0, 10),
-          String(p.status || 'unknown').substring(0, 8),
+        projectRows.push([
+          String(p.name || '').substring(0, 20),
+          String(typeStr).substring(0, 8),
+          statusIcon + ' ' + String(rawStatus).substring(0, 7),
           String(p.path || '').split('/').slice(-2).join('/')
         ])
+      }
+
+      // Update projects table
+      projectsTable.setData({
+        headers: ['Project', 'Type', 'Status', 'Location'],
+        data: projectRows.slice(0, 20)
       })
 
-      // Get inbox stats
-      try {
-        const triageUseCase = atlas.container.resolve('TriageInboxUseCase')
-        const stats = await triageUseCase.getStats()
-        inboxBox.setDisplay(String(stats.inbox || 0).padStart(4, ' '))
-      } catch (e) {
-        inboxBox.setDisplay('   -')
-      }
-
-      // Get recent captures
-      try {
-        const captures = await atlas.capture.inbox({ limit: 5 })
-        if (captures && captures.length > 0) {
-          captures.forEach(c => {
-            const text = c.text || c.content || ''
-            captureLog.log(`[${c.type || 'idea'}] ${text.substring(0, 30)}`)
-          })
-        }
-      } catch (e) {
-        captureLog.log('(no captures)')
-      }
-
-      // Get current session
+      // Get session info
+      let sessionInfo = '{yellow-fg}No active session{/}'
       try {
         const session = await atlas.sessions.current()
         if (session) {
           const duration = session.getDuration ? session.getDuration() : 0
-          sessionBox.setContent(
-            `\n  Project: ${session.project || 'default'}` +
-            `\n  Duration: ${duration}m` +
-            `\n  Task: ${session.task || '-'}`
-          )
-        } else {
-          sessionBox.setContent('\n  No active session\n\n  Use: atlas session start')
+          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} ({white-fg}${duration}m{/})`
         }
-      } catch (e) {
-        sessionBox.setContent('\n  Session error\n  ' + e.message)
-      }
+      } catch (e) { /* ignore */ }
+
+      // Update status bar
+      statusBar.setContent(
+        ` ${sessionInfo}` +
+        `  {gray-fg}│{/}  ` +
+        `{green-fg}●{/} Active: {bold}${counts.active}{/}  ` +
+        `{yellow-fg}●{/} Paused: {bold}${counts.paused}{/}  ` +
+        `{cyan-fg}●{/} Stable: {bold}${counts.stable}{/}  ` +
+        `{gray-fg}●{/} Other: ${counts.other}  ` +
+        `{gray-fg}│{/}  ` +
+        `{white-fg}${projects.length} projects{/}`
+      )
 
       // Get today's stats
+      let statsText = ''
       try {
         const status = await atlas.context.getStatus()
-        if (status && status.today) {
-          statsBox.setContent(
-            `  Sessions: ${status.today.sessions || 0}` +
-            `  |  Duration: ${status.today.totalDuration || 0}m` +
-            `  |  Flow: ${status.today.flowSessions || 0}` +
-            `  |  Projects: ${projects.length}`
-          )
-        } else {
-          statsBox.setContent(`  Projects: ${projects.length}`)
+        if (status?.today) {
+          statsText =
+            `{bold}Today{/}\n` +
+            `─────────────────\n` +
+            `{cyan-fg}Sessions:{/}  ${status.today.sessions || 0}\n` +
+            `{cyan-fg}Duration:{/}  ${status.today.totalDuration || 0}m\n` +
+            `{cyan-fg}Flow:{/}      ${status.today.flowSessions || 0}\n\n` +
+            `{bold}Inbox{/}\n` +
+            `─────────────────\n`
         }
+      } catch (e) { /* ignore */ }
+
+      // Get inbox count
+      try {
+        const triageUseCase = atlas.container.resolve('TriageInboxUseCase')
+        const inboxStats = await triageUseCase.getStats()
+        statsText += `{yellow-fg}Items:{/}     ${inboxStats.inbox || 0}\n`
       } catch (e) {
-        statsBox.setContent(`  Projects: ${projects.length}`)
+        statsText += `{gray-fg}Items:{/}     -\n`
+      }
+
+      statsContent.setContent(statsText)
+
+      // Get recent captures
+      try {
+        const captures = await atlas.capture.inbox({ limit: 5 })
+        let captureText = ''
+        if (captures && captures.length > 0) {
+          captures.forEach((c, i) => {
+            const icon = c.type === 'task' ? '☐' : '💡'
+            const text = (c.text || c.content || '').substring(0, 25)
+            captureText += ` ${icon} ${text}\n`
+          })
+        } else {
+          captureText = ' {gray-fg}No recent captures{/}'
+        }
+        capturesBox.setContent(captureText)
+      } catch (e) {
+        capturesBox.setContent(' {gray-fg}Error loading{/}')
       }
 
     } catch (err) {
-      captureLog.log(`Error: ${err.message}`)
+      statusBar.setContent(` {red-fg}Error: ${err.message}{/}`)
     }
 
     screen.render()
   }
 
+  function getStatusIcon(status) {
+    const icons = {
+      active: '{green-fg}●{/}',
+      working: '{green-fg}●{/}',
+      'in-progress': '{green-fg}●{/}',
+      testing: '{green-fg}◐{/}',
+      paused: '{yellow-fg}◑{/}',
+      blocked: '{red-fg}✖{/}',
+      waiting: '{yellow-fg}◑{/}',
+      stable: '{cyan-fg}●{/}',
+      complete: '{cyan-fg}✓{/}',
+      released: '{cyan-fg}✓{/}',
+      ready: '{blue-fg}○{/}',
+      planning: '{magenta-fg}○{/}',
+      draft: '{gray-fg}○{/}',
+      archive: '{gray-fg}▪{/}',
+      unknown: '{gray-fg}?{/}'
+    }
+    return icons[status] || icons.unknown
+  }
+
   // ============================================================================
-  // KEY BINDINGS
+  // KEYBOARD NAVIGATION
   // ============================================================================
 
-  screen.key(['escape', 'q', 'C-c'], () => {
-    return process.exit(0)
-  })
+  // Quit
+  screen.key(['q', 'C-c'], () => process.exit(0))
 
+  // Refresh
   screen.key(['r'], async () => {
-    captureLog.log('Refreshing...')
+    statusBar.setContent(' {yellow-fg}Refreshing...{/}')
+    screen.render()
     await loadData()
   })
+
+  // Help
+  screen.key(['?', 'h'], () => showHelp())
+
+  // Start session
+  screen.key(['s'], () => showSessionPrompt())
+
+  // End session
+  screen.key(['e'], async () => {
+    try {
+      await atlas.sessions.end('Ended from dashboard')
+      await loadData()
+    } catch (e) {
+      statusBar.setContent(` {red-fg}${e.message}{/}`)
+      screen.render()
+    }
+  })
+
+  // Capture
+  screen.key(['c'], () => showCapturePrompt())
+
+  // Tab to switch focus
+  screen.key(['tab'], () => {
+    if (projectsTable.focused) {
+      capturesBox.focus()
+    } else {
+      projectsTable.focus()
+    }
+    screen.render()
+  })
+
+  // ============================================================================
+  // DIALOGS
+  // ============================================================================
+
+  function showHelp() {
+    const help = blessed.box({
+      top: 'center',
+      left: 'center',
+      width: 50,
+      height: 18,
+      tags: true,
+      border: { type: 'line', fg: 'cyan' },
+      style: { bg: 'black' },
+      label: ' {bold}Keyboard Shortcuts{/} ',
+      content: `
+  {bold}{cyan-fg}Navigation{/}
+  ─────────────────────────────
+  {yellow-fg}↑/↓{/}        Move through projects
+  {yellow-fg}Tab{/}        Switch between panels
+  {yellow-fg}Enter{/}      Select project
+
+  {bold}{cyan-fg}Actions{/}
+  ─────────────────────────────
+  {yellow-fg}s{/}          Start session
+  {yellow-fg}e{/}          End current session
+  {yellow-fg}c{/}          Quick capture
+  {yellow-fg}r{/}          Refresh data
+
+  {bold}{cyan-fg}General{/}
+  ─────────────────────────────
+  {yellow-fg}q{/}          Quit dashboard
+  {yellow-fg}?{/}          Show this help
+
+  {gray-fg}Press any key to close{/}
+      `
+    })
+
+    screen.append(help)
+    help.focus()
+    screen.render()
+
+    help.onceKey(['escape', 'q', 'enter', 'space'], () => {
+      screen.remove(help)
+      projectsTable.focus()
+      screen.render()
+    })
+  }
+
+  function showSessionPrompt() {
+    const input = blessed.textbox({
+      top: 'center',
+      left: 'center',
+      width: 50,
+      height: 3,
+      border: { type: 'line', fg: 'green' },
+      label: ' Start Session - Enter project name: ',
+      style: { bg: 'black', focus: { border: { fg: 'cyan' } } },
+      inputOnFocus: true
+    })
+
+    screen.append(input)
+    input.focus()
+    screen.render()
+
+    input.on('submit', async (value) => {
+      screen.remove(input)
+      if (value && value.trim()) {
+        try {
+          await atlas.sessions.start(value.trim())
+          await loadData()
+        } catch (e) {
+          statusBar.setContent(` {red-fg}${e.message}{/}`)
+        }
+      }
+      projectsTable.focus()
+      screen.render()
+    })
+
+    input.on('cancel', () => {
+      screen.remove(input)
+      projectsTable.focus()
+      screen.render()
+    })
+  }
+
+  function showCapturePrompt() {
+    const input = blessed.textbox({
+      top: 'center',
+      left: 'center',
+      width: 60,
+      height: 3,
+      border: { type: 'line', fg: 'yellow' },
+      label: ' Quick Capture - Enter idea/task: ',
+      style: { bg: 'black', focus: { border: { fg: 'cyan' } } },
+      inputOnFocus: true
+    })
+
+    screen.append(input)
+    input.focus()
+    screen.render()
+
+    input.on('submit', async (value) => {
+      screen.remove(input)
+      if (value && value.trim()) {
+        try {
+          await atlas.capture.add(value.trim())
+          statusBar.setContent(` {green-fg}✓ Captured: "${value.substring(0, 30)}..."{/}`)
+          setTimeout(() => loadData(), 1500)
+        } catch (e) {
+          statusBar.setContent(` {red-fg}${e.message}{/}`)
+        }
+      }
+      projectsTable.focus()
+      screen.render()
+    })
+
+    input.on('cancel', () => {
+      screen.remove(input)
+      projectsTable.focus()
+      screen.render()
+    })
+  }
 
   // ============================================================================
   // INITIALIZE
   // ============================================================================
 
-  // Initial load
   await loadData()
 
   // Auto-refresh every 30 seconds
   const refreshInterval = setInterval(loadData, 30000)
-
-  // Cleanup on exit
-  process.on('exit', () => {
-    clearInterval(refreshInterval)
-  })
+  process.on('exit', () => clearInterval(refreshInterval))
 
   screen.render()
 }
