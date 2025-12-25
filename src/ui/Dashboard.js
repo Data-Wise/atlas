@@ -369,9 +369,9 @@ export class Dashboard {
       })
 
       return [
-        s.project.substring(0, 18),
-        (s.task || 'General').substring(0, 28),
-        `${s.duration}m`,
+        String(s.project || '').substring(0, 18),
+        String(s.task || 'General').substring(0, 28),
+        `${s.duration || 0}m`,
         s.outcome || 'ongoing',
         `${dateStr} ${timeStr}`
       ]

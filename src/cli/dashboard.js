@@ -128,9 +128,11 @@ export async function runDashboard(atlas, options = {}) {
 
         if (status === 'active') {
           const projectDetails = await atlas.projects.get(p.name)
+          // Handle ProjectType value object or string
+          const typeStr = typeof p.type === 'object' ? (p.type?.value || 'generic') : (p.type || 'generic')
           activeProjects.push({
             name: p.name,
-            type: p.type || 'generic',
+            type: typeStr,
             progress: projectDetails?.progress || 0,
             next: projectDetails?.next?.[0]?.action || '-'
           })
@@ -156,10 +158,10 @@ export async function runDashboard(atlas, options = {}) {
       projectsTable.setData({
         headers: ['Project', 'Type', 'Progress', 'Next Action'],
         data: activeProjects.map(p => [
-          p.name.substring(0, 18),
-          p.type.substring(0, 8),
-          `${p.progress}%`,
-          p.next.substring(0, 28)
+          String(p.name || '').substring(0, 18),
+          String(p.type || 'generic').substring(0, 8),
+          `${p.progress || 0}%`,
+          String(p.next || '-').substring(0, 28)
         ])
       })
 
