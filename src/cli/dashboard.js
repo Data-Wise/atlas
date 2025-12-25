@@ -6,10 +6,14 @@
  * - Always-visible keyboard shortcuts
  * - Project detail view on Enter
  * - Color-coded status indicators
+ * - Zen mode for minimal distraction
+ * - State machine for reliable transitions
  */
 
 import blessed from 'blessed'
 import contrib from 'blessed-contrib'
+import { createStateMachine, STATES } from './dashboard/stateMachine.js'
+import { createTimerManager } from './dashboard/timerManager.js'
 
 /**
  * Create and run the dashboard
@@ -21,19 +25,28 @@ export async function runDashboard(atlas, options = {}) {
     fullUnicode: true
   })
 
-  // Track state
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+
+  // Create state machine for view management
+  const stateMachine = createStateMachine({ initial: STATES.BROWSE })
+
+  // Create timer manager for Pomodoro
+  const timer = createTimerManager({ defaultMinutes: 25 })
+
+  // Track data state (separate from view state)
   let projectList = []
   let filteredList = []
-  let currentView = 'main' // 'main', 'detail', or 'focus'
   let selectedProject = null
   let currentFilter = '*' // 'a' = active, 'p' = paused, 's' = stable, '*' = all
   let searchTerm = ''
   let activeSessionProject = null // Track which project has active session
 
-  // Pomodoro timer state
+  // Legacy timer state (for compatibility during refactor)
   let pomodoroActive = false
   let pomodoroStart = null
-  let pomodoroMinutes = 25 // Default pomodoro duration
+  let pomodoroMinutes = 25
   let breakReminder = false
   let timerInterval = null
 
@@ -405,6 +418,46 @@ export async function runDashboard(atlas, options = {}) {
   screen.append(focusView)
 
   // ============================================================================
+  // ZEN MODE VIEW - Minimal distraction mode
+  // ============================================================================
+
+  const zenView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Zen mode content - large centered display
+  const zenContent = blessed.box({
+    parent: zenView,
+    top: 'center',
+    left: 'center',
+    width: 60,
+    height: 15,
+    tags: true,
+    style: { bg: 'black' },
+    align: 'center',
+    valign: 'middle'
+  })
+
+  // Zen mode minimal command bar
+  const zenCommandBar = blessed.box({
+    parent: zenView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}Space{/} Pause  {cyan-fg}c{/} Capture  {cyan-fg}Esc{/} Expand  {cyan-fg}q{/} Quit'
+  })
+
+  screen.append(zenView)
+
+  // ============================================================================
   // HELPER FUNCTIONS
   // ============================================================================
 
@@ -761,16 +814,20 @@ export async function runDashboard(atlas, options = {}) {
   // ============================================================================
 
   function showMainView() {
-    currentView = 'main'
+    stateMachine.transition(STATES.BROWSE)
     detailView.hide()
+    focusView.hide()
+    zenView.hide()
     mainView.show()
     projectsTable.focus()
     screen.render()
   }
 
   function showDetailView(project) {
-    currentView = 'detail'
+    stateMachine.transition(STATES.DETAIL, { project })
     mainView.hide()
+    focusView.hide()
+    zenView.hide()
     detailView.show()
     loadDetailView(project)
   }
@@ -797,9 +854,10 @@ export async function runDashboard(atlas, options = {}) {
   // ============================================================================
 
   function showFocusMode() {
-    currentView = 'focus'
+    stateMachine.transition(STATES.FOCUS)
     mainView.hide()
     detailView.hide()
+    zenView.hide()
     focusView.show()
 
     // Start pomodoro if not already running
@@ -812,8 +870,9 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   function exitFocusMode() {
-    currentView = 'main'
+    stateMachine.transition(STATES.BROWSE)
     focusView.hide()
+    zenView.hide()
     mainView.show()
     projectsTable.focus()
     screen.render()
@@ -827,7 +886,12 @@ export async function runDashboard(atlas, options = {}) {
     // Update timer every second
     if (timerInterval) clearInterval(timerInterval)
     timerInterval = setInterval(() => {
-      updateFocusTimer()
+      // Update the correct view based on current state
+      if (stateMachine.is(STATES.FOCUS)) {
+        updateFocusTimer()
+      } else if (stateMachine.is(STATES.ZEN)) {
+        updateZenDisplay()
+      }
 
       // Check for break reminder
       const elapsed = Math.floor((Date.now() - pomodoroStart) / 60000)
@@ -980,6 +1044,80 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // ZEN MODE
+  // ============================================================================
+
+  function showZenMode() {
+    stateMachine.transition(STATES.ZEN)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.show()
+
+    // Start timer if not already running
+    if (!pomodoroActive) {
+      startPomodoro()
+    }
+
+    updateZenDisplay()
+    screen.render()
+  }
+
+  function exitZenMode() {
+    stateMachine.transition(STATES.BROWSE)
+    zenView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  function updateZenDisplay() {
+    const timerStatus = timer.getStatus()
+    const todayHistory = timer.getTodayHistory()
+
+    // Get session info
+    let projectName = activeSessionProject || 'No session'
+
+    // Calculate streak (simplified - days with any Pomodoro)
+    const streakDays = pomodoroHistory.length > 0 ? Math.min(pomodoroHistory.length, 7) : 0
+
+    // Timer display
+    const remaining = pomodoroStart
+      ? Math.max(0, (pomodoroMinutes * 60) - Math.floor((Date.now() - pomodoroStart) / 1000))
+      : pomodoroMinutes * 60
+    const mins = Math.floor(remaining / 60)
+    const secs = remaining % 60
+    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+
+    // Progress bar (simple ASCII)
+    const elapsed = pomodoroMinutes * 60 - remaining
+    const progress = pomodoroMinutes > 0 ? (elapsed / (pomodoroMinutes * 60)) * 100 : 0
+    const barWidth = 30
+    const filled = Math.round((progress / 100) * barWidth)
+    const progressBar = '{green-fg}' + '█'.repeat(filled) + '{/}{gray-fg}' + '░'.repeat(barWidth - filled) + '{/}'
+
+    // Status
+    const statusIcon = pomodoroActive
+      ? (breakReminder ? '{yellow-fg}☕ BREAK{/}' : '{green-fg}● FOCUS{/}')
+      : '{yellow-fg}◑ PAUSED{/}'
+
+    // Today's stats
+    const todayCount = pomodoroHistory.filter(p =>
+      p.completed.startsWith(new Date().toISOString().split('T')[0])
+    ).length
+
+    zenContent.setContent(
+      `\n\n` +
+      `{bold}{white-fg}${projectName}{/}\n\n` +
+      `${statusIcon}\n\n` +
+      `{bold}{white-fg}${timeStr}{/}\n\n` +
+      `${progressBar}\n\n` +
+      `{cyan-fg}Day ${streakDays || 1}{/}  |  {cyan-fg}${todayCount} 🍅 today{/}`
+    )
+    screen.render()
+  }
+
+  // ============================================================================
   // DECISION HELPER
   // ============================================================================
 
@@ -1115,18 +1253,36 @@ export async function runDashboard(atlas, options = {}) {
 
   // Quit
   screen.key(['q', 'C-c'], () => {
-    if (currentView === 'detail') {
+    if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
+    } else if (stateMachine.is(STATES.FOCUS) || stateMachine.is(STATES.ZEN)) {
+      // Confirm quit if timer is running
+      if (pomodoroActive) {
+        exitFocusMode()
+      } else {
+        cleanup()
+        process.exit(0)
+      }
     } else {
+      cleanup()
       process.exit(0)
     }
   })
 
-  // Escape - back to main (or exit focus mode)
+  // Cleanup function
+  function cleanup() {
+    if (timerInterval) clearInterval(timerInterval)
+    timer.destroy()
+    stateMachine.destroy()
+  }
+
+  // Escape - back to main (or exit focus/zen mode)
   screen.key(['escape'], () => {
-    if (currentView === 'focus') {
+    if (stateMachine.is(STATES.ZEN)) {
+      exitZenMode()
+    } else if (stateMachine.is(STATES.FOCUS)) {
       exitFocusMode()
-    } else if (currentView === 'detail') {
+    } else if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
     }
   })
@@ -1282,18 +1438,32 @@ export async function runDashboard(atlas, options = {}) {
 
   // Theme cycling: t key
   screen.key(['t'], () => {
-    if (currentView === 'main' || currentView === 'detail') {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
       cycleTheme()
     }
   })
 
-  // Focus mode: space for pause/resume
+  // Zen mode: z key
+  screen.key(['z'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showZenMode()
+    } else if (stateMachine.is(STATES.FOCUS)) {
+      // Switch from focus to zen
+      focusView.hide()
+      showZenMode()
+    }
+  })
+
+  // Focus/Zen mode: space for pause/resume
   screen.key(['space'], () => {
-    if (currentView === 'focus') {
+    if (stateMachine.is(STATES.FOCUS) || stateMachine.is(STATES.ZEN)) {
       if (pomodoroActive) {
         pausePomodoro()
       } else {
         resumePomodoro()
+      }
+      if (stateMachine.is(STATES.ZEN)) {
+        updateZenDisplay()
       }
     }
   })
@@ -1348,11 +1518,12 @@ export async function runDashboard(atlas, options = {}) {
   {yellow-fg}d{/}          Decision helper
   {yellow-fg}t{/}          Cycle themes
 
-  {bold}{cyan-fg}Focus Mode (f){/}
+  {bold}{cyan-fg}Focus Mode (f) / Zen Mode (z){/}
   ─────────────────────────────────────────
   {yellow-fg}Space{/}      Pause/Resume timer
   {yellow-fg}r{/}          Reset timer
   {yellow-fg}+/-{/}        Adjust time (±5m)
+  {yellow-fg}z{/}          Toggle Zen mode (minimal)
 
   {yellow-fg}q{/} Quit  {yellow-fg}?{/} Help  {gray-fg}Press any key to close{/}
       `
