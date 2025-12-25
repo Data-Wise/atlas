@@ -331,22 +331,50 @@ export class FileSystemProjectRepository extends IProjectRepository {
    * @param {string} rootPath - Root directory to scan
    * @param {Function} [progressCallback] - Progress callback for each project found
    */
-  async _scanBasic(rootPath, progressCallback = null) {
-    try {
-      const entries = await fs.readdir(rootPath, { withFileTypes: true })
-      const directories = entries.filter(entry => entry.isDirectory())
+  async _scanBasic(rootPath, progressCallback = null, maxDepth = 3) {
+    const projects = []
+    await this._scanRecursive(rootPath, projects, progressCallback, 0, maxDepth)
+    return projects
+  }
 
-      // Scan directories in parallel with timeout
-      const scanPromises = directories.map(entry =>
-        this._scanDirectory(rootPath, entry, progressCallback)
+  /**
+   * Recursively scan directories for projects
+   * @private
+   */
+  async _scanRecursive(dirPath, projects, progressCallback, currentDepth, maxDepth) {
+    if (currentDepth >= maxDepth) return
+
+    try {
+      const entries = await fs.readdir(dirPath, { withFileTypes: true })
+      const directories = entries.filter(entry =>
+        entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules'
       )
 
-      const results = await Promise.all(scanPromises)
+      for (const entry of directories) {
+        const projectPath = join(dirPath, entry.name)
 
-      // Filter out null results (non-projects or failed scans)
-      return results.filter(project => project !== null)
+        // Try to detect if this is a project
+        const type = await this._withTimeout(
+          this._detectProjectType(projectPath),
+          this.scanTimeout,
+          null
+        )
+
+        if (type) {
+          const project = new Project(
+            projectPath,
+            entry.name,
+            { type, path: projectPath }
+          )
+          projects.push(project)
+          if (progressCallback) progressCallback(project)
+        } else {
+          // Not a project, recurse deeper
+          await this._scanRecursive(projectPath, projects, progressCallback, currentDepth + 1, maxDepth)
+        }
+      }
     } catch (error) {
-      throw new Error(`Basic scan failed: ${error.message}`)
+      // Silently skip directories that fail to read
     }
   }
 
@@ -405,7 +433,7 @@ export class FileSystemProjectRepository extends IProjectRepository {
    * @private
    */
   async _detectProjectType(projectPath) {
-    // Check for various project markers
+    // Check for various project markers (order matters - more specific first)
     const markers = [
       { file: 'package.json', type: ProjectType.NODE },
       { file: 'DESCRIPTION', type: ProjectType.R_PACKAGE },
@@ -413,7 +441,8 @@ export class FileSystemProjectRepository extends IProjectRepository {
       { file: 'pyproject.toml', type: ProjectType.PYTHON },
       { file: 'setup.py', type: ProjectType.PYTHON },
       { file: '.spacemacs', type: ProjectType.SPACEMACS },
-      { file: '.zshrc', type: ProjectType.ZSH }
+      { file: '.zshrc', type: ProjectType.ZSH },
+      { file: '.STATUS', type: ProjectType.GENERAL } // Atlas-tracked project
     ]
 
     for (const { file, type } of markers) {
