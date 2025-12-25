@@ -147,6 +147,42 @@ export class Atlas {
       console.log('No status available');
       return;
     }
+
+    // Handle global status format (from GetStatusUseCase)
+    if (status.activeSession !== undefined || status.today || status.metrics) {
+      console.log('\n📊 WORKFLOW STATUS');
+      console.log('─'.repeat(40));
+
+      // Active session
+      if (status.activeSession) {
+        const s = status.activeSession;
+        console.log(`🎯 Active: ${s.project || 'unknown'}`);
+        if (s.task) console.log(`   Task: ${s.task}`);
+        console.log(`   Duration: ${s.duration} min`);
+        if (s.isFlowState) console.log(`   🌊 In flow state!`);
+      } else {
+        console.log('💤 No active session');
+      }
+
+      // Today's summary
+      if (status.today) {
+        console.log(`\n📅 Today: ${status.today.sessions} sessions, ${status.today.totalDuration} min`);
+      }
+
+      // Metrics
+      if (status.metrics) {
+        const m = status.metrics;
+        console.log(`📈 Streak: ${m.streak} days | Flow: ${m.flowPercentage}% | Completion: ${m.completionRate}%`);
+      }
+
+      // Projects summary
+      if (status.projects) {
+        console.log(`\n📁 ${status.projects.total} projects registered`);
+      }
+      return;
+    }
+
+    // Handle project-specific status format
     console.log(`📁 ${status.project || status.name}`);
     console.log(`   Status: ${status.status || 'unknown'}`);
     if (status.focus) console.log(`   Focus: ${status.focus}`);

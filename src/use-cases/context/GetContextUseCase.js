@@ -14,10 +14,11 @@ export class GetContextUseCase {
 
   /**
    * Get current context for a project or globally
-   * @param {string} [project] - Project name (optional)
+   * @param {Object} options - Options object
+   * @param {string} [options.project] - Project name (optional)
    * @returns {Promise<Object>} - Context information
    */
-  async execute(project) {
+  async execute({ project } = {}) {
     const context = {
       project: null,
       focus: null,

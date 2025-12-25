@@ -210,4 +210,12 @@ export class FileSystemSessionRepository extends ISessionRepository {
     const sessions = await this._loadSessions()
     return sessions.filter(s => s.startTime >= startDate && s.startTime <= endDate)
   }
+
+  /**
+   * Find all sessions (alias for list without filters)
+   * @returns {Promise<Session[]>}
+   */
+  async findAll() {
+    return this.list()
+  }
 }

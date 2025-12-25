@@ -30,12 +30,12 @@ export class GetTrailUseCase {
     }
 
     // Sort by timestamp (newest first)
-    crumbs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    crumbs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     return crumbs.slice(0, limit).map(c => ({
       ...c,
-      timestamp: this._formatTimestamp(c.createdAt),
-      ago: this._formatAgo(c.createdAt),
+      formattedTime: this._formatTimestamp(c.timestamp),
+      ago: this._formatAgo(c.timestamp),
     }));
   }
 

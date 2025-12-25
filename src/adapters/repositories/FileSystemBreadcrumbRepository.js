@@ -121,6 +121,37 @@ export class FileSystemBreadcrumbRepository {
     }
     return data.breadcrumbs.length;
   }
+
+  /**
+   * Find recent breadcrumbs (interface method for use cases)
+   * @param {string} project - Project name to filter by (optional)
+   * @param {number} limit - Maximum number to return
+   * @returns {Promise<Breadcrumb[]>}
+   */
+  async findRecent(project, limit = 10) {
+    return this.getRecent({ project, limit });
+  }
+
+  /**
+   * Find breadcrumbs since a specific date
+   * @param {string} since - ISO date string
+   * @param {string} [project] - Optional project filter
+   * @returns {Promise<Breadcrumb[]>}
+   */
+  async findSince(since, project = null) {
+    const data = await this._read();
+    const sinceDate = new Date(since);
+
+    let breadcrumbs = data.breadcrumbs
+      .map(b => Breadcrumb.fromJSON(b))
+      .filter(b => b.timestamp >= sinceDate);
+
+    if (project) {
+      breadcrumbs = breadcrumbs.filter(b => b.project === project);
+    }
+
+    return breadcrumbs;
+  }
 }
 
 export default FileSystemBreadcrumbRepository;
