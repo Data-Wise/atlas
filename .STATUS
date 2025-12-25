@@ -19,10 +19,16 @@ CLI and programmatic API available.
 - [x] CLI commands: project, session, catch, crumb, where, trail
 
 ## Current Tasks
-- [ ] Write tests for new Capture/Breadcrumb entities
-- [ ] Implement SQLite repository option for performance
-- [ ] Add registry persistence (registry.json)
-- [ ] Complete sync command for .STATUS files
+- [x] Write tests for new Capture/Breadcrumb entities (62 tests)
+- [x] Implement SQLite repository option for performance
+- [x] Add registry persistence via SyncRegistryUseCase
+- [x] Complete sync command for .STATUS files
+
+## Next Tasks
+- [ ] Add CLI flag for SQLite storage (--storage sqlite)
+- [ ] Create migration tool (JSON → SQLite)
+- [ ] Add watch mode for sync command
+- [ ] Implement RegisterProjectUseCase (manual add)
 
 ## Blockers
 None
@@ -44,3 +50,6 @@ atlas/
 
 ## Session Log
 - 2025-12-25: Initial restructuring from flow-cli
+- 2025-12-25: Added Capture/Breadcrumb entities + tests (62 new tests)
+- 2025-12-25: Implemented SQLite storage backend (29 integration tests)
+- 2025-12-25: Added SyncRegistryUseCase for .STATUS file integration
