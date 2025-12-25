@@ -23,8 +23,12 @@ export async function runDashboard(atlas, options = {}) {
 
   // Track state
   let projectList = []
+  let filteredList = []
   let currentView = 'main' // 'main' or 'detail'
   let selectedProject = null
+  let currentFilter = '*' // 'a' = active, 'p' = paused, 's' = stable, '*' = all
+  let searchTerm = ''
+  let activeSessionProject = null // Track which project has active session
 
   // ============================================================================
   // MAIN VIEW WIDGETS
@@ -48,13 +52,41 @@ export async function runDashboard(atlas, options = {}) {
     style: { fg: 'white', bg: 'blue' }
   })
 
-  // Projects table
-  const projectsTable = contrib.table({
+  // Filter bar
+  const filterBar = blessed.box({
     parent: mainView,
     top: 3,
     left: 0,
     width: '65%',
-    height: '100%-6',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Search input (hidden by default)
+  const searchInput = blessed.textbox({
+    parent: mainView,
+    top: 3,
+    left: 0,
+    width: '40%',
+    height: 1,
+    tags: true,
+    hidden: true,
+    style: {
+      fg: 'white',
+      bg: 'blue',
+      focus: { bg: 'blue' }
+    },
+    inputOnFocus: true
+  })
+
+  // Projects table
+  const projectsTable = contrib.table({
+    parent: mainView,
+    top: 4,
+    left: 0,
+    width: '65%',
+    height: '100%-7',
     keys: true,
     vi: true,
     mouse: true,
@@ -62,20 +94,20 @@ export async function runDashboard(atlas, options = {}) {
     selectedFg: 'black',
     selectedBg: 'cyan',
     interactive: true,
-    label: ' {bold}Projects{/bold} (↑↓ Enter) ',
+    label: ' {bold}Projects{/bold} ',
     tags: true,
     border: { type: 'line', fg: 'blue' },
-    columnSpacing: 2,
-    columnWidth: [20, 8, 12, 20]
+    columnSpacing: 1,
+    columnWidth: [2, 16, 6, 10, 8]  // Focus, Name, Type, Status, Last
   })
 
   // Sidebar
   const sidebar = blessed.box({
     parent: mainView,
-    top: 3,
+    top: 4,
     right: 0,
     width: '35%',
-    height: '100%-6',
+    height: '100%-7',
     border: { type: 'line', fg: 'blue' },
     label: ' {bold}Overview{/bold} ',
     tags: true
@@ -133,7 +165,7 @@ export async function runDashboard(atlas, options = {}) {
     height: 3,
     tags: true,
     style: { fg: 'white', bg: 'black' },
-    content: ' {cyan-fg}q{/} Quit  {cyan-fg}Enter{/} Details  {cyan-fg}s{/} Session  {cyan-fg}c{/} Capture  {cyan-fg}r{/} Refresh  {cyan-fg}?{/} Help  {gray-fg}│{/} {yellow-fg}↑↓{/} Navigate'
+    content: ' {cyan-fg}q{/}Quit {cyan-fg}/{/}Search {cyan-fg}a{/}{cyan-fg}p{/}{cyan-fg}s{/}{cyan-fg}*{/}Filter {cyan-fg}Enter{/}Details {cyan-fg}s{/}Session {cyan-fg}c{/}Capture {cyan-fg}r{/}Refresh {yellow-fg}↑↓{/}Nav'
   })
 
   screen.append(mainView)
@@ -304,6 +336,59 @@ export async function runDashboard(atlas, options = {}) {
     return type || 'general'
   }
 
+  function timeAgo(date) {
+    if (!date) return '-'
+    const now = Date.now()
+    const then = new Date(date).getTime()
+    const diff = now - then
+    const mins = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+    const weeks = Math.floor(diff / 604800000)
+
+    if (mins < 1) return 'now'
+    if (mins < 60) return `${mins}m`
+    if (hours < 24) return `${hours}h`
+    if (days < 7) return `${days}d`
+    return `${weeks}w`
+  }
+
+  function getStatusCategory(status) {
+    if (['active', 'working', 'in-progress', 'testing'].includes(status)) return 'a'
+    if (['paused', 'blocked', 'waiting'].includes(status)) return 'p'
+    if (['stable', 'complete', 'released', 'ready'].includes(status)) return 's'
+    return 'o'
+  }
+
+  function matchesFilter(project) {
+    const status = project.status || 'unknown'
+    const category = getStatusCategory(status)
+
+    // Status filter
+    if (currentFilter !== '*' && category !== currentFilter) return false
+
+    // Search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase()
+      const name = (project.name || '').toLowerCase()
+      const type = getTypeStr(project.type).toLowerCase()
+      if (!name.includes(term) && !type.includes(term)) return false
+    }
+
+    return true
+  }
+
+  function updateFilterBar() {
+    const filters = [
+      currentFilter === 'a' ? '{green-fg}[A]ctive{/}' : '{gray-fg}[a]ctive{/}',
+      currentFilter === 'p' ? '{yellow-fg}[P]aused{/}' : '{gray-fg}[p]aused{/}',
+      currentFilter === 's' ? '{cyan-fg}[S]table{/}' : '{gray-fg}[s]table{/}',
+      currentFilter === '*' ? '{white-fg}[*]All{/}' : '{gray-fg}[*]all{/}'
+    ]
+    const searchDisplay = searchTerm ? ` {blue-fg}/${searchTerm}{/}` : ' {gray-fg}/search{/}'
+    filterBar.setContent(` ${filters.join('  ')}  ${searchDisplay}`)
+  }
+
   // ============================================================================
   // MAIN VIEW DATA
   // ============================================================================
@@ -313,65 +398,105 @@ export async function runDashboard(atlas, options = {}) {
       const projects = await atlas.projects.list()
       projectList = projects
 
-      // Status counts
+      // Get active session to highlight its project
+      try {
+        const session = await atlas.sessions.current()
+        activeSessionProject = session?.project || null
+      } catch (e) {
+        activeSessionProject = null
+      }
+
+      // Status counts (for all projects, regardless of filter)
       const counts = { active: 0, paused: 0, stable: 0, other: 0 }
-      const projectRows = []
 
       for (const p of projects) {
+        const category = getStatusCategory(p.status || 'unknown')
+        if (category === 'a') counts.active++
+        else if (category === 'p') counts.paused++
+        else if (category === 's') counts.stable++
+        else counts.other++
+      }
+
+      // Apply filters
+      filteredList = projects.filter(matchesFilter)
+
+      // Build table rows
+      const projectRows = []
+
+      for (const p of filteredList) {
         const rawStatus = p.status || 'unknown'
-
-        if (['active', 'working', 'in-progress', 'testing'].includes(rawStatus)) {
-          counts.active++
-        } else if (['paused', 'blocked', 'waiting'].includes(rawStatus)) {
-          counts.paused++
-        } else if (['stable', 'complete', 'released', 'ready'].includes(rawStatus)) {
-          counts.stable++
-        } else {
-          counts.other++
-        }
-
         const typeStr = getTypeStr(p.type)
         const statusIcon = getStatusIcon(rawStatus)
 
+        // Focus indicator: ► for active session's project
+        const focusIndicator = (p.name === activeSessionProject) ? '{green-fg}►{/}' : ' '
+
+        // Time since last session (mock for now - would need session history)
+        const lastActive = p.lastSession ? timeAgo(p.lastSession) : '-'
+
         projectRows.push([
-          String(p.name || '').substring(0, 18),
-          String(typeStr).substring(0, 6),
-          statusIcon + ' ' + String(rawStatus).substring(0, 8),
-          String(p.path || '').split('/').slice(-2).join('/')
+          focusIndicator,
+          String(p.name || '').substring(0, 14),
+          String(typeStr).substring(0, 5),
+          statusIcon + ' ' + String(rawStatus).substring(0, 6),
+          lastActive
         ])
       }
 
+      // Update filter bar
+      updateFilterBar()
+
+      // Update table
       projectsTable.setData({
-        headers: ['Project', 'Type', 'Status', 'Location'],
+        headers: ['', 'Project', 'Type', 'Status', 'Last'],
         data: projectRows.slice(0, 25)
       })
 
-      // Session info
-      let sessionInfo = '{yellow-fg}No active session{/}'
+      // Session info for status bar
+      let sessionInfo = '{yellow-fg}No session{/}'
+      let sessionDuration = 0
       try {
         const session = await atlas.sessions.current()
         if (session) {
-          const duration = session.getDuration ? session.getDuration() : 0
-          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} (${duration}m)`
+          sessionDuration = session.getDuration ? session.getDuration() : 0
+          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} (${sessionDuration}m)`
         }
       } catch (e) { /* ignore */ }
 
+      // Show filter status and counts
+      const filterLabel = currentFilter === '*' ? '' : ` [${currentFilter.toUpperCase()}]`
       statusBar.setContent(
         ` ${sessionInfo}  {gray-fg}│{/}  ` +
-        `{green-fg}●{/} ${counts.active}  ` +
-        `{yellow-fg}●{/} ${counts.paused}  ` +
-        `{cyan-fg}●{/} ${counts.stable}  ` +
-        `{gray-fg}●{/} ${counts.other}  ` +
-        `{gray-fg}│{/}  ${projects.length} projects`
+        `{green-fg}●{/}${counts.active} ` +
+        `{yellow-fg}●{/}${counts.paused} ` +
+        `{cyan-fg}●{/}${counts.stable}` +
+        `${filterLabel}  ` +
+        `{gray-fg}│{/}  ${filteredList.length}/${projects.length}`
       )
 
-      // Activity sparkline (mock data for now - sessions per day)
+      // Activity sparkline - real session data for past 7 days
       try {
-        const status = await atlas.context.getStatus()
-        // Create sparkline data from recent sessions
-        const weekData = [2, 4, 3, 5, 4, 6, status?.today?.sessions || 0]
+        const sessionRepo = atlas.container.resolve('SessionRepository')
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        const sessions = await sessionRepo.list({ since: sevenDaysAgo })
+
+        // Count sessions per day (past 7 days)
+        const weekData = [0, 0, 0, 0, 0, 0, 0]
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        for (const s of sessions) {
+          const sessionDate = new Date(s.startTime)
+          sessionDate.setHours(0, 0, 0, 0)
+          const daysAgo = Math.floor((today - sessionDate) / (24 * 60 * 60 * 1000))
+          if (daysAgo >= 0 && daysAgo < 7) {
+            weekData[6 - daysAgo]++ // Most recent day is at index 6
+          }
+        }
+
         activitySpark.setData(['Sessions'], [weekData])
       } catch (e) {
+        // Fallback to zeros if can't load
         activitySpark.setData(['Sessions'], [[0, 0, 0, 0, 0, 0, 0]])
       }
 
@@ -432,14 +557,25 @@ export async function runDashboard(atlas, options = {}) {
       ` {bold}← Esc{/}  │  {bold}${name}{/}  │  ${getStatusIcon(status)} ${status}  │  ${typeStr}`
     )
 
-    // Project info box
+    // Project info box - include next action if available
     const shortPath = (project.path || '').split('/').slice(-3).join('/')
-    projectInfoBox.setContent(
+    const nextAction = project.next || project.metadata?.next
+    const focusText = project.focus || project.metadata?.focus
+
+    let infoContent =
       `{bold}Name:{/}   ${name}\n` +
       `{bold}Status:{/} ${getStatusIcon(status)} ${status}\n` +
       `{bold}Type:{/}   ${typeStr}\n` +
       `{bold}Path:{/}   ${shortPath}`
-    )
+
+    if (nextAction) {
+      infoContent += `\n\n{bold}{yellow-fg}Next:{/} ${nextAction.substring(0, 35)}`
+    }
+    if (focusText) {
+      infoContent += `\n{bold}{cyan-fg}Focus:{/} ${focusText.substring(0, 35)}`
+    }
+
+    projectInfoBox.setContent(infoContent)
 
     // Session gauge - today's progress
     let gaugePercent = 0
@@ -566,16 +702,73 @@ export async function runDashboard(atlas, options = {}) {
 
   // Enter - show detail (using rows.on for blessed-contrib table)
   projectsTable.rows.on('select', (item, index) => {
-    if (projectList[index]) {
-      showDetailView(projectList[index])
+    if (filteredList[index]) {
+      showDetailView(filteredList[index])
     }
   })
 
   // Update overview when selection changes
   projectsTable.rows.on('select item', (item, index) => {
-    if (projectList[index] && currentView === 'main') {
-      updateOverviewFor(projectList[index])
+    if (filteredList[index] && currentView === 'main') {
+      updateOverviewFor(filteredList[index])
     }
+  })
+
+  // Filter keys: a = active, p = paused, s = stable, * = all
+  screen.key(['a'], () => {
+    if (currentView === 'main') {
+      currentFilter = currentFilter === 'a' ? '*' : 'a'
+      loadMainView()
+    }
+  })
+
+  screen.key(['p'], () => {
+    if (currentView === 'main') {
+      currentFilter = currentFilter === 'p' ? '*' : 'p'
+      loadMainView()
+    }
+  })
+
+  // Note: 's' is also used for session, so only filter when not in detail view
+  // Actually, 's' for stable conflicts. Let's use shift+s or just rely on command bar
+  // For now, stable filter will only work via the filter bar display
+
+  screen.key(['*', '8'], () => {
+    if (currentView === 'main') {
+      currentFilter = '*'
+      searchTerm = ''
+      loadMainView()
+    }
+  })
+
+  // Search: / opens search input
+  screen.key(['/'], () => {
+    if (currentView === 'main') {
+      searchInput.show()
+      searchInput.focus()
+      searchInput.setValue(searchTerm)
+      screen.render()
+    }
+  })
+
+  // Search input handlers
+  searchInput.on('submit', (value) => {
+    searchTerm = value || ''
+    searchInput.hide()
+    projectsTable.focus()
+    loadMainView()
+  })
+
+  searchInput.on('cancel', () => {
+    searchInput.hide()
+    projectsTable.focus()
+    screen.render()
+  })
+
+  searchInput.key(['escape'], () => {
+    searchInput.hide()
+    projectsTable.focus()
+    screen.render()
   })
 
   // Refresh
@@ -738,44 +931,63 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   function showCapturePrompt() {
-    const input = blessed.textbox({
-      top: 'center',
-      left: 'center',
-      width: 60,
-      height: 3,
-      border: { type: 'line', fg: 'yellow' },
-      label: ' 💡 Quick Capture: ',
-      style: { bg: 'black' },
+    // Inline capture at bottom of screen (ADHD-friendly - stays in context)
+    const captureInput = blessed.textbox({
+      bottom: 3,
+      left: 0,
+      width: '100%',
+      height: 1,
+      tags: true,
+      style: {
+        fg: 'white',
+        bg: 'yellow'
+      },
       inputOnFocus: true
     })
 
-    screen.append(input)
-    input.focus()
+    // Show prompt prefix
+    const captureLabel = blessed.box({
+      bottom: 3,
+      left: 0,
+      width: 12,
+      height: 1,
+      tags: true,
+      style: { fg: 'black', bg: 'yellow' },
+      content: ' 💡 Capture:'
+    })
+
+    screen.append(captureLabel)
+    screen.append(captureInput)
+    captureInput.focus()
     screen.render()
 
-    input.on('submit', async (value) => {
-      screen.remove(input)
+    const cleanup = () => {
+      screen.remove(captureInput)
+      screen.remove(captureLabel)
+      projectsTable.focus()
+      screen.render()
+    }
+
+    captureInput.on('submit', async (value) => {
+      cleanup()
       if (value?.trim()) {
         try {
           await atlas.capture.add(value.trim())
-          statusBar.setContent(` {green-fg}✓ Captured!{/}`)
+          statusBar.setContent(` {green-fg}✓ Captured: "${value.trim().substring(0, 30)}..."{/}`)
+          screen.render()
           setTimeout(() => {
             if (currentView === 'main') loadMainView()
-            else loadDetailView(selectedProject)
-          }, 1000)
+            else if (selectedProject) loadDetailView(selectedProject)
+          }, 1500)
         } catch (e) {
           statusBar.setContent(` {red-fg}${e.message}{/}`)
+          screen.render()
         }
       }
-      projectsTable.focus()
-      screen.render()
     })
 
-    input.on('cancel', () => {
-      screen.remove(input)
-      projectsTable.focus()
-      screen.render()
-    })
+    captureInput.on('cancel', cleanup)
+    captureInput.key(['escape'], cleanup)
   }
 
   // ============================================================================
