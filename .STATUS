@@ -25,10 +25,16 @@ CLI and programmatic API available.
 - [x] Complete sync command for .STATUS files
 
 ## Next Tasks
-- [ ] Add CLI flag for SQLite storage (--storage sqlite)
-- [ ] Create migration tool (JSON → SQLite)
-- [ ] Add watch mode for sync command
-- [ ] Implement RegisterProjectUseCase (manual add)
+- [x] Add CLI flag for SQLite storage (--storage sqlite)
+- [x] Create migration tool (JSON → SQLite)
+- [x] Add watch mode for sync command
+- [x] Implement RegisterProjectUseCase (manual add)
+
+## Future Enhancements
+- [ ] Add UpdateStatusUseCase for programmatic .STATUS updates
+- [ ] Interactive triage mode for inbox
+- [ ] Dashboard TUI (blessed-contrib)
+- [ ] Shell completions (zsh/bash/fish)
 
 ## Blockers
 None
@@ -53,3 +59,4 @@ atlas/
 - 2025-12-25: Added Capture/Breadcrumb entities + tests (62 new tests)
 - 2025-12-25: Implemented SQLite storage backend (29 integration tests)
 - 2025-12-25: Added SyncRegistryUseCase for .STATUS file integration
+- 2025-12-25: CLI enhancements (--storage, migrate, watch mode, register)
