@@ -123,19 +123,29 @@ atlas dash                     # Alias for dashboard
 |-----|--------|
 | `↑↓` | Navigate projects |
 | `Enter` | Open project detail view |
-| `Esc` | Return to main view / Cancel |
+| `Esc` | Return to main view / Exit focus mode |
 | `/` | Search/filter projects |
 | `a` | Filter: active projects only |
 | `p` | Filter: paused projects only |
-| `s` | Filter: stable projects only |
 | `*` | Clear filter (show all) |
 | `s` | Start session (in detail view) |
 | `e` | End current session |
 | `c` | Quick capture |
-| `r` | Refresh data |
+| `r` | Refresh data (reset timer in focus mode) |
 | `o` | Open project folder (detail view) |
+| `f` | Enter focus mode (Pomodoro timer) |
+| `d` | Decision helper ("What to work on?") |
 | `q` | Quit dashboard |
 | `?` | Show help |
+
+#### Focus Mode Keys (v0.3.0+)
+| Key | Action |
+|-----|--------|
+| `Space` | Pause/Resume timer |
+| `r` | Reset timer |
+| `+/-` | Adjust time (±5 minutes) |
+| `c` | Quick capture |
+| `Esc` | Exit focus mode |
 
 #### Dashboard Features (v0.2.0+)
 - **Focus indicator**: Active session's project highlighted
@@ -145,6 +155,12 @@ atlas dash                     # Alias for dashboard
 - **Session gauge**: Visual progress toward daily goal
 - **Sparkline**: Weekly session activity graph
 - **Inline capture**: Quick idea capture without leaving dashboard
+
+#### Dashboard Features (v0.3.0+)
+- **Focus mode**: Minimal distraction UI with Pomodoro timer (`f`)
+- **Decision helper**: "What should I work on?" suggestions (`d`)
+- **Break reminders**: Notification after Pomodoro completes
+- **Terminal-adaptive**: Adjusts to terminal size, warns if too small
 
 ### Storage & Migration
 ```bash

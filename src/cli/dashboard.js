@@ -24,11 +24,56 @@ export async function runDashboard(atlas, options = {}) {
   // Track state
   let projectList = []
   let filteredList = []
-  let currentView = 'main' // 'main' or 'detail'
+  let currentView = 'main' // 'main', 'detail', or 'focus'
   let selectedProject = null
   let currentFilter = '*' // 'a' = active, 'p' = paused, 's' = stable, '*' = all
   let searchTerm = ''
   let activeSessionProject = null // Track which project has active session
+
+  // Pomodoro timer state
+  let pomodoroActive = false
+  let pomodoroStart = null
+  let pomodoroMinutes = 25 // Default pomodoro duration
+  let breakReminder = false
+  let timerInterval = null
+
+  // Theme state
+  const themes = {
+    default: {
+      primary: 'blue',
+      secondary: 'cyan',
+      accent: 'green',
+      warning: 'yellow',
+      error: 'red',
+      muted: 'gray'
+    },
+    dark: {
+      primary: 'magenta',
+      secondary: 'blue',
+      accent: 'green',
+      warning: 'yellow',
+      error: 'red',
+      muted: 'gray'
+    },
+    minimal: {
+      primary: 'white',
+      secondary: 'gray',
+      accent: 'cyan',
+      warning: 'yellow',
+      error: 'red',
+      muted: 'gray'
+    }
+  }
+  let currentTheme = themes.default
+
+  // Terminal size detection for adaptive layout
+  function getLayoutMode() {
+    const width = screen.width
+    const height = screen.height
+    if (width < 80) return 'compact'
+    if (width < 120) return 'normal'
+    return 'wide'
+  }
 
   // ============================================================================
   // MAIN VIEW WIDGETS
@@ -291,6 +336,47 @@ export async function runDashboard(atlas, options = {}) {
   })
 
   screen.append(detailView)
+
+  // ============================================================================
+  // FOCUS MODE VIEW (Minimal, distraction-free)
+  // ============================================================================
+
+  const focusView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Large centered timer display
+  const focusTimer = blessed.box({
+    parent: focusView,
+    top: 'center',
+    left: 'center',
+    width: 50,
+    height: 15,
+    tags: true,
+    border: { type: 'line', fg: 'green' },
+    style: { bg: 'black' },
+    align: 'center',
+    valign: 'middle'
+  })
+
+  // Focus mode command bar
+  const focusCommandBar = blessed.box({
+    parent: focusView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}Esc{/} Exit Focus  {cyan-fg}Space{/} Pause/Resume  {cyan-fg}r{/} Reset  {cyan-fg}c{/} Capture  {cyan-fg}+/-{/} Adjust Time'
+  })
+
+  screen.append(focusView)
 
   // ============================================================================
   // HELPER FUNCTIONS
@@ -681,6 +767,210 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // FOCUS MODE
+  // ============================================================================
+
+  function showFocusMode() {
+    currentView = 'focus'
+    mainView.hide()
+    detailView.hide()
+    focusView.show()
+
+    // Start pomodoro if not already running
+    if (!pomodoroActive) {
+      startPomodoro()
+    }
+
+    updateFocusTimer()
+    screen.render()
+  }
+
+  function exitFocusMode() {
+    currentView = 'main'
+    focusView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  function startPomodoro() {
+    pomodoroActive = true
+    pomodoroStart = Date.now()
+    breakReminder = false
+
+    // Update timer every second
+    if (timerInterval) clearInterval(timerInterval)
+    timerInterval = setInterval(() => {
+      updateFocusTimer()
+
+      // Check for break reminder
+      const elapsed = Math.floor((Date.now() - pomodoroStart) / 60000)
+      if (elapsed >= pomodoroMinutes && !breakReminder) {
+        breakReminder = true
+        showBreakReminder()
+      }
+    }, 1000)
+  }
+
+  function pausePomodoro() {
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+    pomodoroActive = false
+  }
+
+  function resumePomodoro() {
+    if (!pomodoroActive && pomodoroStart) {
+      pomodoroActive = true
+      timerInterval = setInterval(() => {
+        updateFocusTimer()
+        const elapsed = Math.floor((Date.now() - pomodoroStart) / 60000)
+        if (elapsed >= pomodoroMinutes && !breakReminder) {
+          breakReminder = true
+          showBreakReminder()
+        }
+      }, 1000)
+    }
+  }
+
+  function resetPomodoro() {
+    if (timerInterval) clearInterval(timerInterval)
+    pomodoroActive = false
+    pomodoroStart = null
+    breakReminder = false
+    startPomodoro()
+    updateFocusTimer()
+  }
+
+  function updateFocusTimer() {
+    const now = Date.now()
+    const elapsed = pomodoroStart ? Math.floor((now - pomodoroStart) / 1000) : 0
+    const remaining = Math.max(0, (pomodoroMinutes * 60) - elapsed)
+
+    const mins = Math.floor(remaining / 60)
+    const secs = remaining % 60
+    const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+
+    // Progress bar
+    const progress = pomodoroMinutes > 0 ? Math.min(100, (elapsed / (pomodoroMinutes * 60)) * 100) : 0
+    const barWidth = 30
+    const filled = Math.round((progress / 100) * barWidth)
+    const progressBar = '{green-fg}' + '█'.repeat(filled) + '{/}{gray-fg}' + '░'.repeat(barWidth - filled) + '{/}'
+
+    // Get session info
+    let sessionInfo = '{gray-fg}No active session{/}'
+    if (activeSessionProject) {
+      sessionInfo = `{green-fg}●{/} {bold}${activeSessionProject}{/}`
+    }
+
+    // Status indicator
+    const statusIcon = pomodoroActive
+      ? (breakReminder ? '{yellow-fg}☕ BREAK TIME{/}' : '{green-fg}● FOCUSING{/}')
+      : '{yellow-fg}◑ PAUSED{/}'
+
+    focusTimer.setContent(
+      `\n\n` +
+      `${sessionInfo}\n\n` +
+      `{bold}${statusIcon}{/}\n\n` +
+      `{bold}{white-fg}${timeStr}{/}\n\n` +
+      `${progressBar}\n\n` +
+      `{gray-fg}${pomodoroMinutes} min session{/}`
+    )
+    screen.render()
+  }
+
+  function showBreakReminder() {
+    // Flash the border and show break message
+    focusTimer.style.border = { fg: 'yellow' }
+    focusTimer.setLabel(' {bold}{yellow-fg}☕ Take a Break!{/} ')
+    screen.render()
+
+    // Could add a beep/notification here
+    // process.stdout.write('\x07') // Terminal bell
+  }
+
+  function adjustPomodoroTime(delta) {
+    pomodoroMinutes = Math.max(5, Math.min(60, pomodoroMinutes + delta))
+    updateFocusTimer()
+  }
+
+  // ============================================================================
+  // DECISION HELPER
+  // ============================================================================
+
+  async function showDecisionHelper() {
+    // Analyze projects and suggest what to work on
+    const suggestions = []
+
+    try {
+      // Get all projects
+      const projects = await atlas.projects.list()
+
+      // Sort by various criteria
+      const active = projects.filter(p => getStatusCategory(p.status) === 'a')
+      const paused = projects.filter(p => getStatusCategory(p.status) === 'p')
+      const blocked = projects.filter(p => p.status === 'blocked')
+
+      // Suggest unblocking blocked items first
+      if (blocked.length > 0) {
+        suggestions.push({
+          project: blocked[0],
+          reason: 'Unblock this first',
+          priority: 1
+        })
+      }
+
+      // Suggest active projects not recently worked on
+      for (const p of active.slice(0, 3)) {
+        suggestions.push({
+          project: p,
+          reason: p.next || 'Continue work',
+          priority: 2
+        })
+      }
+
+      // Show decision dialog
+      const decisionBox = blessed.box({
+        top: 'center',
+        left: 'center',
+        width: 60,
+        height: 16,
+        tags: true,
+        border: { type: 'line', fg: 'magenta' },
+        label: ' {bold}🎯 What Should I Work On?{/} ',
+        style: { bg: 'black' }
+      })
+
+      let content = '\n'
+      if (suggestions.length === 0) {
+        content += '  {gray-fg}No suggestions - all caught up!{/}\n'
+      } else {
+        suggestions.forEach((s, i) => {
+          const icon = i === 0 ? '{green-fg}►{/}' : ' '
+          content += `  ${icon} {bold}${s.project.name}{/}\n`
+          content += `     {gray-fg}${s.reason}{/}\n\n`
+        })
+      }
+      content += '\n  {gray-fg}Press any key to close{/}'
+
+      decisionBox.setContent(content)
+      screen.append(decisionBox)
+      decisionBox.focus()
+      screen.render()
+
+      decisionBox.onceKey(['escape', 'enter', 'space', 'q'], () => {
+        screen.remove(decisionBox)
+        projectsTable.focus()
+        screen.render()
+      })
+    } catch (e) {
+      statusBar.setContent(` {red-fg}Error: ${e.message}{/}`)
+      screen.render()
+    }
+  }
+
+  // ============================================================================
   // KEYBOARD HANDLERS
   // ============================================================================
 
@@ -693,9 +983,11 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
-  // Escape - back to main
+  // Escape - back to main (or exit focus mode)
   screen.key(['escape'], () => {
-    if (currentView === 'detail') {
+    if (currentView === 'focus') {
+      exitFocusMode()
+    } else if (currentView === 'detail') {
       showMainView()
     }
   })
@@ -771,8 +1063,12 @@ export async function runDashboard(atlas, options = {}) {
     screen.render()
   })
 
-  // Refresh
+  // Refresh (or reset timer in focus mode)
   screen.key(['r'], async () => {
+    if (currentView === 'focus') {
+      resetPomodoro()
+      return
+    }
     statusBar.setContent(' {yellow-fg}Refreshing...{/}')
     screen.render()
     if (currentView === 'main') {
@@ -831,6 +1127,44 @@ export async function runDashboard(atlas, options = {}) {
     screen.render()
   })
 
+  // Focus mode: f key (only from main or detail view)
+  screen.key(['f'], () => {
+    if (currentView === 'main' || currentView === 'detail') {
+      showFocusMode()
+    }
+  })
+
+  // Decision helper: d key
+  screen.key(['d'], () => {
+    if (currentView === 'main') {
+      showDecisionHelper()
+    }
+  })
+
+  // Focus mode: space for pause/resume
+  screen.key(['space'], () => {
+    if (currentView === 'focus') {
+      if (pomodoroActive) {
+        pausePomodoro()
+      } else {
+        resumePomodoro()
+      }
+    }
+  })
+
+  // Focus mode: +/- for time adjustment (only when paused)
+  screen.key(['+', '='], () => {
+    if (currentView === 'focus' && !pomodoroActive) {
+      adjustPomodoroTime(5) // Add 5 minutes
+    }
+  })
+
+  screen.key(['-', '_'], () => {
+    if (currentView === 'focus' && !pomodoroActive) {
+      adjustPomodoroTime(-5) // Remove 5 minutes
+    }
+  })
+
   // ============================================================================
   // DIALOGS
   // ============================================================================
@@ -839,34 +1173,41 @@ export async function runDashboard(atlas, options = {}) {
     const help = blessed.box({
       top: 'center',
       left: 'center',
-      width: 55,
-      height: 20,
+      width: 58,
+      height: 28,
       tags: true,
       border: { type: 'line', fg: 'cyan' },
       style: { bg: 'black' },
       label: ' {bold}Keyboard Shortcuts{/} ',
       content: `
   {bold}{cyan-fg}Navigation{/}
-  ─────────────────────────────────
+  ─────────────────────────────────────────
   {yellow-fg}↑/↓{/}        Navigate projects
   {yellow-fg}Enter{/}      Open project details
-  {yellow-fg}Esc{/}        Back to main view
+  {yellow-fg}Esc{/}        Back / Exit focus mode
   {yellow-fg}Tab{/}        Switch panels
 
   {bold}{cyan-fg}Actions{/}
-  ─────────────────────────────────
+  ─────────────────────────────────────────
   {yellow-fg}s{/}          Start session
   {yellow-fg}e{/}          End session
   {yellow-fg}c{/}          Quick capture
   {yellow-fg}r{/}          Refresh
   {yellow-fg}o{/}          Open project folder
 
-  {bold}{cyan-fg}General{/}
-  ─────────────────────────────────
-  {yellow-fg}q{/}          Quit (or back)
-  {yellow-fg}?{/}          This help
+  {bold}{cyan-fg}Filter & Search{/}
+  ─────────────────────────────────────────
+  {yellow-fg}/{/}          Search projects
+  {yellow-fg}a{/}/{yellow-fg}p{/}/{yellow-fg}*{/}      Filter: active/paused/all
+  {yellow-fg}d{/}          Decision helper
 
-  {gray-fg}Press any key to close{/}
+  {bold}{cyan-fg}Focus Mode (f){/}
+  ─────────────────────────────────────────
+  {yellow-fg}Space{/}      Pause/Resume timer
+  {yellow-fg}r{/}          Reset timer
+  {yellow-fg}+/-{/}        Adjust time (±5m)
+
+  {yellow-fg}q{/} Quit  {yellow-fg}?{/} Help  {gray-fg}Press any key to close{/}
       `
     })
 
@@ -989,6 +1330,26 @@ export async function runDashboard(atlas, options = {}) {
     captureInput.on('cancel', cleanup)
     captureInput.key(['escape'], cleanup)
   }
+
+  // ============================================================================
+  // TERMINAL-ADAPTIVE LAYOUT
+  // ============================================================================
+
+  // Handle terminal resize
+  screen.on('resize', () => {
+    const mode = getLayoutMode()
+    if (mode === 'compact') {
+      // Show compact mode warning
+      statusBar.setContent(' {yellow-fg}⚠ Terminal too narrow - expand for best view{/}')
+    }
+    // Refresh current view
+    if (currentView === 'main') {
+      loadMainView()
+    } else if (currentView === 'detail' && selectedProject) {
+      loadDetailView(selectedProject)
+    }
+    screen.render()
+  })
 
   // ============================================================================
   // INITIALIZE
