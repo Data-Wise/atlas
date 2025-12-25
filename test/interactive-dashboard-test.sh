@@ -3,7 +3,7 @@
 # Interactive Dashboard Test Script
 #
 # Runs through dashboard features and logs results for later analysis.
-# Each test asks the user to confirm if the output matches expectations.
+# The script launches the dashboard itself, then asks for confirmation.
 #
 # Usage: ./test/interactive-dashboard-test.sh
 #
@@ -81,80 +81,73 @@ print_step() {
 
 # Print expected behavior
 print_expected() {
-  echo -e "${CYAN}Expected:${NC}"
-  echo -e "  $1"
+  echo -e "${CYAN}Expected:${NC} $1"
   log "EXPECTED: $1"
+}
+
+# Print instructions (what to do in the dashboard)
+print_instructions() {
+  echo ""
+  echo -e "${BOLD}While in dashboard:${NC}"
+  for instruction in "$@"; do
+    echo -e "  • $instruction"
+  done
+  echo -e "  • Press ${BOLD}q${NC} to quit when done"
+  echo ""
 }
 
 # Ask user for result
 ask_result() {
   local test_name="$1"
-  local options="${2:-ynsp}"
 
   TESTS_RUN=$((TESTS_RUN + 1))
 
   echo ""
   echo -e "${BOLD}Did it work as expected?${NC}"
-
-  if [[ "$options" == *"y"* ]]; then echo -e "  ${GREEN}y${NC} = Yes, it worked"; fi
-  if [[ "$options" == *"n"* ]]; then echo -e "  ${RED}n${NC} = No, something was wrong"; fi
-  if [[ "$options" == *"s"* ]]; then echo -e "  ${YELLOW}s${NC} = Skip this test"; fi
-  if [[ "$options" == *"p"* ]]; then echo -e "  ${BLUE}p${NC} = Partially worked"; fi
-  if [[ "$options" == *"q"* ]]; then echo -e "  ${RED}q${NC} = Quit testing"; fi
-
-  echo -n "> "
-  read -n 1 result
+  echo -e "  ${GREEN}y${NC} = Yes, it worked"
+  echo -e "  ${RED}n${NC} = No, something was wrong"
+  echo -e "  ${YELLOW}s${NC} = Skip this test"
+  echo -e "  ${BLUE}p${NC} = Partial (worked with issues)"
   echo ""
 
-  case "$result" in
-    y|Y)
-      echo -e "${GREEN}✓ PASSED${NC}"
-      log_ts "RESULT: PASSED"
-      TESTS_PASSED=$((TESTS_PASSED + 1))
-      return 0
-      ;;
-    n|N)
-      echo -e "${RED}✗ FAILED${NC}"
-      echo -n "Describe what went wrong (or press Enter to skip): "
-      read error_desc
-      log_ts "RESULT: FAILED"
-      log "ERROR: $error_desc"
-      TESTS_FAILED=$((TESTS_FAILED + 1))
-      return 1
-      ;;
-    p|P)
-      echo -e "${YELLOW}◐ PARTIAL${NC}"
-      echo -n "Describe what worked and what didn't: "
-      read partial_desc
-      log_ts "RESULT: PARTIAL"
-      log "PARTIAL: $partial_desc"
-      TESTS_FAILED=$((TESTS_FAILED + 1))
-      return 1
-      ;;
-    s|S)
-      echo -e "${YELLOW}⊘ SKIPPED${NC}"
-      log_ts "RESULT: SKIPPED"
-      TESTS_SKIPPED=$((TESTS_SKIPPED + 1))
-      TESTS_RUN=$((TESTS_RUN - 1))
-      return 0
-      ;;
-    q|Q)
-      echo -e "${RED}Quitting tests...${NC}"
-      log_ts "RESULT: QUIT"
-      print_summary
-      exit 0
-      ;;
-    *)
-      echo -e "${YELLOW}Invalid input, treating as skip${NC}"
-      log_ts "RESULT: SKIPPED (invalid input)"
-      TESTS_SKIPPED=$((TESTS_SKIPPED + 1))
-      TESTS_RUN=$((TESTS_RUN - 1))
-      return 0
-      ;;
-  esac
+  while true; do
+    read -n 1 -p "Result [y/n/s/p]: " result
+    echo ""
+    case $result in
+      y|Y)
+        echo -e "${GREEN}✓ PASSED${NC}"
+        log_ts "RESULT: PASSED"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+        return 0
+        ;;
+      n|N)
+        echo -e "${RED}✗ FAILED${NC}"
+        read -p "What went wrong? " error_desc
+        log_ts "RESULT: FAILED"
+        log "ERROR: $error_desc"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        return 1
+        ;;
+      p|P)
+        echo -e "${YELLOW}~ PARTIAL${NC}"
+        read -p "What issues? " issue_desc
+        log_ts "RESULT: PARTIAL"
+        log "ISSUES: $issue_desc"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+        return 0
+        ;;
+      s|S)
+        echo -e "${YELLOW}○ SKIPPED${NC}"
+        log_ts "RESULT: SKIPPED"
+        TESTS_SKIPPED=$((TESTS_SKIPPED + 1))
+        TESTS_RUN=$((TESTS_RUN - 1))
+        return 0
+        ;;
+    esac
+  done
 }
 
-# Capture screenshot info
+# Capture state before test
 capture_state() {
   log ""
   log "--- State Capture ---"
@@ -164,35 +157,19 @@ capture_state() {
   log ""
 }
 
-# Wait for user to press key
-wait_key() {
+# Launch the dashboard and wait for it to exit
+launch_dashboard() {
+  echo -e "${YELLOW}Launching dashboard...${NC}"
   echo ""
-  echo -e "${YELLOW}Press any key to continue...${NC}"
-  read -n 1 -s
+  log_ts "LAUNCHING: node $ATLAS_BIN dash"
+
+  # Run dashboard in foreground - user will interact and press 'q' to quit
+  node "$ATLAS_BIN" dash 2>&1 | tee -a "$LOG_FILE"
+  local exit_code=$?
+
   echo ""
-}
-
-# Run a command and log output
-run_cmd() {
-  local cmd="$1"
-  local timeout="${2:-5}"
-
-  log_ts "COMMAND: $cmd"
-  log "--- Output Start ---"
-
-  # Run command with timeout and capture output
-  if output=$(timeout "$timeout" bash -c "$cmd" 2>&1); then
-    log "$output"
-    log "--- Output End (exit: 0) ---"
-    echo "$output"
-    return 0
-  else
-    local exit_code=$?
-    log "$output"
-    log "--- Output End (exit: $exit_code) ---"
-    echo "$output"
-    return $exit_code
-  fi
+  log_ts "Dashboard exited with code: $exit_code"
+  return $exit_code
 }
 
 # Print summary
@@ -209,7 +186,7 @@ print_summary() {
   echo ""
 
   if [[ $TESTS_FAILED -eq 0 && $TESTS_RUN -gt 0 ]]; then
-    echo -e "  ${GREEN}${BOLD}All tests passed! 🎉${NC}"
+    echo -e "  ${GREEN}${BOLD}All tests passed!${NC}"
   elif [[ $TESTS_FAILED -gt 0 ]]; then
     echo -e "  ${RED}${BOLD}Some tests failed. Check log: $LOG_FILE${NC}"
   fi
@@ -230,323 +207,238 @@ print_summary() {
 test_dashboard_launch() {
   print_header "Test 1: Dashboard Launch"
 
-  print_step "Launch the dashboard with: node $ATLAS_BIN dash"
-  print_expected "Dashboard opens with project list, sidebar, and command bar at bottom"
+  print_step "Launching dashboard to verify basic layout"
+  print_expected "Project list, sidebar with stats, command bar at bottom"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Observe the dashboard layout"
-  echo "  3. Press 'q' to quit the dashboard"
-  echo "  4. Return here to report result"
-  echo ""
+  print_instructions \
+    "Verify you see: project list (left), sidebar (right)" \
+    "Bottom bar should show keyboard shortcuts" \
+    "Projects should be listed with status icons"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Dashboard Launch"
 }
 
 test_navigation() {
   print_header "Test 2: Navigation"
 
-  print_step "Test arrow key navigation in project list"
+  print_step "Testing arrow key navigation in project list"
   print_expected "Up/Down arrows move selection, selection is highlighted"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press Up/Down arrows to navigate"
-  echo "  3. Verify selection highlight moves"
-  echo "  4. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press Up/Down arrows to navigate projects" \
+    "Selection should be highlighted (different color)" \
+    "Try navigating to first and last items"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Navigation"
 }
 
 test_detail_view() {
   print_header "Test 3: Detail View"
 
-  print_step "Test Enter key to open detail view"
-  print_expected "Pressing Enter on a project shows detailed view with project info"
+  print_step "Testing Enter key to open detail view"
+  print_expected "Pressing Enter shows detailed project info"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Select a project with arrow keys"
-  echo "  3. Press Enter"
-  echo "  4. Verify detail view appears"
-  echo "  5. Press Esc to go back"
-  echo "  6. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Select a project with arrow keys" \
+    "Press Enter to open detail view" \
+    "Verify you see project path, status, recent files" \
+    "Press Esc to go back to main view"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Detail View"
 }
 
 test_focus_mode() {
   print_header "Test 4: Focus Mode (f key)"
 
-  print_step "Test focus mode with Pomodoro timer"
+  print_step "Testing focus mode with Pomodoro timer"
   print_expected "Large centered timer, progress bar, session info"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'f' to enter focus mode"
-  echo "  3. Verify timer appears (should show 25:00 or countdown)"
-  echo "  4. Verify progress bar is visible"
-  echo "  5. Press Space to pause/resume"
-  echo "  6. Press Esc to exit"
-  echo "  7. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press 'f' to enter focus mode" \
+    "Verify timer appears (should show 25:00 or countdown)" \
+    "Verify progress bar is visible" \
+    "Press Space to pause/resume" \
+    "Press Esc to exit focus mode"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Focus Mode"
 }
 
 test_zen_mode() {
   print_header "Test 5: Zen Mode (z key)"
 
-  print_step "Test minimal Zen mode"
-  print_expected "Minimal UI with: project name, timer, progress bar, streak info"
+  print_step "Testing minimal Zen mode"
+  print_expected "Minimal UI: project name, timer, progress bar"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'z' to enter Zen mode"
-  echo "  3. Verify minimal display appears with:"
-  echo "     - Project name (or 'No session')"
-  echo "     - Status indicator (● FOCUS or ◑ PAUSED)"
-  echo "     - Large timer display"
-  echo "     - Progress bar"
-  echo "     - 'Day X | Y 🍅 today' line"
-  echo "  4. Press Space to pause/resume"
-  echo "  5. Press Esc to exit"
-  echo "  6. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press 'z' to enter Zen mode" \
+    "Verify minimal display with timer" \
+    "Should show: project name, status indicator, timer" \
+    "Press Space to pause/resume" \
+    "Press Esc to exit Zen mode"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Zen Mode"
 }
 
 test_zen_timer_update() {
   print_header "Test 6: Zen Mode Timer Updates"
 
-  print_step "Verify timer updates in Zen mode"
+  print_step "Verifying timer updates in Zen mode"
   print_expected "Timer counts down every second, progress bar advances"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'z' to enter Zen mode"
-  echo "  3. Wait 5-10 seconds"
-  echo "  4. Verify timer is counting down (seconds change)"
-  echo "  5. Verify progress bar is advancing"
-  echo "  6. Press Esc to exit"
-  echo "  7. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press 'z' to enter Zen mode" \
+    "Wait 5-10 seconds watching the timer" \
+    "Verify timer is counting down (seconds change)" \
+    "Verify progress bar is advancing" \
+    "Press Esc to exit"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Zen Mode Timer Updates"
 }
 
 test_focus_to_zen_switch() {
   print_header "Test 7: Switch from Focus to Zen"
 
-  print_step "Test switching between Focus and Zen modes"
+  print_step "Testing switching between Focus and Zen modes"
   print_expected "Can switch from Focus to Zen with 'z', timer state preserved"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'f' to enter Focus mode"
-  echo "  3. Note the timer value"
-  echo "  4. Press 'z' to switch to Zen mode"
-  echo "  5. Verify timer is approximately the same"
-  echo "  6. Press Esc to exit"
-  echo "  7. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press 'f' to enter Focus mode" \
+    "Note the timer value" \
+    "Press 'z' to switch to Zen mode" \
+    "Verify timer is approximately the same" \
+    "Press Esc to exit"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Focus to Zen Switch"
 }
 
 test_theme_cycling() {
   print_header "Test 8: Theme Cycling (t key)"
 
-  print_step "Test theme switching"
-  print_expected "Colors change when pressing 't' (default → dark → minimal → default)"
+  print_step "Testing theme switching"
+  print_expected "Colors change when pressing 't'"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Note the current colors (should be blue)"
-  echo "  3. Press 't' to cycle theme"
-  echo "  4. Verify status bar shows 'Theme: dark'"
-  echo "  5. Press 't' again"
-  echo "  6. Verify status bar shows 'Theme: minimal'"
-  echo "  7. Press 't' again"
-  echo "  8. Verify back to 'Theme: default'"
-  echo "  9. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Note the current colors (should be blue/default)" \
+    "Press 't' to cycle themes" \
+    "Colors should change (dark, minimal, etc.)" \
+    "Press 't' multiple times to cycle through all themes"
 
   capture_state
-  wait_key
-
+  launch_dashboard
   ask_result "Theme Cycling"
 }
 
-test_decision_helper() {
-  print_header "Test 9: Decision Helper (d key)"
+test_session_start() {
+  print_header "Test 9: Session Start (s key)"
 
-  print_step "Test decision helper dialog"
-  print_expected "Dialog with time-of-day context and project suggestions"
+  print_step "Testing session start functionality"
+  print_expected "Pressing 's' starts a work session for selected project"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'd' to open decision helper"
-  echo "  3. Verify dialog appears with:"
-  echo "     - Time context (🌅 Morning, ☀️ Afternoon, etc.)"
-  echo "     - Project suggestions with reasons"
-  echo "  4. Press any key to close"
-  echo "  5. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Select a project with arrow keys" \
+    "Press 's' to start a session" \
+    "Timer should appear or session indicator should update" \
+    "Sidebar stats may update"
 
   capture_state
-  wait_key
-
-  ask_result "Decision Helper"
+  launch_dashboard
+  ask_result "Session Start"
 }
 
-test_filter_keys() {
-  print_header "Test 10: Filter Keys (a/p/*)"
+test_session_end() {
+  print_header "Test 10: Session End (e key)"
 
-  print_step "Test project filtering"
-  print_expected "Pressing 'a' shows only active, 'p' only paused, '*' shows all"
+  print_step "Testing session end functionality"
+  print_expected "Pressing 'e' ends the current work session"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Note total project count"
-  echo "  3. Press 'a' to filter active"
-  echo "  4. Verify filter bar shows 'Filter: active'"
-  echo "  5. Press 'p' to filter paused"
-  echo "  6. Verify filter bar shows 'Filter: paused'"
-  echo "  7. Press '*' to show all"
-  echo "  8. Verify all projects visible again"
-  echo "  9. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "If a session is active, press 'e' to end it" \
+    "Session should end, stats should update" \
+    "Timer should stop if running"
 
   capture_state
-  wait_key
-
-  ask_result "Filter Keys"
+  launch_dashboard
+  ask_result "Session End"
 }
 
-test_search() {
-  print_header "Test 11: Search (/ key)"
+test_project_open() {
+  print_header "Test 11: Open in Editor (o key)"
 
-  print_step "Test project search"
-  print_expected "Pressing '/' opens search, typing filters projects"
+  print_step "Testing open in editor functionality"
+  print_expected "Pressing 'o' opens project in default editor"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press '/' to start search"
-  echo "  3. Type part of a project name"
-  echo "  4. Press Enter"
-  echo "  5. Verify list is filtered"
-  echo "  6. Press '*' to clear filter"
-  echo "  7. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Select a project with arrow keys" \
+    "Press 'o' to open in editor" \
+    "Editor should open with project directory" \
+    "(This may open VS Code, Cursor, etc.)"
 
   capture_state
-  wait_key
-
-  ask_result "Search"
+  launch_dashboard
+  ask_result "Open in Editor"
 }
 
-test_help_dialog() {
-  print_header "Test 12: Help Dialog (? key)"
+test_filter_toggle() {
+  print_header "Test 12: Filter Toggle (/ key)"
 
-  print_step "Test help dialog"
-  print_expected "Help shows all keyboard shortcuts including Zen mode"
+  print_step "Testing filter/search functionality"
+  print_expected "Pressing '/' opens filter mode for project search"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press '?' to open help"
-  echo "  3. Verify dialog shows:"
-  echo "     - Navigation keys"
-  echo "     - Action keys (s, e, c, r, o)"
-  echo "     - Filter keys (/, a, p, *, d, t)"
-  echo "     - Focus/Zen mode section with 'z' key"
-  echo "  4. Press any key to close"
-  echo "  5. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press '/' to open filter" \
+    "Type part of a project name" \
+    "List should filter to matching projects" \
+    "Press Esc to clear filter"
 
   capture_state
-  wait_key
-
-  ask_result "Help Dialog"
+  launch_dashboard
+  ask_result "Filter Toggle"
 }
 
-test_escape_handling() {
-  print_header "Test 13: Escape Key Handling"
+test_refresh() {
+  print_header "Test 13: Refresh (r key)"
 
-  print_step "Test Escape key in different contexts"
-  print_expected "Escape returns to previous view in all modes"
+  print_step "Testing refresh functionality"
+  print_expected "Pressing 'r' refreshes the project list"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press Enter on a project → Esc should return to main"
-  echo "  3. Press 'f' for focus mode → Esc should return to main"
-  echo "  4. Press 'z' for zen mode → Esc should return to main"
-  echo "  5. Verify each Escape works correctly"
-  echo "  6. Press 'q' to quit"
-  echo ""
+  print_instructions \
+    "Press 'r' to refresh" \
+    "List should reload (may flash briefly)" \
+    "Stats should update if any changes"
 
   capture_state
-  wait_key
-
-  ask_result "Escape Handling"
+  launch_dashboard
+  ask_result "Refresh"
 }
 
-test_quit_behavior() {
-  print_header "Test 14: Quit Behavior"
+test_help_toggle() {
+  print_header "Test 14: Help Toggle (? key)"
 
-  print_step "Test quit from different states"
-  print_expected "'q' exits dashboard cleanly from any view"
+  print_step "Testing help overlay"
+  print_expected "Pressing '?' shows keyboard shortcuts help"
 
-  echo ""
-  echo -e "${BOLD}Instructions:${NC}"
-  echo "  1. Run: node $ATLAS_BIN dash"
-  echo "  2. Press 'q' from main view - should quit"
-  echo "  3. Run again, enter detail view, press 'q' - should return to main"
-  echo "  4. Run again, enter focus mode, press 'q' - should return to main (timer running)"
-  echo "  5. Verify no errors in terminal after quit"
-  echo ""
+  print_instructions \
+    "Press '?' to show help" \
+    "Help overlay should appear with all shortcuts" \
+    "Press '?' or Esc to close help"
 
   capture_state
-  wait_key
-
-  ask_result "Quit Behavior"
+  launch_dashboard
+  ask_result "Help Toggle"
 }
 
 # ============================================================================
@@ -555,35 +447,25 @@ test_quit_behavior() {
 
 main() {
   clear
-  echo -e "${BOLD}${CYAN}"
-  echo "  ╔═══════════════════════════════════════════════════════════════════╗"
-  echo "  ║           ATLAS DASHBOARD INTERACTIVE TEST SUITE                  ║"
-  echo "  ╠═══════════════════════════════════════════════════════════════════╣"
-  echo "  ║  This script will guide you through manual testing of the        ║"
-  echo "  ║  dashboard features. Results are logged for later analysis.      ║"
-  echo "  ║                                                                   ║"
-  echo "  ║  Log file: test/interactive-test-results.log                     ║"
-  echo "  ╚═══════════════════════════════════════════════════════════════════╝"
+  echo -e "${BOLD}${BLUE}"
+  echo "╔════════════════════════════════════════════════════════════════════════════╗"
+  echo "║             ATLAS DASHBOARD - INTERACTIVE TEST SUITE                       ║"
+  echo "╚════════════════════════════════════════════════════════════════════════════╝"
   echo -e "${NC}"
   echo ""
-  echo -e "${YELLOW}Prerequisites:${NC}"
-  echo "  • Terminal at least 80x24"
-  echo "  • Node.js installed"
-  echo "  • In atlas project directory"
+  echo "This script will launch the dashboard for each test."
+  echo "After each test, you'll confirm whether it worked correctly."
   echo ""
-  echo -e "${BOLD}Press Enter to start testing, or 'q' to quit...${NC}"
-  read -n 1 start_key
+  echo -e "Log file: ${CYAN}$LOG_FILE${NC}"
+  echo ""
+  echo -e "${YELLOW}Press any key to start testing...${NC}"
+  read -n 1 -s
+  echo ""
 
-  if [[ "$start_key" == "q" || "$start_key" == "Q" ]]; then
-    echo "Cancelled."
-    exit 0
-  fi
-
-  # Initialize
   init_log
   log_ts "Starting interactive test session"
 
-  # Run tests
+  # Run all tests
   test_dashboard_launch
   test_navigation
   test_detail_view
@@ -592,18 +474,17 @@ main() {
   test_zen_timer_update
   test_focus_to_zen_switch
   test_theme_cycling
-  test_decision_helper
-  test_filter_keys
-  test_search
-  test_help_dialog
-  test_escape_handling
-  test_quit_behavior
+  test_session_start
+  test_session_end
+  test_project_open
+  test_filter_toggle
+  test_refresh
+  test_help_toggle
 
-  # Summary
   print_summary
 
   echo ""
-  echo -e "${CYAN}Log saved to: ${BOLD}$LOG_FILE${NC}"
+  echo -e "${CYAN}Full log saved to: $LOG_FILE${NC}"
   echo ""
 }
 
