@@ -117,6 +117,35 @@ atlas dashboard                # Launch TUI dashboard
 atlas dash                     # Alias for dashboard
 ```
 
+#### Dashboard Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `↑↓` | Navigate projects |
+| `Enter` | Open project detail view |
+| `Esc` | Return to main view / Cancel |
+| `/` | Search/filter projects |
+| `a` | Filter: active projects only |
+| `p` | Filter: paused projects only |
+| `s` | Filter: stable projects only |
+| `*` | Clear filter (show all) |
+| `s` | Start session (in detail view) |
+| `e` | End current session |
+| `c` | Quick capture |
+| `r` | Refresh data |
+| `o` | Open project folder (detail view) |
+| `q` | Quit dashboard |
+| `?` | Show help |
+
+#### Dashboard Features (v0.2.0+)
+- **Focus indicator**: Active session's project highlighted
+- **Recency column**: "Last: 2h ago" shows time since last session
+- **Quick filters**: Press `a/p/s/*` to filter by status
+- **Search**: Press `/` to fuzzy search projects
+- **Session gauge**: Visual progress toward daily goal
+- **Sparkline**: Weekly session activity graph
+- **Inline capture**: Quick idea capture without leaving dashboard
+
 ### Storage & Migration
 ```bash
 atlas --storage sqlite         # Use SQLite backend
