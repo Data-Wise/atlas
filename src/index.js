@@ -135,11 +135,34 @@ export class Atlas {
         break;
       default: // table
         if (Array.isArray(data) && data.length > 0) {
-          console.table(data);
+          // Convert value objects to strings for clean table display
+          const cleanData = data.map(item => this._cleanForTable(item));
+          console.table(cleanData);
         } else if (data) {
           console.log(data);
         }
     }
+  }
+
+  /**
+   * Convert value objects to strings for table display
+   * @private
+   */
+  _cleanForTable(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+
+    const clean = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value && typeof value === 'object' && typeof value.toString === 'function' && value.constructor.name !== 'Object' && value.constructor.name !== 'Array') {
+        // Value object with toString() - use the string representation
+        clean[key] = value.toString();
+      } else if (value instanceof Date) {
+        clean[key] = value.toISOString();
+      } else {
+        clean[key] = value;
+      }
+    }
+    return clean;
   }
 
   formatStatus(status) {
