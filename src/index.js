@@ -393,9 +393,9 @@ class SessionsAPI {
 
   async end(note) {
     const endSession = this.container.resolve('EndSessionUseCase');
-    const result = await endSession.execute({ note });
+    const session = await endSession.execute({ note });
     return {
-      duration: result.duration,
+      duration: session.getDuration ? `${session.getDuration()}m` : 'unknown',
       note
     };
   }

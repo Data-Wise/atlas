@@ -76,7 +76,11 @@ project
   .option('--format <format>', 'Output format (table|json|shell)', 'table')
   .action(async (name, options) => {
     const project = await getAtlas().projects.get(name);
-    getAtlas().formatOutput(project, options.format);
+    if (options.format === 'table') {
+      getAtlas().formatStatus(project);
+    } else {
+      getAtlas().formatOutput(project, options.format);
+    }
   });
 
 project
