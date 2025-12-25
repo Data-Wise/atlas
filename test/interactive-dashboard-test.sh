@@ -163,8 +163,8 @@ launch_dashboard() {
   echo ""
   log_ts "LAUNCHING: node $ATLAS_BIN dash"
 
-  # Run dashboard in foreground - user will interact and press 'q' to quit
-  node "$ATLAS_BIN" dash 2>&1 | tee -a "$LOG_FILE"
+  # Run dashboard directly (no pipe - TTY required)
+  node "$ATLAS_BIN" dash
   local exit_code=$?
 
   echo ""
