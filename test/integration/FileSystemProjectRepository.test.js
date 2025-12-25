@@ -7,9 +7,9 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
-import { FileSystemProjectRepository } from '../../cli/adapters/repositories/FileSystemProjectRepository.js'
-import { Project } from '../../cli/domain/entities/Project.js'
-import { ProjectType } from '../../cli/domain/value-objects/ProjectType.js'
+import { FileSystemProjectRepository } from '../../src/adapters/repositories/FileSystemProjectRepository.js'
+import { Project } from '../../src/domain/entities/Project.js'
+import { ProjectType } from '../../src/domain/value-objects/ProjectType.js'
 
 describe('FileSystemProjectRepository Integration', () => {
   let repo

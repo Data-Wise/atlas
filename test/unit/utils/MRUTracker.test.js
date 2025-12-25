@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
-import { MRUTracker } from '../../../cli/utils/MRUTracker.js'
+import { MRUTracker } from '../../../src/utils/MRUTracker.js'
 
 describe('MRUTracker', () => {
   let tracker

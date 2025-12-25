@@ -10,7 +10,7 @@ import {
   percentIndicator,
   histogram,
   durationBar
-} from '../../../cli/utils/ascii-charts.js'
+} from '../../../src/utils/ascii-charts.js'
 
 describe('ASCII Chart Utilities', () => {
   describe('sparkline', () => {

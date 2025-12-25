@@ -2,9 +2,9 @@
  * Unit tests for ScanProjectsUseCase
  */
 
-import { ScanProjectsUseCase } from '../../../cli/use-cases/ScanProjectsUseCase.js'
-import { Project } from '../../../cli/domain/entities/Project.js'
-import { ProjectType } from '../../../cli/domain/value-objects/ProjectType.js'
+import { ScanProjectsUseCase } from '../../../src/use-cases/ScanProjectsUseCase.js'
+import { Project } from '../../../src/domain/entities/Project.js'
+import { ProjectType } from '../../../src/domain/value-objects/ProjectType.js'
 
 // Mock repository
 class MockProjectRepository {

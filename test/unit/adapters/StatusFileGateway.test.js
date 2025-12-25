@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach } from '@jest/globals'
-import { StatusFileGateway } from '../../../cli/adapters/gateways/StatusFileGateway.js'
+import { StatusFileGateway } from '../../../src/adapters/gateways/StatusFileGateway.js'
 import { writeFile, unlink, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import { join } from 'path'

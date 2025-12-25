@@ -6,8 +6,8 @@ import { describe, test, expect, beforeEach, afterEach } from '@jest/globals'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import os from 'os'
-import { FileSystemProjectRepository } from '../../cli/adapters/repositories/FileSystemProjectRepository.js'
-import { ProjectType } from '../../cli/domain/value-objects/ProjectType.js'
+import { FileSystemProjectRepository } from '../../src/adapters/repositories/FileSystemProjectRepository.js'
+import { ProjectType } from '../../src/domain/value-objects/ProjectType.js'
 
 describe('Parallel Scanning with Caching (Integration)', () => {
   let tempDir

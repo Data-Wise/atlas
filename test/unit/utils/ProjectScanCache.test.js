@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
-import { ProjectScanCache } from '../../../cli/utils/ProjectScanCache.js'
+import { ProjectScanCache } from '../../../src/utils/ProjectScanCache.js'
 
 describe('ProjectScanCache', () => {
   let cache

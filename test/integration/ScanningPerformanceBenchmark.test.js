@@ -9,7 +9,7 @@ import { describe, test, expect, beforeAll, afterAll } from '@jest/globals'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import os from 'os'
-import { FileSystemProjectRepository } from '../../cli/adapters/repositories/FileSystemProjectRepository.js'
+import { FileSystemProjectRepository } from '../../src/adapters/repositories/FileSystemProjectRepository.js'
 
 describe('Scanning Performance Benchmark', () => {
   let tempDir

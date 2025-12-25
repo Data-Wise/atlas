@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect, beforeAll } from '@jest/globals'
-import { GitGateway } from '../../../cli/adapters/gateways/GitGateway.js'
+import { GitGateway } from '../../../src/adapters/gateways/GitGateway.js'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 

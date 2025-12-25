@@ -2,7 +2,7 @@
  * Unit tests for TaskPriority value object
  */
 
-import { TaskPriority } from '../../../../cli/domain/value-objects/TaskPriority.js'
+import { TaskPriority } from '../../../../src/domain/value-objects/TaskPriority.js'
 
 describe('TaskPriority Value Object', () => {
   describe('Construction', () => {

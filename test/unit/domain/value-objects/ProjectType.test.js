@@ -2,7 +2,7 @@
  * Unit tests for ProjectType value object
  */
 
-import { ProjectType } from '../../../../cli/domain/value-objects/ProjectType.js'
+import { ProjectType } from '../../../../src/domain/value-objects/ProjectType.js'
 
 describe('ProjectType Value Object', () => {
   describe('Construction', () => {

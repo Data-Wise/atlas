@@ -2,8 +2,8 @@
  * Unit tests for Task entity
  */
 
-import { Task } from '../../../../cli/domain/entities/Task.js'
-import { TaskPriority } from '../../../../cli/domain/value-objects/TaskPriority.js'
+import { Task } from '../../../../src/domain/entities/Task.js'
+import { TaskPriority } from '../../../../src/domain/value-objects/TaskPriority.js'
 
 describe('Task Entity', () => {
   describe('Construction', () => {

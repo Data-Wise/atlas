@@ -3,7 +3,7 @@
  */
 
 import { describe, test, expect } from '@jest/globals'
-import { StatusFileValidator } from '../../../../cli/domain/validators/StatusFileValidator.js'
+import { StatusFileValidator } from '../../../../src/domain/validators/StatusFileValidator.js'
 
 describe('StatusFileValidator', () => {
   let validator

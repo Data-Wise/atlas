@@ -7,8 +7,8 @@
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
-import { FileSystemSessionRepository } from '../../cli/adapters/repositories/FileSystemSessionRepository.js'
-import { Session } from '../../cli/domain/entities/Session.js'
+import { FileSystemSessionRepository } from '../../src/adapters/repositories/FileSystemSessionRepository.js'
+import { Session } from '../../src/domain/entities/Session.js'
 
 describe('FileSystemSessionRepository Integration', () => {
   let repo

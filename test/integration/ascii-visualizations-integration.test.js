@@ -4,11 +4,11 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
-import { StatusController } from '../../cli/adapters/controllers/StatusController.js'
-import { GetStatusUseCase } from '../../cli/use-cases/GetStatusUseCase.js'
-import { Session } from '../../cli/domain/entities/Session.js'
-import { Project } from '../../cli/domain/entities/Project.js'
-import { ProjectType } from '../../cli/domain/value-objects/ProjectType.js'
+import { StatusController } from '../../src/adapters/controllers/StatusController.js'
+import { GetStatusUseCase } from '../../src/use-cases/GetStatusUseCase.js'
+import { Session } from '../../src/domain/entities/Session.js'
+import { Project } from '../../src/domain/entities/Project.js'
+import { ProjectType } from '../../src/domain/value-objects/ProjectType.js'
 
 // Mock repositories with realistic data
 class MockSessionRepository {

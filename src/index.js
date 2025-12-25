@@ -13,6 +13,8 @@ import { Container } from './adapters/Container.js';
 export { Project } from './domain/entities/Project.js';
 export { Session } from './domain/entities/Session.js';
 export { Task } from './domain/entities/Task.js';
+export { Capture } from './domain/entities/Capture.js';
+export { Breadcrumb } from './domain/entities/Breadcrumb.js';
 
 // Re-export value objects
 export { ProjectType } from './domain/value-objects/ProjectType.js';
@@ -30,7 +32,7 @@ export { SessionState } from './domain/value-objects/SessionState.js';
 export class Atlas {
   constructor(options = {}) {
     this.configPath = options.configPath || this._defaultConfigPath();
-    this.container = new Container(this.configPath);
+    this.container = new Container({ dataDir: this.configPath });
     
     // Initialize subsystems
     this.projects = new ProjectsAPI(this.container);
@@ -48,7 +50,13 @@ export class Atlas {
    */
   async init(options = {}) {
     const { global: isGlobal = false } = options;
-    // Implementation will create config directory and initial files
+    const { mkdir } = await import('fs/promises');
+    const { existsSync } = await import('fs');
+    
+    if (!existsSync(this.configPath)) {
+      await mkdir(this.configPath, { recursive: true });
+    }
+    
     return { success: true, message: `Atlas initialized at ${this.configPath}` };
   }
 
@@ -58,6 +66,16 @@ export class Atlas {
   async sync(options = {}) {
     const scanUseCase = this.container.resolve('ScanProjectsUseCase');
     const projects = await scanUseCase.execute();
+    
+    if (options.dryRun) {
+      return {
+        success: true,
+        count: projects.length,
+        message: `[DRY RUN] Would sync ${projects.length} projects`,
+        projects: projects.map(p => ({ name: p.name, path: p.path }))
+      };
+    }
+    
     return {
       success: true,
       count: projects.length,
@@ -80,12 +98,20 @@ export class Atlas {
         // Shell-friendly format for scripting
         if (data && typeof data === 'object') {
           Object.entries(data).forEach(([k, v]) => {
-            console.log(`${k}="${v}"`);
+            if (typeof v === 'object') {
+              console.log(`${k}="${JSON.stringify(v)}"`);
+            } else {
+              console.log(`${k}="${v}"`);
+            }
           });
         }
         break;
       default: // table
-        console.table(data);
+        if (Array.isArray(data) && data.length > 0) {
+          console.table(data);
+        } else if (data) {
+          console.log(data);
+        }
     }
   }
 
@@ -94,8 +120,8 @@ export class Atlas {
       console.log('No status available');
       return;
     }
-    console.log(`📁 ${status.project}`);
-    console.log(`   Status: ${status.status}`);
+    console.log(`📁 ${status.project || status.name}`);
+    console.log(`   Status: ${status.status || 'unknown'}`);
     if (status.focus) console.log(`   Focus: ${status.focus}`);
     if (status.session) console.log(`   Session: ${status.session.duration}`);
   }
@@ -109,12 +135,15 @@ export class Atlas {
     console.log('─'.repeat(40));
     if (context.project) console.log(`Project: ${context.project}`);
     if (context.focus) console.log(`Focus: ${context.focus}`);
-    if (context.session) console.log(`Session: ${context.session.duration}`);
+    if (context.session) console.log(`Session: ${context.session.duration || 'active'}`);
     if (context.recentCrumbs?.length) {
       console.log('\nRecent breadcrumbs:');
       context.recentCrumbs.forEach(c => {
-        console.log(`  🍞 ${c.text} (${c.ago})`);
+        console.log(`  🍞 ${c.text} (${c.ago || c.getAge?.() || ''})`);
       });
+    }
+    if (context.inboxCount > 0) {
+      console.log(`\n📥 ${context.inboxCount} items in inbox`);
     }
   }
 
@@ -127,7 +156,8 @@ export class Atlas {
     console.log('─'.repeat(40));
     items.forEach((item, i) => {
       const icon = item.type === 'task' ? '☐' : item.type === 'bug' ? '🐛' : '💡';
-      console.log(`${i + 1}. ${icon} ${item.text}`);
+      const age = item.getAge?.() || item.age || '';
+      console.log(`${i + 1}. ${icon} ${item.text} ${age ? `(${age})` : ''}`);
       if (item.project) console.log(`   └─ ${item.project}`);
     });
   }
@@ -140,8 +170,10 @@ export class Atlas {
     console.log('\n🍞 BREADCRUMB TRAIL');
     console.log('─'.repeat(40));
     trail.forEach(crumb => {
-      console.log(`${crumb.timestamp} │ ${crumb.text}`);
-      if (crumb.project) console.log(`           └─ ${crumb.project}`);
+      const icon = crumb.getIcon?.() || '🍞';
+      const time = crumb.timestamp?.toLocaleString?.() || crumb.timestamp;
+      console.log(`${time} │ ${icon} ${crumb.text}`);
+      if (crumb.project) console.log(`             └─ ${crumb.project}`);
     });
   }
 }
@@ -155,7 +187,7 @@ class ProjectsAPI {
   }
 
   async register(path, options = {}) {
-    // Will use RegisterProjectUseCase
+    // TODO: Implement RegisterProjectUseCase
     return { success: true, message: `Registered: ${path}` };
   }
 
@@ -167,7 +199,6 @@ class ProjectsAPI {
     const scanUseCase = this.container.resolve('ScanProjectsUseCase');
     const projects = await scanUseCase.execute();
     
-    // Apply filters
     let filtered = projects;
     if (options.status) {
       filtered = filtered.filter(p => p.status === options.status);
@@ -190,7 +221,7 @@ class ProjectsAPI {
   }
 
   async setFocus(name, focus) {
-    // Will use UpdateStatusUseCase
+    // TODO: Implement UpdateStatusUseCase
     return { success: true };
   }
 
@@ -214,7 +245,7 @@ class SessionsAPI {
 
   async start(project) {
     const createSession = this.container.resolve('CreateSessionUseCase');
-    const session = await createSession.execute({ project });
+    const session = await createSession.execute({ project: project || 'default' });
     return {
       project: session.project,
       focus: session.focus,
@@ -232,8 +263,9 @@ class SessionsAPI {
   }
 
   async current() {
-    // Get current active session
-    return null; // Will be implemented
+    const sessionRepo = this.container.resolve('SessionRepository');
+    const sessions = await sessionRepo.findAll();
+    return sessions.find(s => s.state === 'active') || null;
   }
 }
 
@@ -246,19 +278,23 @@ class CaptureAPI {
   }
 
   async add(text, options = {}) {
-    // Will use CaptureIdeaUseCase (new)
-    return {
-      id: Date.now(),
+    const captureUseCase = this.container.resolve('CaptureIdeaUseCase');
+    return await captureUseCase.execute({
       text,
       type: options.type || 'idea',
       project: options.project,
-      timestamp: new Date().toISOString()
-    };
+      tags: options.tags || []
+    });
   }
 
   async inbox(options = {}) {
-    // Will use GetInboxUseCase (new)
-    return [];
+    const inboxUseCase = this.container.resolve('GetInboxUseCase');
+    return await inboxUseCase.execute(options);
+  }
+
+  async counts() {
+    const captureRepo = this.container.resolve('CaptureRepository');
+    return await captureRepo.getCounts();
   }
 }
 
@@ -271,23 +307,18 @@ class ContextAPI {
   }
 
   async where(project) {
-    // Will use GetContextUseCase (new)
-    return {
-      project,
-      focus: null,
-      session: null,
-      recentCrumbs: []
-    };
+    const contextUseCase = this.container.resolve('GetContextUseCase');
+    return await contextUseCase.execute({ project });
   }
 
   async breadcrumb(text, project) {
-    // Will use LogBreadcrumbUseCase (new)
-    return { success: true };
+    const logCrumbUseCase = this.container.resolve('LogBreadcrumbUseCase');
+    return await logCrumbUseCase.execute({ text, project });
   }
 
   async trail(project, days = 7) {
-    // Will use GetTrailUseCase (new)
-    return [];
+    const trailUseCase = this.container.resolve('GetTrailUseCase');
+    return await trailUseCase.execute({ project, days });
   }
 
   async getStatus(project) {

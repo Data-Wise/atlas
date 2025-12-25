@@ -13,7 +13,7 @@
  * This is a pure business logic layer with no framework dependencies.
  */
 
-import { Session } from '../domain/entities/Session.js'
+import { Session } from '../../domain/entities/Session.js'
 
 export class CreateSessionUseCase {
   /**

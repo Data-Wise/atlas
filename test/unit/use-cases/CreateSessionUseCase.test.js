@@ -2,9 +2,9 @@
  * Unit tests for CreateSessionUseCase
  */
 
-import { CreateSessionUseCase } from '../../../cli/use-cases/CreateSessionUseCase.js'
-import { Session } from '../../../cli/domain/entities/Session.js'
-import { Project } from '../../../cli/domain/entities/Project.js'
+import { CreateSessionUseCase } from '../../../src/use-cases/CreateSessionUseCase.js'
+import { Session } from '../../../src/domain/entities/Session.js'
+import { Project } from '../../../src/domain/entities/Project.js'
 
 // Mock repositories
 class MockSessionRepository {

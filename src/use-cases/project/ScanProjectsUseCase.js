@@ -13,8 +13,8 @@
  * This is a pure business logic layer with no framework dependencies.
  */
 
-import { Project } from '../domain/entities/Project.js'
-import { ProjectType } from '../domain/value-objects/ProjectType.js'
+import { Project } from '../../domain/entities/Project.js'
+import { ProjectType } from '../../domain/value-objects/ProjectType.js'
 
 export class ScanProjectsUseCase {
   /**

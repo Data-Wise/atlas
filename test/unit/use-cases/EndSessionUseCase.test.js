@@ -2,9 +2,9 @@
  * Unit tests for EndSessionUseCase
  */
 
-import { EndSessionUseCase } from '../../../cli/use-cases/EndSessionUseCase.js'
-import { Session } from '../../../cli/domain/entities/Session.js'
-import { Project } from '../../../cli/domain/entities/Project.js'
+import { EndSessionUseCase } from '../../../src/use-cases/EndSessionUseCase.js'
+import { Session } from '../../../src/domain/entities/Session.js'
+import { Project } from '../../../src/domain/entities/Project.js'
 
 // Mock repositories
 class MockSessionRepository {

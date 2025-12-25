@@ -1,20 +1,30 @@
 # Atlas
 
-**Project State Engine** - Registry, sessions, capture, and context management for ADHD-friendly workflows.
+**Project State Engine** - Registry, sessions, capture, and context management for ADHD-friendly workflow.
 
 ## Overview
 
-Atlas is the state management core extracted from flow-cli. It provides:
+Atlas is the state management engine that powers the flow-cli workflow system. It can be used standalone or as a library.
 
-- **Project Registry**: Track all your projects in one place
-- **Session Management**: Track work sessions with duration and notes
-- **Quick Capture**: Frictionless idea/task capture to inbox
-- **Context Reconstruction**: "Where was I?" - rebuild mental state after breaks
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  flow-cli (ZSH)                 atlas (Node.js)                 │
+│  ────────────────               ────────────────                │
+│  • Shell commands               • Clean Architecture            │
+│  • Fast CLI                     • State management              │
+│  • TUI dashboard                • Registry + Sessions           │
+│  Consumes ──────────────────────▶ Standalone engine             │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ## Installation
 
 ```bash
+# Global install
 npm install -g @data-wise/atlas
+
+# Or use directly
+npx @data-wise/atlas status
 ```
 
 ## Quick Start
@@ -23,108 +33,153 @@ npm install -g @data-wise/atlas
 # Initialize atlas
 atlas init
 
-# Register a project
-atlas project add ~/projects/my-project --tags=active,coding
+# Sync projects from .STATUS files
+atlas sync
 
-# Start working
-atlas session start my-project
-
-# Set your focus
-atlas focus my-project "implement feature X"
+# Start a work session
+atlas session start myproject
 
 # Quick capture an idea
-atlas catch "what about using Y instead?"
+atlas catch "check VanderWeele 2015 appendix"
 
-# Check context after a break
+# Leave a breadcrumb
+atlas crumb "stuck on variance estimation"
+
+# Show context ("where was I?")
 atlas where
-
-# End session
-atlas session end "completed feature X"
 ```
 
 ## CLI Commands
 
 ### Project Management
-
 ```bash
-atlas project add [path]        # Register project
-atlas project list              # List all projects
-atlas project show <name>       # Show project details
-atlas project remove <name>     # Unregister project
+atlas project add ~/projects/medrobust --tags=r-package,active
+atlas project list --status=active
+atlas project show medrobust
+atlas project remove oldproject
 ```
 
-### Status & Focus
-
+### Session Management
 ```bash
-atlas focus <project> [text]    # Get/set project focus
-atlas status [project]          # Show project status
+atlas session start medrobust
+atlas session status
+atlas session end "Completed delta method SEs"
 ```
 
-### Sessions
-
+### Quick Capture
 ```bash
-atlas session start [project]   # Start work session
-atlas session end [note]        # End current session
-atlas session status            # Show current session
+atlas catch "check VanderWeele 2015 appendix"
+atlas catch medrobust "add sensitivity plot"
+atlas inbox
+atlas inbox --project=medrobust
 ```
 
-### Capture
-
+### Context & Breadcrumbs
 ```bash
-atlas catch <text>              # Quick capture
-atlas inbox                     # Show inbox
+atlas where                    # Current context
+atlas where medrobust          # Project context
+atlas crumb "stuck on variance"
+atlas trail                    # Recent breadcrumbs
+atlas trail --days=7
 ```
 
-### Context
-
+### Sync
 ```bash
-atlas where [project]           # "Where was I?"
-atlas crumb <text>              # Leave breadcrumb
-atlas trail [project]           # Show breadcrumb history
+atlas sync                     # Import from .STATUS files
+atlas sync --dry-run           # Preview what would sync
 ```
 
-## Library API
+## Programmatic API
 
 ```javascript
 import { Atlas } from '@data-wise/atlas';
 
 const atlas = new Atlas();
 
-// List projects
+// List active projects
 const projects = await atlas.projects.list({ status: 'active' });
 
+// Get project with context
+const ctx = await atlas.context.where('medrobust');
+console.log(ctx.focus);          // "delta method SEs"
+console.log(ctx.session);        // { start: ..., duration: ... }
+console.log(ctx.recentCrumbs);   // ["stuck on variance", ...]
+
+// Capture idea
+await atlas.capture.add("new idea", { project: 'medrobust' });
+
 // Start session
-await atlas.sessions.start('my-project');
-
-// Quick capture
-await atlas.capture.add('new idea', { project: 'my-project' });
-
-// Get context
-const context = await atlas.context.where('my-project');
+const session = await atlas.sessions.start('medrobust');
 ```
 
 ## Architecture
 
-Atlas uses Clean Architecture:
+Atlas follows Clean Architecture principles:
 
 ```
 src/
-├── domain/           # Core business logic (entities, value objects)
-├── use-cases/        # Application-specific business rules
-├── adapters/         # Interface adapters (repositories, controllers)
-├── api/              # API layer
-└── cli/              # CLI interface
+├── domain/                  # Business entities & rules
+│   ├── entities/            # Project, Session, Capture, Breadcrumb
+│   ├── value-objects/       # ProjectType, SessionState
+│   └── repositories/        # Repository interfaces
+│
+├── use-cases/               # Application business logic
+│   ├── project/             # Project operations
+│   ├── session/             # Session management
+│   ├── capture/             # Quick capture
+│   └── context/             # Context reconstruction
+│
+├── adapters/                # External interfaces
+│   ├── repositories/        # FileSystem implementations
+│   ├── Container.js         # Dependency injection
+│   └── events/              # Event publishing
+│
+└── cli/                     # Command-line interface
+```
+
+## Data Storage
+
+Atlas stores data in `~/.atlas/`:
+
+```
+~/.atlas/
+├── config.yaml              # Configuration
+├── registry.json            # Project registry
+├── sessions.json            # Session history
+├── captures.json            # Captured ideas/tasks
+└── breadcrumbs.json         # Breadcrumb trail
 ```
 
 ## Integration with flow-cli
 
-Atlas is designed to work with [flow-cli](../flow-cli), a ZSH workflow system:
+flow-cli (the ZSH plugin) uses atlas for state management:
 
 ```zsh
-# flow-cli commands call atlas under the hood
-work my-project    # Calls: atlas session start my-project
-finish "done"      # Calls: atlas session end "done"
-why                # Calls: atlas where
+# flow-cli command
+work medrobust
+
+# Internally calls:
+# atlas session start medrobust
+# atlas where medrobust
+```
+
+The atlas-bridge in flow-cli provides graceful degradation - flow-cli works without atlas installed, just with reduced features.
+
+## Development
+
+```bash
+# Run tests
+npm test
+
+# Run specific test suite
+npm run test:unit
+npm run test:integration
+
+# Lint
+npm run lint
+
+# Format
+npm run format
 ```
 
 ## License

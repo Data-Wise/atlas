@@ -3,9 +3,9 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach } from '@jest/globals'
-import { StatusController } from '../../cli/adapters/controllers/StatusController.js'
-import { GetStatusUseCase } from '../../cli/use-cases/GetStatusUseCase.js'
-import { Session } from '../../cli/domain/entities/Session.js'
+import { StatusController } from '../../src/adapters/controllers/StatusController.js'
+import { GetStatusUseCase } from '../../src/use-cases/GetStatusUseCase.js'
+import { Session } from '../../src/domain/entities/Session.js'
 import { writeFile, unlink, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { homedir } from 'os'

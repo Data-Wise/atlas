@@ -2,9 +2,9 @@
  * Unit tests for GetStatusUseCase
  */
 
-import { GetStatusUseCase } from '../../../cli/use-cases/GetStatusUseCase.js'
-import { Session } from '../../../cli/domain/entities/Session.js'
-import { Project } from '../../../cli/domain/entities/Project.js'
+import { GetStatusUseCase } from '../../../src/use-cases/GetStatusUseCase.js'
+import { Session } from '../../../src/domain/entities/Session.js'
+import { Project } from '../../../src/domain/entities/Project.js'
 
 // Mock repositories
 class MockSessionRepository {

@@ -4,7 +4,7 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
-import { StatusController } from '../../../cli/adapters/controllers/StatusController.js'
+import { StatusController } from '../../../src/adapters/controllers/StatusController.js'
 
 // Mock console.log to capture output
 let consoleOutput = []

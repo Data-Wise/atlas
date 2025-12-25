@@ -2,8 +2,8 @@
  * Unit tests for Project entity
  */
 
-import { Project } from '../../../../cli/domain/entities/Project.js'
-import { ProjectType } from '../../../../cli/domain/value-objects/ProjectType.js'
+import { Project } from '../../../../src/domain/entities/Project.js'
+import { ProjectType } from '../../../../src/domain/value-objects/ProjectType.js'
 
 describe('Project Entity', () => {
   describe('Construction', () => {

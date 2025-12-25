@@ -2,9 +2,9 @@
  * Unit tests for GetRecentProjectsUseCase
  */
 
-import { GetRecentProjectsUseCase } from '../../../cli/use-cases/GetRecentProjectsUseCase.js'
-import { Project } from '../../../cli/domain/entities/Project.js'
-import { ProjectType } from '../../../cli/domain/value-objects/ProjectType.js'
+import { GetRecentProjectsUseCase } from '../../../src/use-cases/GetRecentProjectsUseCase.js'
+import { Project } from '../../../src/domain/entities/Project.js'
+import { ProjectType } from '../../../src/domain/value-objects/ProjectType.js'
 
 // Mock repository
 class MockProjectRepository {

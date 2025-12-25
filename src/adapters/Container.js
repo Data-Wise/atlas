@@ -14,20 +14,27 @@ import { join } from 'path'
 import { homedir } from 'os'
 import { FileSystemSessionRepository } from './repositories/FileSystemSessionRepository.js'
 import { FileSystemProjectRepository } from './repositories/FileSystemProjectRepository.js'
-import { CreateSessionUseCase } from '../use-cases/CreateSessionUseCase.js'
-import { EndSessionUseCase } from '../use-cases/EndSessionUseCase.js'
-import { ScanProjectsUseCase } from '../use-cases/ScanProjectsUseCase.js'
-import { GetStatusUseCase } from '../use-cases/GetStatusUseCase.js'
-import { GetRecentProjectsUseCase } from '../use-cases/GetRecentProjectsUseCase.js'
+import { FileSystemCaptureRepository } from './repositories/FileSystemCaptureRepository.js'
+import { FileSystemBreadcrumbRepository } from './repositories/FileSystemBreadcrumbRepository.js'
+import { CreateSessionUseCase } from '../use-cases/session/CreateSessionUseCase.js'
+import { EndSessionUseCase } from '../use-cases/session/EndSessionUseCase.js'
+import { ScanProjectsUseCase } from '../use-cases/project/ScanProjectsUseCase.js'
+import { GetStatusUseCase } from '../use-cases/project/GetStatusUseCase.js'
+import { GetRecentProjectsUseCase } from '../use-cases/project/GetRecentProjectsUseCase.js'
+import { CaptureIdeaUseCase } from '../use-cases/capture/CaptureIdeaUseCase.js'
+import { GetInboxUseCase } from '../use-cases/capture/GetInboxUseCase.js'
+import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
+import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
+import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 
 export class Container {
   constructor(options = {}) {
     this.instances = {}
 
-    // Configuration
+    // Configuration - use ~/.atlas by default for atlas
     this.config = {
-      dataDir: options.dataDir || join(homedir(), '.flow-cli'),
+      dataDir: options.dataDir || join(homedir(), '.atlas'),
       detectorScriptPath: options.detectorScriptPath || null
     }
   }
@@ -43,7 +50,9 @@ export class Container {
     return this.instances[name]
   }
 
-  // Repositories (Adapters Layer)
+  // ============================================================================
+  // REPOSITORIES (Adapters Layer)
+  // ============================================================================
 
   getSessionRepository() {
     return this._resolve('sessionRepository', () => {
@@ -59,7 +68,21 @@ export class Container {
     })
   }
 
-  // Use Cases (Application Layer)
+  getCaptureRepository() {
+    return this._resolve('captureRepository', () => {
+      return new FileSystemCaptureRepository(this.config.dataDir)
+    })
+  }
+
+  getBreadcrumbRepository() {
+    return this._resolve('breadcrumbRepository', () => {
+      return new FileSystemBreadcrumbRepository(this.config.dataDir)
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Session (Application Layer)
+  // ============================================================================
 
   getCreateSessionUseCase() {
     return this._resolve('createSessionUseCase', () => {
@@ -72,6 +95,10 @@ export class Container {
       return new EndSessionUseCase(this.getSessionRepository(), this.getProjectRepository())
     })
   }
+
+  // ============================================================================
+  // USE CASES - Project
+  // ============================================================================
 
   getScanProjectsUseCase() {
     return this._resolve('scanProjectsUseCase', () => {
@@ -91,7 +118,62 @@ export class Container {
     })
   }
 
-  // Services (Infrastructure Layer)
+  // ============================================================================
+  // USE CASES - Capture
+  // ============================================================================
+
+  getCaptureIdeaUseCase() {
+    return this._resolve('captureIdeaUseCase', () => {
+      return new CaptureIdeaUseCase({
+        captureRepository: this.getCaptureRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getGetInboxUseCase() {
+    return this._resolve('getInboxUseCase', () => {
+      return new GetInboxUseCase({
+        captureRepository: this.getCaptureRepository()
+      })
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Context
+  // ============================================================================
+
+  getGetContextUseCase() {
+    return this._resolve('getContextUseCase', () => {
+      return new GetContextUseCase({
+        projectRepository: this.getProjectRepository(),
+        sessionRepository: this.getSessionRepository(),
+        captureRepository: this.getCaptureRepository(),
+        breadcrumbRepository: this.getBreadcrumbRepository()
+      })
+    })
+  }
+
+  getLogBreadcrumbUseCase() {
+    return this._resolve('logBreadcrumbUseCase', () => {
+      return new LogBreadcrumbUseCase({
+        breadcrumbRepository: this.getBreadcrumbRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getGetTrailUseCase() {
+    return this._resolve('getTrailUseCase', () => {
+      return new GetTrailUseCase({
+        breadcrumbRepository: this.getBreadcrumbRepository()
+      })
+    })
+  }
+
+  // ============================================================================
+  // SERVICES (Infrastructure Layer)
+  // ============================================================================
 
   getEventPublisher() {
     return this._resolve('eventPublisher', () => {
@@ -107,15 +189,67 @@ export class Container {
   }
 
   /**
+   * Resolve a use case by name
+   * Maps string names to getter methods for convenient access
+   */
+  resolve(name) {
+    const map = {
+      // Project use cases
+      'GetStatusUseCase': () => this.getGetStatusUseCase(),
+      'ScanProjectsUseCase': () => this.getScanProjectsUseCase(),
+      'GetRecentProjectsUseCase': () => this.getGetRecentProjectsUseCase(),
+      
+      // Session use cases
+      'CreateSessionUseCase': () => this.getCreateSessionUseCase(),
+      'EndSessionUseCase': () => this.getEndSessionUseCase(),
+      
+      // Capture use cases
+      'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
+      'GetInboxUseCase': () => this.getGetInboxUseCase(),
+      
+      // Context use cases
+      'GetContextUseCase': () => this.getGetContextUseCase(),
+      'LogBreadcrumbUseCase': () => this.getLogBreadcrumbUseCase(),
+      'GetTrailUseCase': () => this.getGetTrailUseCase(),
+      
+      // Repositories
+      'SessionRepository': () => this.getSessionRepository(),
+      'ProjectRepository': () => this.getProjectRepository(),
+      'CaptureRepository': () => this.getCaptureRepository(),
+      'BreadcrumbRepository': () => this.getBreadcrumbRepository(),
+      
+      // Services
+      'EventPublisher': () => this.getEventPublisher()
+    };
+    
+    if (!map[name]) {
+      throw new Error(`Unknown dependency: ${name}`);
+    }
+    return map[name]();
+  }
+
+  /**
    * Get all use cases
    */
   getUseCases() {
     return {
+      // Session
       createSession: this.getCreateSessionUseCase(),
       endSession: this.getEndSessionUseCase(),
+      
+      // Project
       scanProjects: this.getScanProjectsUseCase(),
       getStatus: this.getGetStatusUseCase(),
-      getRecentProjects: this.getGetRecentProjectsUseCase()
+      getRecentProjects: this.getGetRecentProjectsUseCase(),
+      
+      // Capture
+      captureIdea: this.getCaptureIdeaUseCase(),
+      getInbox: this.getGetInboxUseCase(),
+      
+      // Context
+      getContext: this.getGetContextUseCase(),
+      logBreadcrumb: this.getLogBreadcrumbUseCase(),
+      getTrail: this.getGetTrailUseCase()
     }
   }
 
@@ -125,7 +259,9 @@ export class Container {
   getRepositories() {
     return {
       sessions: this.getSessionRepository(),
-      projects: this.getProjectRepository()
+      projects: this.getProjectRepository(),
+      captures: this.getCaptureRepository(),
+      breadcrumbs: this.getBreadcrumbRepository()
     }
   }
 }

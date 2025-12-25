@@ -9,8 +9,8 @@
  */
 
 import { jest } from '@jest/globals'
-import { Dashboard } from '../../cli/ui/Dashboard.js'
-import { GetStatusUseCase } from '../../cli/use-cases/GetStatusUseCase.js'
+import { Dashboard } from '../../src/ui/Dashboard.js'
+import { GetStatusUseCase } from '../../src/use-cases/GetStatusUseCase.js'
 
 // Mock repositories
 class MockSessionRepository {

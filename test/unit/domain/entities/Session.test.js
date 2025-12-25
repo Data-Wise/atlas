@@ -2,14 +2,14 @@
  * Unit tests for Session entity
  */
 
-import { Session } from '../../../../cli/domain/entities/Session.js'
-import { SessionState } from '../../../../cli/domain/value-objects/SessionState.js'
+import { Session } from '../../../../src/domain/entities/Session.js'
+import { SessionState } from '../../../../src/domain/value-objects/SessionState.js'
 import {
   SessionStartedEvent,
   SessionEndedEvent,
   SessionPausedEvent,
   SessionResumedEvent
-} from '../../../../cli/domain/events/SessionEvent.js'
+} from '../../../../src/domain/events/SessionEvent.js'
 
 describe('Session Entity', () => {
   describe('Construction', () => {

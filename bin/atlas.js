@@ -10,10 +10,22 @@ import { Atlas } from '../src/index.js';
 const program = new Command();
 const atlas = new Atlas();
 
+// Check for -v early (before Commander.js parses)
+if (process.argv.includes('-v')) {
+  console.log('0.1.0');
+  process.exit(0);
+}
+
 program
   .name('atlas')
   .description('Project state engine for ADHD-friendly workflow management')
-  .version('0.1.0');
+  .version('0.1.0', '-V, --version', 'output the version number');
+
+// Handle unknown commands
+program.on('command:*', function (operands) {
+  console.error(`error: unknown command '${operands[0]}'`);
+  process.exit(1);
+});
 
 // ============================================================================
 // PROJECT COMMANDS
@@ -201,6 +213,12 @@ program
     const result = await atlas.sync(options);
     console.log(result.message);
   });
+
+// Show help if no command was provided (before parsing to avoid Commander errors)
+if (process.argv.length <= 2) {
+  program.outputHelp();
+  process.exit(0);
+}
 
 // Parse and execute
 program.parse();

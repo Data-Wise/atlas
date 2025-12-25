@@ -1,14 +1,14 @@
 /**
- * Jest configuration for ES modules
+ * Jest configuration for Atlas - ES modules
  */
 export default {
   testEnvironment: 'node',
   transform: {},
-  rootDir: '..',
-  testMatch: ['<rootDir>/tests/**/*.test.js'],
-  collectCoverageFrom: ['<rootDir>/cli/domain/**/*.js', '!<rootDir>/cli/domain/**/*.test.js'],
-  coverageDirectory: '<rootDir>/cli/coverage',
+  rootDir: '.',
+  testMatch: ['<rootDir>/test/**/*.test.js'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.js', '!<rootDir>/src/**/*.test.js'],
+  coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/docs/', '<rootDir>/site/'],
+  testPathIgnorePatterns: ['/node_modules/'],
   verbose: true
 }

@@ -3,8 +3,8 @@
  */
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
-import { UpdateStatusFileUseCase } from '../../../cli/use-cases/status/UpdateStatusFileUseCase.js'
-import { Session } from '../../../cli/domain/entities/Session.js'
+import { UpdateStatusFileUseCase } from '../../../src/use-cases/status/UpdateStatusFileUseCase.js'
+import { Session } from '../../../src/domain/entities/Session.js'
 
 // Mock repositories
 class MockSessionRepository {
