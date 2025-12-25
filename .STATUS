@@ -1,10 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🔧 Development
+## Phase: 🚀 Release Ready
 ## Priority: 1
+## Progress: 90
 
-## Focus: Feature-complete MVP with all core functionality
+## Focus: npm publish pending, Homebrew ready
 
 ## Quick Context
 Atlas is the project state engine extracted from flow-cli. Clean Architecture with
@@ -15,36 +16,43 @@ CLI and programmatic API available. SQLite and filesystem storage backends.
 - [x] Extracted Clean Architecture code from flow-cli/cli
 - [x] Added Capture and Breadcrumb entities (62 tests)
 - [x] Created capture and context use-cases
-- [x] Updated Container with all repositories
 - [x] CLI commands: project, session, catch, crumb, where, trail
-- [x] Implement SQLite repository option for performance (29 tests)
-- [x] Add registry persistence via SyncRegistryUseCase
-- [x] Complete sync command with watch mode
+- [x] SQLite repository option for performance (29 tests)
+- [x] SyncRegistryUseCase for .STATUS file integration
 - [x] Migration tool (filesystem ↔ SQLite)
-- [x] RegisterProjectUseCase (manual project add)
-
-## Current Tasks
-- [x] UpdateStatusUseCase for programmatic .STATUS updates (41 tests)
+- [x] UpdateStatusUseCase + CLI (41 tests)
 - [x] Interactive triage mode (`atlas inbox --triage`)
 - [x] Dashboard TUI (`atlas dashboard`)
 - [x] Shell completions (`atlas completions zsh|bash|fish`)
+- [x] E2E tests for CLI commands (41 tests, 718 total)
+- [x] Complete README documentation
+- [x] GitHub repo: github.com/Data-Wise/atlas
+- [x] Homebrew formula: `brew install Data-Wise/tap/atlas`
+
+## Current Tasks
+- [ ] Publish to npm: `npm publish --access public --otp=XXXXXX`
 
 ## Next Tasks
-- [ ] Add E2E tests for new CLI commands
-- [ ] Test dashboard on actual project data
-- [ ] Document API in README
-- [ ] Package for npm publish
+- [ ] Test Homebrew installation on clean system
+- [ ] Add GitHub Actions CI/CD pipeline
+- [ ] Create GitHub release with changelog
+- [ ] Integration with flow-cli (atlas-bridge)
 
 ## Future Enhancements
 - [ ] Project templates (init --template node/r-package)
 - [ ] Remote sync (GitHub/GitLab status)
 - [ ] VS Code extension for .STATUS editing
 - [ ] Mobile-friendly web dashboard
+- [ ] `atlas focus` command for pomodoro-style sessions
+- [ ] `atlas report` for session analytics
 
 ## Blockers
 None
 
 ## Links
+- GitHub: https://github.com/Data-Wise/atlas
+- Homebrew: `brew install Data-Wise/tap/atlas`
+- npm (pending): `npm install -g @data-wise/atlas`
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Architecture
@@ -54,9 +62,8 @@ atlas/
 │   ├── domain/          # Entities, Value Objects
 │   ├── use-cases/       # Business logic
 │   ├── adapters/        # Repositories, Container
-│   ├── cli/             # CLI commands
-│   └── api/             # Programmatic API
-└── test/                # Unit, Integration, E2E
+│   └── cli/             # CLI commands + dashboard
+└── test/                # 718 tests (Unit, Integration, E2E)
 ```
 
 ## Session Log
@@ -65,7 +72,10 @@ atlas/
 - 2025-12-25: Implemented SQLite storage backend (29 integration tests)
 - 2025-12-25: Added SyncRegistryUseCase for .STATUS file integration
 - 2025-12-25: CLI enhancements (--storage, migrate, watch mode, register)
-- 2025-12-25: UpdateStatusUseCase + CLI (41 new tests, 691 total)
+- 2025-12-25: UpdateStatusUseCase + CLI (41 new tests)
 - 2025-12-25: Interactive inbox triage mode (TriageInboxUseCase)
 - 2025-12-25: Dashboard TUI with blessed-contrib
 - 2025-12-25: Shell completions (zsh/bash/fish)
+- 2025-12-25: E2E tests, README docs, npm packaging (718 tests)
+- 2025-12-25: GitHub repo created, v0.1.0 tagged
+- 2025-12-25: Homebrew formula added to Data-Wise/homebrew-tap
