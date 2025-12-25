@@ -12,10 +12,19 @@
 
 import { join } from 'path'
 import { homedir } from 'os'
+
+// FileSystem repositories
 import { FileSystemSessionRepository } from './repositories/FileSystemSessionRepository.js'
 import { FileSystemProjectRepository } from './repositories/FileSystemProjectRepository.js'
 import { FileSystemCaptureRepository } from './repositories/FileSystemCaptureRepository.js'
 import { FileSystemBreadcrumbRepository } from './repositories/FileSystemBreadcrumbRepository.js'
+
+// SQLite repositories
+import { SQLiteDatabase } from './repositories/SQLiteDatabase.js'
+import { SQLiteProjectRepository } from './repositories/SQLiteProjectRepository.js'
+import { SQLiteSessionRepository } from './repositories/SQLiteSessionRepository.js'
+import { SQLiteCaptureRepository } from './repositories/SQLiteCaptureRepository.js'
+import { SQLiteBreadcrumbRepository } from './repositories/SQLiteBreadcrumbRepository.js'
 import { CreateSessionUseCase } from '../use-cases/session/CreateSessionUseCase.js'
 import { EndSessionUseCase } from '../use-cases/session/EndSessionUseCase.js'
 import { ScanProjectsUseCase } from '../use-cases/project/ScanProjectsUseCase.js'
@@ -29,14 +38,41 @@ import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 
 export class Container {
+  /**
+   * Storage types supported
+   */
+  static STORAGE_TYPES = {
+    FILESYSTEM: 'filesystem',
+    SQLITE: 'sqlite'
+  }
+
+  /**
+   * @param {Object} options
+   * @param {string} [options.dataDir] - Data directory path
+   * @param {string} [options.storage='filesystem'] - Storage type: 'filesystem' or 'sqlite'
+   * @param {string} [options.detectorScriptPath] - Path to project detector script
+   */
   constructor(options = {}) {
     this.instances = {}
 
     // Configuration - use ~/.atlas by default for atlas
     this.config = {
       dataDir: options.dataDir || join(homedir(), '.atlas'),
+      storage: options.storage || Container.STORAGE_TYPES.FILESYSTEM,
       detectorScriptPath: options.detectorScriptPath || null
     }
+
+    // Validate storage type
+    if (!Object.values(Container.STORAGE_TYPES).includes(this.config.storage)) {
+      throw new Error(`Invalid storage type: ${this.config.storage}. Use 'filesystem' or 'sqlite'.`)
+    }
+  }
+
+  /**
+   * Check if using SQLite storage
+   */
+  usingSQLite() {
+    return this.config.storage === Container.STORAGE_TYPES.SQLITE
   }
 
   /**
@@ -54,8 +90,23 @@ export class Container {
   // REPOSITORIES (Adapters Layer)
   // ============================================================================
 
+  /**
+   * Get the SQLite database instance (shared across all SQLite repositories)
+   */
+  getDatabase() {
+    return this._resolve('database', () => {
+      const dbPath = join(this.config.dataDir, 'atlas.db')
+      const db = new SQLiteDatabase(dbPath)
+      db.init()
+      return db
+    })
+  }
+
   getSessionRepository() {
     return this._resolve('sessionRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteSessionRepository(this.getDatabase())
+      }
       const filePath = join(this.config.dataDir, 'sessions.json')
       return new FileSystemSessionRepository(filePath)
     })
@@ -63,6 +114,20 @@ export class Container {
 
   getProjectRepository() {
     return this._resolve('projectRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteProjectRepository(this.getDatabase())
+      }
+      const filePath = join(this.config.dataDir, 'projects.json')
+      return new FileSystemProjectRepository(filePath, this.config.detectorScriptPath)
+    })
+  }
+
+  /**
+   * Get FileSystem project repository for scanning
+   * (always uses FileSystem since scanning is a filesystem operation)
+   */
+  getFileSystemProjectRepository() {
+    return this._resolve('fsProjectRepository', () => {
       const filePath = join(this.config.dataDir, 'projects.json')
       return new FileSystemProjectRepository(filePath, this.config.detectorScriptPath)
     })
@@ -70,12 +135,18 @@ export class Container {
 
   getCaptureRepository() {
     return this._resolve('captureRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteCaptureRepository(this.getDatabase())
+      }
       return new FileSystemCaptureRepository(this.config.dataDir)
     })
   }
 
   getBreadcrumbRepository() {
     return this._resolve('breadcrumbRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteBreadcrumbRepository(this.getDatabase())
+      }
       return new FileSystemBreadcrumbRepository(this.config.dataDir)
     })
   }
@@ -185,7 +256,20 @@ export class Container {
    * Clear all cached instances (useful for testing)
    */
   clear() {
+    // Close database if it exists
+    if (this.instances.database) {
+      this.instances.database.close()
+    }
     this.instances = {}
+  }
+
+  /**
+   * Close the container and release resources
+   */
+  close() {
+    if (this.instances.database) {
+      this.instances.database.close()
+    }
   }
 
   /**
