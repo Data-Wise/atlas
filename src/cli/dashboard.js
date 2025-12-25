@@ -488,6 +488,23 @@ export async function runDashboard(atlas, options = {}) {
     loadDetailView(project)
   }
 
+  function updateOverviewFor(project) {
+    // Update sidebar to show selected project info
+    const typeStr = getTypeStr(project.type)
+    const status = project.status || 'unknown'
+    const statusIcon = getStatusIcon(status)
+
+    statsBox.setContent(
+      `{bold}Selected{/}\n` +
+      `───────────────────\n` +
+      `{cyan-fg}${project.name}{/}\n` +
+      `Type: ${typeStr}\n` +
+      `Status: ${statusIcon} ${status}\n\n` +
+      `{gray-fg}Press Enter for details{/}`
+    )
+    screen.render()
+  }
+
   // ============================================================================
   // KEYBOARD HANDLERS
   // ============================================================================
@@ -508,11 +525,17 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
-  // Enter - show detail
-  projectsTable.key(['enter'], () => {
-    const selected = projectsTable.rows?.selected || 0
-    if (projectList[selected]) {
-      showDetailView(projectList[selected])
+  // Enter - show detail (using rows.on for blessed-contrib table)
+  projectsTable.rows.on('select', (item, index) => {
+    if (projectList[index]) {
+      showDetailView(projectList[index])
+    }
+  })
+
+  // Update overview when selection changes
+  projectsTable.rows.on('select item', (item, index) => {
+    if (projectList[index] && currentView === 'main') {
+      updateOverviewFor(projectList[index])
     }
   })
 
