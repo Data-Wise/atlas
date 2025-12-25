@@ -147,159 +147,234 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
-  // MAIN VIEW WIDGETS
+  // MAIN VIEW WIDGETS - Card Stack Design
   // ============================================================================
 
   const mainView = blessed.box({
     top: 0,
     left: 0,
     width: '100%',
-    height: '100%'
+    height: '100%',
+    style: { bg: 'black' }
   })
 
-  // Status bar
-  const statusBar = blessed.box({
+  // Title bar - minimal
+  const titleBar = blessed.box({
     parent: mainView,
     top: 0,
     left: 0,
     width: '100%',
-    height: 3,
-    tags: true,
-    style: { fg: 'white', bg: 'blue' }
-  })
-
-  // Filter bar
-  const filterBar = blessed.box({
-    parent: mainView,
-    top: 3,
-    left: 0,
-    width: '65%',
     height: 1,
     tags: true,
-    style: { fg: 'white', bg: 'black' }
+    style: { fg: 'white', bg: 'black' },
+    content: ' {bold}ATLAS{/bold}  {gray-fg}─────────────────────────────────────────────────────────{/}'
   })
 
-  // Search input (hidden by default)
-  const searchInput = blessed.textbox({
+  // Card container - scrollable area for project cards
+  const cardContainer = blessed.box({
     parent: mainView,
-    top: 3,
-    left: 0,
-    width: '40%',
-    height: 1,
+    top: 2,
+    left: 2,
+    right: 2,
+    bottom: 4,
     tags: true,
-    hidden: true,
-    style: {
-      fg: 'white',
-      bg: 'blue',
-      focus: { bg: 'blue' }
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: {
+      ch: '│',
+      style: { fg: 'gray' }
     },
-    inputOnFocus: true
-  })
-
-  // Projects table
-  const projectsTable = contrib.table({
-    parent: mainView,
-    top: 4,
-    left: 0,
-    width: '65%',
-    height: '100%-7',
     keys: true,
     vi: true,
-    mouse: true,
-    fg: 'white',
-    selectedFg: 'black',
-    selectedBg: 'cyan',
-    interactive: true,
-    label: ' {bold}Projects{/bold} ',
-    tags: true,
-    border: { type: 'line', fg: 'blue' },
-    columnSpacing: 1,
-    columnWidth: [2, 16, 6, 10, 8]  // Focus, Name, Type, Status, Last
+    mouse: true
   })
 
-  // Sidebar
-  const sidebar = blessed.box({
+  // Project cards will be created dynamically
+  let projectCards = []
+  let selectedCardIndex = 0
+  const CARD_HEIGHT = 4
+  const MAX_VISIBLE_CARDS = Math.floor((screen.height - 8) / CARD_HEIGHT)
+
+  // Stats footer - always visible
+  const statsFooter = blessed.box({
     parent: mainView,
-    top: 4,
-    right: 0,
-    width: '35%',
-    height: '100%-7',
-    border: { type: 'line', fg: 'blue' },
-    label: ' {bold}Overview{/bold} ',
-    tags: true
-  })
-
-  // Activity sparkline in sidebar
-  const activityLabel = blessed.box({
-    parent: sidebar,
-    top: 0,
-    left: 1,
-    width: '100%-4',
+    bottom: 2,
+    left: 0,
+    width: '100%',
     height: 1,
     tags: true,
-    content: '{bold}This Week{/bold}'
+    style: { fg: 'gray', bg: 'black' },
+    align: 'center'
   })
 
-  // Sparkline with fallback for terminal compatibility issues
-  let activitySpark = null
-  if (canvasSupported) {
-    activitySpark = contrib.sparkline({
-      parent: sidebar,
-      top: 1,
-      left: 1,
-      width: '100%-4',
-      height: 4,
-      tags: true,
-      style: { fg: 'cyan' }
-    })
-  } else {
-    // Text-based fallback when canvas widgets won't work
-    activitySpark = blessed.box({
-      parent: sidebar,
-      top: 1,
-      left: 1,
-      width: '100%-4',
-      height: 4,
-      tags: true,
-      content: '{gray-fg}(Activity graph unavailable){/}'
-    })
-  }
-
-  // Stats in sidebar
-  const statsBox = blessed.box({
-    parent: sidebar,
-    top: 6,
-    left: 1,
-    right: 1,
-    height: 8,
-    tags: true
-  })
-
-  // Recent captures
-  const capturesBox = blessed.box({
-    parent: sidebar,
-    top: 15,
-    left: 1,
-    right: 1,
-    bottom: 1,
-    tags: true,
-    label: ' 💡 Inbox ',
-    border: { type: 'line', fg: 'gray' }
-  })
-
-  // Command bar
+  // Command bar - minimal
   const commandBar = blessed.box({
     parent: mainView,
     bottom: 0,
     left: 0,
     width: '100%',
-    height: 3,
+    height: 2,
     tags: true,
-    style: { fg: 'white', bg: 'black' },
-    content: ' {cyan-fg}q{/}Quit {cyan-fg}/{/}Search {cyan-fg}a{/}{cyan-fg}p{/}{cyan-fg}s{/}{cyan-fg}*{/}Filter {cyan-fg}Enter{/}Details {cyan-fg}s{/}Session {cyan-fg}c{/}Capture {cyan-fg}r{/}Refresh {yellow-fg}↑↓{/}Nav'
+    style: { fg: 'white', bg: '#1a1a1a' },
+    content: '\n  {cyan-fg}↑↓{/} Navigate   {cyan-fg}Enter{/} Open   {cyan-fg}s{/} Start Session   {cyan-fg}c{/} Capture   {cyan-fg}?{/} Help   {cyan-fg}q{/} Quit'
   })
 
+  // Search input (hidden by default)
+  const searchInput = blessed.textbox({
+    parent: mainView,
+    top: 1,
+    left: 2,
+    width: '50%',
+    height: 1,
+    tags: true,
+    hidden: true,
+    style: {
+      fg: 'white',
+      bg: '#333',
+      focus: { bg: '#333' }
+    },
+    inputOnFocus: true
+  })
+
+  // Filter indicator
+  const filterBar = blessed.box({
+    parent: mainView,
+    top: 1,
+    left: 2,
+    width: '100%-4',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' }
+  })
+
+  // Legacy compatibility aliases
+  const statusBar = titleBar
+  const projectsTable = {
+    rows: { selected: 0, emit: () => {} },
+    setData: () => {},
+    focus: () => cardContainer.focus()
+  }
+  const sidebar = blessed.box({ hidden: true })
+  const activitySpark = { setData: () => {} }
+  const statsBox = blessed.box({ setContent: () => {} })
+  const capturesBox = blessed.box({ setContent: () => {} })
+
   screen.append(mainView)
+
+  // ============================================================================
+  // CARD CREATION AND MANAGEMENT
+  // ============================================================================
+
+  function createProjectCard(project, index, isSelected, isActive) {
+    const cardTop = index * CARD_HEIGHT
+
+    // Card colors based on state
+    let borderColor = 'gray'
+    let bgColor = 'black'
+    let nameColor = 'white'
+
+    if (isActive) {
+      borderColor = 'green'
+      nameColor = 'green'
+    }
+    if (isSelected) {
+      borderColor = 'cyan'
+      bgColor = '#111'
+    }
+
+    const card = blessed.box({
+      parent: cardContainer,
+      top: cardTop,
+      left: 0,
+      width: '100%-2',
+      height: CARD_HEIGHT - 1,
+      tags: true,
+      border: { type: 'line', fg: borderColor },
+      style: { bg: bgColor }
+    })
+
+    // Project name and status
+    const statusIcon = getStatusIcon(project.status || 'unknown')
+    const activeIndicator = isActive ? '{green-fg}● ACTIVE{/}' : ''
+    const timeInfo = project.lastSession ? timeAgo(project.lastSession) : ''
+
+    const nameDisplay = isActive
+      ? `{bold}{green-fg}${project.name}{/}{/bold}`
+      : `{bold}{${nameColor}-fg}${project.name}{/}{/bold}`
+
+    // Line 1: Name and active status
+    const line1 = blessed.box({
+      parent: card,
+      top: 0,
+      left: 1,
+      width: '100%-4',
+      height: 1,
+      tags: true,
+      content: `${statusIcon} ${nameDisplay}  ${activeIndicator}`
+    })
+
+    // Line 2: Type, status, time
+    const typeStr = getTypeStr(project.type)
+    const statusStr = project.status || 'unknown'
+
+    const line2 = blessed.box({
+      parent: card,
+      top: 1,
+      left: 1,
+      width: '100%-4',
+      height: 1,
+      tags: true,
+      content: `  {gray-fg}${typeStr} • ${statusStr}${timeInfo ? ' • ' + timeInfo : ''}{/}`
+    })
+
+    return card
+  }
+
+  function renderCards() {
+    // Clear existing cards
+    for (const card of projectCards) {
+      card.destroy()
+    }
+    projectCards = []
+
+    // Create new cards
+    for (let i = 0; i < filteredList.length; i++) {
+      const project = filteredList[i]
+      const isSelected = i === selectedCardIndex
+      const isActive = project.name === activeSessionProject
+      const card = createProjectCard(project, i, isSelected, isActive)
+      projectCards.push(card)
+    }
+
+    // Show pagination indicator if needed
+    if (filteredList.length > MAX_VISIBLE_CARDS) {
+      const moreCount = filteredList.length - MAX_VISIBLE_CARDS
+      titleBar.setContent(
+        ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
+        `{gray-fg}${filteredList.length} projects (scroll for more){/}`
+      )
+    } else {
+      titleBar.setContent(
+        ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
+        `{gray-fg}${filteredList.length} projects{/}`
+      )
+    }
+
+    // Scroll to selected card
+    cardContainer.scrollTo(selectedCardIndex * CARD_HEIGHT)
+
+    screen.render()
+  }
+
+  function selectCard(index) {
+    if (index < 0) index = 0
+    if (index >= filteredList.length) index = filteredList.length - 1
+    if (index < 0) return
+
+    selectedCardIndex = index
+    selectedProject = filteredList[index]
+    renderCards()
+  }
 
   // ============================================================================
   // DETAIL VIEW WIDGETS
@@ -627,16 +702,20 @@ export async function runDashboard(atlas, options = {}) {
       projectList = projects
 
       // Get active session to highlight its project
+      let currentSession = null
+      let sessionDuration = 0
       try {
-        const session = await atlas.sessions.current()
-        activeSessionProject = session?.project || null
+        currentSession = await atlas.sessions.current()
+        activeSessionProject = currentSession?.project || null
+        if (currentSession && currentSession.getDuration) {
+          sessionDuration = currentSession.getDuration()
+        }
       } catch (e) {
         activeSessionProject = null
       }
 
-      // Status counts (for all projects, regardless of filter)
+      // Status counts
       const counts = { active: 0, paused: 0, stable: 0, other: 0 }
-
       for (const p of projects) {
         const category = getStatusCategory(p.status || 'unknown')
         if (category === 'a') counts.active++
@@ -648,127 +727,40 @@ export async function runDashboard(atlas, options = {}) {
       // Apply filters
       filteredList = projects.filter(matchesFilter)
 
-      // Build table rows
-      const projectRows = []
-
-      for (const p of filteredList) {
-        const rawStatus = p.status || 'unknown'
-        const typeStr = getTypeStr(p.type)
-        const statusIcon = getStatusIcon(rawStatus)
-
-        // Focus indicator: ► for active session's project
-        const focusIndicator = (p.name === activeSessionProject) ? '{green-fg}►{/}' : ' '
-
-        // Time since last session (mock for now - would need session history)
-        const lastActive = p.lastSession ? timeAgo(p.lastSession) : '-'
-
-        projectRows.push([
-          focusIndicator,
-          String(p.name || '').substring(0, 14),
-          String(typeStr).substring(0, 5),
-          statusIcon + ' ' + String(rawStatus).substring(0, 6),
-          lastActive
-        ])
-      }
-
       // Update filter bar
       updateFilterBar()
 
-      // Update table
-      projectsTable.setData({
-        headers: ['', 'Project', 'Type', 'Status', 'Last'],
-        data: projectRows.slice(0, 25)
-      })
-
-      // Session info for status bar
-      let sessionInfo = '{yellow-fg}No session{/}'
-      let sessionDuration = 0
-      try {
-        const session = await atlas.sessions.current()
-        if (session) {
-          sessionDuration = session.getDuration ? session.getDuration() : 0
-          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} (${sessionDuration}m)`
-        }
-      } catch (e) { /* ignore */ }
-
-      // Show filter status and counts
-      const filterLabel = currentFilter === '*' ? '' : ` [${currentFilter.toUpperCase()}]`
-      statusBar.setContent(
-        ` ${sessionInfo}  {gray-fg}│{/}  ` +
-        `{green-fg}●{/}${counts.active} ` +
-        `{yellow-fg}●{/}${counts.paused} ` +
-        `{cyan-fg}●{/}${counts.stable}` +
-        `${filterLabel}  ` +
-        `{gray-fg}│{/}  ${filteredList.length}/${projects.length}`
-      )
-
-      // Activity sparkline - real session data for past 7 days
-      try {
-        const sessionRepo = atlas.container.resolve('SessionRepository')
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        const sessions = await sessionRepo.list({ since: sevenDaysAgo })
-
-        // Count sessions per day (past 7 days)
-        const weekData = [0, 0, 0, 0, 0, 0, 0]
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        for (const s of sessions) {
-          const sessionDate = new Date(s.startTime)
-          sessionDate.setHours(0, 0, 0, 0)
-          const daysAgo = Math.floor((today - sessionDate) / (24 * 60 * 60 * 1000))
-          if (daysAgo >= 0 && daysAgo < 7) {
-            weekData[6 - daysAgo]++ // Most recent day is at index 6
-          }
-        }
-
-        if (canvasSupported) {
-          activitySpark.setData(['Sessions'], [weekData])
-        }
-      } catch (e) {
-        // Fallback to zeros if can't load
-        if (canvasSupported) {
-          activitySpark.setData(['Sessions'], [[0, 0, 0, 0, 0, 0, 0]])
-        }
+      // Render cards
+      if (selectedCardIndex >= filteredList.length) {
+        selectedCardIndex = Math.max(0, filteredList.length - 1)
       }
+      if (filteredList.length > 0) {
+        selectedProject = filteredList[selectedCardIndex]
+      }
+      renderCards()
 
-      // Stats
+      // Update stats footer with useful info
+      let todayStats = { sessions: 0, totalDuration: 0 }
+      let streak = 0
       try {
         const status = await atlas.context.getStatus()
-        const today = status?.today || {}
-        const pct = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
+        todayStats = status?.today || todayStats
+        streak = status?.streak || 0
+      } catch (e) { /* ignore */ }
 
-        statsBox.setContent(
-          `{bold}Today{/}\n` +
-          `───────────────────\n` +
-          `Sessions: ${today.sessions || 0}/5\n` +
-          progressBar(pct, 18) + `\n\n` +
-          `Duration: {cyan-fg}${today.totalDuration || 0}m{/}\n` +
-          `Flow:     {green-fg}${today.flowSessions || 0}{/}`
-        )
-      } catch (e) {
-        statsBox.setContent('{gray-fg}Loading...{/}')
-      }
+      const sessionStr = currentSession
+        ? `{green-fg}●{/} ${currentSession.project} (${sessionDuration}m)`
+        : '{gray-fg}No active session{/}'
 
-      // Captures
-      try {
-        const captures = await atlas.capture.inbox({ limit: 4 })
-        let text = ''
-        if (captures?.length) {
-          captures.forEach(c => {
-            const icon = c.type === 'task' ? '☐' : '💡'
-            text += ` ${icon} ${(c.text || '').substring(0, 22)}\n`
-          })
-        } else {
-          text = ' {gray-fg}Empty inbox!{/}'
-        }
-        capturesBox.setContent(text)
-      } catch (e) {
-        capturesBox.setContent(' {gray-fg}-{/}')
-      }
+      const streakStr = streak > 0 ? `{yellow-fg}🔥 Day ${streak}{/}` : ''
+      const todayStr = `Today: ${todayStats.sessions || 0} sessions, ${todayStats.totalDuration || 0}m`
+
+      statsFooter.setContent(
+        `  ${sessionStr}  {gray-fg}│{/}  ${todayStr}  ${streakStr ? '{gray-fg}│{/}  ' + streakStr : ''}`
+      )
 
     } catch (err) {
-      statusBar.setContent(` {red-fg}Error: ${err.message}{/}`)
+      titleBar.setContent(` {bold}ATLAS{/bold}  {red-fg}Error: ${err.message}{/}`)
     }
 
     screen.render()
@@ -1358,17 +1350,23 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
-  // Enter - show detail (using rows.on for blessed-contrib table)
-  projectsTable.rows.on('select', (item, index) => {
-    if (filteredList[index]) {
-      showDetailView(filteredList[index])
+  // Arrow keys - navigate cards
+  screen.key(['up', 'k'], () => {
+    if (stateMachine.is(STATES.BROWSE) && filteredList.length > 0) {
+      selectCard(selectedCardIndex - 1)
     }
   })
 
-  // Update overview when selection changes
-  projectsTable.rows.on('select item', (item, index) => {
-    if (filteredList[index] && stateMachine.is(STATES.BROWSE)) {
-      updateOverviewFor(filteredList[index])
+  screen.key(['down', 'j'], () => {
+    if (stateMachine.is(STATES.BROWSE) && filteredList.length > 0) {
+      selectCard(selectedCardIndex + 1)
+    }
+  })
+
+  // Enter - show detail for selected card
+  screen.key(['enter'], () => {
+    if (stateMachine.is(STATES.BROWSE) && selectedProject) {
+      showDetailView(selectedProject)
     }
   })
 
