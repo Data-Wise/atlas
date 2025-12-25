@@ -195,7 +195,7 @@ check_not() {
   fi
 }
 
-# Measure command execution time (macOS compatible)
+# Measure command execution time (cross-platform)
 benchmark() {
   local name="$1"
   local cmd="$2"
@@ -203,11 +203,21 @@ benchmark() {
 
   log_raw "${YELLOW}[BENCH]${NC} $name (max: ${max_ms}ms)"
 
-  # Use perl for millisecond precision on macOS
-  local start=$(perl -MTime::HiRes=time -e 'printf "%.0f\n", time * 1000')
-  eval "$cmd" > /dev/null 2>&1
-  local end=$(perl -MTime::HiRes=time -e 'printf "%.0f\n", time * 1000')
-  local duration=$((end - start))
+  local duration
+
+  # Try perl first (most accurate), fall back to date (second precision)
+  if perl -MTime::HiRes -e '1' 2>/dev/null; then
+    local start=$(perl -MTime::HiRes=time -e 'printf "%.0f\n", time * 1000')
+    eval "$cmd" > /dev/null 2>&1
+    local end=$(perl -MTime::HiRes=time -e 'printf "%.0f\n", time * 1000')
+    duration=$((end - start))
+  else
+    # Fallback: use seconds (less precise but works everywhere)
+    local start=$(date +%s)
+    eval "$cmd" > /dev/null 2>&1
+    local end=$(date +%s)
+    duration=$(( (end - start) * 1000 ))
+  fi
 
   if [[ $duration -le $max_ms ]]; then
     log_raw "        ${GREEN}✓ PASS${NC} (${duration}ms)"
