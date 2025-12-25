@@ -42,12 +42,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/data-wise/atlas.git"
+    "url": "git+https://github.com/Data-Wise/atlas.git"
   },
   "bugs": {
-    "url": "https://github.com/data-wise/atlas/issues"
+    "url": "https://github.com/Data-Wise/atlas/issues"
   },
-  "homepage": "https://github.com/data-wise/atlas#readme",
+  "homepage": "https://github.com/Data-Wise/atlas#readme",
   "engines": {
     "node": ">=18.0.0"
   },
