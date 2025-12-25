@@ -135,6 +135,7 @@ atlas dash                     # Alias for dashboard
 | `o` | Open project folder (detail view) |
 | `f` | Enter focus mode (Pomodoro timer) |
 | `d` | Decision helper ("What to work on?") |
+| `t` | Cycle themes (default/dark/minimal) |
 | `q` | Quit dashboard |
 | `?` | Show help |
 
@@ -161,6 +162,12 @@ atlas dash                     # Alias for dashboard
 - **Decision helper**: "What should I work on?" suggestions (`d`)
 - **Break reminders**: Notification after Pomodoro completes
 - **Terminal-adaptive**: Adjusts to terminal size, warns if too small
+
+#### Dashboard Features (v0.3.1+)
+- **Theme cycling**: Press `t` to cycle through themes (default, dark, minimal)
+- **Time-aware suggestions**: Decision helper adapts to time of day
+- **Pomodoro stats**: Shows today's completed sessions in focus mode
+- **Break enforcement**: Modal break dialog after Pomodoro completes
 
 ### Storage & Migration
 ```bash

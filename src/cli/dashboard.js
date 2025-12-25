@@ -64,7 +64,33 @@ export async function runDashboard(atlas, options = {}) {
       muted: 'gray'
     }
   }
+  const themeNames = Object.keys(themes)
+  let currentThemeIndex = 0
   let currentTheme = themes.default
+
+  // Pomodoro history (completed sessions)
+  let pomodoroHistory = []
+  let breakEnforced = false // When true, locks dashboard during break
+
+  // Cycle to next theme
+  function cycleTheme() {
+    currentThemeIndex = (currentThemeIndex + 1) % themeNames.length
+    const themeName = themeNames[currentThemeIndex]
+    currentTheme = themes[themeName]
+    applyTheme()
+    statusBar.setContent(` {green-fg}Theme: ${themeName}{/}`)
+    screen.render()
+  }
+
+  // Apply current theme to widgets
+  function applyTheme() {
+    statusBar.style.bg = currentTheme.primary
+    filterBar.style.bg = 'black'
+    projectsTable.options.border.fg = currentTheme.primary
+    sidebar.options.border.fg = currentTheme.primary
+    commandBar.style.bg = currentTheme.primary
+    screen.render()
+  }
 
   // Terminal size detection for adaptive layout
   function getLayoutMode() {
@@ -869,25 +895,83 @@ export async function runDashboard(atlas, options = {}) {
       ? (breakReminder ? '{yellow-fg}☕ BREAK TIME{/}' : '{green-fg}● FOCUSING{/}')
       : '{yellow-fg}◑ PAUSED{/}'
 
+    // Today's Pomodoro stats
+    const today = new Date().toISOString().split('T')[0]
+    const todayPomodoros = pomodoroHistory.filter(p => p.completed.startsWith(today))
+    const todayMinutes = todayPomodoros.reduce((sum, p) => sum + p.duration, 0)
+    const statsLine = todayPomodoros.length > 0
+      ? `{cyan-fg}Today: ${todayPomodoros.length} 🍅 (${todayMinutes}m){/}`
+      : '{gray-fg}Start your first Pomodoro!{/}'
+
     focusTimer.setContent(
       `\n\n` +
       `${sessionInfo}\n\n` +
       `{bold}${statusIcon}{/}\n\n` +
       `{bold}{white-fg}${timeStr}{/}\n\n` +
       `${progressBar}\n\n` +
-      `{gray-fg}${pomodoroMinutes} min session{/}`
+      `{gray-fg}${pomodoroMinutes} min session{/}\n\n` +
+      `${statsLine}`
     )
     screen.render()
   }
 
   function showBreakReminder() {
-    // Flash the border and show break message
-    focusTimer.style.border = { fg: 'yellow' }
-    focusTimer.setLabel(' {bold}{yellow-fg}☕ Take a Break!{/} ')
+    // Record completed Pomodoro in history
+    pomodoroHistory.push({
+      completed: new Date().toISOString(),
+      duration: pomodoroMinutes,
+      project: activeSessionProject || 'unknown'
+    })
+
+    // Play terminal bell
+    process.stdout.write('\x07')
+
+    // Enable break enforcement
+    breakEnforced = true
+
+    // Show break dialog
+    const breakBox = blessed.box({
+      top: 'center',
+      left: 'center',
+      width: 50,
+      height: 12,
+      tags: true,
+      border: { type: 'line', fg: 'yellow' },
+      label: ' {bold}{yellow-fg}☕ Break Time!{/} ',
+      style: { bg: 'black' },
+      content: `
+
+  {bold}{green-fg}✓ Pomodoro Complete!{/}
+
+  {cyan-fg}Session #{pomodoroHistory.length}{/} - ${pomodoroMinutes} minutes
+
+  Take a 5-minute break to:
+  • Stretch & move around
+  • Rest your eyes
+  • Hydrate
+
+  {gray-fg}Press Enter when ready to continue{/}
+      `
+    })
+
+    screen.append(breakBox)
+    breakBox.focus()
     screen.render()
 
-    // Could add a beep/notification here
-    // process.stdout.write('\x07') // Terminal bell
+    breakBox.onceKey(['enter', 'space'], () => {
+      breakEnforced = false
+      screen.remove(breakBox)
+      resetPomodoro()
+      focusTimer.focus()
+      screen.render()
+    })
+
+    // Also allow escape to exit focus mode entirely
+    breakBox.onceKey(['escape', 'q'], () => {
+      breakEnforced = false
+      screen.remove(breakBox)
+      exitFocusMode()
+    })
   }
 
   function adjustPomodoroTime(delta) {
@@ -903,6 +987,25 @@ export async function runDashboard(atlas, options = {}) {
     // Analyze projects and suggest what to work on
     const suggestions = []
 
+    // Time-of-day awareness
+    const hour = new Date().getHours()
+    let timeContext = ''
+    let taskPriority = 'any' // 'heavy', 'medium', 'light'
+
+    if (hour >= 6 && hour < 12) {
+      timeContext = '🌅 Morning - peak focus time'
+      taskPriority = 'heavy'
+    } else if (hour >= 12 && hour < 17) {
+      timeContext = '☀️ Afternoon - steady work'
+      taskPriority = 'medium'
+    } else if (hour >= 17 && hour < 21) {
+      timeContext = '🌆 Evening - lighter tasks'
+      taskPriority = 'light'
+    } else {
+      timeContext = '🌙 Late - consider resting'
+      taskPriority = 'light'
+    }
+
     try {
       // Get all projects
       const projects = await atlas.projects.list()
@@ -911,23 +1014,59 @@ export async function runDashboard(atlas, options = {}) {
       const active = projects.filter(p => getStatusCategory(p.status) === 'a')
       const paused = projects.filter(p => getStatusCategory(p.status) === 'p')
       const blocked = projects.filter(p => p.status === 'blocked')
+      const stable = projects.filter(p => getStatusCategory(p.status) === 's')
 
-      // Suggest unblocking blocked items first
-      if (blocked.length > 0) {
-        suggestions.push({
-          project: blocked[0],
-          reason: 'Unblock this first',
-          priority: 1
-        })
-      }
+      // Late night: suggest rest or very light tasks only
+      if (hour >= 21 || hour < 6) {
+        if (stable.length > 0) {
+          suggestions.push({
+            project: stable[0],
+            reason: '💤 Light review only - rest soon!',
+            priority: 0
+          })
+        }
+      } else {
+        // Suggest unblocking blocked items first (always high priority)
+        if (blocked.length > 0) {
+          suggestions.push({
+            project: blocked[0],
+            reason: '🚫 Unblock this first',
+            priority: 1
+          })
+        }
 
-      // Suggest active projects not recently worked on
-      for (const p of active.slice(0, 3)) {
-        suggestions.push({
-          project: p,
-          reason: p.next || 'Continue work',
-          priority: 2
-        })
+        // Time-aware project suggestions
+        if (taskPriority === 'heavy' && active.length > 0) {
+          // Morning: prioritize complex/active work
+          const complex = active.filter(p => p.progress < 50)
+          if (complex.length > 0) {
+            suggestions.push({
+              project: complex[0],
+              reason: '🧠 Deep work - use peak focus',
+              priority: 2
+            })
+          }
+        }
+
+        // Add active projects
+        for (const p of active.slice(0, 2)) {
+          if (!suggestions.find(s => s.project.name === p.name)) {
+            suggestions.push({
+              project: p,
+              reason: p.next || 'Continue work',
+              priority: 3
+            })
+          }
+        }
+
+        // Evening: suggest lighter tasks
+        if (taskPriority === 'light' && stable.length > 0) {
+          suggestions.push({
+            project: stable[0],
+            reason: '📝 Light task - review or docs',
+            priority: 4
+          })
+        }
       }
 
       // Show decision dialog
@@ -935,18 +1074,18 @@ export async function runDashboard(atlas, options = {}) {
         top: 'center',
         left: 'center',
         width: 60,
-        height: 16,
+        height: 18,
         tags: true,
         border: { type: 'line', fg: 'magenta' },
         label: ' {bold}🎯 What Should I Work On?{/} ',
         style: { bg: 'black' }
       })
 
-      let content = '\n'
+      let content = `\n  {cyan-fg}${timeContext}{/}\n\n`
       if (suggestions.length === 0) {
         content += '  {gray-fg}No suggestions - all caught up!{/}\n'
       } else {
-        suggestions.forEach((s, i) => {
+        suggestions.slice(0, 4).forEach((s, i) => {
           const icon = i === 0 ? '{green-fg}►{/}' : ' '
           content += `  ${icon} {bold}${s.project.name}{/}\n`
           content += `     {gray-fg}${s.reason}{/}\n\n`
@@ -1141,6 +1280,13 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
+  // Theme cycling: t key
+  screen.key(['t'], () => {
+    if (currentView === 'main' || currentView === 'detail') {
+      cycleTheme()
+    }
+  })
+
   // Focus mode: space for pause/resume
   screen.key(['space'], () => {
     if (currentView === 'focus') {
@@ -1200,6 +1346,7 @@ export async function runDashboard(atlas, options = {}) {
   {yellow-fg}/{/}          Search projects
   {yellow-fg}a{/}/{yellow-fg}p{/}/{yellow-fg}*{/}      Filter: active/paused/all
   {yellow-fg}d{/}          Decision helper
+  {yellow-fg}t{/}          Cycle themes
 
   {bold}{cyan-fg}Focus Mode (f){/}
   ─────────────────────────────────────────
