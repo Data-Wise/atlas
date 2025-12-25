@@ -161,35 +161,89 @@ export async function runDashboard(atlas, options = {}) {
     style: { fg: 'white', bg: 'green' }
   })
 
-  // Detail content area
-  const detailContent = blessed.box({
+  // Left panel - Project info & session gauge
+  const detailLeftPanel = blessed.box({
     parent: detailView,
     top: 3,
     left: 0,
-    width: '100%',
+    width: '50%',
     height: '100%-6',
-    tags: true,
-    border: { type: 'line', fg: 'green' }
+    border: { type: 'line', fg: 'green' },
+    label: ' {bold}Project{/} ',
+    tags: true
   })
 
-  // Left column - status & sessions
-  const detailLeft = blessed.box({
-    parent: detailContent,
+  // Project info text
+  const projectInfoBox = blessed.box({
+    parent: detailLeftPanel,
     top: 0,
     left: 1,
-    width: '50%-2',
-    height: '100%-2',
+    width: '100%-4',
+    height: 6,
     tags: true
   })
 
-  // Right column - breadcrumbs & captures
-  const detailRight = blessed.box({
-    parent: detailContent,
-    top: 0,
-    right: 1,
-    width: '50%-2',
-    height: '100%-2',
+  // Session gauge (visual progress)
+  const sessionGauge = contrib.gauge({
+    parent: detailLeftPanel,
+    top: 7,
+    left: 1,
+    width: '100%-4',
+    height: 5,
+    label: ' Today\'s Progress ',
+    stroke: 'green',
+    fill: 'white',
+    showLabel: true
+  })
+
+  // Current session box
+  const currentSessionBox = blessed.box({
+    parent: detailLeftPanel,
+    top: 13,
+    left: 1,
+    width: '100%-4',
+    bottom: 1,
+    tags: true,
+    border: { type: 'line', fg: 'cyan' },
+    label: ' {bold}Current Session{/} '
+  })
+
+  // Right panel - Breadcrumbs & Captures (using log widget for scrolling)
+  const detailRightPanel = blessed.box({
+    parent: detailView,
+    top: 3,
+    right: 0,
+    width: '50%',
+    height: '100%-6',
+    border: { type: 'line', fg: 'blue' },
+    label: ' {bold}Activity{/} ',
     tags: true
+  })
+
+  // Breadcrumbs log (scrollable)
+  const breadcrumbsLog = contrib.log({
+    parent: detailRightPanel,
+    top: 0,
+    left: 1,
+    width: '100%-4',
+    height: '50%-1',
+    label: ' 🍞 Breadcrumbs ',
+    tags: true,
+    border: { type: 'line', fg: 'gray' },
+    bufferLength: 20
+  })
+
+  // Captures log (scrollable)
+  const capturesLog = contrib.log({
+    parent: detailRightPanel,
+    top: '50%',
+    left: 1,
+    width: '100%-4',
+    bottom: 1,
+    label: ' 💡 Captures ',
+    tags: true,
+    border: { type: 'line', fg: 'yellow' },
+    bufferLength: 20
   })
 
   // Detail command bar
@@ -201,7 +255,7 @@ export async function runDashboard(atlas, options = {}) {
     height: 3,
     tags: true,
     style: { fg: 'white', bg: 'black' },
-    content: ' {yellow-fg}Esc{/} Back  {cyan-fg}s{/} Start Session  {cyan-fg}e{/} End Session  {cyan-fg}c{/} Capture  {cyan-fg}f{/} Set Focus  {cyan-fg}o{/} Open Folder'
+    content: ' {yellow-fg}Esc{/} Back  {cyan-fg}s{/} Session  {cyan-fg}c{/} Capture  {cyan-fg}o{/} Open  {gray-fg}│{/} {yellow-fg}↑↓{/} Scroll'
   })
 
   screen.append(detailView)
@@ -373,99 +427,84 @@ export async function runDashboard(atlas, options = {}) {
     const typeStr = getTypeStr(project.type)
     const status = project.status || 'unknown'
 
+    // Header with project name and status
     detailHeader.setContent(
       ` {bold}← Esc{/}  │  {bold}${name}{/}  │  ${getStatusIcon(status)} ${status}  │  ${typeStr}`
     )
 
-    // Left column: Status & Sessions
-    let leftContent = ''
+    // Project info box
+    const shortPath = (project.path || '').split('/').slice(-3).join('/')
+    projectInfoBox.setContent(
+      `{bold}Name:{/}   ${name}\n` +
+      `{bold}Status:{/} ${getStatusIcon(status)} ${status}\n` +
+      `{bold}Type:{/}   ${typeStr}\n` +
+      `{bold}Path:{/}   ${shortPath}`
+    )
 
-    // Project info
-    leftContent += `{bold}📊 Project Info{/}\n`
-    leftContent += `─────────────────────\n`
-    leftContent += `Status: ${getStatusIcon(status)} ${status}\n`
-    leftContent += `Type:   ${typeStr}\n`
-    leftContent += `Path:   ${project.path || '-'}\n\n`
-
-    // Today's sessions for this project
-    leftContent += `{bold}⏱️ Sessions Today{/}\n`
-    leftContent += `─────────────────────\n`
+    // Session gauge - today's progress
+    let gaugePercent = 0
+    let sessionText = '{gray-fg}No active session{/}\nPress {cyan-fg}s{/} to start'
 
     try {
       const statusData = await atlas.context.getStatus()
       const today = statusData?.today || {}
-      const pct = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
-
-      leftContent += `Count:    ${today.sessions || 0}\n`
-      leftContent += `Duration: ${today.totalDuration || 0}m\n`
-      leftContent += `Progress: ${progressBar(pct, 15)}\n\n`
+      gaugePercent = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
+      sessionGauge.setPercent(gaugePercent)
     } catch (e) {
-      leftContent += `{gray-fg}No data{/}\n\n`
+      sessionGauge.setPercent(0)
     }
 
-    // Current session
-    leftContent += `{bold}🎯 Current Session{/}\n`
-    leftContent += `─────────────────────\n`
+    // Current session info
     try {
       const session = await atlas.sessions.current()
       if (session && session.project === name) {
         const duration = session.getDuration ? session.getDuration() : 0
-        leftContent += `{green-fg}● Active{/} (${duration}m)\n`
-        leftContent += `Task: ${session.task || '-'}\n`
+        sessionText = ` {green-fg}● ACTIVE{/} (${duration}m)\n`
+        sessionText += ` Task: ${session.task || '-'}\n`
+        sessionText += ` {gray-fg}Press e to end{/}`
       } else if (session) {
-        leftContent += `{yellow-fg}● Other project{/}\n`
-        leftContent += `(${session.project})\n`
-      } else {
-        leftContent += `{gray-fg}No active session{/}\n`
-        leftContent += `Press {cyan-fg}s{/} to start\n`
+        sessionText = ` {yellow-fg}● Other: ${session.project}{/}\n`
+        sessionText += ` {gray-fg}End other first{/}`
       }
-    } catch (e) {
-      leftContent += `{gray-fg}-{/}\n`
-    }
+    } catch (e) { /* ignore */ }
 
-    detailLeft.setContent(leftContent)
+    currentSessionBox.setContent(sessionText)
 
-    // Right column: Breadcrumbs & Captures
-    let rightContent = ''
-
-    // Breadcrumbs
-    rightContent += `{bold}🍞 Recent Breadcrumbs{/}\n`
-    rightContent += `─────────────────────\n`
+    // Clear and populate breadcrumbs log
+    breadcrumbsLog.log('{bold}Recent Activity{/}')
     try {
-      const trail = await atlas.context.trail({ project: name, limit: 5 })
+      const trail = await atlas.context.trail({ project: name, limit: 8 })
       if (trail?.length) {
         trail.forEach(b => {
-          const time = new Date(b.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-          rightContent += `${time} ${(b.text || '').substring(0, 20)}\n`
+          const time = new Date(b.timestamp).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+          breadcrumbsLog.log(`{cyan-fg}${time}{/} ${(b.text || '').substring(0, 25)}`)
         })
       } else {
-        rightContent += `{gray-fg}No breadcrumbs yet{/}\n`
-        rightContent += `Press {cyan-fg}b{/} to add one\n`
+        breadcrumbsLog.log('{gray-fg}No breadcrumbs yet{/}')
       }
     } catch (e) {
-      rightContent += `{gray-fg}No breadcrumbs{/}\n`
+      breadcrumbsLog.log('{gray-fg}Error loading{/}')
     }
 
-    rightContent += `\n`
-
-    // Captures
-    rightContent += `{bold}💡 Ideas & Tasks{/}\n`
-    rightContent += `─────────────────────\n`
+    // Clear and populate captures log
+    capturesLog.log('{bold}Inbox Items{/}')
     try {
-      const captures = await atlas.capture.inbox({ limit: 5 })
+      const captures = await atlas.capture.inbox({ limit: 8 })
       if (captures?.length) {
         captures.forEach(c => {
           const icon = c.type === 'task' ? '☐' : '💡'
-          rightContent += `${icon} ${(c.text || '').substring(0, 22)}\n`
+          capturesLog.log(`${icon} ${(c.text || '').substring(0, 28)}`)
         })
       } else {
-        rightContent += `{gray-fg}No captures{/}\n`
+        capturesLog.log('{gray-fg}Inbox empty!{/}')
       }
     } catch (e) {
-      rightContent += `{gray-fg}-{/}\n`
+      capturesLog.log('{gray-fg}Error loading{/}')
     }
 
-    detailRight.setContent(rightContent)
     screen.render()
   }
 
