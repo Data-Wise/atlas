@@ -36,6 +36,7 @@ import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
+import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 
@@ -258,6 +259,15 @@ export class Container {
     })
   }
 
+  getRegisterProjectUseCase() {
+    return this._resolve('registerProjectUseCase', () => {
+      return new RegisterProjectUseCase({
+        projectRepository: this.getProjectRepository(),
+        statusFileGateway: this.getStatusFileGateway()
+      })
+    })
+  }
+
   // ============================================================================
   // GATEWAYS (Infrastructure Layer)
   // ============================================================================
@@ -324,6 +334,7 @@ export class Container {
 
       // Registry use cases
       'SyncRegistryUseCase': () => this.getSyncRegistryUseCase(),
+      'RegisterProjectUseCase': () => this.getRegisterProjectUseCase(),
 
       // Gateways
       'StatusFileGateway': () => this.getStatusFileGateway(),
@@ -368,7 +379,8 @@ export class Container {
       getTrail: this.getGetTrailUseCase(),
 
       // Registry
-      syncRegistry: this.getSyncRegistryUseCase()
+      syncRegistry: this.getSyncRegistryUseCase(),
+      registerProject: this.getRegisterProjectUseCase()
     }
   }
 

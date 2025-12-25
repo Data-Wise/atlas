@@ -30,15 +30,32 @@ export { SessionState } from './domain/value-objects/SessionState.js';
  * - context: Context reconstruction ("where was I?")
  */
 export class Atlas {
+  /**
+   * @param {Object} options
+   * @param {string} [options.configPath] - Data directory path
+   * @param {string} [options.storage='filesystem'] - Storage backend: 'filesystem' or 'sqlite'
+   */
   constructor(options = {}) {
     this.configPath = options.configPath || this._defaultConfigPath();
-    this.container = new Container({ dataDir: this.configPath });
-    
+    this.storage = options.storage || process.env.ATLAS_STORAGE || 'filesystem';
+
+    this.container = new Container({
+      dataDir: this.configPath,
+      storage: this.storage
+    });
+
     // Initialize subsystems
     this.projects = new ProjectsAPI(this.container);
     this.sessions = new SessionsAPI(this.container);
     this.capture = new CaptureAPI(this.container);
     this.context = new ContextAPI(this.container);
+  }
+
+  /**
+   * Close resources (important for SQLite)
+   */
+  close() {
+    this.container.close();
   }
 
   _defaultConfigPath() {
@@ -192,12 +209,24 @@ class ProjectsAPI {
   }
 
   async register(path, options = {}) {
-    // TODO: Implement RegisterProjectUseCase
-    return { success: true, message: `Registered: ${path}` };
+    const registerUseCase = this.container.resolve('RegisterProjectUseCase');
+    const result = await registerUseCase.execute({
+      path,
+      name: options.name,
+      tags: options.tags ? options.tags.split(',').map(t => t.trim()) : [],
+      status: options.status,
+      description: options.description
+    });
+    return result;
   }
 
   async unregister(name) {
-    return { success: true, message: `Unregistered: ${name}` };
+    const projectRepo = this.container.resolve('ProjectRepository');
+    const deleted = await projectRepo.delete(name);
+    return {
+      success: deleted,
+      message: deleted ? `Unregistered: ${name}` : `Project not found: ${name}`
+    };
   }
 
   async list(options = {}) {
