@@ -31,13 +31,14 @@ export async function runDashboard(atlas, options = {}) {
   // WIDGETS
   // ============================================================================
 
-  // Project status donut chart (top-left)
-  const statusDonut = grid.set(0, 0, 4, 4, contrib.donut, {
+  // Project status bar chart (top-left) - more reliable than donut
+  const statusBar = grid.set(0, 0, 4, 4, contrib.bar, {
     label: ' Project Status ',
-    radius: 10,
-    arcWidth: 3,
-    remainColor: 'black',
-    yPadding: 2
+    barWidth: 6,
+    barSpacing: 2,
+    xOffset: 0,
+    maxHeight: 50,
+    barBgColor: 'cyan'
   })
 
   // Inbox stats (top-middle)
@@ -63,19 +64,19 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
-  // Active projects table (middle)
+  // Projects table (middle)
   const projectsTable = grid.set(4, 0, 5, 8, contrib.table, {
     keys: true,
     fg: 'white',
     selectedFg: 'white',
     selectedBg: 'blue',
     interactive: true,
-    label: ' Active Projects ',
+    label: ' Projects ',
     width: '100%',
     height: '100%',
     border: { type: 'line', fg: 'cyan' },
     columnSpacing: 3,
-    columnWidth: [20, 10, 8, 30]
+    columnWidth: [20, 12, 10, 25]
   })
 
   // Recent captures log (middle-right)
@@ -85,17 +86,14 @@ export async function runDashboard(atlas, options = {}) {
     label: ' Recent Captures '
   })
 
-  // Next actions list (bottom)
-  const nextActions = grid.set(9, 0, 3, 8, blessed.list, {
-    label: ' Next Actions ',
+  // Stats box (bottom)
+  const statsBox = grid.set(9, 0, 3, 8, blessed.box, {
+    label: ' Today ',
     border: { type: 'line' },
     style: {
       fg: 'white',
-      border: { fg: 'cyan' },
-      selected: { bg: 'blue' }
-    },
-    keys: true,
-    vi: true
+      border: { fg: 'cyan' }
+    }
   })
 
   // Help box (bottom-right)
@@ -106,7 +104,7 @@ export async function runDashboard(atlas, options = {}) {
       fg: 'gray',
       border: { fg: 'gray' }
     },
-    content: 'q: quit\nr: refresh\nt: triage\ns: start session'
+    content: 'q: quit\nr: refresh'
   })
 
   // ============================================================================
@@ -115,76 +113,121 @@ export async function runDashboard(atlas, options = {}) {
 
   async function loadData() {
     try {
-      // Get projects
+      // Get all projects
       const projects = await atlas.projects.list()
-      const statusCounts = { active: 0, paused: 0, blocked: 0, archived: 0, complete: 0 }
 
-      const activeProjects = []
-      const allNextActions = []
+      // Count by status
+      const statusCounts = {
+        active: 0,
+        paused: 0,
+        stable: 0,
+        other: 0
+      }
+
+      const projectRows = []
 
       for (const p of projects) {
-        const status = p.status || 'active'
-        statusCounts[status] = (statusCounts[status] || 0) + 1
+        // Normalize status
+        const rawStatus = p.status || 'unknown'
+        let status = rawStatus
 
-        if (status === 'active') {
-          const projectDetails = await atlas.projects.get(p.name)
-          // Handle ProjectType value object or string
-          const typeStr = typeof p.type === 'object' ? (p.type?.value || 'generic') : (p.type || 'generic')
-          activeProjects.push({
-            name: p.name,
-            type: typeStr,
-            progress: projectDetails?.progress || 0,
-            next: projectDetails?.next?.[0]?.action || '-'
-          })
-
-          if (projectDetails?.next?.[0]) {
-            allNextActions.push(`${p.name}: ${projectDetails.next[0].action}`)
-          }
+        if (['active', 'working', 'in-progress'].includes(rawStatus)) {
+          status = 'active'
+          statusCounts.active++
+        } else if (['paused', 'blocked', 'waiting'].includes(rawStatus)) {
+          status = 'paused'
+          statusCounts.paused++
+        } else if (['stable', 'complete', 'released'].includes(rawStatus)) {
+          status = 'stable'
+          statusCounts.stable++
+        } else {
+          statusCounts.other++
         }
+
+        // Get type string
+        const typeStr = typeof p.type === 'object'
+          ? (p.type?.value || p.type?._value || 'general')
+          : (p.type || 'general')
+
+        projectRows.push({
+          name: p.name,
+          type: typeStr,
+          status: rawStatus,
+          path: p.path
+        })
       }
 
-      // Update status donut
-      const donutData = []
-      if (statusCounts.active > 0) donutData.push({ percent: statusCounts.active, label: 'Active', color: 'green' })
-      if (statusCounts.paused > 0) donutData.push({ percent: statusCounts.paused, label: 'Paused', color: 'yellow' })
-      if (statusCounts.blocked > 0) donutData.push({ percent: statusCounts.blocked, label: 'Blocked', color: 'red' })
-      if (statusCounts.complete > 0) donutData.push({ percent: statusCounts.complete, label: 'Complete', color: 'blue' })
+      // Update status bar chart
+      statusBar.setData({
+        titles: ['Active', 'Paused', 'Stable', 'Other'],
+        data: [statusCounts.active, statusCounts.paused, statusCounts.stable, statusCounts.other]
+      })
 
-      if (donutData.length > 0) {
-        statusDonut.setData(donutData)
-      }
-
-      // Update projects table
+      // Update projects table - show first 15
       projectsTable.setData({
-        headers: ['Project', 'Type', 'Progress', 'Next Action'],
-        data: activeProjects.map(p => [
+        headers: ['Project', 'Type', 'Status', 'Path'],
+        data: projectRows.slice(0, 15).map(p => [
           String(p.name || '').substring(0, 18),
-          String(p.type || 'generic').substring(0, 8),
-          `${p.progress || 0}%`,
-          String(p.next || '-').substring(0, 28)
+          String(p.type || 'general').substring(0, 10),
+          String(p.status || 'unknown').substring(0, 8),
+          String(p.path || '').split('/').slice(-2).join('/')
         ])
       })
 
-      // Update next actions
-      nextActions.setItems(allNextActions.slice(0, 10))
-
       // Get inbox stats
-      const triageUseCase = atlas.container.resolve('TriageInboxUseCase')
-      const stats = await triageUseCase.getStats()
-      inboxBox.setDisplay(stats.inbox.toString().padStart(4, ' '))
+      try {
+        const triageUseCase = atlas.container.resolve('TriageInboxUseCase')
+        const stats = await triageUseCase.getStats()
+        inboxBox.setDisplay(String(stats.inbox || 0).padStart(4, ' '))
+      } catch (e) {
+        inboxBox.setDisplay('   -')
+      }
 
       // Get recent captures
-      const captures = await atlas.capture.inbox({ limit: 5 })
-      captures.forEach(c => {
-        captureLog.log(`[${c.type}] ${c.text.substring(0, 30)}`)
-      })
+      try {
+        const captures = await atlas.capture.inbox({ limit: 5 })
+        if (captures && captures.length > 0) {
+          captures.forEach(c => {
+            const text = c.text || c.content || ''
+            captureLog.log(`[${c.type || 'idea'}] ${text.substring(0, 30)}`)
+          })
+        }
+      } catch (e) {
+        captureLog.log('(no captures)')
+      }
 
       // Get current session
-      const session = await atlas.sessions.current()
-      if (session) {
-        sessionBox.setContent(`\n  Project: ${session.project || 'default'}\n  Started: ${session.startTime || 'now'}\n  Focus: ${session.focus || '-'}`)
-      } else {
-        sessionBox.setContent('\n  No active session\n\n  Press "s" to start')
+      try {
+        const session = await atlas.sessions.current()
+        if (session) {
+          const duration = session.getDuration ? session.getDuration() : 0
+          sessionBox.setContent(
+            `\n  Project: ${session.project || 'default'}` +
+            `\n  Duration: ${duration}m` +
+            `\n  Task: ${session.task || '-'}`
+          )
+        } else {
+          sessionBox.setContent('\n  No active session\n\n  Use: atlas session start')
+        }
+      } catch (e) {
+        sessionBox.setContent('\n  Session error\n  ' + e.message)
+      }
+
+      // Get today's stats
+      try {
+        const status = await atlas.context.getStatus()
+        if (status && status.today) {
+          statsBox.setContent(
+            `  Sessions: ${status.today.sessions || 0}` +
+            `  |  Duration: ${status.today.totalDuration || 0}m` +
+            `  |  Flow: ${status.today.flowSessions || 0}` +
+            `  |  Projects: ${projects.length}`
+          )
+        } else {
+          statsBox.setContent(`  Projects: ${projects.length}`)
+        }
+      } catch (e) {
+        statsBox.setContent(`  Projects: ${projects.length}`)
       }
 
     } catch (err) {
