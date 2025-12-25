@@ -194,7 +194,8 @@ session
   .action(async () => {
     const session = await getAtlas().sessions.current();
     if (session) {
-      console.log(`Active: ${session.project} (${session.duration})`);
+      const duration = session.getDuration ? session.getDuration() : '?';
+      console.log(`Active: ${session.project} (${duration}m)`);
     } else {
       console.log('No active session');
     }

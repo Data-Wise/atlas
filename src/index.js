@@ -379,8 +379,7 @@ class SessionsAPI {
 
   async current() {
     const sessionRepo = this.container.resolve('SessionRepository');
-    const sessions = await sessionRepo.findAll();
-    return sessions.find(s => s.state === 'active') || null;
+    return await sessionRepo.findActive();
   }
 }
 
