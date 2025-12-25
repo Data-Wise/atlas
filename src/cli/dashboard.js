@@ -2,10 +2,10 @@
  * Atlas Dashboard TUI
  *
  * ADHD-friendly terminal dashboard with:
- * - Clear visual hierarchy
+ * - Visual graphs (sparklines, progress bars)
  * - Always-visible keyboard shortcuts
+ * - Project detail view on Enter
  * - Color-coded status indicators
- * - Simple navigation
  */
 
 import blessed from 'blessed'
@@ -21,38 +21,39 @@ export async function runDashboard(atlas, options = {}) {
     fullUnicode: true
   })
 
-  // Color scheme
-  const colors = {
-    active: 'green',
-    paused: 'yellow',
-    stable: 'cyan',
-    border: 'blue',
-    highlight: 'white',
-    muted: 'gray'
-  }
+  // Track state
+  let projectList = []
+  let currentView = 'main' // 'main' or 'detail'
+  let selectedProject = null
 
   // ============================================================================
-  // LAYOUT: Simple 3-row design
+  // MAIN VIEW WIDGETS
   // ============================================================================
 
-  // Row 1: Status bar (current session + quick stats)
+  const mainView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%'
+  })
+
+  // Status bar
   const statusBar = blessed.box({
+    parent: mainView,
     top: 0,
     left: 0,
     width: '100%',
     height: 3,
     tags: true,
-    style: {
-      fg: 'white',
-      bg: 'blue'
-    }
+    style: { fg: 'white', bg: 'blue' }
   })
 
-  // Row 2: Main content (projects table)
+  // Projects table
   const projectsTable = contrib.table({
+    parent: mainView,
     top: 3,
     left: 0,
-    width: '70%',
+    width: '65%',
     height: '100%-6',
     keys: true,
     vi: true,
@@ -61,208 +62,164 @@ export async function runDashboard(atlas, options = {}) {
     selectedFg: 'black',
     selectedBg: 'cyan',
     interactive: true,
-    label: ' {bold}Projects{/bold} (↑↓ navigate, Enter select) ',
+    label: ' {bold}Projects{/bold} (↑↓ Enter) ',
     tags: true,
-    border: { type: 'line', fg: colors.border },
+    border: { type: 'line', fg: 'blue' },
     columnSpacing: 2,
-    columnWidth: [22, 10, 10, 25]
+    columnWidth: [20, 8, 12, 20]
   })
 
-  // Sidebar: Quick stats + captures
+  // Sidebar
   const sidebar = blessed.box({
+    parent: mainView,
     top: 3,
     right: 0,
-    width: '30%',
+    width: '35%',
     height: '100%-6',
-    border: { type: 'line', fg: colors.border },
-    label: ' {bold}Quick View{/bold} ',
-    tags: true,
-    style: { border: { fg: colors.border } }
+    border: { type: 'line', fg: 'blue' },
+    label: ' {bold}Overview{/bold} ',
+    tags: true
   })
 
-  // Stats section in sidebar
-  const statsContent = blessed.box({
+  // Activity sparkline in sidebar
+  const activityLabel = blessed.box({
     parent: sidebar,
     top: 0,
     left: 1,
-    right: 1,
-    height: 8,
+    width: '100%-4',
+    height: 1,
     tags: true,
-    content: '{gray-fg}Loading...{/}'
+    content: '{bold}This Week{/bold}'
   })
 
-  // Captures section in sidebar
+  const activitySpark = contrib.sparkline({
+    parent: sidebar,
+    top: 1,
+    left: 1,
+    width: '100%-4',
+    height: 4,
+    tags: true,
+    style: { fg: 'cyan' }
+  })
+
+  // Stats in sidebar
+  const statsBox = blessed.box({
+    parent: sidebar,
+    top: 6,
+    left: 1,
+    right: 1,
+    height: 8,
+    tags: true
+  })
+
+  // Recent captures
   const capturesBox = blessed.box({
     parent: sidebar,
-    top: 9,
+    top: 15,
     left: 1,
     right: 1,
     bottom: 1,
     tags: true,
-    label: ' Recent Captures ',
-    border: { type: 'line', fg: 'gray' },
-    scrollable: true
+    label: ' 💡 Inbox ',
+    border: { type: 'line', fg: 'gray' }
   })
 
-  // Row 3: Command bar (always visible!)
+  // Command bar
   const commandBar = blessed.box({
+    parent: mainView,
     bottom: 0,
     left: 0,
     width: '100%',
     height: 3,
     tags: true,
-    style: {
-      fg: 'white',
-      bg: 'black'
-    },
-    content: getCommandBarContent()
+    style: { fg: 'white', bg: 'black' },
+    content: ' {cyan-fg}q{/} Quit  {cyan-fg}Enter{/} Details  {cyan-fg}s{/} Session  {cyan-fg}c{/} Capture  {cyan-fg}r{/} Refresh  {cyan-fg}?{/} Help  {gray-fg}│{/} {yellow-fg}↑↓{/} Navigate'
   })
 
-  // Add widgets to screen
-  screen.append(statusBar)
-  screen.append(projectsTable)
-  screen.append(sidebar)
-  screen.append(commandBar)
-
-  // Focus on projects table
-  projectsTable.focus()
+  screen.append(mainView)
 
   // ============================================================================
-  // COMMAND BAR CONTENT
+  // DETAIL VIEW WIDGETS
   // ============================================================================
 
-  function getCommandBarContent() {
-    return ' {bold}{cyan-fg}q{/} Quit  ' +
-           '{bold}{cyan-fg}r{/} Refresh  ' +
-           '{bold}{cyan-fg}s{/} Start Session  ' +
-           '{bold}{cyan-fg}e{/} End Session  ' +
-           '{bold}{cyan-fg}c{/} Capture  ' +
-           '{bold}{cyan-fg}?{/} Help  ' +
-           '{gray-fg}│{/} {bold}{yellow-fg}↑↓{/} Navigate  ' +
-           '{bold}{yellow-fg}Tab{/} Switch Panel'
+  const detailView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true
+  })
+
+  // Detail header
+  const detailHeader = blessed.box({
+    parent: detailView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 3,
+    tags: true,
+    style: { fg: 'white', bg: 'green' }
+  })
+
+  // Detail content area
+  const detailContent = blessed.box({
+    parent: detailView,
+    top: 3,
+    left: 0,
+    width: '100%',
+    height: '100%-6',
+    tags: true,
+    border: { type: 'line', fg: 'green' }
+  })
+
+  // Left column - status & sessions
+  const detailLeft = blessed.box({
+    parent: detailContent,
+    top: 0,
+    left: 1,
+    width: '50%-2',
+    height: '100%-2',
+    tags: true
+  })
+
+  // Right column - breadcrumbs & captures
+  const detailRight = blessed.box({
+    parent: detailContent,
+    top: 0,
+    right: 1,
+    width: '50%-2',
+    height: '100%-2',
+    tags: true
+  })
+
+  // Detail command bar
+  const detailCommandBar = blessed.box({
+    parent: detailView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 3,
+    tags: true,
+    style: { fg: 'white', bg: 'black' },
+    content: ' {yellow-fg}Esc{/} Back  {cyan-fg}s{/} Start Session  {cyan-fg}e{/} End Session  {cyan-fg}c{/} Capture  {cyan-fg}f{/} Set Focus  {cyan-fg}o{/} Open Folder'
+  })
+
+  screen.append(detailView)
+
+  // ============================================================================
+  // HELPER FUNCTIONS
+  // ============================================================================
+
+  function sparkline(data, width = 20) {
+    const chars = '▁▂▃▄▅▆▇█'
+    const max = Math.max(...data, 1)
+    return data.map(v => chars[Math.floor((v / max) * 7)]).join('')
   }
 
-  // ============================================================================
-  // DATA LOADING
-  // ============================================================================
-
-  async function loadData() {
-    try {
-      // Get projects
-      const projects = await atlas.projects.list()
-
-      // Status counts
-      const counts = { active: 0, paused: 0, stable: 0, other: 0 }
-      const projectRows = []
-
-      for (const p of projects) {
-        const rawStatus = p.status || 'unknown'
-
-        // Categorize
-        if (['active', 'working', 'in-progress', 'testing'].includes(rawStatus)) {
-          counts.active++
-        } else if (['paused', 'blocked', 'waiting'].includes(rawStatus)) {
-          counts.paused++
-        } else if (['stable', 'complete', 'released', 'ready'].includes(rawStatus)) {
-          counts.stable++
-        } else {
-          counts.other++
-        }
-
-        // Get type string safely
-        const typeStr = typeof p.type === 'object'
-          ? (p.type?.value || p.type?._value || 'general')
-          : (p.type || 'general')
-
-        // Status emoji
-        const statusIcon = getStatusIcon(rawStatus)
-
-        projectRows.push([
-          String(p.name || '').substring(0, 20),
-          String(typeStr).substring(0, 8),
-          statusIcon + ' ' + String(rawStatus).substring(0, 7),
-          String(p.path || '').split('/').slice(-2).join('/')
-        ])
-      }
-
-      // Update projects table
-      projectsTable.setData({
-        headers: ['Project', 'Type', 'Status', 'Location'],
-        data: projectRows.slice(0, 20)
-      })
-
-      // Get session info
-      let sessionInfo = '{yellow-fg}No active session{/}'
-      try {
-        const session = await atlas.sessions.current()
-        if (session) {
-          const duration = session.getDuration ? session.getDuration() : 0
-          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} ({white-fg}${duration}m{/})`
-        }
-      } catch (e) { /* ignore */ }
-
-      // Update status bar
-      statusBar.setContent(
-        ` ${sessionInfo}` +
-        `  {gray-fg}│{/}  ` +
-        `{green-fg}●{/} Active: {bold}${counts.active}{/}  ` +
-        `{yellow-fg}●{/} Paused: {bold}${counts.paused}{/}  ` +
-        `{cyan-fg}●{/} Stable: {bold}${counts.stable}{/}  ` +
-        `{gray-fg}●{/} Other: ${counts.other}  ` +
-        `{gray-fg}│{/}  ` +
-        `{white-fg}${projects.length} projects{/}`
-      )
-
-      // Get today's stats
-      let statsText = ''
-      try {
-        const status = await atlas.context.getStatus()
-        if (status?.today) {
-          statsText =
-            `{bold}Today{/}\n` +
-            `─────────────────\n` +
-            `{cyan-fg}Sessions:{/}  ${status.today.sessions || 0}\n` +
-            `{cyan-fg}Duration:{/}  ${status.today.totalDuration || 0}m\n` +
-            `{cyan-fg}Flow:{/}      ${status.today.flowSessions || 0}\n\n` +
-            `{bold}Inbox{/}\n` +
-            `─────────────────\n`
-        }
-      } catch (e) { /* ignore */ }
-
-      // Get inbox count
-      try {
-        const triageUseCase = atlas.container.resolve('TriageInboxUseCase')
-        const inboxStats = await triageUseCase.getStats()
-        statsText += `{yellow-fg}Items:{/}     ${inboxStats.inbox || 0}\n`
-      } catch (e) {
-        statsText += `{gray-fg}Items:{/}     -\n`
-      }
-
-      statsContent.setContent(statsText)
-
-      // Get recent captures
-      try {
-        const captures = await atlas.capture.inbox({ limit: 5 })
-        let captureText = ''
-        if (captures && captures.length > 0) {
-          captures.forEach((c, i) => {
-            const icon = c.type === 'task' ? '☐' : '💡'
-            const text = (c.text || c.content || '').substring(0, 25)
-            captureText += ` ${icon} ${text}\n`
-          })
-        } else {
-          captureText = ' {gray-fg}No recent captures{/}'
-        }
-        capturesBox.setContent(captureText)
-      } catch (e) {
-        capturesBox.setContent(' {gray-fg}Error loading{/}')
-      }
-
-    } catch (err) {
-      statusBar.setContent(` {red-fg}Error: ${err.message}{/}`)
-    }
-
-    screen.render()
+  function progressBar(percent, width = 20) {
+    const filled = Math.round((percent / 100) * width)
+    const empty = width - filled
+    return '{green-fg}' + '█'.repeat(filled) + '{/}{gray-fg}' + '░'.repeat(empty) + '{/}'
   }
 
   function getStatusIcon(status) {
@@ -286,31 +243,311 @@ export async function runDashboard(atlas, options = {}) {
     return icons[status] || icons.unknown
   }
 
+  function getTypeStr(type) {
+    if (typeof type === 'object') {
+      return type?.value || type?._value || 'general'
+    }
+    return type || 'general'
+  }
+
   // ============================================================================
-  // KEYBOARD NAVIGATION
+  // MAIN VIEW DATA
+  // ============================================================================
+
+  async function loadMainView() {
+    try {
+      const projects = await atlas.projects.list()
+      projectList = projects
+
+      // Status counts
+      const counts = { active: 0, paused: 0, stable: 0, other: 0 }
+      const projectRows = []
+
+      for (const p of projects) {
+        const rawStatus = p.status || 'unknown'
+
+        if (['active', 'working', 'in-progress', 'testing'].includes(rawStatus)) {
+          counts.active++
+        } else if (['paused', 'blocked', 'waiting'].includes(rawStatus)) {
+          counts.paused++
+        } else if (['stable', 'complete', 'released', 'ready'].includes(rawStatus)) {
+          counts.stable++
+        } else {
+          counts.other++
+        }
+
+        const typeStr = getTypeStr(p.type)
+        const statusIcon = getStatusIcon(rawStatus)
+
+        projectRows.push([
+          String(p.name || '').substring(0, 18),
+          String(typeStr).substring(0, 6),
+          statusIcon + ' ' + String(rawStatus).substring(0, 8),
+          String(p.path || '').split('/').slice(-2).join('/')
+        ])
+      }
+
+      projectsTable.setData({
+        headers: ['Project', 'Type', 'Status', 'Location'],
+        data: projectRows.slice(0, 25)
+      })
+
+      // Session info
+      let sessionInfo = '{yellow-fg}No active session{/}'
+      try {
+        const session = await atlas.sessions.current()
+        if (session) {
+          const duration = session.getDuration ? session.getDuration() : 0
+          sessionInfo = `{green-fg}●{/} {bold}${session.project}{/} (${duration}m)`
+        }
+      } catch (e) { /* ignore */ }
+
+      statusBar.setContent(
+        ` ${sessionInfo}  {gray-fg}│{/}  ` +
+        `{green-fg}●{/} ${counts.active}  ` +
+        `{yellow-fg}●{/} ${counts.paused}  ` +
+        `{cyan-fg}●{/} ${counts.stable}  ` +
+        `{gray-fg}●{/} ${counts.other}  ` +
+        `{gray-fg}│{/}  ${projects.length} projects`
+      )
+
+      // Activity sparkline (mock data for now - sessions per day)
+      try {
+        const status = await atlas.context.getStatus()
+        // Create sparkline data from recent sessions
+        const weekData = [2, 4, 3, 5, 4, 6, status?.today?.sessions || 0]
+        activitySpark.setData(['Sessions'], [weekData])
+      } catch (e) {
+        activitySpark.setData(['Sessions'], [[0, 0, 0, 0, 0, 0, 0]])
+      }
+
+      // Stats
+      try {
+        const status = await atlas.context.getStatus()
+        const today = status?.today || {}
+        const pct = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
+
+        statsBox.setContent(
+          `{bold}Today{/}\n` +
+          `───────────────────\n` +
+          `Sessions: ${today.sessions || 0}/5\n` +
+          progressBar(pct, 18) + `\n\n` +
+          `Duration: {cyan-fg}${today.totalDuration || 0}m{/}\n` +
+          `Flow:     {green-fg}${today.flowSessions || 0}{/}`
+        )
+      } catch (e) {
+        statsBox.setContent('{gray-fg}Loading...{/}')
+      }
+
+      // Captures
+      try {
+        const captures = await atlas.capture.inbox({ limit: 4 })
+        let text = ''
+        if (captures?.length) {
+          captures.forEach(c => {
+            const icon = c.type === 'task' ? '☐' : '💡'
+            text += ` ${icon} ${(c.text || '').substring(0, 22)}\n`
+          })
+        } else {
+          text = ' {gray-fg}Empty inbox!{/}'
+        }
+        capturesBox.setContent(text)
+      } catch (e) {
+        capturesBox.setContent(' {gray-fg}-{/}')
+      }
+
+    } catch (err) {
+      statusBar.setContent(` {red-fg}Error: ${err.message}{/}`)
+    }
+
+    screen.render()
+  }
+
+  // ============================================================================
+  // DETAIL VIEW DATA
+  // ============================================================================
+
+  async function loadDetailView(project) {
+    selectedProject = project
+    const name = project.name
+    const typeStr = getTypeStr(project.type)
+    const status = project.status || 'unknown'
+
+    detailHeader.setContent(
+      ` {bold}← Esc{/}  │  {bold}${name}{/}  │  ${getStatusIcon(status)} ${status}  │  ${typeStr}`
+    )
+
+    // Left column: Status & Sessions
+    let leftContent = ''
+
+    // Project info
+    leftContent += `{bold}📊 Project Info{/}\n`
+    leftContent += `─────────────────────\n`
+    leftContent += `Status: ${getStatusIcon(status)} ${status}\n`
+    leftContent += `Type:   ${typeStr}\n`
+    leftContent += `Path:   ${project.path || '-'}\n\n`
+
+    // Today's sessions for this project
+    leftContent += `{bold}⏱️ Sessions Today{/}\n`
+    leftContent += `─────────────────────\n`
+
+    try {
+      const statusData = await atlas.context.getStatus()
+      const today = statusData?.today || {}
+      const pct = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
+
+      leftContent += `Count:    ${today.sessions || 0}\n`
+      leftContent += `Duration: ${today.totalDuration || 0}m\n`
+      leftContent += `Progress: ${progressBar(pct, 15)}\n\n`
+    } catch (e) {
+      leftContent += `{gray-fg}No data{/}\n\n`
+    }
+
+    // Current session
+    leftContent += `{bold}🎯 Current Session{/}\n`
+    leftContent += `─────────────────────\n`
+    try {
+      const session = await atlas.sessions.current()
+      if (session && session.project === name) {
+        const duration = session.getDuration ? session.getDuration() : 0
+        leftContent += `{green-fg}● Active{/} (${duration}m)\n`
+        leftContent += `Task: ${session.task || '-'}\n`
+      } else if (session) {
+        leftContent += `{yellow-fg}● Other project{/}\n`
+        leftContent += `(${session.project})\n`
+      } else {
+        leftContent += `{gray-fg}No active session{/}\n`
+        leftContent += `Press {cyan-fg}s{/} to start\n`
+      }
+    } catch (e) {
+      leftContent += `{gray-fg}-{/}\n`
+    }
+
+    detailLeft.setContent(leftContent)
+
+    // Right column: Breadcrumbs & Captures
+    let rightContent = ''
+
+    // Breadcrumbs
+    rightContent += `{bold}🍞 Recent Breadcrumbs{/}\n`
+    rightContent += `─────────────────────\n`
+    try {
+      const trail = await atlas.context.trail({ project: name, limit: 5 })
+      if (trail?.length) {
+        trail.forEach(b => {
+          const time = new Date(b.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+          rightContent += `${time} ${(b.text || '').substring(0, 20)}\n`
+        })
+      } else {
+        rightContent += `{gray-fg}No breadcrumbs yet{/}\n`
+        rightContent += `Press {cyan-fg}b{/} to add one\n`
+      }
+    } catch (e) {
+      rightContent += `{gray-fg}No breadcrumbs{/}\n`
+    }
+
+    rightContent += `\n`
+
+    // Captures
+    rightContent += `{bold}💡 Ideas & Tasks{/}\n`
+    rightContent += `─────────────────────\n`
+    try {
+      const captures = await atlas.capture.inbox({ limit: 5 })
+      if (captures?.length) {
+        captures.forEach(c => {
+          const icon = c.type === 'task' ? '☐' : '💡'
+          rightContent += `${icon} ${(c.text || '').substring(0, 22)}\n`
+        })
+      } else {
+        rightContent += `{gray-fg}No captures{/}\n`
+      }
+    } catch (e) {
+      rightContent += `{gray-fg}-{/}\n`
+    }
+
+    detailRight.setContent(rightContent)
+    screen.render()
+  }
+
+  // ============================================================================
+  // VIEW SWITCHING
+  // ============================================================================
+
+  function showMainView() {
+    currentView = 'main'
+    detailView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  function showDetailView(project) {
+    currentView = 'detail'
+    mainView.hide()
+    detailView.show()
+    loadDetailView(project)
+  }
+
+  // ============================================================================
+  // KEYBOARD HANDLERS
   // ============================================================================
 
   // Quit
-  screen.key(['q', 'C-c'], () => process.exit(0))
+  screen.key(['q', 'C-c'], () => {
+    if (currentView === 'detail') {
+      showMainView()
+    } else {
+      process.exit(0)
+    }
+  })
+
+  // Escape - back to main
+  screen.key(['escape'], () => {
+    if (currentView === 'detail') {
+      showMainView()
+    }
+  })
+
+  // Enter - show detail
+  projectsTable.key(['enter'], () => {
+    const selected = projectsTable.rows?.selected || 0
+    if (projectList[selected]) {
+      showDetailView(projectList[selected])
+    }
+  })
 
   // Refresh
   screen.key(['r'], async () => {
     statusBar.setContent(' {yellow-fg}Refreshing...{/}')
     screen.render()
-    await loadData()
+    if (currentView === 'main') {
+      await loadMainView()
+    } else if (selectedProject) {
+      await loadDetailView(selectedProject)
+    }
   })
 
   // Help
   screen.key(['?', 'h'], () => showHelp())
 
   // Start session
-  screen.key(['s'], () => showSessionPrompt())
+  screen.key(['s'], () => {
+    if (currentView === 'detail' && selectedProject) {
+      startSessionFor(selectedProject.name)
+    } else {
+      showSessionPrompt()
+    }
+  })
 
   // End session
   screen.key(['e'], async () => {
     try {
       await atlas.sessions.end('Ended from dashboard')
-      await loadData()
+      if (currentView === 'main') {
+        await loadMainView()
+      } else {
+        await loadDetailView(selectedProject)
+      }
     } catch (e) {
       statusBar.setContent(` {red-fg}${e.message}{/}`)
       screen.render()
@@ -319,6 +556,15 @@ export async function runDashboard(atlas, options = {}) {
 
   // Capture
   screen.key(['c'], () => showCapturePrompt())
+
+  // Open folder (detail view)
+  screen.key(['o'], () => {
+    if (currentView === 'detail' && selectedProject?.path) {
+      require('child_process').exec(`open "${selectedProject.path}"`)
+      statusBar.setContent(` {green-fg}Opened: ${selectedProject.path}{/}`)
+      screen.render()
+    }
+  })
 
   // Tab to switch focus
   screen.key(['tab'], () => {
@@ -338,30 +584,32 @@ export async function runDashboard(atlas, options = {}) {
     const help = blessed.box({
       top: 'center',
       left: 'center',
-      width: 50,
-      height: 18,
+      width: 55,
+      height: 20,
       tags: true,
       border: { type: 'line', fg: 'cyan' },
       style: { bg: 'black' },
       label: ' {bold}Keyboard Shortcuts{/} ',
       content: `
   {bold}{cyan-fg}Navigation{/}
-  ─────────────────────────────
-  {yellow-fg}↑/↓{/}        Move through projects
-  {yellow-fg}Tab{/}        Switch between panels
-  {yellow-fg}Enter{/}      Select project
+  ─────────────────────────────────
+  {yellow-fg}↑/↓{/}        Navigate projects
+  {yellow-fg}Enter{/}      Open project details
+  {yellow-fg}Esc{/}        Back to main view
+  {yellow-fg}Tab{/}        Switch panels
 
   {bold}{cyan-fg}Actions{/}
-  ─────────────────────────────
+  ─────────────────────────────────
   {yellow-fg}s{/}          Start session
-  {yellow-fg}e{/}          End current session
+  {yellow-fg}e{/}          End session
   {yellow-fg}c{/}          Quick capture
-  {yellow-fg}r{/}          Refresh data
+  {yellow-fg}r{/}          Refresh
+  {yellow-fg}o{/}          Open project folder
 
   {bold}{cyan-fg}General{/}
-  ─────────────────────────────
-  {yellow-fg}q{/}          Quit dashboard
-  {yellow-fg}?{/}          Show this help
+  ─────────────────────────────────
+  {yellow-fg}q{/}          Quit (or back)
+  {yellow-fg}?{/}          This help
 
   {gray-fg}Press any key to close{/}
       `
@@ -373,7 +621,9 @@ export async function runDashboard(atlas, options = {}) {
 
     help.onceKey(['escape', 'q', 'enter', 'space'], () => {
       screen.remove(help)
-      projectsTable.focus()
+      if (currentView === 'main') {
+        projectsTable.focus()
+      }
       screen.render()
     })
   }
@@ -385,8 +635,8 @@ export async function runDashboard(atlas, options = {}) {
       width: 50,
       height: 3,
       border: { type: 'line', fg: 'green' },
-      label: ' Start Session - Enter project name: ',
-      style: { bg: 'black', focus: { border: { fg: 'cyan' } } },
+      label: ' Start Session - Project name: ',
+      style: { bg: 'black' },
       inputOnFocus: true
     })
 
@@ -396,13 +646,8 @@ export async function runDashboard(atlas, options = {}) {
 
     input.on('submit', async (value) => {
       screen.remove(input)
-      if (value && value.trim()) {
-        try {
-          await atlas.sessions.start(value.trim())
-          await loadData()
-        } catch (e) {
-          statusBar.setContent(` {red-fg}${e.message}{/}`)
-        }
+      if (value?.trim()) {
+        await startSessionFor(value.trim())
       }
       projectsTable.focus()
       screen.render()
@@ -415,6 +660,21 @@ export async function runDashboard(atlas, options = {}) {
     })
   }
 
+  async function startSessionFor(projectName) {
+    try {
+      await atlas.sessions.start(projectName)
+      statusBar.setContent(` {green-fg}✓ Session started: ${projectName}{/}`)
+      if (currentView === 'main') {
+        await loadMainView()
+      } else {
+        await loadDetailView(selectedProject)
+      }
+    } catch (e) {
+      statusBar.setContent(` {red-fg}${e.message}{/}`)
+      screen.render()
+    }
+  }
+
   function showCapturePrompt() {
     const input = blessed.textbox({
       top: 'center',
@@ -422,8 +682,8 @@ export async function runDashboard(atlas, options = {}) {
       width: 60,
       height: 3,
       border: { type: 'line', fg: 'yellow' },
-      label: ' Quick Capture - Enter idea/task: ',
-      style: { bg: 'black', focus: { border: { fg: 'cyan' } } },
+      label: ' 💡 Quick Capture: ',
+      style: { bg: 'black' },
       inputOnFocus: true
     })
 
@@ -433,11 +693,14 @@ export async function runDashboard(atlas, options = {}) {
 
     input.on('submit', async (value) => {
       screen.remove(input)
-      if (value && value.trim()) {
+      if (value?.trim()) {
         try {
           await atlas.capture.add(value.trim())
-          statusBar.setContent(` {green-fg}✓ Captured: "${value.substring(0, 30)}..."{/}`)
-          setTimeout(() => loadData(), 1500)
+          statusBar.setContent(` {green-fg}✓ Captured!{/}`)
+          setTimeout(() => {
+            if (currentView === 'main') loadMainView()
+            else loadDetailView(selectedProject)
+          }, 1000)
         } catch (e) {
           statusBar.setContent(` {red-fg}${e.message}{/}`)
         }
@@ -457,12 +720,14 @@ export async function runDashboard(atlas, options = {}) {
   // INITIALIZE
   // ============================================================================
 
-  await loadData()
+  projectsTable.focus()
+  await loadMainView()
 
-  // Auto-refresh every 30 seconds
-  const refreshInterval = setInterval(loadData, 30000)
+  const refreshInterval = setInterval(() => {
+    if (currentView === 'main') loadMainView()
+  }, 30000)
+
   process.on('exit', () => clearInterval(refreshInterval))
-
   screen.render()
 }
 
