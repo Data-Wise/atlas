@@ -507,6 +507,53 @@ program
     console.log(content);
   });
 
+// ============================================================================
+// CONFIG COMMANDS
+// ============================================================================
+
+const config = program.command('config').description('Manage atlas configuration');
+
+config
+  .command('paths')
+  .description('Show configured scan paths')
+  .action(async () => {
+    const paths = await getAtlas().config.getScanPaths();
+    console.log('Configured scan paths:');
+    paths.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
+  });
+
+config
+  .command('add-path <path>')
+  .description('Add a scan path')
+  .action(async (path) => {
+    const { resolve } = await import('path');
+    const absolutePath = resolve(path.replace(/^~/, process.env.HOME));
+    const paths = await getAtlas().config.addScanPath(absolutePath);
+    console.log(`Added: ${absolutePath}`);
+    console.log(`\nCurrent paths (${paths.length}):`);
+    paths.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
+  });
+
+config
+  .command('remove-path <path>')
+  .description('Remove a scan path')
+  .action(async (path) => {
+    const { resolve } = await import('path');
+    const absolutePath = resolve(path.replace(/^~/, process.env.HOME));
+    const paths = await getAtlas().config.removeScanPath(absolutePath);
+    console.log(`Removed: ${absolutePath}`);
+    console.log(`\nCurrent paths (${paths.length}):`);
+    paths.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
+  });
+
+config
+  .command('show')
+  .description('Show all configuration')
+  .action(async () => {
+    const cfg = await getAtlas().config.load();
+    console.log(JSON.stringify(cfg, null, 2));
+  });
+
 // Show help if no command was provided (before parsing to avoid Commander errors)
 if (process.argv.length <= 2) {
   program.outputHelp();

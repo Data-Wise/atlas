@@ -8,6 +8,7 @@
  */
 
 import { Container } from './adapters/Container.js';
+import { Config } from './utils/Config.js';
 
 // Re-export domain entities for library consumers
 export { Project } from './domain/entities/Project.js';
@@ -39,13 +40,16 @@ export class Atlas {
     this.configPath = options.configPath || this._defaultConfigPath();
     this.storage = options.storage || process.env.ATLAS_STORAGE || 'filesystem';
 
+    // Config manager for user preferences
+    this.config = new Config(this.configPath);
+
     this.container = new Container({
       dataDir: this.configPath,
       storage: this.storage
     });
 
     // Initialize subsystems
-    this.projects = new ProjectsAPI(this.container);
+    this.projects = new ProjectsAPI(this.container, this.config);
     this.sessions = new SessionsAPI(this.container);
     this.capture = new CaptureAPI(this.container);
     this.context = new ContextAPI(this.container);
@@ -87,7 +91,8 @@ export class Atlas {
    */
   async sync(options = {}) {
     const syncUseCase = this.container.resolve('SyncRegistryUseCase');
-    const rootPaths = options.paths || [`${process.env.HOME}/projects`];
+    const configPaths = await this.config.getScanPaths();
+    const rootPaths = options.paths || configPaths;
 
     const result = await syncUseCase.execute({
       rootPaths,
@@ -204,8 +209,9 @@ export class Atlas {
  * Projects API - Registry operations
  */
 class ProjectsAPI {
-  constructor(container) {
+  constructor(container, config) {
     this.container = container;
+    this.config = config;
   }
 
   async register(path, options = {}) {
@@ -231,9 +237,9 @@ class ProjectsAPI {
 
   async list(options = {}) {
     const scanUseCase = this.container.resolve('ScanProjectsUseCase');
-    const result = await scanUseCase.execute({
-      rootPath: options.rootPath || `${process.env.HOME}/projects`
-    });
+    const configPaths = await this.config.getScanPaths();
+    const rootPath = options.rootPath || configPaths[0];
+    const result = await scanUseCase.execute({ rootPath });
 
     // Combine discovered and updated for the full list
     const allProjects = [...(result.discovered || []), ...(result.updated || [])];
