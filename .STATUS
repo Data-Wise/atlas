@@ -1,0 +1,35 @@
+# Atlas - Project State Engine
+# Extracted from flow-cli Node.js Clean Architecture
+
+## Status: ACTIVE
+## Phase: P1 - Initial Setup
+## Focus: Core infrastructure and migration from flow-cli
+
+## Current Sprint
+- [x] Create project structure
+- [x] Migrate domain layer from flow-cli
+- [x] Migrate adapters layer
+- [x] Migrate use-cases
+- [x] Create CLI entry point
+- [x] Create main Atlas facade class
+- [ ] Update imports in migrated files
+- [ ] Add new capture use-cases
+- [ ] Add new context use-cases
+- [ ] Test suite validation
+
+## Architecture
+- Clean Architecture (from flow-cli)
+- Domain-driven design
+- CQRS-ready structure
+
+## Integration Points
+- flow-cli ZSH plugin (consumer)
+- MCP server (future)
+- TUI dashboard (future)
+
+## Key Files
+- src/index.js - Main Atlas class
+- bin/atlas.js - CLI entry point
+- src/domain/ - Core entities and value objects
+- src/use-cases/ - Business logic
+- src/adapters/ - Repository implementations

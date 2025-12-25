@@ -1,0 +1,53 @@
+{
+  "name": "@data-wise/atlas",
+  "version": "0.1.0",
+  "description": "Project state engine - registry, sessions, capture, and context management",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "atlas": "./bin/atlas.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./api": "./src/api/index.js"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:unit": "npm test -- --testPathPattern=test/unit",
+    "test:integration": "npm test -- --testPathPattern=test/integration",
+    "test:e2e": "npm test -- --testPathPattern=test/e2e",
+    "test:coverage": "npm test -- --coverage",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
+    "start": "node bin/atlas.js"
+  },
+  "keywords": [
+    "project-management",
+    "workflow",
+    "adhd",
+    "productivity",
+    "cli",
+    "state-management"
+  ],
+  "author": "Stat-Wise",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/data-wise/atlas.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "yaml": "^2.3.4",
+    "better-sqlite3": "^9.2.2",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1"
+  }
+}
