@@ -62,24 +62,29 @@ export class Atlas {
 
   /**
    * Sync registry from .STATUS files
+   *
+   * @param {Object} options
+   * @param {string[]} [options.paths] - Root paths to scan (defaults to ~/projects)
+   * @param {boolean} [options.dryRun] - If true, show what would be synced without saving
+   * @param {boolean} [options.removeOrphans] - Remove projects no longer on disk
    */
   async sync(options = {}) {
-    const scanUseCase = this.container.resolve('ScanProjectsUseCase');
-    const projects = await scanUseCase.execute();
-    
-    if (options.dryRun) {
-      return {
-        success: true,
-        count: projects.length,
-        message: `[DRY RUN] Would sync ${projects.length} projects`,
-        projects: projects.map(p => ({ name: p.name, path: p.path }))
-      };
-    }
-    
+    const syncUseCase = this.container.resolve('SyncRegistryUseCase');
+    const rootPaths = options.paths || [`${process.env.HOME}/projects`];
+
+    const result = await syncUseCase.execute({
+      rootPaths,
+      dryRun: options.dryRun || false,
+      removeOrphans: options.removeOrphans || false
+    });
+
+    const totalChanged = result.discovered.length + result.updated.length;
+    const prefix = options.dryRun ? '[DRY RUN] Would sync' : 'Synced';
+
     return {
       success: true,
-      count: projects.length,
-      message: `Synced ${projects.length} projects from .STATUS files`
+      ...result,
+      message: `${prefix} ${totalChanged} projects (${result.discovered.length} new, ${result.updated.length} updated, ${result.unchanged.length} unchanged)`
     };
   }
 

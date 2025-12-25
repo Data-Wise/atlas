@@ -35,7 +35,9 @@ import { GetInboxUseCase } from '../use-cases/capture/GetInboxUseCase.js'
 import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
+import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
+import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 
 export class Container {
   /**
@@ -243,6 +245,30 @@ export class Container {
   }
 
   // ============================================================================
+  // USE CASES - Registry
+  // ============================================================================
+
+  getSyncRegistryUseCase() {
+    return this._resolve('syncRegistryUseCase', () => {
+      return new SyncRegistryUseCase({
+        projectRepository: this.getProjectRepository(),
+        statusFileGateway: this.getStatusFileGateway(),
+        fileSystemProjectRepository: this.getFileSystemProjectRepository()
+      })
+    })
+  }
+
+  // ============================================================================
+  // GATEWAYS (Infrastructure Layer)
+  // ============================================================================
+
+  getStatusFileGateway() {
+    return this._resolve('statusFileGateway', () => {
+      return new StatusFileGateway()
+    })
+  }
+
+  // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
 
@@ -295,7 +321,13 @@ export class Container {
       'GetContextUseCase': () => this.getGetContextUseCase(),
       'LogBreadcrumbUseCase': () => this.getLogBreadcrumbUseCase(),
       'GetTrailUseCase': () => this.getGetTrailUseCase(),
-      
+
+      // Registry use cases
+      'SyncRegistryUseCase': () => this.getSyncRegistryUseCase(),
+
+      // Gateways
+      'StatusFileGateway': () => this.getStatusFileGateway(),
+
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
       'ProjectRepository': () => this.getProjectRepository(),
@@ -333,7 +365,10 @@ export class Container {
       // Context
       getContext: this.getGetContextUseCase(),
       logBreadcrumb: this.getLogBreadcrumbUseCase(),
-      getTrail: this.getGetTrailUseCase()
+      getTrail: this.getGetTrailUseCase(),
+
+      // Registry
+      syncRegistry: this.getSyncRegistryUseCase()
     }
   }
 
