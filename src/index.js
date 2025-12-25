@@ -114,7 +114,13 @@ export class Atlas {
   formatOutput(data, format = 'table') {
     switch (format) {
       case 'json':
-        console.log(JSON.stringify(data, null, 2));
+        // Use replacer to convert value objects to strings
+        console.log(JSON.stringify(data, (key, value) => {
+          if (value && typeof value === 'object' && value._value !== undefined) {
+            return value._value; // Value object - return inner value
+          }
+          return value;
+        }, 2));
         break;
       case 'names':
         if (Array.isArray(data)) {
