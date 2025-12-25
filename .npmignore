@@ -1,0 +1,41 @@
+# Test files
+test/
+*.test.js
+jest.config.js
+.jest/
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/
+
+# Config files
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Status files (project-specific)
+.STATUS
+
+# Docs (README included via files field)
+docs/
+
+# Node
+node_modules/
+coverage/
+.nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+npm-debug.log*
+
+# Local config
+*.local.json
+
+# Legacy API files (incompatible)
+src/api/

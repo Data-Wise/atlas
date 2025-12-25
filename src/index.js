@@ -231,20 +231,25 @@ class ProjectsAPI {
 
   async list(options = {}) {
     const scanUseCase = this.container.resolve('ScanProjectsUseCase');
-    const projects = await scanUseCase.execute();
-    
-    let filtered = projects;
+    const result = await scanUseCase.execute({
+      rootPath: options.rootPath || `${process.env.HOME}/projects`
+    });
+
+    // Combine discovered and updated for the full list
+    const allProjects = [...(result.discovered || []), ...(result.updated || [])];
+
+    let filtered = allProjects;
     if (options.status) {
       filtered = filtered.filter(p => p.status === options.status);
     }
     if (options.tag) {
       filtered = filtered.filter(p => p.tags?.includes(options.tag));
     }
-    
+
     return filtered.map(p => ({
       name: p.name,
       path: p.path,
-      status: p.status,
+      status: p.status || p.metadata?.status,
       type: p.type
     }));
   }
@@ -255,8 +260,11 @@ class ProjectsAPI {
   }
 
   async setFocus(name, focus) {
-    // TODO: Implement UpdateStatusUseCase
-    return { success: true };
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.execute({
+      project: name,
+      updates: { focus }
+    });
   }
 
   async getFocus(name) {
@@ -265,7 +273,38 @@ class ProjectsAPI {
   }
 
   async setStatus(name, status) {
-    return { success: true };
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.execute({
+      project: name,
+      updates: { status }
+    });
+  }
+
+  async setProgress(name, progress) {
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.execute({
+      project: name,
+      updates: { progress }
+    });
+  }
+
+  async update(name, updates) {
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.execute({
+      project: name,
+      updates,
+      createIfMissing: updates.createIfMissing
+    });
+  }
+
+  async incrementProgress(name, amount = 10) {
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.incrementProgress(name, amount);
+  }
+
+  async completeNextAction(name, newAction = null) {
+    const updateUseCase = this.container.resolve('UpdateStatusUseCase');
+    return await updateUseCase.completeNextAction(name, newAction);
   }
 }
 

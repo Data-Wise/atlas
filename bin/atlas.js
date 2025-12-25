@@ -106,15 +106,62 @@ program
 
 program
   .command('status [project]')
-  .description('Get or show project status')
-  .option('--set <status>', 'Set status (active|paused|blocked|archived)')
+  .description('Get or update project status')
+  .option('--set <status>', 'Set status (active|paused|blocked|archived|complete)')
+  .option('--progress <percent>', 'Set progress (0-100)')
+  .option('--focus <text>', 'Set current focus/checkpoint')
+  .option('--next <action>', 'Set next action(s) - comma separated')
+  .option('--complete', 'Mark current next action as done')
+  .option('--then <action>', 'After completing, add this as next action')
+  .option('--increment <amount>', 'Increment progress by amount (default: 10)')
+  .option('--create', 'Create .STATUS file if missing')
   .action(async (project, options) => {
-    if (options.set) {
-      await getAtlas().projects.setStatus(project, options.set);
-      console.log(`✓ Status: ${options.set}`);
+    const a = getAtlas();
+    const hasUpdate = options.set || options.progress || options.focus ||
+                      options.next || options.complete || options.increment;
+
+    if (hasUpdate) {
+      // Build updates object
+      const updates = {};
+      if (options.set) updates.status = options.set;
+      if (options.progress !== undefined) updates.progress = parseInt(options.progress);
+      if (options.focus) updates.focus = options.focus;
+      if (options.next) {
+        updates.next = options.next.split(',').map(n => n.trim());
+      }
+
+      // Handle complete action with optional next action
+      if (options.complete) {
+        const result = await a.projects.completeNextAction(project, options.then);
+        console.log(result.message);
+        return;
+      }
+
+      // Handle increment
+      if (options.increment !== undefined) {
+        const result = await a.projects.incrementProgress(
+          project,
+          parseInt(options.increment) || 10
+        );
+        console.log(result.message);
+        return;
+      }
+
+      // Apply updates
+      if (Object.keys(updates).length > 0) {
+        const result = await a.projects.update(project, {
+          ...updates,
+          createIfMissing: options.create
+        });
+        console.log(result.message);
+        if (result.changes?.length > 0) {
+          result.changes.forEach(c => console.log(`   ${c}`));
+        }
+      }
     } else {
-      const status = await getAtlas().context.getStatus(project);
-      getAtlas().formatStatus(status);
+      // Just show status
+      const status = await a.context.getStatus(project);
+      a.formatStatus(status);
     }
   });
 
@@ -172,10 +219,123 @@ program
   .description('Show captured items')
   .option('-p, --project <project>', 'Filter by project')
   .option('--triage', 'Interactive triage mode')
+  .option('--stats', 'Show inbox statistics')
   .action(async (options) => {
-    const items = await getAtlas().capture.inbox(options);
-    getAtlas().formatInbox(items);
+    const a = getAtlas();
+
+    if (options.stats) {
+      const triageUseCase = a.container.resolve('TriageInboxUseCase');
+      const stats = await triageUseCase.getStats();
+      console.log('\n📊 INBOX STATS');
+      console.log('─'.repeat(30));
+      console.log(`📥 Inbox: ${stats.inbox}`);
+      console.log(`✓  Triaged: ${stats.triaged}`);
+      console.log(`📦 Archived: ${stats.archived}`);
+      if (Object.keys(stats.byType).length > 0) {
+        console.log('\nBy type:');
+        Object.entries(stats.byType).forEach(([type, count]) => {
+          const icon = type === 'task' ? '☐' : type === 'bug' ? '🐛' : type === 'question' ? '❓' : '💡';
+          console.log(`  ${icon} ${type}: ${count}`);
+        });
+      }
+      return;
+    }
+
+    if (options.triage) {
+      await runTriageMode(a);
+      return;
+    }
+
+    const items = await a.capture.inbox(options);
+    a.formatInbox(items);
   });
+
+/**
+ * Interactive triage mode
+ */
+async function runTriageMode(atlas) {
+  const readline = await import('readline');
+  const triageUseCase = atlas.container.resolve('TriageInboxUseCase');
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  const question = (prompt) => new Promise(resolve => rl.question(prompt, resolve));
+
+  console.log('\n🔄 TRIAGE MODE');
+  console.log('─'.repeat(40));
+  console.log('Commands: [a]ssign, [s]kip, [d]elete, [q]uit');
+  console.log('');
+
+  let processed = 0;
+  let skipped = 0;
+
+  while (true) {
+    const item = await triageUseCase.getNextItem();
+
+    if (!item) {
+      console.log('\n📭 Inbox empty! Nice work.');
+      break;
+    }
+
+    // Display item
+    const icon = item.type === 'task' ? '☐' : item.type === 'bug' ? '🐛' : item.type === 'question' ? '❓' : '💡';
+    console.log(`\n${icon} [${item.type}] ${item.text}`);
+    console.log(`   Age: ${item.getAge()} | ID: ${item.id.slice(0, 12)}...`);
+    if (item.project) console.log(`   Project: ${item.project}`);
+
+    const answer = await question('\nAction (a/s/d/q): ');
+    const action = answer.trim().toLowerCase();
+
+    switch (action) {
+      case 'a':
+      case 'assign':
+        const projectName = await question('Project name: ');
+        if (projectName.trim()) {
+          try {
+            const result = await triageUseCase.assign(item.id, projectName.trim());
+            console.log(`✓ ${result.message}`);
+            processed++;
+          } catch (err) {
+            console.log(`✗ ${err.message}`);
+          }
+        } else {
+          console.log('Skipped (no project entered)');
+          skipped++;
+        }
+        break;
+
+      case 's':
+      case 'skip':
+        console.log('→ Skipped');
+        skipped++;
+        // Move to end of queue by archiving and re-adding (or just break out)
+        break;
+
+      case 'd':
+      case 'delete':
+      case 'x':
+        await triageUseCase.archive(item.id);
+        console.log('✗ Archived');
+        processed++;
+        break;
+
+      case 'q':
+      case 'quit':
+        console.log(`\n✓ Triage complete: ${processed} processed, ${skipped} skipped`);
+        rl.close();
+        return;
+
+      default:
+        console.log('Unknown action. Use: a(ssign), s(kip), d(elete), q(uit)');
+    }
+  }
+
+  console.log(`\n✓ Triage complete: ${processed} processed, ${skipped} skipped`);
+  rl.close();
+}
 
 // ============================================================================
 // CONTEXT COMMANDS
@@ -205,6 +365,19 @@ program
   .action(async (project, options) => {
     const trail = await getAtlas().context.trail(project, parseInt(options.days));
     getAtlas().formatTrail(trail);
+  });
+
+// ============================================================================
+// DASHBOARD COMMAND
+// ============================================================================
+
+program
+  .command('dashboard')
+  .alias('dash')
+  .description('Launch interactive dashboard TUI')
+  .action(async () => {
+    const { runDashboard } = await import('../src/cli/dashboard.js');
+    await runDashboard(getAtlas());
   });
 
 // ============================================================================
@@ -299,6 +472,39 @@ program
       dryRun: options.dryRun
     });
     console.log(result.message);
+  });
+
+program
+  .command('completions [shell]')
+  .description('Generate shell completions (zsh|bash|fish)')
+  .action(async (shell) => {
+    const { readFileSync } = await import('fs');
+    const { fileURLToPath } = await import('url');
+    const { dirname, join } = await import('path');
+
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const completionsDir = join(__dirname, '..', 'completions');
+
+    const supportedShells = ['zsh', 'bash', 'fish'];
+
+    if (!shell) {
+      console.log('Shell completions for Atlas CLI\n');
+      console.log('Available shells: zsh, bash, fish\n');
+      console.log('Installation:');
+      console.log('  ZSH:  eval "$(atlas completions zsh)" >> ~/.zshrc');
+      console.log('  Bash: eval "$(atlas completions bash)" >> ~/.bashrc');
+      console.log('  Fish: atlas completions fish > ~/.config/fish/completions/atlas.fish');
+      return;
+    }
+
+    if (!supportedShells.includes(shell)) {
+      console.error(`Unsupported shell: ${shell}. Use: zsh, bash, or fish`);
+      process.exit(1);
+    }
+
+    const filename = `atlas.${shell}`;
+    const content = readFileSync(join(completionsDir, filename), 'utf-8');
+    console.log(content);
   });
 
 // Show help if no command was provided (before parsing to avoid Commander errors)

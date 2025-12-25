@@ -4,37 +4,42 @@
 ## Phase: 🔧 Development
 ## Priority: 1
 
-## Focus: State engine extraction complete, testing integration
+## Focus: Feature-complete MVP with all core functionality
 
 ## Quick Context
-Atlas is the project state engine extracted from flow-cli. Clean Architecture with 
+Atlas is the project state engine extracted from flow-cli. Clean Architecture with
 domain entities (Project, Session, Capture, Breadcrumb), use-cases, and adapters.
-CLI and programmatic API available.
+CLI and programmatic API available. SQLite and filesystem storage backends.
 
 ## Recent Progress
 - [x] Extracted Clean Architecture code from flow-cli/cli
-- [x] Added Capture and Breadcrumb entities
+- [x] Added Capture and Breadcrumb entities (62 tests)
 - [x] Created capture and context use-cases
 - [x] Updated Container with all repositories
 - [x] CLI commands: project, session, catch, crumb, where, trail
+- [x] Implement SQLite repository option for performance (29 tests)
+- [x] Add registry persistence via SyncRegistryUseCase
+- [x] Complete sync command with watch mode
+- [x] Migration tool (filesystem ↔ SQLite)
+- [x] RegisterProjectUseCase (manual project add)
 
 ## Current Tasks
-- [x] Write tests for new Capture/Breadcrumb entities (62 tests)
-- [x] Implement SQLite repository option for performance
-- [x] Add registry persistence via SyncRegistryUseCase
-- [x] Complete sync command for .STATUS files
+- [x] UpdateStatusUseCase for programmatic .STATUS updates (41 tests)
+- [x] Interactive triage mode (`atlas inbox --triage`)
+- [x] Dashboard TUI (`atlas dashboard`)
+- [x] Shell completions (`atlas completions zsh|bash|fish`)
 
 ## Next Tasks
-- [x] Add CLI flag for SQLite storage (--storage sqlite)
-- [x] Create migration tool (JSON → SQLite)
-- [x] Add watch mode for sync command
-- [x] Implement RegisterProjectUseCase (manual add)
+- [ ] Add E2E tests for new CLI commands
+- [ ] Test dashboard on actual project data
+- [ ] Document API in README
+- [ ] Package for npm publish
 
 ## Future Enhancements
-- [ ] Add UpdateStatusUseCase for programmatic .STATUS updates
-- [ ] Interactive triage mode for inbox
-- [ ] Dashboard TUI (blessed-contrib)
-- [ ] Shell completions (zsh/bash/fish)
+- [ ] Project templates (init --template node/r-package)
+- [ ] Remote sync (GitHub/GitLab status)
+- [ ] VS Code extension for .STATUS editing
+- [ ] Mobile-friendly web dashboard
 
 ## Blockers
 None
@@ -60,3 +65,7 @@ atlas/
 - 2025-12-25: Implemented SQLite storage backend (29 integration tests)
 - 2025-12-25: Added SyncRegistryUseCase for .STATUS file integration
 - 2025-12-25: CLI enhancements (--storage, migrate, watch mode, register)
+- 2025-12-25: UpdateStatusUseCase + CLI (41 new tests, 691 total)
+- 2025-12-25: Interactive inbox triage mode (TriageInboxUseCase)
+- 2025-12-25: Dashboard TUI with blessed-contrib
+- 2025-12-25: Shell completions (zsh/bash/fish)

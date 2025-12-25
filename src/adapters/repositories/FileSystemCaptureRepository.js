@@ -79,6 +79,13 @@ export class FileSystemCaptureRepository {
   }
 
   /**
+   * Find by status
+   */
+  async findByStatus(status) {
+    return this.findAll({ status });
+  }
+
+  /**
    * Find by ID
    */
   async findById(id) {

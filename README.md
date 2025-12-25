@@ -25,6 +25,9 @@ npm install -g @data-wise/atlas
 
 # Or use directly
 npx @data-wise/atlas status
+
+# Enable shell completions
+atlas completions zsh >> ~/.zshrc   # or bash/fish
 ```
 
 ## Quick Start
@@ -83,10 +86,42 @@ atlas trail                    # Recent breadcrumbs
 atlas trail --days=7
 ```
 
+### Status Updates
+```bash
+atlas status myproject                          # Show project status
+atlas status myproject --set active             # Set status
+atlas status myproject --progress 50            # Set progress
+atlas status myproject --next "Implement X"     # Set next action
+atlas status myproject --complete               # Complete current action
+atlas status myproject --increment 10           # Increase progress by 10
+atlas focus myproject "Delta method SEs"        # Set focus
+```
+
 ### Sync
 ```bash
 atlas sync                     # Import from .STATUS files
 atlas sync --dry-run           # Preview what would sync
+atlas sync --watch             # Watch mode (5s interval)
+```
+
+### Inbox Triage
+```bash
+atlas inbox                    # Show inbox items
+atlas inbox --stats            # Show inbox statistics
+atlas inbox --triage           # Interactive triage mode
+```
+
+### Dashboard
+```bash
+atlas dashboard                # Launch TUI dashboard
+atlas dash                     # Alias for dashboard
+```
+
+### Storage & Migration
+```bash
+atlas --storage sqlite         # Use SQLite backend
+atlas migrate --to sqlite      # Migrate to SQLite
+atlas migrate --to filesystem  # Migrate back to JSON
 ```
 
 ## Programmatic API
@@ -94,22 +129,45 @@ atlas sync --dry-run           # Preview what would sync
 ```javascript
 import { Atlas } from '@data-wise/atlas';
 
-const atlas = new Atlas();
+// Initialize with options
+const atlas = new Atlas({
+  storage: 'sqlite',           // or 'filesystem' (default)
+  configPath: '~/.atlas'       // data directory
+});
 
-// List active projects
+// Projects API
 const projects = await atlas.projects.list({ status: 'active' });
+await atlas.projects.register('/path/to/project', { tags: ['r-package'] });
+await atlas.projects.setStatus('medrobust', 'paused');
+await atlas.projects.setProgress('medrobust', 75);
+await atlas.projects.setFocus('medrobust', 'Delta method SEs');
+await atlas.projects.incrementProgress('medrobust', 10);
+await atlas.projects.completeNextAction('medrobust', 'New task');
 
-// Get project with context
+// Sessions API
+const session = await atlas.sessions.start('medrobust');
+await atlas.sessions.end('Completed delta method');
+const current = await atlas.sessions.current();
+
+// Capture API
+await atlas.capture.add("new idea", { project: 'medrobust', type: 'idea' });
+const inbox = await atlas.capture.inbox({ project: 'medrobust' });
+const counts = await atlas.capture.counts();
+
+// Context API
 const ctx = await atlas.context.where('medrobust');
 console.log(ctx.focus);          // "delta method SEs"
 console.log(ctx.session);        // { start: ..., duration: ... }
 console.log(ctx.recentCrumbs);   // ["stuck on variance", ...]
 
-// Capture idea
-await atlas.capture.add("new idea", { project: 'medrobust' });
+await atlas.context.breadcrumb("stuck on variance", 'medrobust');
+const trail = await atlas.context.trail('medrobust', 7); // last 7 days
 
-// Start session
-const session = await atlas.sessions.start('medrobust');
+// Sync API
+await atlas.sync({ paths: ['~/projects'], dryRun: false });
+
+// Clean up (important for SQLite)
+atlas.close();
 ```
 
 ## Architecture
@@ -124,31 +182,43 @@ src/
 │   └── repositories/        # Repository interfaces
 │
 ├── use-cases/               # Application business logic
-│   ├── project/             # Project operations
-│   ├── session/             # Session management
-│   ├── capture/             # Quick capture
-│   └── context/             # Context reconstruction
+│   ├── project/             # ScanProjects, GetStatus, GetRecentProjects
+│   ├── session/             # CreateSession, EndSession
+│   ├── capture/             # CaptureIdea, GetInbox, TriageInbox
+│   ├── context/             # GetContext, LogBreadcrumb, GetTrail
+│   ├── registry/            # SyncRegistry, RegisterProject
+│   └── status/              # UpdateStatus
 │
 ├── adapters/                # External interfaces
-│   ├── repositories/        # FileSystem implementations
+│   ├── repositories/        # FileSystem + SQLite implementations
 │   ├── Container.js         # Dependency injection
+│   ├── gateways/            # StatusFileGateway
 │   └── events/              # Event publishing
 │
 └── cli/                     # Command-line interface
+    └── dashboard.js         # TUI dashboard (blessed-contrib)
 ```
 
 ## Data Storage
 
-Atlas stores data in `~/.atlas/`:
+Atlas supports two storage backends:
 
+### Filesystem (Default)
 ```
 ~/.atlas/
-├── config.yaml              # Configuration
-├── registry.json            # Project registry
+├── projects.json            # Project registry
 ├── sessions.json            # Session history
 ├── captures.json            # Captured ideas/tasks
 └── breadcrumbs.json         # Breadcrumb trail
 ```
+
+### SQLite (Better Performance)
+```
+~/.atlas/
+└── atlas.db                 # All data in single SQLite database
+```
+
+Switch backends with `--storage sqlite` or migrate with `atlas migrate`.
 
 ## Integration with flow-cli
 

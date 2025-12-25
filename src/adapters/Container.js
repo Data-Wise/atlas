@@ -32,11 +32,13 @@ import { GetStatusUseCase } from '../use-cases/project/GetStatusUseCase.js'
 import { GetRecentProjectsUseCase } from '../use-cases/project/GetRecentProjectsUseCase.js'
 import { CaptureIdeaUseCase } from '../use-cases/capture/CaptureIdeaUseCase.js'
 import { GetInboxUseCase } from '../use-cases/capture/GetInboxUseCase.js'
+import { TriageInboxUseCase } from '../use-cases/capture/TriageInboxUseCase.js'
 import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
 import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
+import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 
@@ -213,6 +215,16 @@ export class Container {
     })
   }
 
+  getTriageInboxUseCase() {
+    return this._resolve('triageInboxUseCase', () => {
+      return new TriageInboxUseCase({
+        captureRepository: this.getCaptureRepository(),
+        projectRepository: this.getProjectRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
   // ============================================================================
   // USE CASES - Context
   // ============================================================================
@@ -262,6 +274,19 @@ export class Container {
   getRegisterProjectUseCase() {
     return this._resolve('registerProjectUseCase', () => {
       return new RegisterProjectUseCase({
+        projectRepository: this.getProjectRepository(),
+        statusFileGateway: this.getStatusFileGateway()
+      })
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Status
+  // ============================================================================
+
+  getUpdateStatusUseCase() {
+    return this._resolve('updateStatusUseCase', () => {
+      return new UpdateStatusUseCase({
         projectRepository: this.getProjectRepository(),
         statusFileGateway: this.getStatusFileGateway()
       })
@@ -326,7 +351,8 @@ export class Container {
       // Capture use cases
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
       'GetInboxUseCase': () => this.getGetInboxUseCase(),
-      
+      'TriageInboxUseCase': () => this.getTriageInboxUseCase(),
+
       // Context use cases
       'GetContextUseCase': () => this.getGetContextUseCase(),
       'LogBreadcrumbUseCase': () => this.getLogBreadcrumbUseCase(),
@@ -335,6 +361,9 @@ export class Container {
       // Registry use cases
       'SyncRegistryUseCase': () => this.getSyncRegistryUseCase(),
       'RegisterProjectUseCase': () => this.getRegisterProjectUseCase(),
+
+      // Status use cases
+      'UpdateStatusUseCase': () => this.getUpdateStatusUseCase(),
 
       // Gateways
       'StatusFileGateway': () => this.getStatusFileGateway(),
@@ -372,7 +401,8 @@ export class Container {
       // Capture
       captureIdea: this.getCaptureIdeaUseCase(),
       getInbox: this.getGetInboxUseCase(),
-      
+      triageInbox: this.getTriageInboxUseCase(),
+
       // Context
       getContext: this.getGetContextUseCase(),
       logBreadcrumb: this.getLogBreadcrumbUseCase(),
@@ -380,7 +410,10 @@ export class Container {
 
       // Registry
       syncRegistry: this.getSyncRegistryUseCase(),
-      registerProject: this.getRegisterProjectUseCase()
+      registerProject: this.getRegisterProjectUseCase(),
+
+      // Status
+      updateStatus: this.getUpdateStatusUseCase()
     }
   }
 

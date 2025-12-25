@@ -1,16 +1,22 @@
 {
   "name": "@data-wise/atlas",
   "version": "0.1.0",
-  "description": "Project state engine - registry, sessions, capture, and context management",
+  "description": "Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow",
   "type": "module",
   "main": "src/index.js",
   "bin": {
     "atlas": "./bin/atlas.js"
   },
   "exports": {
-    ".": "./src/index.js",
-    "./api": "./src/api/index.js"
+    ".": "./src/index.js"
   },
+  "files": [
+    "bin",
+    "src",
+    "completions",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:unit": "npm test -- --testPathPattern=test/unit",
@@ -19,7 +25,8 @@
     "test:coverage": "npm test -- --coverage",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
-    "start": "node bin/atlas.js"
+    "start": "node bin/atlas.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "project-management",
@@ -27,7 +34,9 @@
     "adhd",
     "productivity",
     "cli",
-    "state-management"
+    "state-management",
+    "context-switching",
+    "session-tracking"
   ],
   "author": "Stat-Wise",
   "license": "MIT",
@@ -35,12 +44,17 @@
     "type": "git",
     "url": "git+https://github.com/data-wise/atlas.git"
   },
+  "bugs": {
+    "url": "https://github.com/data-wise/atlas/issues"
+  },
+  "homepage": "https://github.com/data-wise/atlas#readme",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
     "better-sqlite3": "^12.5.0",
     "blessed": "^0.1.81",
+    "blessed-contrib": "^4.11.0",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "glob": "^10.3.10",
@@ -49,7 +63,6 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "blessed-contrib": "^4.11.0",
     "eslint": "^8.57.1",
     "express": "^5.2.1",
     "jest": "^29.7.0",
