@@ -19,10 +19,42 @@ import { createTimerManager } from './dashboard/timerManager.js'
  * Create and run the dashboard
  */
 export async function runDashboard(atlas, options = {}) {
+  // Check for valid terminal
+  if (!process.stdout.isTTY) {
+    console.error('Error: Dashboard requires an interactive terminal (TTY)')
+    console.error('Run this command in a terminal, not through a pipe or script.')
+    process.exit(1)
+  }
+
+  // Check terminal dimensions
+  const cols = process.stdout.columns || 80
+  const rows = process.stdout.rows || 24
+  if (cols < 60 || rows < 15) {
+    console.error(`Error: Terminal too small (${cols}x${rows})`)
+    console.error('Dashboard requires at least 60x15. Please resize your terminal.')
+    process.exit(1)
+  }
+
+  // Detect if canvas-based widgets will work
+  // Canvas fails in pseudo-TTYs (from script command), XPC service contexts, etc.
+  const canvasSupported = !(
+    process.env.XPC_SERVICE_NAME === '0' ||  // Running in XPC service context
+    !process.stdout.getWindowSize ||          // No window size function
+    cols <= 0 || rows <= 0                     // Invalid dimensions
+  )
+
+  // Detect problematic terminals and use safe fallback
+  const problemTerminals = ['xterm-ghostty', 'ghostty']
+  const currentTerm = process.env.TERM || ''
+  const safeTerminal = problemTerminals.some(t => currentTerm.includes(t))
+    ? 'xterm-256color'
+    : currentTerm || 'xterm-256color'
+
   const screen = blessed.screen({
     smartCSR: true,
     title: 'Atlas Dashboard',
-    fullUnicode: true
+    fullUnicode: true,
+    terminal: safeTerminal
   })
 
   // ============================================================================
@@ -208,15 +240,30 @@ export async function runDashboard(atlas, options = {}) {
     content: '{bold}This Week{/bold}'
   })
 
-  const activitySpark = contrib.sparkline({
-    parent: sidebar,
-    top: 1,
-    left: 1,
-    width: '100%-4',
-    height: 4,
-    tags: true,
-    style: { fg: 'cyan' }
-  })
+  // Sparkline with fallback for terminal compatibility issues
+  let activitySpark = null
+  if (canvasSupported) {
+    activitySpark = contrib.sparkline({
+      parent: sidebar,
+      top: 1,
+      left: 1,
+      width: '100%-4',
+      height: 4,
+      tags: true,
+      style: { fg: 'cyan' }
+    })
+  } else {
+    // Text-based fallback when canvas widgets won't work
+    activitySpark = blessed.box({
+      parent: sidebar,
+      top: 1,
+      left: 1,
+      width: '100%-4',
+      height: 4,
+      tags: true,
+      content: '{gray-fg}(Activity graph unavailable){/}'
+    })
+  }
 
   // Stats in sidebar
   const statsBox = blessed.box({
@@ -300,17 +347,33 @@ export async function runDashboard(atlas, options = {}) {
   })
 
   // Session gauge (visual progress)
-  const sessionGauge = contrib.gauge({
-    parent: detailLeftPanel,
-    top: 7,
-    left: 1,
-    width: '100%-4',
-    height: 5,
-    label: ' Today\'s Progress ',
-    stroke: 'green',
-    fill: 'white',
-    showLabel: true
-  })
+  let sessionGauge = null
+  if (canvasSupported) {
+    sessionGauge = contrib.gauge({
+      parent: detailLeftPanel,
+      top: 7,
+      left: 1,
+      width: '100%-4',
+      height: 5,
+      label: ' Today\'s Progress ',
+      stroke: 'green',
+      fill: 'white',
+      showLabel: true
+    })
+  } else {
+    // Text-based fallback when canvas widgets won't work
+    sessionGauge = blessed.box({
+      parent: detailLeftPanel,
+      top: 7,
+      left: 1,
+      width: '100%-4',
+      height: 5,
+      border: { type: 'line' },
+      label: ' Today\'s Progress ',
+      tags: true,
+      content: '{center}{gray-fg}(Gauge unavailable){/}{/center}'
+    })
+  }
 
   // Current session box
   const currentSessionBox = blessed.box({
@@ -659,10 +722,14 @@ export async function runDashboard(atlas, options = {}) {
           }
         }
 
-        activitySpark.setData(['Sessions'], [weekData])
+        if (canvasSupported) {
+          activitySpark.setData(['Sessions'], [weekData])
+        }
       } catch (e) {
         // Fallback to zeros if can't load
-        activitySpark.setData(['Sessions'], [[0, 0, 0, 0, 0, 0, 0]])
+        if (canvasSupported) {
+          activitySpark.setData(['Sessions'], [[0, 0, 0, 0, 0, 0, 0]])
+        }
       }
 
       // Stats
@@ -750,9 +817,13 @@ export async function runDashboard(atlas, options = {}) {
       const statusData = await atlas.context.getStatus()
       const today = statusData?.today || {}
       gaugePercent = today.sessions ? Math.min(100, Math.round((today.sessions / 5) * 100)) : 0
-      sessionGauge.setPercent(gaugePercent)
+      if (canvasSupported) {
+        sessionGauge.setPercent(gaugePercent)
+      }
     } catch (e) {
-      sessionGauge.setPercent(0)
+      if (canvasSupported) {
+        sessionGauge.setPercent(0)
+      }
     }
 
     // Current session info
@@ -1296,21 +1367,21 @@ export async function runDashboard(atlas, options = {}) {
 
   // Update overview when selection changes
   projectsTable.rows.on('select item', (item, index) => {
-    if (filteredList[index] && currentView === 'main') {
+    if (filteredList[index] && stateMachine.is(STATES.BROWSE)) {
       updateOverviewFor(filteredList[index])
     }
   })
 
   // Filter keys: a = active, p = paused, s = stable, * = all
   screen.key(['a'], () => {
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       currentFilter = currentFilter === 'a' ? '*' : 'a'
       loadMainView()
     }
   })
 
   screen.key(['p'], () => {
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       currentFilter = currentFilter === 'p' ? '*' : 'p'
       loadMainView()
     }
@@ -1321,7 +1392,7 @@ export async function runDashboard(atlas, options = {}) {
   // For now, stable filter will only work via the filter bar display
 
   screen.key(['*', '8'], () => {
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       currentFilter = '*'
       searchTerm = ''
       loadMainView()
@@ -1330,7 +1401,7 @@ export async function runDashboard(atlas, options = {}) {
 
   // Search: / opens search input
   screen.key(['/'], () => {
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       searchInput.show()
       searchInput.focus()
       searchInput.setValue(searchTerm)
@@ -1360,13 +1431,13 @@ export async function runDashboard(atlas, options = {}) {
 
   // Refresh (or reset timer in focus mode)
   screen.key(['r'], async () => {
-    if (currentView === 'focus') {
+    if (stateMachine.is(STATES.FOCUS)) {
       resetPomodoro()
       return
     }
     statusBar.setContent(' {yellow-fg}Refreshing...{/}')
     screen.render()
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       await loadMainView()
     } else if (selectedProject) {
       await loadDetailView(selectedProject)
@@ -1378,7 +1449,7 @@ export async function runDashboard(atlas, options = {}) {
 
   // Start session
   screen.key(['s'], () => {
-    if (currentView === 'detail' && selectedProject) {
+    if (stateMachine.is(STATES.DETAIL) && selectedProject) {
       startSessionFor(selectedProject.name)
     } else {
       showSessionPrompt()
@@ -1389,7 +1460,7 @@ export async function runDashboard(atlas, options = {}) {
   screen.key(['e'], async () => {
     try {
       await atlas.sessions.end('Ended from dashboard')
-      if (currentView === 'main') {
+      if (stateMachine.is(STATES.BROWSE)) {
         await loadMainView()
       } else {
         await loadDetailView(selectedProject)
@@ -1405,7 +1476,7 @@ export async function runDashboard(atlas, options = {}) {
 
   // Open folder (detail view)
   screen.key(['o'], () => {
-    if (currentView === 'detail' && selectedProject?.path) {
+    if (stateMachine.is(STATES.DETAIL) && selectedProject?.path) {
       require('child_process').exec(`open "${selectedProject.path}"`)
       statusBar.setContent(` {green-fg}Opened: ${selectedProject.path}{/}`)
       screen.render()
@@ -1424,14 +1495,14 @@ export async function runDashboard(atlas, options = {}) {
 
   // Focus mode: f key (only from main or detail view)
   screen.key(['f'], () => {
-    if (currentView === 'main' || currentView === 'detail') {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
       showFocusMode()
     }
   })
 
   // Decision helper: d key
   screen.key(['d'], () => {
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       showDecisionHelper()
     }
   })
@@ -1470,13 +1541,13 @@ export async function runDashboard(atlas, options = {}) {
 
   // Focus mode: +/- for time adjustment (only when paused)
   screen.key(['+', '='], () => {
-    if (currentView === 'focus' && !pomodoroActive) {
+    if (stateMachine.is(STATES.FOCUS) && !pomodoroActive) {
       adjustPomodoroTime(5) // Add 5 minutes
     }
   })
 
   screen.key(['-', '_'], () => {
-    if (currentView === 'focus' && !pomodoroActive) {
+    if (stateMachine.is(STATES.FOCUS) && !pomodoroActive) {
       adjustPomodoroTime(-5) // Remove 5 minutes
     }
   })
@@ -1535,7 +1606,7 @@ export async function runDashboard(atlas, options = {}) {
 
     help.onceKey(['escape', 'q', 'enter', 'space'], () => {
       screen.remove(help)
-      if (currentView === 'main') {
+      if (stateMachine.is(STATES.BROWSE)) {
         projectsTable.focus()
       }
       screen.render()
@@ -1578,7 +1649,7 @@ export async function runDashboard(atlas, options = {}) {
     try {
       await atlas.sessions.start(projectName)
       statusBar.setContent(` {green-fg}✓ Session started: ${projectName}{/}`)
-      if (currentView === 'main') {
+      if (stateMachine.is(STATES.BROWSE)) {
         await loadMainView()
       } else {
         await loadDetailView(selectedProject)
@@ -1635,7 +1706,7 @@ export async function runDashboard(atlas, options = {}) {
           statusBar.setContent(` {green-fg}✓ Captured: "${value.trim().substring(0, 30)}..."{/}`)
           screen.render()
           setTimeout(() => {
-            if (currentView === 'main') loadMainView()
+            if (stateMachine.is(STATES.BROWSE)) loadMainView()
             else if (selectedProject) loadDetailView(selectedProject)
           }, 1500)
         } catch (e) {
@@ -1661,9 +1732,9 @@ export async function runDashboard(atlas, options = {}) {
       statusBar.setContent(' {yellow-fg}⚠ Terminal too narrow - expand for best view{/}')
     }
     // Refresh current view
-    if (currentView === 'main') {
+    if (stateMachine.is(STATES.BROWSE)) {
       loadMainView()
-    } else if (currentView === 'detail' && selectedProject) {
+    } else if (stateMachine.is(STATES.DETAIL) && selectedProject) {
       loadDetailView(selectedProject)
     }
     screen.render()
@@ -1677,7 +1748,7 @@ export async function runDashboard(atlas, options = {}) {
   await loadMainView()
 
   const refreshInterval = setInterval(() => {
-    if (currentView === 'main') loadMainView()
+    if (stateMachine.is(STATES.BROWSE)) loadMainView()
   }, 30000)
 
   process.on('exit', () => clearInterval(refreshInterval))
