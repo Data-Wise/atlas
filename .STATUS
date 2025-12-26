@@ -107,8 +107,8 @@ atlas dashboard           # Interactive TUI
 - [x] Finalize Card Stack polish
 - [x] Fix dashboard corruption from broken commit
 - [x] Add Ghostty terminal canvas fallback
-- [ ] Publish v0.4.0 to npm
-- [ ] Update Homebrew formula to 0.4.0
+- [ ] Publish v0.4.0 to npm (requires OTP)
+- [x] Update Homebrew formula to 0.4.0
 
 ## Next Tasks (v0.4.x)
 - [ ] Streak tracking and display
