@@ -2,6 +2,42 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.5.2] - 2025-12-26
+
+### Added
+- **Template Variables from Config**: Custom variables in `preferences.templateVariables`
+  - Variables replaced as `{{variable_name}}` in templates
+  - Priority: defaults < config < CLI values
+  - Common vars: `author`, `github_user`, `email`, `company`
+- **Template Inheritance**: Extend built-in templates
+  - Create with `atlas template create my-node --extends node`
+  - Use `{{parent}}` to include parent template content
+  - Frontmatter: `extends: node`
+
+## [0.5.1] - 2025-12-26
+
+### Added
+- **Park Feature** (ADHD-friendly context switching):
+  - `atlas park [note]` - Save session state with breadcrumbs
+  - `atlas unpark [id]` - Restore parked context and start session
+  - `atlas parked` - List all parked contexts
+  - Captures: project, task, duration, breadcrumbs, note
+  - Shows "where you left off" on restore
+- **Template Management CLI**:
+  - `atlas template list` - Show built-in + custom templates
+  - `atlas template show <id>` - Display template content
+  - `atlas template create <id>` - Create custom template
+  - `atlas template export <id>` - Export built-in for editing
+  - `atlas template delete <id>` - Remove custom template
+  - `atlas template dir` - Show templates directory
+- **Custom Templates**: Store in `~/.atlas/templates/`
+  - YAML frontmatter for name/description
+  - Override built-in templates
+- **Comprehensive Tests**: 958 tests (unit + e2e)
+
+### Changed
+- Capture entity now supports `parked` type and status
+
 ## [0.5.0] - 2025-12-26
 
 ### Added
