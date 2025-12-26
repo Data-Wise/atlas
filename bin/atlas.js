@@ -609,6 +609,63 @@ config
     console.log(JSON.stringify(cfg, null, 2));
   });
 
+// Preferences subcommand
+const prefs = config.command('prefs').description('Manage preferences');
+
+prefs
+  .command('show')
+  .description('Show all preferences')
+  .action(async () => {
+    const preferences = await getAtlas().config.getPreferences();
+    console.log(JSON.stringify(preferences, null, 2));
+  });
+
+prefs
+  .command('get <path>')
+  .description('Get a preference (e.g., adhd.showStreak)')
+  .action(async (path) => {
+    const value = await getAtlas().config.getPreference(path);
+    if (value === undefined) {
+      console.log(`Preference '${path}' not found`);
+    } else if (typeof value === 'object') {
+      console.log(JSON.stringify(value, null, 2));
+    } else {
+      console.log(value);
+    }
+  });
+
+prefs
+  .command('set <path> <value>')
+  .description('Set a preference (e.g., adhd.showStreak false)')
+  .action(async (path, value) => {
+    // Parse value type
+    let parsedValue = value;
+    if (value === 'true') parsedValue = true;
+    else if (value === 'false') parsedValue = false;
+    else if (value === 'null') parsedValue = null;
+    else if (!isNaN(Number(value))) parsedValue = Number(value);
+
+    await getAtlas().config.setPreference(path, parsedValue);
+    console.log(`✓ Set ${path} = ${JSON.stringify(parsedValue)}`);
+  });
+
+prefs
+  .command('reset')
+  .description('Reset all preferences to defaults')
+  .action(async () => {
+    await getAtlas().config.resetPreferences();
+    console.log('✓ Preferences reset to defaults');
+  });
+
+prefs
+  .command('defaults')
+  .description('Show default preference values')
+  .action(() => {
+    const Config = require('../src/utils/Config.js').default;
+    const defaults = Config.getDefaults();
+    console.log(JSON.stringify(defaults.preferences, null, 2));
+  });
+
 // Show help if no command was provided (before parsing to avoid Commander errors)
 if (process.argv.length <= 2) {
   program.outputHelp();

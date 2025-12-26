@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   unit-tests:
@@ -65,10 +65,9 @@ jobs:
 
       - name: Run dogfood tests
         run: |
-          chmod +x test/dogfood-comprehensive.sh
-          ./test/dogfood-comprehensive.sh
+          chmod +x test/dogfood-noninteractive.sh
+          ./test/dogfood-noninteractive.sh
         env:
-          # Ensure consistent behavior across platforms
           TERM: xterm-256color
 
   e2e-tests:

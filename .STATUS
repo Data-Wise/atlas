@@ -117,13 +117,15 @@ atlas dashboard           # Interactive TUI
 - [x] CLI integration: context restoration on start, celebration on end
 
 ## Current Tasks
-- [ ] Publish v0.4.1 to npm (requires OTP)
-- [ ] Update Homebrew formula to 0.4.1
+- [x] Update Homebrew formula to 0.4.1
+- [ ] npm publish deferred (requires authenticator app setup)
+- [x] GitHub Actions CI/CD (dogfood tests on push)
+- [x] Enhanced configuration system with preferences
+- [x] User preferences persistence (ADHD, session, dashboard settings)
 
 ## Next Tasks (v0.5.0)
-- [ ] Configuration system (~/.atlas/config.json)
-- [ ] User preferences persistence
 - [ ] Project templates (init --template node/r-package)
+- [ ] Configuration wizard (atlas config setup)
 
 ## Future Enhancements (v0.5.0+)
 - [ ] "Park" feature for context switching
@@ -136,10 +138,11 @@ atlas dashboard           # Interactive TUI
 None
 
 ## Test Stats
-- Unit Tests: 570+
+- Unit Tests: 590+
 - Integration Tests: 280+
 - E2E Tests: 41
-- Total: 892 passing
+- Dogfood Tests: 45
+- Total: 913 passing
 
 ## Installation
 ```bash
