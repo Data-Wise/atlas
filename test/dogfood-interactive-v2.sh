@@ -303,7 +303,8 @@ echo ""
 echo -e "${DIM}Press Enter to launch dashboard, then q to quit when done...${NC}"
 read -r || true
 
-run_command "timeout 60 atlas dashboard || true"
+echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
+atlas dashboard || true
 
 echo ""
 echo -e "${BOLD}Dashboard Verification:${NC}"
@@ -342,7 +343,8 @@ echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
-run_command "timeout 60 atlas dashboard || true"
+echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
+atlas dashboard || true
 
 echo -en "Did focus mode show large timer with Pomodoro? [y/n/s] "
 read -r r5 || r5="s"
