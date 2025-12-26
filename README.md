@@ -203,6 +203,47 @@ atlas init --template minimal         # Minimal .STATUS
 atlas init --template node --name foo # With custom name
 ```
 
+### Context Parking (v0.5.1+)
+ADHD-friendly context switching - save your place when you need to switch tasks:
+```bash
+atlas park "working on delta method"  # Park current context with note
+atlas park --keep-session             # Park but keep session running
+atlas parked                          # List all parked contexts
+atlas unpark                          # Restore most recent parked context
+atlas unpark abc123                   # Restore specific context by ID
+```
+
+### Template Management (v0.5.1+)
+```bash
+atlas template list                   # Show built-in + custom templates
+atlas template show node              # Display template content
+atlas template create mytemplate      # Create custom template
+atlas template create mynode --from node  # Copy from existing
+atlas template create mynode --extends node  # Inherit from existing (v0.5.2+)
+atlas template export node            # Export built-in for customization
+atlas template delete mytemplate      # Delete custom template
+atlas template dir                    # Show custom templates directory
+```
+
+Custom templates are stored in `~/.atlas/templates/` with YAML frontmatter:
+```yaml
+---
+name: My Template
+description: Custom template for my projects
+extends: node  # Optional: inherit from built-in template
+---
+## Project: {{name}}
+...
+```
+
+### Template Variables (v0.5.2+)
+Define custom variables in config that get replaced in templates:
+```bash
+atlas config prefs set templateVariables.github_user myuser
+atlas config prefs set templateVariables.author "My Name"
+```
+Variables are replaced as `{{variable_name}}` in templates.
+
 ### Configuration (v0.5.0+)
 ```bash
 atlas config setup                    # Interactive wizard
