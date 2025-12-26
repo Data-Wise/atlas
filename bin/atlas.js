@@ -6,6 +6,13 @@
 
 import { Command } from 'commander';
 import { Atlas } from '../src/index.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
 
 const program = new Command();
 
@@ -27,14 +34,14 @@ function getAtlas() {
 
 // Check for -v early (before Commander.js parses)
 if (process.argv.includes('-v')) {
-  console.log('0.1.0');
+  console.log(pkg.version);
   process.exit(0);
 }
 
 program
   .name('atlas')
   .description('Project state engine for ADHD-friendly workflow management')
-  .version('0.1.0', '-V, --version', 'output the version number')
+  .version(pkg.version, '-V, --version', 'output the version number')
   .option('--storage <type>', 'Storage backend: filesystem or sqlite', 'filesystem');
 
 // Handle unknown commands

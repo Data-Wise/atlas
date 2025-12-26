@@ -30,6 +30,17 @@ SKIPPED=0
 TEST_DIR=$(mktemp -d)
 export ATLAS_DATA_DIR="$TEST_DIR"
 
+# Use local dev version instead of installed version
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+alias atlas="node $PROJECT_DIR/bin/atlas.js"
+ATLAS_CMD="node $PROJECT_DIR/bin/atlas.js"
+
+# Function to run atlas commands (uses local dev version)
+run_atlas() {
+    $ATLAS_CMD "$@"
+}
+
 cleanup() {
     rm -rf "$TEST_DIR"
     echo ""
@@ -80,7 +91,9 @@ run_command() {
     echo -e "${DIM}│  ${GREEN}Actual Output:${NC}"
     echo -e "${DIM}└──────────────────────────────────────────────────────────${NC}"
     echo ""
-    eval "$1" 2>&1 | head -30
+    # Replace 'atlas' with local dev version
+    local cmd="${1//atlas/$ATLAS_CMD}"
+    eval "$cmd" 2>&1 | head -30
     echo ""
 }
 
@@ -304,7 +317,7 @@ echo -e "${DIM}Press Enter to launch dashboard, then q to quit when done...${NC}
 read -r || true
 
 echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
-atlas dashboard || true
+$ATLAS_CMD dashboard || true
 
 echo ""
 echo -e "${BOLD}Dashboard Verification:${NC}"
@@ -344,7 +357,7 @@ echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
 echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
-atlas dashboard || true
+$ATLAS_CMD dashboard || true
 
 echo -en "Did focus mode show large timer with Pomodoro? [y/n/s] "
 read -r r5 || r5="s"
@@ -378,7 +391,7 @@ echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
 echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
-atlas dashboard || true
+$ATLAS_CMD dashboard || true
 
 echo -en "Did filter keys (a/p/*) update the title bar? [y/n/s] "
 read -r r7 || r7="s"
@@ -412,7 +425,7 @@ echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
 echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
-atlas dashboard || true
+$ATLAS_CMD dashboard || true
 
 echo -en "Did decision helper show project suggestions? [y/n/s] "
 read -r r9 || r9="s"
