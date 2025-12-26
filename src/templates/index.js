@@ -2,9 +2,16 @@
  * Project Templates for Atlas
  *
  * Templates provide .STATUS file scaffolding for different project types
+ * Supports custom user templates from ~/.atlas/templates/
  */
 
-const TEMPLATES = {
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, unlinkSync } from 'fs';
+import { join } from 'path';
+import { homedir } from 'os';
+
+const USER_TEMPLATES_DIR = join(homedir(), '.atlas', 'templates');
+
+const BUILTIN_TEMPLATES = {
   node: {
     name: 'Node.js Package',
     description: 'Node.js/npm package with standard structure',
@@ -254,13 +261,74 @@ None
 };
 
 /**
+ * Load user templates from ~/.atlas/templates/
+ * Each template is a .md file with YAML frontmatter
+ */
+function loadUserTemplates() {
+  const userTemplates = {};
+
+  if (!existsSync(USER_TEMPLATES_DIR)) {
+    return userTemplates;
+  }
+
+  try {
+    const files = readdirSync(USER_TEMPLATES_DIR).filter(f => f.endsWith('.md'));
+
+    for (const file of files) {
+      const id = file.replace('.md', '');
+      const content = readFileSync(join(USER_TEMPLATES_DIR, file), 'utf-8');
+
+      // Parse YAML frontmatter
+      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      if (frontmatterMatch) {
+        const frontmatter = frontmatterMatch[1];
+        const status = frontmatterMatch[2].trim();
+
+        // Simple YAML parsing for name and description
+        const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
+        const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+
+        userTemplates[id] = {
+          name: nameMatch ? nameMatch[1].trim() : id,
+          description: descMatch ? descMatch[1].trim() : 'Custom template',
+          status,
+          isCustom: true
+        };
+      } else {
+        // No frontmatter, use file content as template
+        userTemplates[id] = {
+          name: id,
+          description: 'Custom template',
+          status: content.trim(),
+          isCustom: true
+        };
+      }
+    }
+  } catch (err) {
+    // Silently fail on errors
+  }
+
+  return userTemplates;
+}
+
+/**
+ * Get all templates (builtin + user, user overrides builtin)
+ */
+function getAllTemplates() {
+  const userTemplates = loadUserTemplates();
+  return { ...BUILTIN_TEMPLATES, ...userTemplates };
+}
+
+/**
  * Get list of available templates
  */
 export function listTemplates() {
-  return Object.entries(TEMPLATES).map(([id, template]) => ({
+  const templates = getAllTemplates();
+  return Object.entries(templates).map(([id, template]) => ({
     id,
     name: template.name,
-    description: template.description
+    description: template.description,
+    isCustom: template.isCustom || false
   }));
 }
 
@@ -268,7 +336,8 @@ export function listTemplates() {
  * Get a template by ID
  */
 export function getTemplate(id) {
-  return TEMPLATES[id] || null;
+  const templates = getAllTemplates();
+  return templates[id] || null;
 }
 
 /**
@@ -300,12 +369,66 @@ export function applyTemplate(templateId, variables = {}) {
  * Get template IDs for CLI completion
  */
 export function getTemplateIds() {
-  return Object.keys(TEMPLATES);
+  return Object.keys(getAllTemplates());
+}
+
+/**
+ * Save a custom template
+ */
+export function saveTemplate(id, { name, description, status }) {
+  // Ensure templates directory exists
+  if (!existsSync(USER_TEMPLATES_DIR)) {
+    mkdirSync(USER_TEMPLATES_DIR, { recursive: true });
+  }
+
+  const content = `---
+name: ${name || id}
+description: ${description || 'Custom template'}
+---
+${status}`;
+
+  const filePath = join(USER_TEMPLATES_DIR, `${id}.md`);
+  writeFileSync(filePath, content, 'utf-8');
+
+  return filePath;
+}
+
+/**
+ * Delete a custom template
+ */
+export function deleteTemplate(id) {
+  const filePath = join(USER_TEMPLATES_DIR, `${id}.md`);
+  if (existsSync(filePath)) {
+    unlinkSync(filePath);
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Export a builtin template for customization
+ */
+export function exportTemplate(id) {
+  const template = BUILTIN_TEMPLATES[id];
+  if (!template) return null;
+
+  return saveTemplate(`${id}-custom`, template);
+}
+
+/**
+ * Get the user templates directory path
+ */
+export function getTemplatesDir() {
+  return USER_TEMPLATES_DIR;
 }
 
 export default {
   listTemplates,
   getTemplate,
   applyTemplate,
-  getTemplateIds
+  getTemplateIds,
+  saveTemplate,
+  deleteTemplate,
+  exportTemplate,
+  getTemplatesDir
 };

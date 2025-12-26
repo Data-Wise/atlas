@@ -8,8 +8,8 @@
  */
 
 export class Capture {
-  static TYPES = ['idea', 'task', 'bug', 'note', 'question'];
-  static STATUSES = ['inbox', 'triaged', 'archived'];
+  static TYPES = ['idea', 'task', 'bug', 'note', 'question', 'parked'];
+  static STATUSES = ['inbox', 'triaged', 'archived', 'parked'];
 
   constructor({
     id,

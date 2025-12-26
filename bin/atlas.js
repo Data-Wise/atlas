@@ -423,6 +423,65 @@ program
   });
 
 // ============================================================================
+// PARK/UNPARK COMMANDS (Context Switching)
+// ============================================================================
+
+program
+  .command('park [note]')
+  .description('Park current context for later (context switching)')
+  .option('-f, --force', 'Park even without active session')
+  .option('-k, --keep-session', 'Keep session running after parking')
+  .action(async (note, options) => {
+    const { ParkContextUseCase } = await import('../src/use-cases/context/ParkContextUseCase.js');
+    const atlas = getAtlas();
+    const parkUseCase = new ParkContextUseCase({
+      sessionRepository: atlas.container.resolve('SessionRepository'),
+      breadcrumbRepository: atlas.container.resolve('BreadcrumbRepository'),
+      projectRepository: atlas.container.resolve('ProjectRepository'),
+      captureRepository: atlas.container.resolve('CaptureRepository')
+    });
+
+    const result = await parkUseCase.execute(note, {
+      force: options.force,
+      keepSession: options.keepSession
+    });
+
+    console.log(result.message);
+  });
+
+program
+  .command('unpark [id]')
+  .description('Restore a parked context')
+  .action(async (id) => {
+    const { UnparkContextUseCase } = await import('../src/use-cases/context/UnparkContextUseCase.js');
+    const atlas = getAtlas();
+    const unparkUseCase = new UnparkContextUseCase({
+      sessionRepository: atlas.container.resolve('SessionRepository'),
+      captureRepository: atlas.container.resolve('CaptureRepository'),
+      projectRepository: atlas.container.resolve('ProjectRepository')
+    });
+
+    const result = await unparkUseCase.execute(id);
+    console.log(result.message);
+  });
+
+program
+  .command('parked')
+  .description('List parked contexts')
+  .action(async () => {
+    const { UnparkContextUseCase } = await import('../src/use-cases/context/UnparkContextUseCase.js');
+    const atlas = getAtlas();
+    const unparkUseCase = new UnparkContextUseCase({
+      sessionRepository: atlas.container.resolve('SessionRepository'),
+      captureRepository: atlas.container.resolve('CaptureRepository'),
+      projectRepository: atlas.container.resolve('ProjectRepository')
+    });
+
+    const result = await unparkUseCase.list();
+    console.log(result.message);
+  });
+
+// ============================================================================
 // DASHBOARD COMMAND
 // ============================================================================
 
@@ -487,6 +546,161 @@ program
 
       await writeFile(statusPath, content);
       console.log(`\n✓ Created .STATUS from '${template.name}' template`);
+    }
+  });
+
+// Template management command
+const templateCmd = program.command('template').description('Manage project templates');
+
+templateCmd
+  .command('list')
+  .description('List all available templates')
+  .action(async () => {
+    const { listTemplates, getTemplatesDir } = await import('../src/templates/index.js');
+    const templates = listTemplates();
+
+    console.log('Available Templates:\n');
+    for (const t of templates) {
+      const marker = t.isCustom ? ' [custom]' : '';
+      console.log(`  ${t.id.padEnd(14)} ${t.name}${marker}`);
+      console.log(`  ${''.padEnd(14)} ${t.description}\n`);
+    }
+    console.log(`Custom templates: ${getTemplatesDir()}`);
+  });
+
+templateCmd
+  .command('show <id>')
+  .description('Show template content')
+  .action(async (id) => {
+    const { getTemplate } = await import('../src/templates/index.js');
+    const template = getTemplate(id);
+
+    if (!template) {
+      console.log(`Template not found: ${id}`);
+      console.log('Use "atlas template list" to see available templates');
+      return;
+    }
+
+    console.log(`# ${template.name}\n`);
+    console.log(template.status);
+  });
+
+templateCmd
+  .command('create <id>')
+  .description('Create a new custom template')
+  .option('-n, --name <name>', 'Template display name')
+  .option('-d, --description <desc>', 'Template description')
+  .option('-f, --from <template>', 'Base on existing template')
+  .action(async (id, options) => {
+    const { saveTemplate, getTemplate, getTemplatesDir } = await import('../src/templates/index.js');
+    const { existsSync } = await import('fs');
+    const { join } = await import('path');
+
+    const templatePath = join(getTemplatesDir(), `${id}.md`);
+    if (existsSync(templatePath)) {
+      console.log(`Template already exists: ${id}`);
+      console.log(`Edit it at: ${templatePath}`);
+      return;
+    }
+
+    let status;
+    if (options.from) {
+      const base = getTemplate(options.from);
+      if (!base) {
+        console.log(`Base template not found: ${options.from}`);
+        return;
+      }
+      status = base.status;
+    } else {
+      status = `## Project: {{name}}
+## Status: active
+## Progress: 0
+
+## Focus: Define your focus here
+
+## Current Tasks
+- [ ] First task
+
+## Next Tasks
+- [ ] Future task
+
+## Blockers
+None
+`;
+    }
+
+    const filePath = saveTemplate(id, {
+      name: options.name || id,
+      description: options.description || 'Custom template',
+      status
+    });
+
+    console.log(`✓ Created custom template: ${id}`);
+    console.log(`  Edit at: ${filePath}`);
+  });
+
+templateCmd
+  .command('export <id>')
+  .description('Export a built-in template for customization')
+  .action(async (id) => {
+    const { exportTemplate, getTemplate } = await import('../src/templates/index.js');
+
+    const template = getTemplate(id);
+    if (!template) {
+      console.log(`Template not found: ${id}`);
+      return;
+    }
+
+    if (template.isCustom) {
+      console.log(`Template "${id}" is already a custom template`);
+      return;
+    }
+
+    const filePath = exportTemplate(id);
+    console.log(`✓ Exported template: ${id}-custom`);
+    console.log(`  Edit at: ${filePath}`);
+  });
+
+templateCmd
+  .command('delete <id>')
+  .description('Delete a custom template')
+  .action(async (id) => {
+    const { deleteTemplate, getTemplate } = await import('../src/templates/index.js');
+    const { unlinkSync } = await import('fs');
+
+    const template = getTemplate(id);
+    if (!template) {
+      console.log(`Template not found: ${id}`);
+      return;
+    }
+
+    if (!template.isCustom) {
+      console.log(`Cannot delete built-in template: ${id}`);
+      console.log('You can only delete custom templates');
+      return;
+    }
+
+    const deleted = deleteTemplate(id);
+    if (deleted) {
+      console.log(`✓ Deleted template: ${id}`);
+    } else {
+      console.log(`Failed to delete template: ${id}`);
+    }
+  });
+
+templateCmd
+  .command('dir')
+  .description('Show custom templates directory')
+  .action(async () => {
+    const { getTemplatesDir } = await import('../src/templates/index.js');
+    const { existsSync, mkdirSync } = await import('fs');
+
+    const dir = getTemplatesDir();
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+      console.log(`Created templates directory: ${dir}`);
+    } else {
+      console.log(`Templates directory: ${dir}`);
     }
   });
 
