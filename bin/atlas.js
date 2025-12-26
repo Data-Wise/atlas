@@ -443,9 +443,51 @@ program
   .command('init')
   .description('Initialize atlas in current directory or globally')
   .option('-g, --global', 'Initialize global atlas config')
+  .option('-t, --template <type>', 'Create .STATUS from template (node, r-package, python, quarto, research, minimal)')
+  .option('-n, --name <name>', 'Project name (defaults to directory name)')
+  .option('--list-templates', 'List available templates')
   .action(async (options) => {
+    // List templates
+    if (options.listTemplates) {
+      const { listTemplates } = await import('../src/templates/index.js');
+      console.log('Available templates:\n');
+      for (const t of listTemplates()) {
+        console.log(`  ${t.id.padEnd(12)} ${t.name}`);
+        console.log(`  ${''.padEnd(12)} ${t.description}\n`);
+      }
+      return;
+    }
+
+    // Initialize atlas config
     const result = await getAtlas().init(options);
     console.log(result.message);
+
+    // Create .STATUS from template if specified
+    if (options.template) {
+      const { applyTemplate, getTemplate } = await import('../src/templates/index.js');
+      const { writeFile } = await import('fs/promises');
+      const { existsSync } = await import('fs');
+      const { basename } = await import('path');
+
+      const template = getTemplate(options.template);
+      if (!template) {
+        console.log(`\nUnknown template: ${options.template}`);
+        console.log('Use --list-templates to see available options');
+        return;
+      }
+
+      const statusPath = '.STATUS';
+      if (existsSync(statusPath)) {
+        console.log('\n.STATUS file already exists, skipping template');
+        return;
+      }
+
+      const projectName = options.name || basename(process.cwd());
+      const content = applyTemplate(options.template, { name: projectName });
+
+      await writeFile(statusPath, content);
+      console.log(`\n✓ Created .STATUS from '${template.name}' template`);
+    }
   });
 
 program
@@ -607,6 +649,107 @@ config
   .action(async () => {
     const cfg = await getAtlas().config.load();
     console.log(JSON.stringify(cfg, null, 2));
+  });
+
+// Setup wizard
+config
+  .command('setup')
+  .description('Interactive configuration wizard')
+  .action(async () => {
+    const readline = await import('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    const ask = (question, defaultValue = '') => new Promise(resolve => {
+      const prompt = defaultValue ? `${question} [${defaultValue}]: ` : `${question}: `;
+      rl.question(prompt, answer => resolve(answer || defaultValue));
+    });
+
+    const askYN = async (question, defaultYes = true) => {
+      const def = defaultYes ? 'Y/n' : 'y/N';
+      const answer = await ask(`${question} (${def})`, '');
+      if (!answer) return defaultYes;
+      return answer.toLowerCase().startsWith('y');
+    };
+
+    console.log('\n╔═══════════════════════════════════════════════════════════╗');
+    console.log('║           Atlas Configuration Wizard                      ║');
+    console.log('╚═══════════════════════════════════════════════════════════╝\n');
+
+    const cfg = getAtlas().config;
+
+    // Scan paths
+    console.log('📁 Project Scan Paths');
+    console.log('   These directories are scanned for projects with .STATUS files.\n');
+
+    const currentPaths = await cfg.getScanPaths();
+    console.log('   Current paths:');
+    currentPaths.forEach((p, i) => console.log(`   ${i + 1}. ${p}`));
+
+    const addPath = await ask('\n   Add a new path (or press Enter to skip)');
+    if (addPath) {
+      const { resolve } = await import('path');
+      const absolutePath = resolve(addPath.replace(/^~/, process.env.HOME));
+      await cfg.addScanPath(absolutePath);
+      console.log(`   ✓ Added: ${absolutePath}`);
+    }
+
+    // Storage backend
+    console.log('\n💾 Storage Backend');
+    console.log('   Choose how atlas stores data:\n');
+    console.log('   1. filesystem - Simple JSON files (default)');
+    console.log('   2. sqlite     - SQLite database (better performance)\n');
+
+    const currentStorage = await cfg.get('storage') || 'filesystem';
+    const storageChoice = await ask(`   Choose storage [1/2]`, currentStorage === 'sqlite' ? '2' : '1');
+    const newStorage = storageChoice === '2' ? 'sqlite' : 'filesystem';
+    await cfg.set('storage', newStorage);
+    console.log(`   ✓ Storage set to: ${newStorage}`);
+
+    // ADHD preferences
+    console.log('\n🧠 ADHD-Friendly Features');
+    console.log('   These features help with focus and time awareness.\n');
+
+    const showStreak = await askYN('   Show streak tracking?', true);
+    await cfg.setPreference('adhd.showStreak', showStreak);
+
+    const showTimeCues = await askYN('   Show gentle time cues during work?', true);
+    await cfg.setPreference('adhd.showTimeCues', showTimeCues);
+
+    const showCelebrations = await askYN('   Show celebrations on achievements?', true);
+    await cfg.setPreference('adhd.showCelebrations', showCelebrations);
+
+    const showContextRestore = await askYN('   Show "last time you were..." on session start?', true);
+    await cfg.setPreference('adhd.showContextRestore', showContextRestore);
+
+    // Session preferences
+    console.log('\n⏱️  Session Settings\n');
+
+    const pomodoroLength = await ask('   Pomodoro work period (minutes)', '25');
+    await cfg.setPreference('session.pomodoroLength', parseInt(pomodoroLength) || 25);
+
+    const breakLength = await ask('   Break period (minutes)', '5');
+    await cfg.setPreference('session.breakLength', parseInt(breakLength) || 5);
+
+    // Dashboard preferences
+    console.log('\n📊 Dashboard Settings\n');
+
+    const zenMode = await askYN('   Enable zen mode (minimal UI)?', false);
+    await cfg.setPreference('dashboard.zenMode', zenMode);
+
+    const maxRecent = await ask('   Max recent projects to show', '5');
+    await cfg.setPreference('dashboard.maxRecentProjects', parseInt(maxRecent) || 5);
+
+    // Done
+    console.log('\n' + '═'.repeat(60));
+    console.log('\n✅ Configuration complete!\n');
+    console.log('View your settings:  atlas config show');
+    console.log('View preferences:    atlas config prefs show');
+    console.log('Change a setting:    atlas config prefs set <path> <value>\n');
+
+    rl.close();
   });
 
 // Preferences subcommand
