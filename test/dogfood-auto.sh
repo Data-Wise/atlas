@@ -76,7 +76,7 @@ echo -e "${NC}"
 
 header "1. Basic Commands"
 
-check "Version" "atlas --version" "0.1.0"
+check "Version" "atlas --version" "0.4"
 check "Help" "atlas --help" "Usage: atlas"
 check "Help shows commands" "atlas --help" "session"
 
