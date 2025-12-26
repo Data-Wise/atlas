@@ -377,4 +377,96 @@ describe('Atlas CLI - E2E Tests', () => {
       expect(stdout).toContain('Usage: atlas')
     })
   })
+
+  describe('Park Commands', () => {
+    test('park --help shows options', () => {
+      const { stdout, exitCode } = runCLI('park --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Park current context')
+      expect(stdout).toContain('--force')
+      expect(stdout).toContain('--keep-session')
+    })
+
+    test('unpark --help shows options', () => {
+      const { stdout, exitCode } = runCLI('unpark --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Restore a parked context')
+    })
+
+    test('parked --help shows options', () => {
+      const { stdout, exitCode } = runCLI('parked --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('List parked contexts')
+    })
+
+    test('parked lists contexts (may be empty)', () => {
+      const { stdout, exitCode } = runCLI('parked')
+
+      expect(exitCode).toBe(0)
+      // Either shows "No parked contexts" or a list
+      expect(stdout).toMatch(/parked|Parked/i)
+    })
+  })
+
+  describe('Template Commands', () => {
+    test('template list shows available templates', () => {
+      const { stdout, exitCode } = runCLI('template list')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Available Templates')
+      expect(stdout).toContain('node')
+      expect(stdout).toContain('r-package')
+      expect(stdout).toContain('python')
+      expect(stdout).toContain('minimal')
+    })
+
+    test('template show displays template content', () => {
+      const { stdout, exitCode } = runCLI('template show minimal')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Minimal')
+      expect(stdout).toContain('Project:')
+      expect(stdout).toContain('Status: active')
+    })
+
+    test('template show returns error for unknown template', () => {
+      const { stdout } = runCLI('template show nonexistent')
+
+      expect(stdout).toContain('not found')
+    })
+
+    test('template dir shows templates directory', () => {
+      const { stdout, exitCode } = runCLI('template dir')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('.atlas')
+      expect(stdout).toContain('templates')
+    })
+
+    test('template create --help shows options', () => {
+      const { stdout, exitCode } = runCLI('template create --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--name')
+      expect(stdout).toContain('--description')
+      expect(stdout).toContain('--from')
+    })
+
+    test('template export --help shows usage', () => {
+      const { stdout, exitCode } = runCLI('template export --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Export a built-in template')
+    })
+
+    test('template delete --help shows usage', () => {
+      const { stdout, exitCode } = runCLI('template delete --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Delete a custom template')
+    })
+  })
 })
