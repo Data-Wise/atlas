@@ -1,9 +1,9 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🎨 v0.4.0 - Dashboard Polish
+## Phase: 🚀 v0.4.0 - Released
 ## Priority: 1
-## Progress: 85
+## Progress: 100
 
 ## Focus: Card Stack UI + ADHD-friendly enhancements
 
@@ -104,9 +104,11 @@ atlas dashboard           # Interactive TUI
 - [x] Contextual command bar
 
 ## Current Tasks
-- [ ] Finalize Card Stack polish
+- [x] Finalize Card Stack polish
+- [x] Fix dashboard corruption from broken commit
+- [x] Add Ghostty terminal canvas fallback
 - [ ] Publish v0.4.0 to npm
-- [ ] Test Homebrew installation on clean system
+- [ ] Update Homebrew formula to 0.4.0
 
 ## Next Tasks (v0.4.x)
 - [ ] Streak tracking and display
