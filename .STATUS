@@ -1,11 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.1.0 - Ecosystem Complete
+## Phase: 🎨 v0.4.0 - Dashboard Polish
 ## Priority: 1
-## Progress: 100
+## Progress: 85
 
-## Focus: Production ready with flow-cli v3.0.0 integration
+## Focus: Card Stack UI + ADHD-friendly enhancements
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -95,22 +95,35 @@ atlas dashboard           # Interactive TUI
 - [x] GitHub repo: github.com/Data-Wise/atlas
 - [x] Homebrew formula: `brew install Data-Wise/tap/atlas`
 - [x] v0.1.0 tagged and released
+- [x] v0.3.1: Themes, focus mode, Pomodoro timer, decision helper
+- [x] State machine refactor for reliable view transitions
+- [x] Timer manager for centralized Pomodoro handling
+- [x] Card Stack layout replacing table view
+- [x] Enhanced cards with progress bars, next actions
+- [x] Zen mode for minimal distraction
+- [x] Contextual command bar
 
 ## Current Tasks
-- [ ] Publish to npm: `npm publish --access public`
+- [ ] Finalize Card Stack polish
+- [ ] Publish v0.4.0 to npm
 - [ ] Test Homebrew installation on clean system
 
-## Next Tasks
-- [ ] Add GitHub Actions CI/CD pipeline
-- [ ] Integration testing with flow-cli
-- [ ] Create usage guide/tutorial
+## Next Tasks (v0.4.x)
+- [ ] Streak tracking and display
+- [ ] Celebration animations on session end
+- [ ] Context restoration ("Last time you were...")
+- [ ] "Good enough" session end option
+- [ ] Time blindness helper (gentle time cues)
 
-## Future Enhancements
+## Future Enhancements (v0.5.0+)
+- [ ] Configuration system (~/.atlas/config.json)
+- [ ] User preferences persistence
 - [ ] Project templates (init --template node/r-package)
+- [ ] "Park" feature for context switching
 - [ ] Remote sync (GitHub/GitLab status)
-- [ ] VS Code extension for .STATUS editing
-- [ ] Mobile-friendly web dashboard
+- [ ] Web dashboard with real-time sync
 - [ ] Session analytics and reports
+- [ ] VS Code extension for .STATUS editing
 
 ## Blockers
 None
@@ -148,16 +161,20 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
-- 2025-12-25: Ecosystem integration complete with flow-cli v3.0.0
-- 2025-12-25: Initial extraction from flow-cli
-- 2025-12-25: Added Capture/Breadcrumb entities (62 tests)
-- 2025-12-25: SQLite storage backend (29 tests)
-- 2025-12-25: SyncRegistryUseCase for .STATUS integration
-- 2025-12-25: CLI enhancements (--storage, migrate, watch)
-- 2025-12-25: UpdateStatusUseCase (41 tests)
-- 2025-12-25: Interactive inbox triage
-- 2025-12-25: Dashboard TUI with blessed-contrib
-- 2025-12-25: Shell completions (zsh/bash/fish)
-- 2025-12-25: E2E tests, README, npm packaging (718 tests)
-- 2025-12-25: GitHub repo created, v0.1.0 tagged
+- 2025-12-25: Card Stack layout with enhanced project cards
+- 2025-12-25: State machine + timer manager refactor
+- 2025-12-25: Zen mode, focus mode, decision helper
+- 2025-12-25: Theme cycling, Pomodoro stats
+- 2025-12-25: Dashboard v0.3.1 with ADHD features
 - 2025-12-25: Homebrew formula added
+- 2025-12-25: GitHub repo created, v0.1.0 tagged
+- 2025-12-25: E2E tests, README, npm packaging (718 tests)
+- 2025-12-25: Shell completions (zsh/bash/fish)
+- 2025-12-25: Dashboard TUI with blessed-contrib
+- 2025-12-25: Interactive inbox triage
+- 2025-12-25: UpdateStatusUseCase (41 tests)
+- 2025-12-25: CLI enhancements (--storage, migrate, watch)
+- 2025-12-25: SyncRegistryUseCase for .STATUS integration
+- 2025-12-25: SQLite storage backend (29 tests)
+- 2025-12-25: Added Capture/Breadcrumb entities (62 tests)
+- 2025-12-25: Initial extraction from flow-cli
