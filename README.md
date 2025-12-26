@@ -36,6 +36,9 @@ atlas completions zsh >> ~/.zshrc   # or bash/fish
 # Initialize atlas
 atlas init
 
+# Initialize with a project template
+atlas init --template node --name my-app
+
 # Sync projects from .STATUS files
 atlas sync
 
@@ -168,6 +171,49 @@ atlas dash                     # Alias for dashboard
 - **Time-aware suggestions**: Decision helper adapts to time of day
 - **Pomodoro stats**: Shows today's completed sessions in focus mode
 - **Break enforcement**: Modal break dialog after Pomodoro completes
+
+#### ADHD-Friendly Features (v0.4.1+)
+- **Streak tracking**: Consecutive day tracking with visual display
+- **Time awareness**: Gentle time cues without breaking flow
+- **Celebrations**: Positive reinforcement on achievements
+- **Context restoration**: "Last time you were..." on session start
+- **Anti-perfectionism**: "Good enough" session endings
+
+Preferences for these features can be configured:
+```bash
+atlas config prefs get adhd           # View ADHD settings
+atlas config prefs set adhd.showStreak false
+atlas config prefs set adhd.celebrationLevel enthusiastic  # minimal|normal|enthusiastic
+```
+
+#### Card Stack Layout (v0.4.0+)
+- **Project cards**: Visual cards with progress bars and next actions
+- **Contextual UI**: Command bar shows available actions
+- **Zen mode**: Minimal distraction mode (`z` key)
+
+### Project Templates (v0.5.0+)
+```bash
+atlas init --list-templates           # Show available templates
+atlas init --template node            # Node.js package
+atlas init --template r-package       # R package
+atlas init --template python          # Python package
+atlas init --template quarto          # Quarto document
+atlas init --template research        # Research project
+atlas init --template minimal         # Minimal .STATUS
+atlas init --template node --name foo # With custom name
+```
+
+### Configuration (v0.5.0+)
+```bash
+atlas config setup                    # Interactive wizard
+atlas config show                     # Show all config
+atlas config paths                    # Show scan paths
+atlas config add-path ~/myprojects    # Add scan path
+atlas config prefs show               # Show preferences
+atlas config prefs get adhd           # Get ADHD settings
+atlas config prefs set adhd.showStreak false  # Set preference
+atlas config prefs reset              # Reset to defaults
+```
 
 ### Storage & Migration
 ```bash
