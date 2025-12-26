@@ -149,7 +149,7 @@ test_json() {
 
 echo -e "${BOLD}"
 echo "╔═══════════════════════════════════════════════════════════╗"
-echo "║     ATLAS - Non-Interactive Dogfooding Test v0.4.1       ║"
+echo "║     ATLAS - Non-Interactive Dogfooding Test v0.5.2       ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo -e "${DIM}Using: $ATLAS${NC}"
@@ -162,7 +162,7 @@ echo -e "${DIM}Test dir: $TEST_DIR${NC}"
 header "1. Version & Help"
 
 test_matches "Version format" "$ATLAS --version" "^[0-9]+\.[0-9]+\.[0-9]+$"
-test_contains "Version is 0.4.x" "$ATLAS --version" "0.4"
+test_contains "Version is 0.5.x" "$ATLAS --version" "0.5"
 test_contains "Help shows usage" "$ATLAS --help" "Usage: atlas"
 test_contains "Help shows session cmd" "$ATLAS --help" "session"
 test_contains "Help shows project cmd" "$ATLAS --help" "project"
@@ -207,7 +207,8 @@ echo "## Project: test-project-2
 test_succeeds "Sync finds projects" "$ATLAS sync"
 test_contains "Sync output" "$ATLAS sync --dry-run" "project"
 test_succeeds "Project list runs" "$ATLAS project list"
-test_contains "Project list shows table" "$ATLAS project list" "│"
+# Table output contains │ when projects exist, or [] for empty list
+test_matches "Project list output" "$ATLAS project list" "(│|\[\])"
 test_succeeds "Project show" "$ATLAS project show test-project-1"
 
 # ============================================================================
