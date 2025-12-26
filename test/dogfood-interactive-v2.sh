@@ -377,7 +377,8 @@ echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
-run_command "timeout 60 atlas dashboard || true"
+echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
+atlas dashboard || true
 
 echo -en "Did filter keys (a/p/*) update the title bar? [y/n/s] "
 read -r r7 || r7="s"
@@ -410,7 +411,8 @@ echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
 read -r || true
 
-run_command "timeout 60 atlas dashboard || true"
+echo -e "${YELLOW}Launching dashboard... Press q to quit when done testing.${NC}"
+atlas dashboard || true
 
 echo -en "Did decision helper show project suggestions? [y/n/s] "
 read -r r9 || r9="s"
