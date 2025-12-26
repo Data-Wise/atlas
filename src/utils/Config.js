@@ -48,6 +48,17 @@ const DEFAULT_CONFIG = {
       showProjectCards: true,     // show project cards
       maxRecentProjects: 5,       // projects in recent list
       zenMode: false              // minimal distraction mode
+    },
+
+    // Template variables for .STATUS generation
+    templateVariables: {
+      // These get replaced in templates as {{variable_name}}
+      // e.g., github_user: 'myuser' → {{github_user}} becomes 'myuser'
+      // Common variables:
+      // author: 'Your Name',
+      // github_user: 'username',
+      // email: 'you@example.com',
+      // company: 'Company Name'
     }
   }
 }

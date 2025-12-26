@@ -282,15 +282,34 @@ function loadUserTemplates() {
       const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
       if (frontmatterMatch) {
         const frontmatter = frontmatterMatch[1];
-        const status = frontmatterMatch[2].trim();
+        let status = frontmatterMatch[2].trim();
 
-        // Simple YAML parsing for name and description
+        // Simple YAML parsing for name, description, extends
         const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
         const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+        const extendsMatch = frontmatter.match(/^extends:\s*(.+)$/m);
+
+        // Handle template inheritance
+        if (extendsMatch) {
+          const parentId = extendsMatch[1].trim();
+          const parentTemplate = BUILTIN_TEMPLATES[parentId];
+          if (parentTemplate) {
+            // Merge: start with parent, apply child overrides
+            // Child content can use {{parent}} to include parent content
+            if (status.includes('{{parent}}')) {
+              status = status.replace('{{parent}}', parentTemplate.status);
+            } else if (status.trim() === '') {
+              // Empty child = use parent as-is
+              status = parentTemplate.status;
+            }
+            // Otherwise child completely overrides parent
+          }
+        }
 
         userTemplates[id] = {
           name: nameMatch ? nameMatch[1].trim() : id,
           description: descMatch ? descMatch[1].trim() : 'Custom template',
+          extends: extendsMatch ? extendsMatch[1].trim() : null,
           status,
           isCustom: true
         };
@@ -341,7 +360,26 @@ export function getTemplate(id) {
 }
 
 /**
+ * Load template variables from user config
+ */
+function loadConfigVariables() {
+  const configPath = join(homedir(), '.atlas', 'config.json');
+  if (!existsSync(configPath)) {
+    return {};
+  }
+
+  try {
+    const content = readFileSync(configPath, 'utf-8');
+    const config = JSON.parse(content);
+    return config?.preferences?.templateVariables || {};
+  } catch {
+    return {};
+  }
+}
+
+/**
  * Apply template with variables
+ * Merges: defaults < config variables < explicit variables
  */
 export function applyTemplate(templateId, variables = {}) {
   const template = getTemplate(templateId);
@@ -349,14 +387,17 @@ export function applyTemplate(templateId, variables = {}) {
 
   let content = template.status;
 
-  // Replace variables
+  // Load config variables synchronously for simplicity
+  const configVars = loadConfigVariables();
+
+  // Replace variables (order: defaults < config < explicit)
   const defaults = {
     name: 'my-project',
     user: process.env.USER || 'user',
     date: new Date().toISOString().split('T')[0]
   };
 
-  const vars = { ...defaults, ...variables };
+  const vars = { ...defaults, ...configVars, ...variables };
 
   for (const [key, value] of Object.entries(vars)) {
     content = content.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
@@ -375,15 +416,21 @@ export function getTemplateIds() {
 /**
  * Save a custom template
  */
-export function saveTemplate(id, { name, description, status }) {
+export function saveTemplate(id, { name, description, status, extends: extendsId }) {
   // Ensure templates directory exists
   if (!existsSync(USER_TEMPLATES_DIR)) {
     mkdirSync(USER_TEMPLATES_DIR, { recursive: true });
   }
 
+  let frontmatter = `name: ${name || id}
+description: ${description || 'Custom template'}`;
+
+  if (extendsId) {
+    frontmatter += `\nextends: ${extendsId}`;
+  }
+
   const content = `---
-name: ${name || id}
-description: ${description || 'Custom template'}
+${frontmatter}
 ---
 ${status}`;
 

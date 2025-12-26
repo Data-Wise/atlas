@@ -590,7 +590,8 @@ templateCmd
   .description('Create a new custom template')
   .option('-n, --name <name>', 'Template display name')
   .option('-d, --description <desc>', 'Template description')
-  .option('-f, --from <template>', 'Base on existing template')
+  .option('-f, --from <template>', 'Copy content from existing template')
+  .option('-e, --extends <template>', 'Extend a template (inherit + override)')
   .action(async (id, options) => {
     const { saveTemplate, getTemplate, getTemplatesDir } = await import('../src/templates/index.js');
     const { existsSync } = await import('fs');
@@ -604,7 +605,23 @@ templateCmd
     }
 
     let status;
-    if (options.from) {
+    let extendsId = null;
+
+    if (options.extends) {
+      // Extending a template - start with minimal override content
+      const base = getTemplate(options.extends);
+      if (!base) {
+        console.log(`Base template not found: ${options.extends}`);
+        return;
+      }
+      extendsId = options.extends;
+      status = `{{parent}}
+
+## Additional Sections
+<!-- Add your customizations here. Use {{parent}} to include base template -->
+`;
+    } else if (options.from) {
+      // Copying from a template
       const base = getTemplate(options.from);
       if (!base) {
         console.log(`Base template not found: ${options.from}`);
@@ -632,10 +649,14 @@ None
     const filePath = saveTemplate(id, {
       name: options.name || id,
       description: options.description || 'Custom template',
-      status
+      status,
+      extends: extendsId
     });
 
     console.log(`✓ Created custom template: ${id}`);
+    if (extendsId) {
+      console.log(`  Extends: ${extendsId}`);
+    }
     console.log(`  Edit at: ${filePath}`);
   });
 
