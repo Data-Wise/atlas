@@ -1,7 +1,7 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.4.0 - Released
+## Phase: 🚀 v0.4.1 - ADHD Utilities
 ## Priority: 1
 ## Progress: 100
 
@@ -39,10 +39,15 @@ atlas/
 │   │   ├── repositories/ # FileSystem + SQLite implementations
 │   │   └── Container.js  # Dependency injection
 │   ├── cli/              # CLI commands + dashboard
-│   └── utils/            # Config, migration, caching
+│   └── utils/            # Config, ADHD helpers, caching
+│       ├── StreakCalculator.js
+│       ├── TimeBlindnessHelper.js
+│       ├── SessionCompletionHelper.js
+│       ├── ContextRestorationHelper.js
+│       └── CelebrationHelper.js
 ├── bin/atlas             # Entry point
 ├── completions/          # zsh, bash, fish
-└── test/                 # 718 tests
+└── test/                 # 892 tests
 ```
 
 ## CLI Commands
@@ -102,25 +107,25 @@ atlas dashboard           # Interactive TUI
 - [x] Enhanced cards with progress bars, next actions
 - [x] Zen mode for minimal distraction
 - [x] Contextual command bar
+- [x] v0.4.1: ADHD-friendly utilities (5 new helpers + 174 tests)
+  - StreakCalculator: Consecutive day tracking with emoji display
+  - TimeBlindnessHelper: Gentle time awareness without breaking flow
+  - SessionCompletionHelper: "Good enough" ending + anti-perfectionism
+  - ContextRestorationHelper: "Last time you were..." + breadcrumbs
+  - CelebrationHelper: Positive reinforcement + milestone recognition
+- [x] Dashboard integration: streak display, time cues, celebrations
+- [x] CLI integration: context restoration on start, celebration on end
 
 ## Current Tasks
-- [x] Finalize Card Stack polish
-- [x] Fix dashboard corruption from broken commit
-- [x] Add Ghostty terminal canvas fallback
-- [ ] Publish v0.4.0 to npm (requires OTP)
-- [x] Update Homebrew formula to 0.4.0
+- [ ] Publish v0.4.1 to npm (requires OTP)
+- [ ] Update Homebrew formula to 0.4.1
 
-## Next Tasks (v0.4.x)
-- [ ] Streak tracking and display
-- [ ] Celebration animations on session end
-- [ ] Context restoration ("Last time you were...")
-- [ ] "Good enough" session end option
-- [ ] Time blindness helper (gentle time cues)
-
-## Future Enhancements (v0.5.0+)
+## Next Tasks (v0.5.0)
 - [ ] Configuration system (~/.atlas/config.json)
 - [ ] User preferences persistence
 - [ ] Project templates (init --template node/r-package)
+
+## Future Enhancements (v0.5.0+)
 - [ ] "Park" feature for context switching
 - [ ] Remote sync (GitHub/GitLab status)
 - [ ] Web dashboard with real-time sync
@@ -131,10 +136,10 @@ atlas dashboard           # Interactive TUI
 None
 
 ## Test Stats
-- Unit Tests: 400+
-- Integration Tests: 250+
+- Unit Tests: 570+
+- Integration Tests: 280+
 - E2E Tests: 41
-- Total: 718 passing
+- Total: 892 passing
 
 ## Installation
 ```bash
@@ -163,6 +168,7 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-26: v0.4.1 ADHD utilities (5 helpers, 174 tests, CLI+dashboard integration)
 - 2025-12-25: Card Stack layout with enhanced project cards
 - 2025-12-25: State machine + timer manager refactor
 - 2025-12-25: Zen mode, focus mode, decision helper

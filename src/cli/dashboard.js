@@ -14,6 +14,10 @@ import blessed from 'blessed'
 import contrib from 'blessed-contrib'
 import { createStateMachine, STATES } from './dashboard/stateMachine.js'
 import { createTimerManager } from './dashboard/timerManager.js'
+import { StreakCalculator } from '../utils/StreakCalculator.js'
+import { TimeBlindnessHelper } from '../utils/TimeBlindnessHelper.js'
+import { ContextRestorationHelper } from '../utils/ContextRestorationHelper.js'
+import { CelebrationHelper } from '../utils/CelebrationHelper.js'
 
 /**
  * Create and run the dashboard
@@ -808,22 +812,32 @@ export async function runDashboard(atlas, options = {}) {
 
       // Update stats footer with useful info
       let todayStats = { sessions: 0, totalDuration: 0 }
-      let streak = 0
+      let streakData = { current: 0, display: '' }
+      let timeAwareness = null
       try {
         const status = await atlas.context.getStatus()
         todayStats = status?.today || todayStats
-        streak = status?.streak || 0
+        streakData = status?.streak || streakData
+
+        // Get time awareness for active session
+        if (currentSession && sessionDuration > 0) {
+          timeAwareness = TimeBlindnessHelper.getTimeAwareness(sessionDuration)
+        }
       } catch (e) { /* ignore */ }
 
       const sessionStr = currentSession
         ? `{green-fg}●{/} ${currentSession.project} (${sessionDuration}m)`
         : '{gray-fg}No active session{/}'
 
-      const streakStr = streak > 0 ? `{yellow-fg}🔥 Day ${streak}{/}` : ''
+      // Enhanced streak display using StreakCalculator
+      const streakStr = streakData.display || (streakData.current > 0 ? `{yellow-fg}🔥 Day ${streakData.current}{/}` : '')
       const todayStr = `Today: ${todayStats.sessions || 0} sessions, ${todayStats.totalDuration || 0}m`
 
+      // Add time awareness cue for long sessions
+      const timeCue = timeAwareness?.suggestBreak ? ` {cyan-fg}${timeAwareness.message}{/}` : ''
+
       statsFooter.setContent(
-        `  ${sessionStr}  {gray-fg}│{/}  ${todayStr}  ${streakStr ? '{gray-fg}│{/}  ' + streakStr : ''}`
+        `  ${sessionStr}${timeCue}  {gray-fg}│{/}  ${todayStr}  ${streakStr ? '{gray-fg}│{/}  ' + streakStr : ''}`
       )
 
     } catch (err) {
@@ -1521,10 +1535,30 @@ export async function runDashboard(atlas, options = {}) {
     }
   })
 
-  // End session
+  // End session with celebration
   screen.key(['e'], async () => {
     try {
+      // Get session info before ending for celebration
+      let celebrationMsg = ''
+      try {
+        const status = await atlas.context.getStatus()
+        const activeSession = status?.activeSession
+        const streakData = status?.streak || { current: 0 }
+
+        if (activeSession) {
+          const duration = activeSession.duration || 0
+          const celebration = CelebrationHelper.getCelebration({
+            duration,
+            outcome: 'completed',
+            streak: streakData.current
+          })
+          celebrationMsg = ` ${celebration.emoji} ${celebration.message}`
+        }
+      } catch (e) { /* ignore celebration errors */ }
+
       await atlas.sessions.end('Ended from dashboard')
+      statusBar.setContent(` {green-fg}✓ Session ended!{/}${celebrationMsg}`)
+
       if (stateMachine.is(STATES.BROWSE)) {
         await loadMainView()
       } else {
@@ -1712,8 +1746,22 @@ export async function runDashboard(atlas, options = {}) {
 
   async function startSessionFor(projectName) {
     try {
+      // Get context restoration info before starting
+      let contextMsg = ''
+      try {
+        const status = await atlas.context.getStatus()
+        const recentSessions = status?.recent?.recentSessions || []
+        const lastSession = recentSessions.find(s => s.project === projectName)
+        const streakData = status?.streak || { current: 0 }
+
+        if (lastSession || streakData.current > 0) {
+          const welcome = ContextRestorationHelper.getWelcomeBack(lastSession, streakData.current)
+          contextMsg = ` {cyan-fg}${welcome}{/}`
+        }
+      } catch (e) { /* ignore context errors */ }
+
       await atlas.sessions.start(projectName)
-      statusBar.setContent(` {green-fg}✓ Session started: ${projectName}{/}`)
+      statusBar.setContent(` {green-fg}✓ Session started: ${projectName}{/}${contextMsg}`)
       if (stateMachine.is(STATES.BROWSE)) {
         await loadMainView()
       } else {

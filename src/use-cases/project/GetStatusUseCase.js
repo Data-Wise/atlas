@@ -13,6 +13,8 @@
  * This is pure business logic - the presentation layer decides how to display it.
  */
 
+import { StreakCalculator } from '../../utils/StreakCalculator.js'
+
 export class GetStatusUseCase {
   /**
    * @param {ISessionRepository} sessionRepository
@@ -90,6 +92,9 @@ export class GetStatusUseCase {
     // Calculate productivity metrics
     const metrics = this._calculateMetrics(todaySessions, recentSessions)
 
+    // Get enhanced streak data
+    const streakData = this._getStreakData(recentSessions)
+
     // Build status response
     return {
       activeSession: activeSession
@@ -140,7 +145,9 @@ export class GetStatusUseCase {
 
       projects: projectStats,
 
-      metrics
+      metrics,
+
+      streak: streakData
     }
   }
 
@@ -192,27 +199,23 @@ export class GetStatusUseCase {
    * @private
    */
   _calculateStreak(sessions) {
-    if (sessions.length === 0) return 0
+    const result = StreakCalculator.calculateStreak(sessions)
+    return result.current
+  }
 
-    // Group sessions by day
-    const daysSeen = new Set()
-    for (const session of sessions) {
-      const day = new Date(session.startTime)
-      day.setHours(0, 0, 0, 0)
-      daysSeen.add(day.getTime())
+  /**
+   * Get full streak data including longest and display
+   * @param {Session[]} sessions
+   * @returns {{current: number, longest: number, display: string, message: string}}
+   */
+  _getStreakData(sessions) {
+    const result = StreakCalculator.calculateStreak(sessions)
+    return {
+      current: result.current,
+      longest: result.longest,
+      lastActiveDate: result.lastActiveDate,
+      display: StreakCalculator.getStreakDisplay(result.current),
+      message: StreakCalculator.getStreakMessage(result.current, result.longest)
     }
-
-    // Check consecutive days from today backwards
-    let streak = 0
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    let currentDay = today.getTime()
-    while (daysSeen.has(currentDay)) {
-      streak++
-      currentDay -= 24 * 60 * 60 * 1000
-    }
-
-    return streak
   }
 }

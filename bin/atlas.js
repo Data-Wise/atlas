@@ -9,6 +9,8 @@ import { Atlas } from '../src/index.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { CelebrationHelper } from '../src/utils/CelebrationHelper.js';
+import { ContextRestorationHelper } from '../src/utils/ContextRestorationHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -186,7 +188,22 @@ session
   .command('start [project]')
   .description('Start a work session')
   .action(async (project) => {
-    const result = await getAtlas().sessions.start(project);
+    const atlasInstance = getAtlas();
+
+    // Get context restoration before starting
+    try {
+      const status = await atlasInstance.context.getStatus();
+      const recentSessions = status?.recent?.recentSessions || [];
+      const lastSession = recentSessions.find(s => s.project === project);
+      const streakData = status?.streak || { current: 0 };
+
+      if (lastSession || streakData.current > 0) {
+        const welcome = ContextRestorationHelper.getWelcomeBack(lastSession, streakData.current);
+        console.log(`\n${welcome}`);
+      }
+    } catch (e) { /* ignore context errors */ }
+
+    const result = await atlasInstance.sessions.start(project);
     console.log(`🎯 Session started: ${result.project}`);
     if (result.focus) console.log(`   Focus: ${result.focus}`);
   });
@@ -195,8 +212,34 @@ session
   .command('end [note]')
   .description('End current session')
   .action(async (note) => {
-    const result = await getAtlas().sessions.end(note);
+    const atlasInstance = getAtlas();
+
+    // Get session info before ending for celebration
+    let duration = 0;
+    let streakCount = 0;
+    try {
+      const status = await atlasInstance.context.getStatus();
+      duration = status?.activeSession?.duration || 0;
+      streakCount = status?.streak?.current || 0;
+    } catch (e) { /* ignore */ }
+
+    const result = await atlasInstance.sessions.end(note);
     console.log(`✓ Session ended (${result.duration})`);
+
+    // Show celebration
+    const celebration = CelebrationHelper.getCelebration({
+      duration,
+      outcome: 'completed',
+      streak: streakCount
+    });
+    console.log(`\n${celebration.emoji} ${celebration.message}`);
+
+    // Show milestones if any
+    if (celebration.milestones.length > 0) {
+      celebration.milestones.forEach(m => {
+        console.log(`   ${m.icon} ${m.message}`);
+      });
+    }
   });
 
 session
