@@ -26,6 +26,7 @@
     "test:dogfood": "bash test/dogfood.sh",
     "test:dogfood-auto": "bash test/dogfood-comprehensive.sh",
     "test:dogfood-log": "bash test/dogfood-comprehensive.sh --log",
+    "test:dogfood-ui": "bash test/dogfood-interactive-v2.sh",
     "test:dashboard": "bash test/interactive-dashboard-test.sh",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
