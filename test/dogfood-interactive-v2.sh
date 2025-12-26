@@ -8,7 +8,8 @@
 # Usage: bash test/dogfood-interactive-v2.sh
 #
 
-set -e
+# Don't use set -e because read commands can fail in non-TTY contexts
+# set -e
 
 # Colors
 RED='\033[0;31m'
@@ -87,23 +88,23 @@ run_command() {
 ask_verify() {
     echo -e "${DIM}──────────────────────────────────────────────────────────${NC}"
     echo -en "${BOLD}Does the output match expected? ${NC}[${GREEN}y${NC}/${RED}n${NC}/${YELLOW}s${NC}kip] "
-    read -r response
+    read -r response || response="s"
     case "$response" in
         y|Y|yes|YES)
             echo -e "${GREEN}✓ PASSED${NC}"
-            ((PASSED++))
+            PASSED=$((PASSED + 1))
             ;;
         n|N|no|NO)
             echo -e "${RED}✗ FAILED${NC}"
-            ((FAILED++))
+            FAILED=$((FAILED + 1))
             ;;
         s|S|skip|SKIP)
             echo -e "${YELLOW}○ SKIPPED${NC}"
-            ((SKIPPED++))
+            SKIPPED=$((SKIPPED + 1))
             ;;
         *)
             echo -e "${YELLOW}○ SKIPPED (invalid input)${NC}"
-            ((SKIPPED++))
+            SKIPPED=$((SKIPPED + 1))
             ;;
     esac
 }
@@ -121,7 +122,7 @@ echo ""
 echo -e "${DIM}Press Enter after each test to continue...${NC}"
 echo -e "${DIM}Respond: y=pass, n=fail, s=skip${NC}"
 echo ""
-read -r -p "Press Enter to start tests..."
+read -r -p "Press Enter to start tests..." || true
 
 # ============================================================================
 print_header "1. Basic CLI Commands"
@@ -300,7 +301,7 @@ echo "     - Press z for zen mode"
 echo "     - Press q to quit"
 echo ""
 echo -e "${DIM}Press Enter to launch dashboard, then q to quit when done...${NC}"
-read -r
+read -r || true
 
 run_command "timeout 60 atlas dashboard || true"
 
@@ -308,19 +309,19 @@ echo ""
 echo -e "${BOLD}Dashboard Verification:${NC}"
 echo ""
 echo -en "1. Did cards display with borders and multiple lines? [y/n/s] "
-read -r r1
+read -r r1 || r1="s"
 echo -en "2. Did cards show progress bars and/or next actions? [y/n/s] "
-read -r r2
+read -r r2 || r2="s"
 echo -en "3. Did navigation (↑↓) work and update title position? [y/n/s] "
-read -r r3
+read -r r3 || r3="s"
 echo -en "4. Did the command bar show contextual shortcuts? [y/n/s] "
-read -r r4
+read -r r4 || r4="s"
 
 for r in "$r1" "$r2" "$r3" "$r4"; do
     case "$r" in
-        y|Y) ((PASSED++)) ;;
-        n|N) ((FAILED++)) ;;
-        *) ((SKIPPED++)) ;;
+        y|Y) PASSED=$((PASSED + 1)) ;;
+        n|N) FAILED=$((FAILED + 1)) ;;
+        *) SKIPPED=$((SKIPPED + 1)) ;;
     esac
 done
 
@@ -339,20 +340,20 @@ echo "  4. Press 'z' to switch to Zen mode"
 echo "  5. Press Esc to exit, then q to quit"
 echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
-read -r
+read -r || true
 
 run_command "timeout 60 atlas dashboard || true"
 
 echo -en "Did focus mode show large timer with Pomodoro? [y/n/s] "
-read -r r5
+read -r r5 || r5="s"
 echo -en "Did zen mode show minimal UI (just timer/project)? [y/n/s] "
-read -r r6
+read -r r6 || r6="s"
 
 for r in "$r5" "$r6"; do
     case "$r" in
-        y|Y) ((PASSED++)) ;;
-        n|N) ((FAILED++)) ;;
-        *) ((SKIPPED++)) ;;
+        y|Y) PASSED=$((PASSED + 1)) ;;
+        n|N) FAILED=$((FAILED + 1)) ;;
+        *) SKIPPED=$((SKIPPED + 1)) ;;
     esac
 done
 
@@ -372,20 +373,20 @@ echo "  5. Type a project name, press Enter"
 echo "  6. Press Esc to clear, then q to quit"
 echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
-read -r
+read -r || true
 
 run_command "timeout 60 atlas dashboard || true"
 
 echo -en "Did filter keys (a/p/*) update the title bar? [y/n/s] "
-read -r r7
+read -r r7 || r7="s"
 echo -en "Did search (/) filter projects by name? [y/n/s] "
-read -r r8
+read -r r8 || r8="s"
 
 for r in "$r7" "$r8"; do
     case "$r" in
-        y|Y) ((PASSED++)) ;;
-        n|N) ((FAILED++)) ;;
-        *) ((SKIPPED++)) ;;
+        y|Y) PASSED=$((PASSED + 1)) ;;
+        n|N) FAILED=$((FAILED + 1)) ;;
+        *) SKIPPED=$((SKIPPED + 1)) ;;
     esac
 done
 
@@ -405,20 +406,20 @@ echo "  5. Colors should change (default → dark → minimal)"
 echo "  6. Press q to quit"
 echo ""
 echo -e "${DIM}Press Enter to launch...${NC}"
-read -r
+read -r || true
 
 run_command "timeout 60 atlas dashboard || true"
 
 echo -en "Did decision helper show project suggestions? [y/n/s] "
-read -r r9
+read -r r9 || r9="s"
 echo -en "Did theme cycling change the color scheme? [y/n/s] "
-read -r r10
+read -r r10 || r10="s"
 
 for r in "$r9" "$r10"; do
     case "$r" in
-        y|Y) ((PASSED++)) ;;
-        n|N) ((FAILED++)) ;;
-        *) ((SKIPPED++)) ;;
+        y|Y) PASSED=$((PASSED + 1)) ;;
+        n|N) FAILED=$((FAILED + 1)) ;;
+        *) SKIPPED=$((SKIPPED + 1)) ;;
     esac
 done
 
