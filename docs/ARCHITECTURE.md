@@ -49,6 +49,7 @@ graph TB
     subgraph "Infrastructure Layer"
         FSRepo[Filesystem Repositories<br/>JSON files]
         SQLRepo[SQLite Repositories]
+        Presenters[Presenters<br/>ProjectPresenter, TuiPresenter]
         StatusGateway[StatusFile Gateway<br/>.STATUS parser]
         EventPub[Event Publisher]
         Config[Configuration]
@@ -136,6 +137,10 @@ src/
 │   │   └── SQLiteBreadcrumbRepository.js
 │   ├── gateways/               # External system interfaces
 │   │   └── StatusFileGateway.js
+│   ├── presenters/             # Formatting and presentation logic
+│   │   ├── ProjectPresenter.js # UI-agnostic formatters
+│   │   ├── TuiPresenter.js     # blessed-specific formatters
+│   │   └── index.js            # Re-exports
 │   ├── controllers/            # Presentation controllers
 │   │   └── StatusController.js
 │   ├── events/                 # Event infrastructure
@@ -145,9 +150,16 @@ src/
 ├── cli/                         # Command-line interface
 │   ├── dashboard.js            # TUI dashboard entry
 │   └── dashboard/              # Dashboard components
-│       ├── DashboardState.js
-│       ├── TimerManager.js
-│       └── ...
+│       ├── constants.js        # Centralized configuration values
+│       ├── helpers.js          # Re-exports from presenters
+│       ├── stateMachine.js     # View state management
+│       ├── timerManager.js     # Pomodoro timer
+│       ├── dialogs.js          # Modal dialogs
+│       └── views/              # View components
+│           ├── MainView.js     # Card-based project list
+│           ├── DetailView.js   # Project details panel
+│           ├── FocusView.js    # Pomodoro timer view
+│           └── ZenView.js      # Minimal focus mode
 │
 ├── utils/                       # Shared utilities
 │   ├── Config.js               # Configuration management
@@ -363,7 +375,7 @@ classDiagram
         +findById(id) Project
         +findByName(name) Project
         +findByPath(path) Project
-        +findAll() Project[]
+        +findAll(options) Project[]
         +findRecent(hours, limit) Project[]
         +findTopByDuration(limit) Project[]
         +save(project) void
@@ -372,9 +384,13 @@ classDiagram
 
     class FileSystemProjectRepository {
         -String filePath
-        -Object cache
+        -Object _projectCache
+        -Map _projectByIdCache
+        -Map _projectByPathCache
+        -Number _projectCacheTTL
         +findById(id) Project
         +findByName(name) Project
+        +findAll(options) Project[]
         +save(project) void
     }
 
@@ -382,11 +398,47 @@ classDiagram
         -Database db
         +findById(id) Project
         +findByName(name) Project
+        +findAll(options) Project[]
         +save(project) void
+        +bulkSave(projects) Number
+        +getStats() Object
     }
 
     IProjectRepository <|.. FileSystemProjectRepository
     IProjectRepository <|.. SQLiteProjectRepository
+```
+
+## Presenter Pattern
+
+Separates UI formatting from business logic:
+
+```mermaid
+classDiagram
+    class ProjectPresenter {
+        <<UI-agnostic>>
+        +formatTimeAgo(date) String
+        +formatDuration(minutes) String
+        +truncateText(text, maxLen) String
+        +formatProjectType(type) String
+        +getStatusCategory(status) String
+        +formatProjectSummary(project) Object
+        +formatSessionInfo(session) Object
+    }
+
+    class TuiPresenter {
+        <<blessed-specific>>
+        +sparkline(data, width) String
+        +progressBar(percent, width) String
+        +createMiniProgressBar(percent) String
+        +getStatusIcon(status) String
+        +formatProjectName(name, isActive, isSelected) String
+        +formatNextAction(action, maxLen) String
+        +formatSessionIndicator(name, duration) String
+        +formatStreak(streakData) String
+    }
+
+    TuiPresenter --> ProjectPresenter : imports
+    Dashboard --> TuiPresenter : uses
 ```
 
 ## Storage Backends
@@ -531,10 +583,13 @@ flowchart TD
 
 ```
 test/
+├── setup.js                 # Jest timer cleanup
 ├── unit/                    # Unit tests (isolated)
 │   ├── domain/             # Entity tests
 │   ├── use-cases/          # Use case tests
-│   └── utils/              # Utility tests
+│   ├── utils/              # Utility tests
+│   └── adapters/           # Adapter tests
+│       └── presenters/     # Presenter tests
 ├── integration/            # Integration tests
 │   ├── repositories/       # Repository tests
 │   └── *.test.js          # Feature tests
@@ -543,16 +598,30 @@ test/
 └── dogfood-noninteractive.sh  # Dogfood script (71 tests)
 ```
 
+**Test Commands:**
+```bash
+npm test                  # All 1,023 tests
+npm run test:debug        # With --detectOpenHandles
+npm run test:unit         # Unit tests only
+npm run test:coverage     # With coverage report
+```
+
 ## Performance Considerations
 
 ### Caching
 
 ```javascript
-// ProjectScanCache for directory scanning
-const cache = new ProjectScanCache({
-  maxSize: 100,        // Max entries
-  ttlMs: 5 * 60 * 1000 // 5 minute TTL
+// ProjectScanCache for directory scanning (1 hour TTL)
+const scanCache = new ProjectScanCache({
+  maxSize: 100,
+  ttlMs: 60 * 60 * 1000
 })
+
+// FileSystemProjectRepository in-memory cache (30s TTL)
+this._projectCache = null
+this._projectCacheTTL = 30000
+this._projectByIdCache = new Map()   // O(1) lookups
+this._projectByPathCache = new Map() // O(1) lookups
 ```
 
 ### Lazy Loading
@@ -560,11 +629,22 @@ const cache = new ProjectScanCache({
 - Repositories load data on first access
 - SQLite uses prepared statements
 - Dashboard uses virtual rendering
+- Project cache populated on first read
 
 ### Parallel Operations
 
 - Directory scanning runs in parallel
 - Multiple scan paths processed concurrently
+
+### Pagination
+
+```javascript
+// Repositories support pagination for large datasets
+const projects = await repo.findAll({
+  limit: 20,
+  offset: 0
+})
+```
 
 ## See Also
 

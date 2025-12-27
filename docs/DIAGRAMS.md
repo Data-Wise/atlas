@@ -16,6 +16,7 @@ graph TB
 
     subgraph "Controller / Adapter Layer"
         StatusCtl["Status Controller<br/>CLI Output Formatting"]
+        Presenters["Presenters<br/>ProjectPresenter<br/>TuiPresenter"]
         FSGateway["Status File Gateway<br/>.STATUS Parser"]
         EventPub["Event Publisher<br/>Event Dispatch"]
     end
@@ -50,6 +51,7 @@ graph TB
     CLI --> ProjectUC
     CLI --> SessionUC
     CLI --> CaptureUC
+    Dashboard --> Presenters
     Dashboard --> ProjectUC
     Dashboard --> SessionUC
     API --> ProjectUC
@@ -94,6 +96,7 @@ graph TB
 
 - **Presentation:** CLI, Dashboard, and programmatic API interfaces
 - **Controllers/Adapters:** Convert between presentation and business logic
+  - **Presenters:** Format data for display (UI-agnostic and TUI-specific)
 - **Use Cases:** Atomic application operations (Session Start, Capture Idea, etc.)
 - **Domain:** Core entities and business rules
 - **Infrastructure:** Storage backends (Filesystem JSON or SQLite) and configuration
@@ -722,6 +725,50 @@ graph TD
 
 ---
 
+## 11. Presenter Layer
+
+```mermaid
+graph TB
+    subgraph "Dashboard TUI"
+        Dashboard["dashboard.js"]
+        Helpers["helpers.js<br/>(re-exports)"]
+        Constants["constants.js<br/>(config values)"]
+    end
+
+    subgraph "Presenters (src/adapters/presenters/)"
+        ProjectPres["ProjectPresenter<br/>(UI-agnostic)"]
+        TuiPres["TuiPresenter<br/>(blessed-specific)"]
+    end
+
+    subgraph "Functions"
+        UIAgnostic["formatTimeAgo()<br/>formatDuration()<br/>truncateText()<br/>formatProjectType()<br/>getStatusCategory()"]
+        BlessedSpec["sparkline()<br/>progressBar()<br/>getStatusIcon()<br/>formatProjectName()<br/>formatStreak()"]
+    end
+
+    Dashboard --> Helpers
+    Dashboard --> Constants
+    Helpers --> TuiPres
+    Helpers --> ProjectPres
+    TuiPres --> ProjectPres
+
+    ProjectPres --> UIAgnostic
+    TuiPres --> BlessedSpec
+
+    style Dashboard fill:#e1f5ff
+    style ProjectPres fill:#e8f5e9
+    style TuiPres fill:#f3e5f5
+    style UIAgnostic fill:#e8f5e9
+    style BlessedSpec fill:#f3e5f5
+```
+
+**Presenter Pattern Benefits:**
+- **Separation of Concerns:** UI formatting separate from business logic
+- **Testability:** Pure functions easy to unit test (65 tests)
+- **Reusability:** ProjectPresenter can be used by future web/API interfaces
+- **Maintainability:** Changes to blessed tags isolated to TuiPresenter
+
+---
+
 ## Diagram Reference Guide
 
 | # | Diagram | Purpose | Key Use Case |
@@ -736,6 +783,7 @@ graph TD
 | 8 | Configuration & ADHD Features | User preferences integration | ADHD-friendly features |
 | 9 | Template System | Project template processing | Creating new projects |
 | 10 | Scanning & Registry | Project discovery | Project synchronization |
+| 11 | Presenter Layer | UI formatting separation | Dashboard TUI formatting |
 
 ---
 

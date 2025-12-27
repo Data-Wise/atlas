@@ -24,11 +24,11 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.5.3 |
+| **Version** | 0.5.6 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 958 (Jest) |
-| **Source** | ~15,000 lines |
+| **Tests** | 1,023 (Jest) |
+| **Source** | ~17,000 lines |
 
 ## Architecture
 
@@ -46,10 +46,17 @@ src/
 │   └── registry/     # RegisterProject, SyncRegistry
 ├── adapters/         # External interfaces
 │   ├── controllers/  # StatusController
+│   ├── presenters/   # ProjectPresenter, TuiPresenter
 │   ├── repositories/ # FileSystem*, SQLite* implementations
 │   └── gateways/     # GitGateway, StatusFileGateway
 ├── utils/            # ADHD helpers, config, charts
 ├── cli/              # Dashboard TUI (blessed)
+│   └── dashboard/    # Modular dashboard components
+│       ├── constants.js   # Configuration values
+│       ├── helpers.js     # Re-exports from presenters
+│       ├── views/         # MainView, DetailView, FocusView, ZenView
+│       ├── stateMachine.js
+│       └── timerManager.js
 └── index.js          # Commander.js CLI entry
 ```
 
@@ -70,6 +77,24 @@ const sessionRepo = container.getSessionRepository()
 ```javascript
 // Session events trigger celebrations, context updates
 eventPublisher.publish(new SessionEvent('ended', session))
+```
+
+### Presenter Pattern
+```javascript
+// UI-agnostic formatting (ProjectPresenter)
+import { formatTimeAgo, formatDuration, getStatusCategory } from './presenters/ProjectPresenter.js'
+
+// TUI-specific formatting (TuiPresenter)
+import { getStatusIcon, progressBar, sparkline } from './presenters/TuiPresenter.js'
+```
+
+### Caching Strategy
+```javascript
+// FileSystemProjectRepository uses in-memory cache with 30s TTL
+this._projectCache = null
+this._projectCacheTTL = 30000
+this._projectByIdCache = new Map()  // Fast lookups
+this._projectByPathCache = new Map()
 ```
 
 ## ADHD-Friendly Features
@@ -120,10 +145,11 @@ atlas
 ## Testing
 
 ```bash
-npm test                  # All 958 tests
+npm test                  # All 1,023 tests
 npm run test:unit         # Unit tests only
 npm run test:e2e          # E2E tests
 npm run test:integration  # Integration tests
+npm run test:debug        # With --detectOpenHandles
 
 # Specific test file
 npx jest test/unit/utils/Config.test.js
@@ -182,6 +208,12 @@ DEBUG=atlas:* atlas status
 2. Wire into dashboard or CLI
 3. Add preferences in Config
 
+### Add a presenter function
+1. UI-agnostic: Add to `src/adapters/presenters/ProjectPresenter.js`
+2. TUI-specific: Add to `src/adapters/presenters/TuiPresenter.js`
+3. Re-export from `src/cli/dashboard/helpers.js` if used by dashboard
+4. Add tests in `test/unit/adapters/presenters/`
+
 ## Documentation
 
 | Doc | Purpose |
@@ -195,6 +227,8 @@ DEBUG=atlas:* atlas status
 
 ## Version History
 
+- **v0.5.6** - Presenter layer, project caching, constants extraction
+- **v0.5.5** - Fix breadcrumb timestamp display
 - **v0.5.3** - Comprehensive documentation, install.sh
 - **v0.5.2** - Template variables and inheritance
 - **v0.5.1** - Park/unpark, template management
