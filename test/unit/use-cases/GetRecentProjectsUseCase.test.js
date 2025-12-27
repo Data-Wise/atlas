@@ -2,7 +2,7 @@
  * Unit tests for GetRecentProjectsUseCase
  */
 
-import { GetRecentProjectsUseCase } from '../../../src/use-cases/GetRecentProjectsUseCase.js'
+import { GetRecentProjectsUseCase } from '../../../src/use-cases/project/GetRecentProjectsUseCase.js'
 import { Project } from '../../../src/domain/entities/Project.js'
 import { ProjectType } from '../../../src/domain/value-objects/ProjectType.js'
 

@@ -31,13 +31,14 @@ export class FileSystemProjectRepository extends IProjectRepository {
    * @param {Object} [cacheOptions] - Cache configuration
    * @param {number} [cacheOptions.ttl=3600000] - Cache TTL in ms (default: 1 hour)
    * @param {number} [cacheOptions.maxSize=1000] - Max cache entries
+   * @param {number} [cacheOptions.projectCacheTTL=30000] - Project cache TTL in ms (default: 30s)
    */
   constructor(filePath, detectorScriptPath = null, cacheOptions = {}) {
     super()
     this.filePath = filePath
     this.detectorScriptPath = detectorScriptPath
 
-    // Initialize cache with 1-hour TTL by default
+    // Initialize scan cache with 1-hour TTL by default
     this.scanCache = new ProjectScanCache({
       ttl: cacheOptions.ttl || 3600000, // 1 hour default
       maxSize: cacheOptions.maxSize || 1000
@@ -45,21 +46,71 @@ export class FileSystemProjectRepository extends IProjectRepository {
 
     // Scan timeout for individual directory scans (5 seconds)
     this.scanTimeout = 5000
+
+    // In-memory project cache to avoid repeated file reads
+    this._projectCache = null
+    this._projectCacheTime = 0
+    this._projectCacheTTL = cacheOptions.projectCacheTTL || 30000 // 30 seconds default
+    this._projectByIdCache = new Map()
+    this._projectByPathCache = new Map()
   }
 
   /**
-   * Load all projects from file
+   * Invalidate all project caches
+   * @private
+   */
+  _invalidateCache() {
+    this._projectCache = null
+    this._projectCacheTime = 0
+    this._projectByIdCache.clear()
+    this._projectByPathCache.clear()
+  }
+
+  /**
+   * Check if project cache is still valid
+   * @private
+   */
+  _isCacheValid() {
+    return this._projectCache !== null &&
+           (Date.now() - this._projectCacheTime) < this._projectCacheTTL
+  }
+
+  /**
+   * Load all projects from file (with caching)
    * @private
    */
   async _loadProjects() {
+    // Return cached projects if valid
+    if (this._isCacheValid()) {
+      return this._projectCache
+    }
+
     try {
       const data = await fs.readFile(this.filePath, 'utf-8')
       const projectsData = JSON.parse(data)
 
-      return projectsData.map(data => this._deserializeProject(data))
+      const projects = projectsData.map(data => this._deserializeProject(data))
+
+      // Update cache
+      this._projectCache = projects
+      this._projectCacheTime = Date.now()
+
+      // Build lookup caches
+      this._projectByIdCache.clear()
+      this._projectByPathCache.clear()
+      for (const project of projects) {
+        this._projectByIdCache.set(project.id, project)
+        if (project.path) {
+          this._projectByPathCache.set(project.path, project)
+        }
+      }
+
+      return projects
     } catch (error) {
       if (error.code === 'ENOENT') {
         // File doesn't exist yet - return empty array
+        this._projectCache = []
+        this._projectCacheTime = Date.now()
         return []
       }
       throw new Error(`Failed to load projects: ${error.message}`)
@@ -128,17 +179,36 @@ export class FileSystemProjectRepository extends IProjectRepository {
   // IProjectRepository implementation
 
   async findById(projectId) {
+    // Fast path: check lookup cache first
+    if (this._isCacheValid() && this._projectByIdCache.has(projectId)) {
+      return this._projectByIdCache.get(projectId)
+    }
+    // Fallback: load and search
     const projects = await this._loadProjects()
-    return projects.find(p => p.id === projectId) || null
+    return this._projectByIdCache.get(projectId) || null
   }
 
   async findByPath(path) {
+    // Fast path: check lookup cache first
+    if (this._isCacheValid() && this._projectByPathCache.has(path)) {
+      return this._projectByPathCache.get(path)
+    }
+    // Fallback: load and search
     const projects = await this._loadProjects()
-    return projects.find(p => p.path === path) || null
+    return this._projectByPathCache.get(path) || null
   }
 
-  async findAll() {
-    return await this._loadProjects()
+  async findAll(options = {}) {
+    const projects = await this._loadProjects()
+    const { limit, offset = 0 } = options
+
+    // Apply pagination if specified
+    if (limit !== undefined) {
+      return projects.slice(offset, offset + limit)
+    }
+
+    // Return all projects (backward compatible)
+    return offset > 0 ? projects.slice(offset) : projects
   }
 
   async findByType(type) {
@@ -190,6 +260,10 @@ export class FileSystemProjectRepository extends IProjectRepository {
     }
 
     await this._saveProjects(projects)
+
+    // Invalidate cache after modification
+    this._invalidateCache()
+
     return project
   }
 
@@ -200,6 +274,10 @@ export class FileSystemProjectRepository extends IProjectRepository {
     if (index >= 0) {
       projects.splice(index, 1)
       await this._saveProjects(projects)
+
+      // Invalidate cache after modification
+      this._invalidateCache()
+
       return true
     }
 

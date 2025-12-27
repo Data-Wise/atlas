@@ -4,7 +4,7 @@
 
 import { describe, test, expect, beforeEach, afterEach } from '@jest/globals'
 import { StatusController } from '../../src/adapters/controllers/StatusController.js'
-import { GetStatusUseCase } from '../../src/use-cases/GetStatusUseCase.js'
+import { GetStatusUseCase } from '../../src/use-cases/project/GetStatusUseCase.js'
 import { Session } from '../../src/domain/entities/Session.js'
 import { writeFile, unlink, mkdir } from 'fs/promises'
 import { join } from 'path'

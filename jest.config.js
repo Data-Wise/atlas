@@ -10,5 +10,8 @@ export default {
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   testPathIgnorePatterns: ['/node_modules/'],
-  verbose: true
+  setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
+  verbose: true,
+  // Force exit after tests complete to prevent hanging on leaked timers
+  forceExit: true
 }

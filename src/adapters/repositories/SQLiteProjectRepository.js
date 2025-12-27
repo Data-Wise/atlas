@@ -77,8 +77,22 @@ export class SQLiteProjectRepository extends IProjectRepository {
     return this._deserialize(row)
   }
 
-  async findAll() {
-    const rows = this.db.query('SELECT * FROM projects ORDER BY name')
+  async findAll(options = {}) {
+    const { limit, offset = 0 } = options
+
+    let query = 'SELECT * FROM projects ORDER BY name'
+    const params = []
+
+    // Add pagination if specified
+    if (limit !== undefined) {
+      query += ' LIMIT ? OFFSET ?'
+      params.push(limit, offset)
+    } else if (offset > 0) {
+      query += ' LIMIT -1 OFFSET ?'
+      params.push(offset)
+    }
+
+    const rows = this.db.query(query, params)
     return rows.map(row => this._deserialize(row))
   }
 

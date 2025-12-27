@@ -2,7 +2,7 @@
  * Unit tests for GetStatusUseCase
  */
 
-import { GetStatusUseCase } from '../../../src/use-cases/GetStatusUseCase.js'
+import { GetStatusUseCase } from '../../../src/use-cases/project/GetStatusUseCase.js'
 import { Session } from '../../../src/domain/entities/Session.js'
 import { Project } from '../../../src/domain/entities/Project.js'
 

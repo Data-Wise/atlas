@@ -29,10 +29,13 @@ export class IProjectRepository {
   }
 
   /**
-   * Find all projects
+   * Find all projects with optional pagination
+   * @param {Object} [options] - Pagination options
+   * @param {number} [options.limit] - Maximum number of results (default: all)
+   * @param {number} [options.offset=0] - Number of results to skip
    * @returns {Promise<Project[]>}
    */
-  async findAll() {
+  async findAll(options = {}) {
     throw new Error('findAll() not implemented')
   }
 

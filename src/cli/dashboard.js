@@ -18,6 +18,22 @@ import { StreakCalculator } from '../utils/StreakCalculator.js'
 import { TimeBlindnessHelper } from '../utils/TimeBlindnessHelper.js'
 import { ContextRestorationHelper } from '../utils/ContextRestorationHelper.js'
 import { CelebrationHelper } from '../utils/CelebrationHelper.js'
+import {
+  CARD_HEIGHT,
+  MIN_TERMINAL_WIDTH,
+  MIN_TERMINAL_HEIGHT,
+  REFRESH_INTERVAL,
+  DEFAULT_POMODORO_MINUTES,
+  MIN_POMODORO_MINUTES,
+  MAX_POMODORO_MINUTES,
+  POMODORO_ADJUST_STEP,
+  PROBLEM_TERMINALS,
+  FALLBACK_TERMINAL,
+  MORNING_START,
+  MORNING_END,
+  AFTERNOON_END,
+  EVENING_END
+} from './dashboard/constants.js'
 
 /**
  * Create and run the dashboard
@@ -33,18 +49,17 @@ export async function runDashboard(atlas, options = {}) {
   // Check terminal dimensions
   const cols = process.stdout.columns || 80
   const rows = process.stdout.rows || 24
-  if (cols < 60 || rows < 15) {
+  if (cols < MIN_TERMINAL_WIDTH || rows < MIN_TERMINAL_HEIGHT) {
     console.error(`Error: Terminal too small (${cols}x${rows})`)
-    console.error('Dashboard requires at least 60x15. Please resize your terminal.')
+    console.error(`Dashboard requires at least ${MIN_TERMINAL_WIDTH}x${MIN_TERMINAL_HEIGHT}. Please resize your terminal.`)
     process.exit(1)
   }
 
   // Detect if canvas-based widgets will work
   // Canvas fails in pseudo-TTYs (from script command), XPC service contexts, etc.
   // Detect problematic terminals (Ghostty has terminfo issues with ansi-term)
-  const problemTerminals = ['xterm-ghostty', 'ghostty']
   const currentTerm = process.env.TERM || ''
-  const isProblematicTerminal = problemTerminals.some(t => currentTerm.includes(t))
+  const isProblematicTerminal = PROBLEM_TERMINALS.some(t => currentTerm.includes(t))
 
   // Canvas-based widgets fail in pseudo-TTYs, XPC contexts, and problematic terminals
   const canvasSupported = !(
@@ -56,8 +71,8 @@ export async function runDashboard(atlas, options = {}) {
 
   // Use safe terminal fallback for problematic terminals
   const safeTerminal = isProblematicTerminal
-    ? 'xterm-256color'
-    : currentTerm || 'xterm-256color'
+    ? FALLBACK_TERMINAL
+    : currentTerm || FALLBACK_TERMINAL
 
   const screen = blessed.screen({
     smartCSR: true,
@@ -74,7 +89,7 @@ export async function runDashboard(atlas, options = {}) {
   const stateMachine = createStateMachine({ initial: STATES.BROWSE })
 
   // Create timer manager for Pomodoro
-  const timer = createTimerManager({ defaultMinutes: 25 })
+  const timer = createTimerManager({ defaultMinutes: DEFAULT_POMODORO_MINUTES })
 
   // Track data state (separate from view state)
   let projectList = []
@@ -87,7 +102,7 @@ export async function runDashboard(atlas, options = {}) {
   // Legacy timer state (for compatibility during refactor)
   let pomodoroActive = false
   let pomodoroStart = null
-  let pomodoroMinutes = 25
+  let pomodoroMinutes = DEFAULT_POMODORO_MINUTES
   let breakReminder = false
   let timerInterval = null
 
@@ -201,7 +216,6 @@ export async function runDashboard(atlas, options = {}) {
   // Project cards will be created dynamically
   let projectCards = []
   let selectedCardIndex = 0
-  const CARD_HEIGHT = 5  // Increased for progress bar + next action
   const MAX_VISIBLE_CARDS = Math.floor((screen.height - 8) / CARD_HEIGHT)
 
   // Stats footer - always visible
@@ -1183,7 +1197,7 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   function adjustPomodoroTime(delta) {
-    pomodoroMinutes = Math.max(5, Math.min(60, pomodoroMinutes + delta))
+    pomodoroMinutes = Math.max(MIN_POMODORO_MINUTES, Math.min(MAX_POMODORO_MINUTES, pomodoroMinutes + delta))
     updateFocusTimer()
   }
 
@@ -1274,13 +1288,13 @@ export async function runDashboard(atlas, options = {}) {
     let timeContext = ''
     let taskPriority = 'any' // 'heavy', 'medium', 'light'
 
-    if (hour >= 6 && hour < 12) {
+    if (hour >= MORNING_START && hour < MORNING_END) {
       timeContext = '🌅 Morning - peak focus time'
       taskPriority = 'heavy'
-    } else if (hour >= 12 && hour < 17) {
+    } else if (hour >= MORNING_END && hour < AFTERNOON_END) {
       timeContext = '☀️ Afternoon - steady work'
       taskPriority = 'medium'
-    } else if (hour >= 17 && hour < 21) {
+    } else if (hour >= AFTERNOON_END && hour < EVENING_END) {
       timeContext = '🌆 Evening - lighter tasks'
       taskPriority = 'light'
     } else {
@@ -1299,7 +1313,7 @@ export async function runDashboard(atlas, options = {}) {
       const stable = projects.filter(p => getStatusCategory(p.status) === 's')
 
       // Late night: suggest rest or very light tasks only
-      if (hour >= 21 || hour < 6) {
+      if (hour >= EVENING_END || hour < MORNING_START) {
         if (stable.length > 0) {
           suggestions.push({
             project: stable[0],
@@ -1576,7 +1590,13 @@ export async function runDashboard(atlas, options = {}) {
   // Open folder (detail view)
   screen.key(['o'], () => {
     if (stateMachine.is(STATES.DETAIL) && selectedProject?.path) {
-      require('child_process').exec(`open "${selectedProject.path}"`)
+      // Use execFile instead of exec for safer command execution (no shell injection)
+      require('child_process').execFile('open', [selectedProject.path], (err) => {
+        if (err) {
+          statusBar.setContent(` {red-fg}Failed to open: ${err.message}{/}`)
+        }
+        screen.render()
+      })
       statusBar.setContent(` {green-fg}Opened: ${selectedProject.path}{/}`)
       screen.render()
     }
@@ -1641,13 +1661,13 @@ export async function runDashboard(atlas, options = {}) {
   // Focus mode: +/- for time adjustment (only when paused)
   screen.key(['+', '='], () => {
     if (stateMachine.is(STATES.FOCUS) && !pomodoroActive) {
-      adjustPomodoroTime(5) // Add 5 minutes
+      adjustPomodoroTime(POMODORO_ADJUST_STEP)
     }
   })
 
   screen.key(['-', '_'], () => {
     if (stateMachine.is(STATES.FOCUS) && !pomodoroActive) {
-      adjustPomodoroTime(-5) // Remove 5 minutes
+      adjustPomodoroTime(-POMODORO_ADJUST_STEP)
     }
   })
 
@@ -1857,14 +1877,35 @@ export async function runDashboard(atlas, options = {}) {
   // INITIALIZE
   // ============================================================================
 
+  // Auto-refresh interval for main view
+  let refreshInterval = null
+
+  function startRefreshInterval() {
+    if (refreshInterval) clearInterval(refreshInterval)
+    refreshInterval = setInterval(() => {
+      if (stateMachine.is(STATES.BROWSE)) loadMainView()
+    }, REFRESH_INTERVAL)
+  }
+
+  function stopRefreshInterval() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval)
+      refreshInterval = null
+    }
+  }
+
+  // Enhanced cleanup that clears ALL intervals
+  const originalCleanup = cleanup
+  cleanup = function() {
+    originalCleanup()
+    stopRefreshInterval()
+  }
+
   projectsTable.focus()
   await loadMainView()
+  startRefreshInterval()
 
-  const refreshInterval = setInterval(() => {
-    if (stateMachine.is(STATES.BROWSE)) loadMainView()
-  }, 30000)
-
-  process.on('exit', () => clearInterval(refreshInterval))
+  process.on('exit', stopRefreshInterval)
   screen.render()
 }
 

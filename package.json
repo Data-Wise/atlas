@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:debug": "npm test -- --detectOpenHandles --runInBand",
     "test:unit": "npm test -- --testPathPattern=test/unit",
     "test:integration": "npm test -- --testPathPattern=test/integration",
     "test:e2e": "npm test -- --testPathPattern=test/e2e",

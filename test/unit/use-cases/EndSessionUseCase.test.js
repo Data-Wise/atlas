@@ -2,7 +2,7 @@
  * Unit tests for EndSessionUseCase
  */
 
-import { EndSessionUseCase } from '../../../src/use-cases/EndSessionUseCase.js'
+import { EndSessionUseCase } from '../../../src/use-cases/session/EndSessionUseCase.js'
 import { Session } from '../../../src/domain/entities/Session.js'
 import { Project } from '../../../src/domain/entities/Project.js'
 

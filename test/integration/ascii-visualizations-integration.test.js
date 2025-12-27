@@ -5,7 +5,7 @@
 
 import { describe, test, expect, beforeEach } from '@jest/globals'
 import { StatusController } from '../../src/adapters/controllers/StatusController.js'
-import { GetStatusUseCase } from '../../src/use-cases/GetStatusUseCase.js'
+import { GetStatusUseCase } from '../../src/use-cases/project/GetStatusUseCase.js'
 import { Session } from '../../src/domain/entities/Session.js'
 import { Project } from '../../src/domain/entities/Project.js'
 import { ProjectType } from '../../src/domain/value-objects/ProjectType.js'
