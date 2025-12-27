@@ -2,6 +2,15 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.5.4] - 2025-12-26
+
+### Changed
+- **Release Sync**: Aligned tagged release with latest documentation improvements
+- Homebrew formula updated to v0.5.4
+
+### Notes
+- This release ensures Homebrew users get all documentation and workflow enhancements from v0.5.3
+
 ## [0.5.3] - 2025-12-26
 
 ### Added
