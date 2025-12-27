@@ -2,6 +2,18 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.5.3] - 2025-12-26
+
+### Added
+- **Comprehensive Documentation**:
+  - `docs/CLI-REFERENCE.md` - Complete CLI command reference
+  - `docs/ARCHITECTURE.md` - Clean Architecture overview with Mermaid diagrams
+  - `docs/API-GUIDE.md` - Programmatic API usage guide
+  - `docs/CONFIGURATION.md` - All settings and preferences
+- **README Improvements**:
+  - Added CI and npm badges
+  - Added documentation section with links
+
 ## [0.5.2] - 2025-12-26
 
 ### Added
