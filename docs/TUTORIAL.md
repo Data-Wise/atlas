@@ -126,7 +126,7 @@ Imagine you're working and remember something:
 atlas catch "check the API documentation"
 
 # Capture for a specific project
-atlas catch myproject "add input validation"
+atlas catch -p myproject "add input validation"
 
 # Capture as a bug report
 atlas catch "login fails on Safari" --type bug
@@ -154,23 +154,22 @@ atlas trail
 
 **Why this works:** Breadcrumbs help you remember your thought process.
 
-### Try This Now #4: Project Status
+### Try This Now #4: Project Focus
 
 ```bash
-# Show project status
-atlas status myproject
-
-# Update status
-atlas status myproject --set active --progress 50
+# Show overall workflow status
+atlas status
 
 # Set what you're focusing on
 atlas focus myproject "implementing user authentication"
 
-# Set next actions
-atlas status myproject --next "Write tests,Update docs"
+# Check your context
+atlas where
+```
 
-# Complete an action and add a new one
-atlas status myproject --complete --then "Deploy to staging"
+**Note:** For detailed project status with `--set`, `--progress`, etc., your project needs a `.STATUS` file. Create one with:
+```bash
+atlas init --template minimal   # in your project directory
 ```
 
 ---
