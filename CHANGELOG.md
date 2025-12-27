@@ -10,9 +10,21 @@ All notable changes to Atlas are documented here.
   - `docs/ARCHITECTURE.md` - Clean Architecture overview with Mermaid diagrams
   - `docs/API-GUIDE.md` - Programmatic API usage guide
   - `docs/CONFIGURATION.md` - All settings and preferences
-- **README Improvements**:
-  - Added CI and npm badges
-  - Added documentation section with links
+  - `docs/TUTORIAL.md` - Step-by-step getting started guide (15 min)
+  - `docs/DIAGRAMS.md` - 10 Mermaid architecture diagrams
+  - `CLAUDE.md` - Project intelligence file for Claude Code
+- **Installation Options**:
+  - `install.sh` - Curl-based installer script
+  - Homebrew formula updated in Data-Wise/homebrew-tap
+  - Installation docs updated (Homebrew, curl, source)
+- **Tutorial Enhancements**:
+  - Zellij terminal multiplexer integration guide
+  - ADHD-friendly workflow patterns
+  - Keybindings cheatsheet
+
+### Fixed
+- Tutorial: Corrected `atlas catch` syntax (use `-p` flag for project)
+- Tutorial: Clarified `.STATUS` file requirement for status updates
 
 ## [0.5.2] - 2025-12-26
 
