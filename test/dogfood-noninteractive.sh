@@ -302,6 +302,70 @@ test_succeeds "Session start shows welcome" "$ATLAS session start test-project-2
 test_succeeds "Session end shows celebration" "$ATLAS session end 'Testing celebrations'"
 
 # ============================================================================
+# 13. PARK FEATURE (v0.5.1)
+# ============================================================================
+
+header "13. Park Feature (v0.5.1)"
+
+# Start a session to park
+test_succeeds "Start session to park" "$ATLAS session start test-project-1 'Working on feature'"
+test_contains "Park with note" "$ATLAS park 'switching to urgent task'" "parked"
+test_contains "No active after park" "$ATLAS session status" "No active"
+
+# Check parked list
+test_succeeds "Parked list runs" "$ATLAS parked"
+test_contains "Parked shows context" "$ATLAS parked" "test-project-1"
+
+# Unpark restores context
+test_contains "Unpark restores" "$ATLAS unpark" "restored"
+test_contains "Session active after unpark" "$ATLAS session status" "test-project-1"
+test_succeeds "End unparked session" "$ATLAS session end 'Back from urgent task'"
+
+# Park with --keep-session
+test_succeeds "Start for keep-session" "$ATLAS session start test-project-2"
+test_contains "Park with keep-session" "$ATLAS park --keep-session 'quick note'" "parked"
+test_contains "Session still active" "$ATLAS session status" "test-project-2"
+test_succeeds "End kept session" "$ATLAS session end"
+
+# ============================================================================
+# 14. TEMPLATE COMMANDS (v0.5.1)
+# ============================================================================
+
+header "14. Template Commands (v0.5.1)"
+
+# List templates
+test_succeeds "Template list runs" "$ATLAS template list"
+test_contains "List shows node template" "$ATLAS template list" "node"
+test_contains "List shows r-package" "$ATLAS template list" "r-package"
+test_contains "List shows minimal" "$ATLAS template list" "minimal"
+
+# Show template content
+test_succeeds "Template show runs" "$ATLAS template show node"
+test_contains "Show has project marker" "$ATLAS template show node" "Project:"
+
+# Template dir
+test_contains "Template dir shows path" "$ATLAS template dir" ".atlas/templates"
+
+# Create custom template
+test_succeeds "Create custom template" "$ATLAS template create test-template"
+test_contains "Custom in list" "$ATLAS template list" "test-template"
+test_contains "Custom marked" "$ATLAS template list" "[custom]"
+
+# Delete custom template
+test_succeeds "Delete custom template" "$ATLAS template delete test-template"
+
+# ============================================================================
+# 15. TEMPLATE INHERITANCE (v0.5.2)
+# ============================================================================
+
+header "15. Template Inheritance (v0.5.2)"
+
+# Create template that extends node
+test_succeeds "Create extending template" "$ATLAS template create my-node --extends node"
+test_contains "Extended in list" "$ATLAS template list" "my-node"
+test_succeeds "Delete extended template" "$ATLAS template delete my-node"
+
+# ============================================================================
 # CLEANUP
 # ============================================================================
 
