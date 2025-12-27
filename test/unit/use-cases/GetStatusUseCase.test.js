@@ -125,22 +125,30 @@ describe('GetStatusUseCase', () => {
     })
 
     test('calculates total duration for today', async () => {
-      const today = new Date()
+      // Use explicit times that are clearly "today" to avoid midnight edge cases
+      const todayNoon = new Date()
+      todayNoon.setHours(12, 0, 0, 0)
 
+      // Session 1: 30 min duration (noon to 12:30)
       const session1 = new Session('s1', 'p1')
-      session1.startTime = new Date(today.getTime() - 30 * 60 * 1000)
-      session1.end('completed')
+      session1.startTime = new Date(todayNoon)
+      session1.endTime = new Date(todayNoon.getTime() + 30 * 60 * 1000)
+      session1.state = { value: 'ended', isActive: () => false, isPaused: () => false }
+      session1.outcome = 'completed'
 
+      // Session 2: 45 min duration (1pm to 1:45)
       const session2 = new Session('s2', 'p2')
-      session2.startTime = new Date(today.getTime() - 45 * 60 * 1000)
-      session2.end('completed')
+      session2.startTime = new Date(todayNoon.getTime() + 60 * 60 * 1000)
+      session2.endTime = new Date(todayNoon.getTime() + 105 * 60 * 1000)
+      session2.state = { value: 'ended', isActive: () => false, isPaused: () => false }
+      session2.outcome = 'completed'
 
       sessionRepo.sessions.push(session1, session2)
 
       const status = await useCase.execute()
 
-      expect(status.today.totalDuration).toBeGreaterThanOrEqual(74)
-      expect(status.today.totalDuration).toBeLessThanOrEqual(76)
+      // 30 + 45 = 75 minutes total
+      expect(status.today.totalDuration).toBe(75)
     })
 
     test('counts completed sessions', async () => {
