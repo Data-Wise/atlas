@@ -63,8 +63,8 @@ export class GetContextUseCase {
         const crumbs = await this.breadcrumbRepository.findRecent(project, 5);
         context.recentCrumbs = crumbs.map(c => ({
           text: c.text,
-          timestamp: c.createdAt,
-          ago: this._formatAgo(c.createdAt),
+          timestamp: c.timestamp,
+          ago: this._formatAgo(c.timestamp),
         }));
       }
 
