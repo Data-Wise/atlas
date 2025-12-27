@@ -2,6 +2,16 @@
 
 **Project State Engine** - Registry, sessions, capture, and context management for ADHD-friendly workflow.
 
+[![Tests](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml/badge.svg)](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml)
+[![npm version](https://badge.fury.io/js/@data-wise%2Fatlas.svg)](https://www.npmjs.com/package/@data-wise/atlas)
+
+## Documentation
+
+- [CLI Command Reference](./docs/CLI-REFERENCE.md) - Complete command documentation
+- [Architecture Overview](./docs/ARCHITECTURE.md) - System design and diagrams
+- [Programmatic API Guide](./docs/API-GUIDE.md) - Using Atlas as a library
+- [Configuration Reference](./docs/CONFIGURATION.md) - All settings and preferences
+
 ## Overview
 
 Atlas is the state management engine that powers the flow-cli workflow system. It can be used standalone or as a library.
