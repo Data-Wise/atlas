@@ -2,6 +2,29 @@
 
 Complete reference for all Atlas CLI commands, options, and usage examples.
 
+## Installation
+
+### Homebrew (macOS)
+
+```bash
+brew tap data-wise/tap
+brew install atlas
+```
+
+### Direct Install (curl)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
+```
+
+### npm
+
+```bash
+npm install -g @data-wise/atlas
+```
+
+---
+
 ## Global Options
 
 ```bash

@@ -29,14 +29,32 @@ Atlas is the state management engine that powers the flow-cli workflow system. I
 
 ## Installation
 
+### Homebrew (macOS)
+
+```bash
+brew tap data-wise/tap
+brew install atlas
+```
+
+### Direct Install (curl)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
+```
+
+### npm
+
 ```bash
 # Global install
 npm install -g @data-wise/atlas
 
 # Or use directly
 npx @data-wise/atlas status
+```
 
-# Enable shell completions
+### Shell Completions
+
+```bash
 atlas completions zsh >> ~/.zshrc   # or bash/fish
 ```
 
