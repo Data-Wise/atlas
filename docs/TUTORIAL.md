@@ -701,17 +701,97 @@ ls ~/.atlas/parked/
 alfred "atlas catch {query}"
 ```
 
-**iTerm2/tmux integration:**
-```bash
-# Show context in status bar
-atlas status --format shell
-```
-
 **Git hooks:**
 ```bash
 # Auto-breadcrumb on commit
 echo 'atlas crumb "committed: $(git log -1 --oneline)"' > .git/hooks/post-commit
 chmod +x .git/hooks/post-commit
+```
+
+---
+
+### Zellij Integration (Recommended)
+
+Zellij is a modern terminal multiplexer with session persistence. Combined with Atlas, you get both mental AND terminal context preservation.
+
+**Install:**
+```bash
+brew install zellij
+```
+
+**Why Zellij + Atlas:**
+| Zellij | Atlas | Combined Benefit |
+|--------|-------|------------------|
+| Session persistence | Park/unpark | Full context survival |
+| Visual keybindings | ADHD helpers | Less to remember |
+| Named sessions | Project registry | One command restores everything |
+
+**The Perfect Layout:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Zellij (myproject)                                         │
+├─────────────────────────────┬───────────────────────────────┤
+│  ❯ vim src/index.js         │  ❯ npm run test:watch         │
+│                             │  PASS ✓✓✓                     │
+├─────────────────────────────┴───────────────────────────────┤
+│  ❯ atlas dash                                               │
+│  🎯 Active: myproject (45m) │ 🔥 5-day streak               │
+├─────────────────────────────────────────────────────────────┤
+│ Alt+←→↑↓: Navigate │ Ctrl+P: Pane │ Ctrl+O,D: Detach        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Quick Start Workflow:**
+```bash
+# Start a project session
+zellij --session myproject
+
+# Create layout (inside Zellij)
+Ctrl+P, D                      # Split down for dashboard
+Alt+↓                          # Move to bottom pane
+atlas dash                     # Start dashboard
+Alt+↑                          # Back to top
+Ctrl+P, R                      # Split right for tests
+Alt+→                          # Move to right pane
+npm run test:watch             # Start tests
+Alt+←                          # Back to editor pane
+vim src/index.js               # Start coding!
+```
+
+**Detach & Reattach (The Magic):**
+```bash
+# End of day - close terminal or:
+Ctrl+O, D
+
+# Next day - everything is exactly where you left it:
+zellij attach myproject
+```
+
+**Zellij Cheatsheet:**
+| Keys | Action |
+|------|--------|
+| `Alt + ←→↑↓` | Navigate between panes |
+| `Ctrl+P, D` | Split pane down |
+| `Ctrl+P, R` | Split pane right |
+| `Ctrl+P, X` | Close pane |
+| `Ctrl+P, Z` | Zoom (fullscreen pane) |
+| `Ctrl+P, F` | Floating pane (overlay) |
+| `Ctrl+O, D` | Detach session |
+| `Ctrl+O, W` | Session manager |
+
+**Auto-Start Zellij (optional):**
+```bash
+# Add to ~/.zshrc
+if [[ -z "$ZELLIJ" ]]; then
+    zellij attach --create default
+fi
+```
+
+**Pro Tip:** Use Zellij sessions named after your Atlas projects:
+```bash
+zellij --session atlas-dev     # For atlas project
+zellij --session myapp         # For myapp project
+zellij list-sessions           # See all sessions
 ```
 
 ### Advanced Features
