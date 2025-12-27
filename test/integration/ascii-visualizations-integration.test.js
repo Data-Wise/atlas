@@ -53,6 +53,27 @@ class MockProjectRepository {
   }
 }
 
+// Helper to get a time that's definitely "today" regardless of timezone
+// Uses noon today to avoid midnight edge cases in CI
+function getTodayNoon() {
+  const noon = new Date()
+  noon.setHours(12, 0, 0, 0)
+  return noon
+}
+
+// Create a session with explicit start/end times (avoids timezone issues)
+function createSession(id, project, durationMinutes, outcome = 'completed', startOffset = 0) {
+  const noon = getTodayNoon()
+  const startTime = new Date(noon.getTime() + startOffset * 60000)
+  const endTime = new Date(startTime.getTime() + durationMinutes * 60000)
+
+  const session = new Session(id, project, { startTime })
+  session.endTime = endTime
+  session.state = { value: 'ended', isActive: () => false, isPaused: () => false }
+  session.outcome = outcome
+  return session
+}
+
 // Capture console output
 let consoleOutput = []
 const originalConsoleLog = console.log
@@ -71,21 +92,15 @@ afterEach(() => {
 describe('ASCII Visualizations - Integration Tests', () => {
   describe('Real-world Workflow Scenarios', () => {
     test('productive day with multiple completed sessions', async () => {
-      // Create realistic session history
-      const now = new Date()
+      // Create realistic session history using explicit times (avoids midnight edge cases)
       const sessions = []
 
-      // 5 completed sessions with varying durations
+      // 5 completed sessions with varying durations, staggered throughout the day
+      let offset = 0
       for (let i = 0; i < 5; i++) {
         const durationMinutes = 25 + i * 10 // 25, 35, 45, 55, 65
-        const startTime = new Date(now.getTime() - durationMinutes * 60000)
-
-        const session = new Session(`session-${i}`, 'flow-cli', {
-          task: `Task ${i + 1}`,
-          startTime
-        })
-        session.end('completed')
-        sessions.push(session)
+        sessions.push(createSession(`session-${i}`, 'flow-cli', durationMinutes, 'completed', offset))
+        offset += durationMinutes + 5 // Small gap between sessions
       }
 
       const sessionRepo = new MockSessionRepository(sessions)
@@ -111,28 +126,18 @@ describe('ASCII Visualizations - Integration Tests', () => {
 
     test('partially complete day with some cancelled sessions', async () => {
       const sessions = []
-      const now = new Date()
 
-      // 3 completed sessions
+      // 3 completed sessions (30 min each)
+      let offset = 0
       for (let i = 0; i < 3; i++) {
-        const startTime = new Date(now.getTime() - 30 * 60000)
-        const session = new Session(`completed-${i}`, 'project-a', {
-          task: `Completed task ${i + 1}`,
-          startTime
-        })
-        session.end('completed')
-        sessions.push(session)
+        sessions.push(createSession(`completed-${i}`, 'project-a', 30, 'completed', offset))
+        offset += 35 // 30 min session + 5 min gap
       }
 
-      // 2 cancelled sessions
+      // 2 cancelled sessions (15 min each)
       for (let i = 0; i < 2; i++) {
-        const startTime = new Date(now.getTime() - 15 * 60000)
-        const session = new Session(`cancelled-${i}`, 'project-b', {
-          task: `Cancelled task ${i + 1}`,
-          startTime
-        })
-        session.end('cancelled')
-        sessions.push(session)
+        sessions.push(createSession(`cancelled-${i}`, 'project-b', 15, 'cancelled', offset))
+        offset += 20 // 15 min session + 5 min gap
       }
 
       const sessionRepo = new MockSessionRepository(sessions)
@@ -231,18 +236,8 @@ describe('ASCII Visualizations - Integration Tests', () => {
     })
 
     test('long work session shows multiple duration blocks', async () => {
-      const now = new Date()
-      const durationMinutes = 180 // 3 hours
-      const startTime = new Date(now.getTime() - durationMinutes * 60000)
-
-      const sessions = [
-        new Session('long-session', 'marathon-project', {
-          task: 'Deep work session',
-          startTime
-        })
-      ]
-
-      sessions[0].end('completed')
+      // 3 hour session using explicit times
+      const sessions = [createSession('long-session', 'marathon-project', 180, 'completed')]
 
       const sessionRepo = new MockSessionRepository(sessions)
       const projectRepo = new MockProjectRepository([])
@@ -288,10 +283,8 @@ describe('ASCII Visualizations - Integration Tests', () => {
     })
 
     test('handles single session correctly', async () => {
-      const now = new Date()
-      const startTime = new Date(now.getTime() - 30 * 60000)
-      const session = new Session('single', 'solo-project', { startTime })
-      session.end('completed')
+      // Single 30-min session using explicit times
+      const session = createSession('single', 'solo-project', 30, 'completed')
 
       const sessionRepo = new MockSessionRepository([session])
       const projectRepo = new MockProjectRepository([])
