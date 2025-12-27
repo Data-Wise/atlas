@@ -721,6 +721,61 @@ ctx.recentCrumbs.forEach(c => console.log(`  - ${c.text}`));
 
 ---
 
+## Presenter Utilities
+
+Atlas exports formatting utilities for building custom UIs:
+
+### ProjectPresenter (UI-agnostic)
+
+```javascript
+import {
+  formatTimeAgo,
+  formatDuration,
+  truncateText,
+  formatProjectStatus,
+  formatSessionStatus
+} from '@data-wise/atlas/presenters';
+
+// Format relative time
+formatTimeAgo(new Date('2024-01-15')); // "2 days ago"
+
+// Format duration
+formatDuration(125); // "2h 5m"
+
+// Truncate with ellipsis
+truncateText('Long project name', 10); // "Long pr..."
+```
+
+### TuiPresenter (Terminal UI)
+
+For blessed/terminal UIs with color tags:
+
+```javascript
+import {
+  sparkline,
+  progressBar,
+  getStatusIcon,
+  formatProjectName,
+  themes
+} from '@data-wise/atlas/presenters';
+
+// Create sparkline chart
+sparkline([1, 2, 5, 3, 4]); // "▁▂█▃▄"
+
+// Progress bar with colors
+progressBar(75, 20); // "{green-fg}███████████████{/}..."
+
+// Status icons
+getStatusIcon('active');  // "{green-fg}●{/}"
+getStatusIcon('blocked'); // "{red-fg}✖{/}"
+
+// Available themes
+console.log(themes.default.primary); // "blue"
+console.log(themes.dark.primary);    // "magenta"
+```
+
+---
+
 ## See Also
 
 - [CLI Reference](./CLI-REFERENCE.md)
