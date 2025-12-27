@@ -3,7 +3,7 @@
 **Project State Engine** - Registry, sessions, capture, and context management for ADHD-friendly workflow.
 
 [![Tests](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml/badge.svg)](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml)
-[![npm version](https://badge.fury.io/js/@data-wise%2Fatlas.svg)](https://www.npmjs.com/package/@data-wise/atlas)
+[![GitHub release](https://img.shields.io/github/v/release/Data-Wise/atlas)](https://github.com/Data-Wise/atlas/releases)
 
 ## Documentation
 
@@ -42,14 +42,12 @@ brew install atlas
 curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
 ```
 
-### npm
+### From Source
 
 ```bash
-# Global install
-npm install -g @data-wise/atlas
-
-# Or use directly
-npx @data-wise/atlas status
+git clone https://github.com/Data-Wise/atlas.git
+cd atlas && npm install
+npm link  # Makes 'atlas' available globally
 ```
 
 ### Shell Completions

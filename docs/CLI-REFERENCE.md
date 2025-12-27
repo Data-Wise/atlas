@@ -17,10 +17,12 @@ brew install atlas
 curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
 ```
 
-### npm
+### From Source
 
 ```bash
-npm install -g @data-wise/atlas
+git clone https://github.com/Data-Wise/atlas.git
+cd atlas && npm install
+npm link  # Makes 'atlas' available globally
 ```
 
 ---
