@@ -1,11 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.5.0 - Configuration & Templates
+## Phase: 🚀 v0.5.3 - Documentation & Distribution
 ## Priority: 1
 ## Progress: 100
 
-## Focus: Card Stack UI + ADHD-friendly enhancements
+## Focus: Comprehensive documentation and installation options
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -117,25 +117,30 @@ atlas dashboard           # Interactive TUI
 - [x] CLI integration: context restoration on start, celebration on end
 
 ## Current Tasks
-- [x] Update Homebrew formula to 0.4.1
-- [ ] npm publish deferred (requires authenticator app setup)
+- [x] Update Homebrew formula to 0.5.3
 - [x] GitHub Actions CI/CD (dogfood tests on push)
 - [x] Enhanced configuration system with preferences
 - [x] User preferences persistence (ADHD, session, dashboard settings)
 - [x] Project templates (node, r-package, python, quarto, research, minimal)
 - [x] Configuration wizard (atlas config setup)
 - [x] v0.5.0 release
+- [x] v0.5.1: Park/unpark feature, template management CLI
+- [x] v0.5.2: Template variables and inheritance
+- [x] v0.5.3: Comprehensive documentation suite
+  - CLI-REFERENCE.md, ARCHITECTURE.md, API-GUIDE.md
+  - CONFIGURATION.md, TUTORIAL.md, DIAGRAMS.md
+  - CLAUDE.md, install.sh, Zellij integration guide
 
 ## Next Tasks (v0.6.0)
-- [ ] "Park" feature for context switching
-- [ ] Template customization
+- [ ] Session analytics (`atlas stats`)
+- [ ] Data export (`atlas export`)
+- [ ] Notification integrations
 
-## Future Enhancements (v0.5.0+)
-- [ ] "Park" feature for context switching
+## Future Enhancements
 - [ ] Remote sync (GitHub/GitLab status)
 - [ ] Web dashboard with real-time sync
-- [ ] Session analytics and reports
 - [ ] VS Code extension for .STATUS editing
+- [ ] Native Zellij integration flag
 
 ## Blockers
 None
@@ -145,15 +150,26 @@ None
 - Integration Tests: 280+
 - E2E Tests: 41
 - Dogfood Tests: 45
-- Total: 926 passing
+- Total: 958 passing
+
+## Documentation (5,239 lines)
+- docs/CLI-REFERENCE.md (839 lines)
+- docs/TUTORIAL.md (898 lines)
+- docs/DIAGRAMS.md (764 lines)
+- docs/API-GUIDE.md (728 lines)
+- docs/CONFIGURATION.md (652 lines)
+- docs/ARCHITECTURE.md (573 lines)
+- CLAUDE.md (203 lines)
+- README.md (428 lines)
 
 ## Installation
 ```bash
-# npm (recommended)
-npm install -g @data-wise/atlas
+# Homebrew (macOS)
+brew tap data-wise/tap
+brew install atlas
 
-# Homebrew
-brew install Data-Wise/tap/atlas
+# Direct install (curl)
+curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
 
 # From source
 git clone https://github.com/Data-Wise/atlas
