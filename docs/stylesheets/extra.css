@@ -1,0 +1,96 @@
+/* Atlas Documentation Custom Styles */
+
+/* Prevent Mermaid overflow */
+.mermaid {
+  overflow-x: auto;
+  text-align: center;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid .nodeLabel {
+  font-size: 12px !important;
+}
+
+/* Code block styling */
+.md-typeset code {
+  font-size: 0.85em;
+}
+
+/* Table improvements */
+.md-typeset table:not([class]) {
+  font-size: 0.85em;
+}
+
+/* Admonition icons for ADHD features */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #9c27b0;
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(156, 39, 176, 0.1);
+}
+
+/* Custom badge styling */
+.md-typeset .badge {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  font-size: 0.75em;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  margin-right: 0.25em;
+}
+
+.md-typeset .badge-new {
+  background-color: #4caf50;
+  color: white;
+}
+
+.md-typeset .badge-adhd {
+  background-color: #9c27b0;
+  color: white;
+}
+
+/* Navigation improvements */
+.md-nav__link {
+  font-size: 0.9rem;
+}
+
+/* Hero section on home page */
+.md-typeset .hero {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.md-typeset .hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.md-typeset .hero p {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+/* Feature grid */
+.md-typeset .feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .feature-card {
+  padding: 1.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.5rem;
+}
+
+.md-typeset .feature-card h3 {
+  margin-top: 0;
+}
