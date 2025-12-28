@@ -7,6 +7,10 @@
  * - Virtual scrolling: Only renders visible cards + buffer
  * - Card pooling: Reuses DOM elements instead of destroy/create
  * - Debounced rendering: Prevents excessive re-renders (60fps target)
+ *
+ * State Management (v0.6.0 Plan C):
+ * - Supports optional ViewStateManager for centralized state
+ * - Backward compatible with direct state management
  */
 
 import blessed from 'blessed'
@@ -29,17 +33,28 @@ import { debounce } from '../../../utils/debounce.js'
  * Create the main view with project cards
  * @param {Object} screen - Blessed screen instance
  * @param {Object} options - Configuration options
+ * @param {Object} options.stateManager - Optional ViewStateManager for centralized state
  * @returns {Object} Main view components and methods
  */
 export function createMainView(screen, options = {}) {
   // Calculate visible area
   const getVisibleCardCount = () => Math.floor((screen.height - 8) / CARD_HEIGHT)
 
-  // State
-  let selectedCardIndex = 0
-  let filteredList = []
-  let activeSessionProject = null
-  let scrollOffset = 0 // Tracks virtual scroll position
+  // State manager (optional - for centralized state)
+  const stateManager = options.stateManager || null
+
+  // Local state (used when no stateManager provided)
+  let _selectedCardIndex = 0
+  let _filteredList = []
+  let _activeSessionProject = null
+
+  // State accessors (use stateManager if available, else local)
+  const getSelectedIndex = () =>
+    stateManager ? stateManager.get('selectedIndex') : _selectedCardIndex
+  const getFilteredList = () =>
+    stateManager ? stateManager.get('filteredProjects') : _filteredList
+  const getActiveSession = () =>
+    stateManager ? stateManager.get('activeSession') : _activeSessionProject
 
   // Main container
   const mainView = blessed.box({
@@ -143,16 +158,18 @@ export function createMainView(screen, options = {}) {
   function getVisibleRange() {
     const visibleCount = getVisibleCardCount()
     const buffer = VIRTUAL_SCROLL_BUFFER
+    const selectedIndex = getSelectedIndex()
+    const filteredList = getFilteredList()
 
     // Calculate start based on scroll position
     const scrollTop = cardContainer.childBase || 0
     const startFromScroll = Math.floor(scrollTop / CARD_HEIGHT)
 
     // Ensure selected card is in range
-    const start = Math.max(0, Math.min(startFromScroll, selectedCardIndex) - buffer)
+    const start = Math.max(0, Math.min(startFromScroll, selectedIndex) - buffer)
     const end = Math.min(
       filteredList.length - 1,
-      Math.max(startFromScroll + visibleCount, selectedCardIndex) + buffer
+      Math.max(startFromScroll + visibleCount, selectedIndex) + buffer
     )
 
     return { start, end }
@@ -217,6 +234,9 @@ export function createMainView(screen, options = {}) {
   function renderCardsInternal() {
     try {
       const { start, end } = getVisibleRange()
+      const filteredList = getFilteredList()
+      const selectedIndex = getSelectedIndex()
+      const activeSession = getActiveSession()
       const currentIndices = cardPool.getInUseIndices()
       const neededIndices = new Set()
 
@@ -238,8 +258,8 @@ export function createMainView(screen, options = {}) {
         if (i >= filteredList.length) break
 
         const project = filteredList[i]
-        const isSelected = i === selectedCardIndex
-        const isActive = project.name === activeSessionProject
+        const isSelected = i === selectedIndex
+        const isActive = project.name === activeSession
         const cardTop = i * CARD_HEIGHT
 
         const card = cardPool.getCard(i)
@@ -270,7 +290,7 @@ export function createMainView(screen, options = {}) {
       }
 
       // Scroll to selected card
-      cardContainer.scrollTo(selectedCardIndex * CARD_HEIGHT)
+      cardContainer.scrollTo(selectedIndex * CARD_HEIGHT)
       screen.render()
     } catch (err) {
       // Graceful fallback - show error in card container
@@ -292,11 +312,17 @@ export function createMainView(screen, options = {}) {
    * Select a card by index
    */
   function selectCard(index) {
+    const filteredList = getFilteredList()
+
     if (index < 0) index = 0
     if (index >= filteredList.length) index = filteredList.length - 1
     if (index < 0) return null
 
-    selectedCardIndex = index
+    if (stateManager) {
+      stateManager.selectByIndex(index)
+    } else {
+      _selectedCardIndex = index
+    }
     // Use immediate render for selection changes (feels responsive)
     renderCardsImmediate()
     return filteredList[index]
@@ -306,9 +332,10 @@ export function createMainView(screen, options = {}) {
    * Update command bar based on session state
    */
   function updateCommandBar() {
-    if (activeSessionProject) {
+    const activeSession = getActiveSession()
+    if (activeSession) {
       commandBar.setContent(
-        `\n  {green-fg}●{/} {bold}${activeSessionProject}{/}  {gray-fg}│{/}  ` +
+        `\n  {green-fg}●{/} {bold}${activeSession}{/}  {gray-fg}│{/}  ` +
         `{cyan-fg}e{/} End  {cyan-fg}f{/} Focus  {cyan-fg}c{/} Capture  {cyan-fg}Enter{/} Details  {cyan-fg}?{/} Help  {cyan-fg}q{/} Quit`
       )
     } else {
@@ -336,7 +363,12 @@ export function createMainView(screen, options = {}) {
    * Set filtered list and reset selection
    */
   function setFilteredList(list) {
-    filteredList = list
+    if (stateManager) {
+      // When using stateManager, set projects through it
+      stateManager.setProjects(list)
+    } else {
+      _filteredList = list
+    }
     // Release all cards when list changes
     cardPool.releaseAll()
   }
@@ -348,12 +380,16 @@ export function createMainView(screen, options = {}) {
     return cardPool.getStats()
   }
 
-  /**
-   * Cleanup resources
-   */
-  function destroy() {
-    renderCards.cancel()
-    cardPool.destroy()
+  // Subscribe to stateManager changes if provided
+  let unsubscribe = null
+  if (stateManager) {
+    unsubscribe = stateManager.subscribe((state, changedFields) => {
+      // Re-render when relevant state changes
+      const relevantFields = ['filteredProjects', 'selectedIndex', 'activeSession']
+      if (changedFields.some(f => relevantFields.includes(f))) {
+        renderCardsImmediate()
+      }
+    })
   }
 
   return {
@@ -371,15 +407,38 @@ export function createMainView(screen, options = {}) {
     selectCard,
     updateCommandBar,
     updateFilterBar,
-    destroy,
+    destroy: () => {
+      if (unsubscribe) unsubscribe()
+      renderCards.cancel()
+      cardPool.destroy()
+    },
 
     // State management
     setFilteredList,
-    setActiveSession: (project) => { activeSessionProject = project },
-    getSelectedIndex: () => selectedCardIndex,
-    setSelectedIndex: (idx) => { selectedCardIndex = idx },
-    getFilteredList: () => filteredList,
-    getSelectedProject: () => filteredList[selectedCardIndex],
+    setActiveSession: (project) => {
+      if (stateManager) {
+        stateManager.setActiveSession(project)
+      } else {
+        _activeSessionProject = project
+      }
+    },
+    getSelectedIndex,
+    setSelectedIndex: (idx) => {
+      if (stateManager) {
+        stateManager.selectByIndex(idx)
+      } else {
+        _selectedCardIndex = idx
+      }
+    },
+    getFilteredList,
+    getSelectedProject: () => {
+      const list = getFilteredList()
+      const idx = getSelectedIndex()
+      return list[idx]
+    },
+
+    // State manager access (for advanced usage)
+    stateManager,
 
     // Debug
     getPoolStats

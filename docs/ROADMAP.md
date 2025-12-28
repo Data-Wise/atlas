@@ -56,10 +56,10 @@ Architecture refinements complete. Ready for v0.6.0 feature development.
 
 ## v0.7.0 - Dashboard Evolution
 
-### Plan C: State Management
-- [ ] Centralized ViewStateManager
-- [ ] Single source of truth for all dashboard state
-- [ ] Simplified view updates via subscriptions
+### Plan C: State Management ✅ COMPLETE (moved to v0.6.0)
+- [x] Centralized ViewStateManager
+- [x] Single source of truth for all dashboard state
+- [x] Simplified view updates via subscriptions
 
 ### Plan D: Multi-Panel Layout
 - [ ] Split layout option (sidebar + main panel)
