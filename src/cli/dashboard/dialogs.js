@@ -5,6 +5,55 @@
  */
 
 import blessed from 'blessed'
+import {
+  DIALOG_HELP,
+  DIALOG_SESSION_PROMPT,
+  DIALOG_BREAK_REMINDER,
+  DIALOG_DECISION_HELPER
+} from './constants.js'
+
+// Track active dialogs for cleanup on screen destroy
+const activeDialogs = new Set()
+
+/**
+ * Register a dialog for tracking
+ * @private
+ */
+function registerDialog(element) {
+  activeDialogs.add(element)
+}
+
+/**
+ * Unregister a dialog after cleanup
+ * @private
+ */
+function unregisterDialog(element) {
+  activeDialogs.delete(element)
+}
+
+/**
+ * Cleanup all active dialogs
+ * Call this on screen destroy to prevent memory leaks
+ * @param {Object} screen - Blessed screen instance
+ */
+export function cleanupAllDialogs(screen) {
+  for (const dialog of activeDialogs) {
+    try {
+      screen.remove(dialog)
+    } catch (e) {
+      // Dialog may already be removed
+    }
+  }
+  activeDialogs.clear()
+}
+
+/**
+ * Get count of active dialogs (for debugging)
+ * @returns {number}
+ */
+export function getActiveDialogCount() {
+  return activeDialogs.size
+}
 
 /**
  * Show help dialog
@@ -15,8 +64,8 @@ export function showHelpDialog(screen, onClose) {
   const help = blessed.box({
     top: 'center',
     left: 'center',
-    width: 58,
-    height: 28,
+    width: DIALOG_HELP.width,
+    height: DIALOG_HELP.height,
     tags: true,
     border: { type: 'line', fg: 'cyan' },
     style: { bg: 'black' },
@@ -56,11 +105,13 @@ export function showHelpDialog(screen, onClose) {
   })
 
   screen.append(help)
+  registerDialog(help)
   help.focus()
   screen.render()
 
   help.onceKey(['escape', 'q', 'enter', 'space'], () => {
     screen.remove(help)
+    unregisterDialog(help)
     if (onClose) onClose()
     screen.render()
   })
@@ -76,8 +127,8 @@ export function showSessionPrompt(screen, onSubmit, onCancel) {
   const input = blessed.textbox({
     top: 'center',
     left: 'center',
-    width: 50,
-    height: 3,
+    width: DIALOG_SESSION_PROMPT.width,
+    height: DIALOG_SESSION_PROMPT.height,
     border: { type: 'line', fg: 'green' },
     label: ' Start Session - Project name: ',
     style: { bg: 'black' },
@@ -85,11 +136,13 @@ export function showSessionPrompt(screen, onSubmit, onCancel) {
   })
 
   screen.append(input)
+  registerDialog(input)
   input.focus()
   screen.render()
 
   input.on('submit', (value) => {
     screen.remove(input)
+    unregisterDialog(input)
     if (value?.trim() && onSubmit) {
       onSubmit(value.trim())
     }
@@ -98,6 +151,7 @@ export function showSessionPrompt(screen, onSubmit, onCancel) {
 
   input.on('cancel', () => {
     screen.remove(input)
+    unregisterDialog(input)
     if (onCancel) onCancel()
     screen.render()
   })
@@ -135,12 +189,16 @@ export function showCapturePrompt(screen, onSubmit, onCancel) {
 
   screen.append(captureLabel)
   screen.append(captureInput)
+  registerDialog(captureLabel)
+  registerDialog(captureInput)
   captureInput.focus()
   screen.render()
 
   const cleanup = () => {
     screen.remove(captureInput)
     screen.remove(captureLabel)
+    unregisterDialog(captureInput)
+    unregisterDialog(captureLabel)
     screen.render()
   }
 
@@ -175,8 +233,8 @@ export function showBreakReminder(screen, options, onContinue, onExit) {
   const breakBox = blessed.box({
     top: 'center',
     left: 'center',
-    width: 50,
-    height: 12,
+    width: DIALOG_BREAK_REMINDER.width,
+    height: DIALOG_BREAK_REMINDER.height,
     tags: true,
     border: { type: 'line', fg: 'yellow' },
     label: ' {bold}{yellow-fg}☕ Break Time!{/} ',
@@ -197,17 +255,20 @@ export function showBreakReminder(screen, options, onContinue, onExit) {
   })
 
   screen.append(breakBox)
+  registerDialog(breakBox)
   breakBox.focus()
   screen.render()
 
   breakBox.onceKey(['enter', 'space'], () => {
     screen.remove(breakBox)
+    unregisterDialog(breakBox)
     if (onContinue) onContinue()
     screen.render()
   })
 
   breakBox.onceKey(['escape', 'q'], () => {
     screen.remove(breakBox)
+    unregisterDialog(breakBox)
     if (onExit) onExit()
     screen.render()
   })
@@ -225,8 +286,8 @@ export function showDecisionHelper(screen, options, onClose) {
   const decisionBox = blessed.box({
     top: 'center',
     left: 'center',
-    width: 60,
-    height: 18,
+    width: DIALOG_DECISION_HELPER.width,
+    height: DIALOG_DECISION_HELPER.height,
     tags: true,
     border: { type: 'line', fg: 'magenta' },
     label: ' {bold}🎯 What Should I Work On?{/} ',
@@ -249,11 +310,13 @@ export function showDecisionHelper(screen, options, onClose) {
 
   decisionBox.setContent(content)
   screen.append(decisionBox)
+  registerDialog(decisionBox)
   decisionBox.focus()
   screen.render()
 
   decisionBox.onceKey(['escape', 'enter', 'space', 'q'], () => {
     screen.remove(decisionBox)
+    unregisterDialog(decisionBox)
     if (onClose) onClose()
     screen.render()
   })

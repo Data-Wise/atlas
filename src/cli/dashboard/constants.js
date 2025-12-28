@@ -27,6 +27,13 @@ export const SCAN_CACHE_TTL = 3600000 // 1 hour
 export const MAX_PROGRESS_BAR_WIDTH = 30
 export const MAX_TRUNCATE_LENGTH = 50
 
+// Dialog dimensions
+export const DIALOG_HELP = { width: 58, height: 28 }
+export const DIALOG_SESSION_PROMPT = { width: 50, height: 3 }
+export const DIALOG_BREAK_REMINDER = { width: 50, height: 12 }
+export const DIALOG_DECISION_HELPER = { width: 60, height: 18 }
+export const DIALOG_FOCUS_TIMER = { width: 50, height: 15 }
+
 // Time of day boundaries (hours)
 export const MORNING_START = 6
 export const MORNING_END = 12

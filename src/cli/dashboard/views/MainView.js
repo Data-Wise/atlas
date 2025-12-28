@@ -5,13 +5,14 @@
  */
 
 import blessed from 'blessed'
+import { CARD_HEIGHT } from '../constants.js'
 import {
   getStatusIcon,
-  getTypeStr,
-  timeAgo,
+  formatProjectType,
+  formatTimeAgo,
   createMiniProgressBar,
   truncateText
-} from '../helpers.js'
+} from '../../../adapters/presenters/index.js'
 
 /**
  * Create the main view with project cards
@@ -20,7 +21,6 @@ import {
  * @returns {Object} Main view components and methods
  */
 export function createMainView(screen, options = {}) {
-  const CARD_HEIGHT = 5
   const MAX_VISIBLE_CARDS = Math.floor((screen.height - 8) / CARD_HEIGHT)
 
   // State
@@ -171,10 +171,10 @@ export function createMainView(screen, options = {}) {
     })
 
     // Line 2: Type, status, time + progress bar
-    const typeStr = getTypeStr(project.type)
+    const typeStr = formatProjectType(project.type)
     const statusStr = project.status || 'unknown'
     const progress = project.progress || project.metadata?.progress || 0
-    const timeInfo = project.lastSession ? timeAgo(project.lastSession) : ''
+    const timeInfo = project.lastSession ? formatTimeAgo(project.lastSession) : ''
     const miniProgressBar = progress > 0 ? ` ${createMiniProgressBar(progress)}` : ''
 
     blessed.box({
@@ -217,39 +217,46 @@ export function createMainView(screen, options = {}) {
 
   /**
    * Render all project cards
+   * Wrapped in error boundary for graceful degradation
    */
   function renderCards() {
-    // Clear existing cards
-    for (const card of projectCards) {
-      card.destroy()
-    }
-    projectCards = []
+    try {
+      // Clear existing cards
+      for (const card of projectCards) {
+        card.destroy()
+      }
+      projectCards = []
 
-    // Create new cards
-    for (let i = 0; i < filteredList.length; i++) {
-      const project = filteredList[i]
-      const isSelected = i === selectedCardIndex
-      const isActive = project.name === activeSessionProject
-      const card = createProjectCard(project, i, isSelected, isActive)
-      projectCards.push(card)
-    }
+      // Create new cards
+      for (let i = 0; i < filteredList.length; i++) {
+        const project = filteredList[i]
+        const isSelected = i === selectedCardIndex
+        const isActive = project.name === activeSessionProject
+        const card = createProjectCard(project, i, isSelected, isActive)
+        projectCards.push(card)
+      }
 
-    // Update title bar with count
-    if (filteredList.length > MAX_VISIBLE_CARDS) {
-      titleBar.setContent(
-        ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
-        `{gray-fg}${filteredList.length} projects (scroll for more){/}`
-      )
-    } else {
-      titleBar.setContent(
-        ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
-        `{gray-fg}${filteredList.length} projects{/}`
-      )
-    }
+      // Update title bar with count
+      if (filteredList.length > MAX_VISIBLE_CARDS) {
+        titleBar.setContent(
+          ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
+          `{gray-fg}${filteredList.length} projects (scroll for more){/}`
+        )
+      } else {
+        titleBar.setContent(
+          ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
+          `{gray-fg}${filteredList.length} projects{/}`
+        )
+      }
 
-    // Scroll to selected card
-    cardContainer.scrollTo(selectedCardIndex * CARD_HEIGHT)
-    screen.render()
+      // Scroll to selected card
+      cardContainer.scrollTo(selectedCardIndex * CARD_HEIGHT)
+      screen.render()
+    } catch (err) {
+      // Graceful fallback - show error in card container
+      cardContainer.setContent(`{red-fg}Render error: ${err.message}{/}\n\n{gray-fg}Press 'r' to refresh{/}`)
+      screen.render()
+    }
   }
 
   /**

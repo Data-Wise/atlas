@@ -6,7 +6,7 @@
 
 import blessed from 'blessed'
 import contrib from 'blessed-contrib'
-import { getStatusIcon, getTypeStr } from '../helpers.js'
+import { getStatusIcon, formatProjectType } from '../../../adapters/presenters/index.js'
 
 /**
  * Create the detail view
@@ -152,7 +152,7 @@ export function createDetailView(screen, canvasSupported = true) {
   function update(project, options = {}) {
     const { session, todayStatus, trail, captures } = options
     const name = project.name
-    const typeStr = getTypeStr(project.type)
+    const typeStr = formatProjectType(project.type)
     const status = project.status || 'unknown'
 
     // Header

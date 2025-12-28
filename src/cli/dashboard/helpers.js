@@ -1,8 +1,12 @@
 /**
  * Dashboard Helper Functions
  *
- * Re-exports formatting functions from the presenters layer.
- * This file provides a convenient import point for dashboard components.
+ * DEPRECATED: Import directly from '../../../adapters/presenters/index.js' instead.
+ *
+ * This file provides backward compatibility and convenience aliases.
+ * New code should import directly from the presenters layer.
+ *
+ * @deprecated Use presenters/index.js for direct imports
  */
 
 // Import from presenters (Clean Architecture - adapters layer)

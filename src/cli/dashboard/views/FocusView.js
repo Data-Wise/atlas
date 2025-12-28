@@ -5,7 +5,8 @@
  */
 
 import blessed from 'blessed'
-import { progressBar } from '../helpers.js'
+import { DIALOG_FOCUS_TIMER } from '../constants.js'
+import { progressBar } from '../../../adapters/presenters/index.js'
 
 /**
  * Create the focus view
@@ -27,8 +28,8 @@ export function createFocusView(screen) {
     parent: focusView,
     top: 'center',
     left: 'center',
-    width: 50,
-    height: 15,
+    width: DIALOG_FOCUS_TIMER.width,
+    height: DIALOG_FOCUS_TIMER.height,
     tags: true,
     border: { type: 'line', fg: 'green' },
     style: { bg: 'black' },
