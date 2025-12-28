@@ -243,7 +243,43 @@ test_success "session status" \
 
 # -----------------------------------------------------------------------------
 
-section "4. CAPTURE COMMANDS"
+section "4. STATS COMMAND"
+
+test_success "stats --help" \
+    "$CLI stats --help" \
+    "Show session analytics"
+
+test_success "stats (default week)" \
+    "$CLI stats" \
+    "Session Analytics"
+
+test_success "stats week" \
+    "$CLI stats week" \
+    "Last 7 Days"
+
+test_success "stats month" \
+    "$CLI stats month" \
+    "Last 30 Days"
+
+test_success "stats --days 14" \
+    "$CLI stats --days 14" \
+    "Last 14 Days"
+
+test_success "stats --format json" \
+    "$CLI stats --format json" \
+    '"summary"'
+
+test_success "stats --format text" \
+    "$CLI stats --format text" \
+    "sessions"
+
+test_success "stats --project atlas" \
+    "$CLI stats --project atlas" \
+    "atlas"
+
+# -----------------------------------------------------------------------------
+
+section "5. CAPTURE COMMANDS"
 
 test_success "catch --help" \
     "$CLI catch --help" \
@@ -263,7 +299,7 @@ test_success "inbox --stats" \
 
 # -----------------------------------------------------------------------------
 
-section "5. CONTEXT COMMANDS"
+section "6. CONTEXT COMMANDS"
 
 test_success "where --help" \
     "$CLI where --help" \
@@ -283,7 +319,7 @@ test_success "trail" \
 
 # -----------------------------------------------------------------------------
 
-section "6. PARK/UNPARK COMMANDS"
+section "7. PARK/UNPARK COMMANDS"
 
 test_success "park --help" \
     "$CLI park --help" \
@@ -303,7 +339,7 @@ test_success "parked" \
 
 # -----------------------------------------------------------------------------
 
-section "7. TEMPLATE COMMANDS"
+section "8. TEMPLATE COMMANDS"
 
 test_success "template --help" \
     "$CLI template --help" \
@@ -347,7 +383,7 @@ test_success "template dir" \
 
 # -----------------------------------------------------------------------------
 
-section "8. CONFIG COMMANDS"
+section "9. CONFIG COMMANDS"
 
 test_success "config --help" \
     "$CLI config --help" \
@@ -439,7 +475,7 @@ test_failure "Invalid storage option" \
 
 # -----------------------------------------------------------------------------
 
-section "14. STATUS & FOCUS COMMANDS"
+section "15. STATUS & FOCUS COMMANDS"
 
 test_success "status --help" \
     "$CLI status --help" \
