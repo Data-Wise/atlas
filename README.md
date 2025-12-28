@@ -6,17 +6,20 @@
 [![GitHub release](https://img.shields.io/github/v/release/Data-Wise/atlas)](https://github.com/Data-Wise/atlas/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+[![Docs](https://img.shields.io/badge/docs-available-blue)](https://data-wise.github.io/atlas/)
 
 ## Documentation
 
+**📚 [Full Documentation Site](https://data-wise.github.io/atlas/)**
+
 | Guide | Description |
 |-------|-------------|
-| [Getting Started Tutorial](./docs/TUTORIAL.md) | Step-by-step introduction (15 min) |
-| [CLI Command Reference](./docs/CLI-REFERENCE.md) | Complete command documentation |
-| [Architecture Overview](./docs/ARCHITECTURE.md) | System design and patterns |
-| [Visual Diagrams](./docs/DIAGRAMS.md) | Mermaid architecture diagrams |
-| [Programmatic API](./docs/API-GUIDE.md) | Using Atlas as a library |
-| [Configuration](./docs/CONFIGURATION.md) | All settings and preferences |
+| [Getting Started Tutorial](https://data-wise.github.io/atlas/TUTORIAL/) | Step-by-step introduction (15 min) |
+| [CLI Command Reference](https://data-wise.github.io/atlas/CLI-REFERENCE/) | Complete command documentation |
+| [Architecture Overview](https://data-wise.github.io/atlas/ARCHITECTURE/) | System design and patterns |
+| [Visual Diagrams](https://data-wise.github.io/atlas/DIAGRAMS/) | Mermaid architecture diagrams |
+| [Programmatic API](https://data-wise.github.io/atlas/API-GUIDE/) | Using Atlas as a library |
+| [Configuration](https://data-wise.github.io/atlas/CONFIGURATION/) | All settings and preferences |
 
 ## Overview
 

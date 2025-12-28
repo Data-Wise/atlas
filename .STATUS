@@ -214,12 +214,14 @@ _flow_has_atlas && _flow_atlas session start "$project"
 ```
 
 ## Links
+- **Docs**: https://data-wise.github.io/atlas/
 - GitHub: https://github.com/Data-Wise/atlas
 - Homebrew: `brew install Data-Wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-28: MkDocs site live at data-wise.github.io/atlas/
 - 2025-12-28: E2E test suite expanded (9 new stats tests, 61 Jest E2E, 1156 total)
 - 2025-12-28: v0.6.0 Session Analytics COMPLETE - atlas stats command (1147 tests)
 - 2025-12-28: v0.6.0 Plan C COMPLETE - ViewStateManager, centralized state (1097 tests)
