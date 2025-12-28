@@ -23,10 +23,10 @@ Architecture refinements complete. Ready for v0.6.0 feature development.
 - [x] Add screen.on('destroy') cleanup for dialogs
 - [x] Remove helpers.js re-export indirection layer
 
-### Plan B: Performance (Priority 2)
-- [ ] Virtual scrolling for 50+ projects
-- [ ] Card pooling (object reuse pattern)
-- [ ] Debounced rendering (60fps target)
+### Plan B: Performance (Priority 2) ✅ COMPLETE
+- [x] Virtual scrolling for 50+ projects
+- [x] Card pooling (object reuse pattern)
+- [x] Debounced rendering (60fps target)
 
 ### Features
 - [ ] Session analytics (`atlas stats`)

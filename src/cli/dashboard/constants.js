@@ -9,6 +9,11 @@ export const CARD_HEIGHT = 5
 export const MIN_TERMINAL_WIDTH = 60
 export const MIN_TERMINAL_HEIGHT = 15
 
+// Virtual scrolling constants
+export const VIRTUAL_SCROLL_BUFFER = 2 // Extra cards above/below viewport
+export const CARD_POOL_SIZE = 20 // Maximum pooled card elements
+export const RENDER_DEBOUNCE_MS = 16 // ~60fps
+
 // Timer constants (in milliseconds)
 export const REFRESH_INTERVAL = 30000 // 30 seconds
 export const TIMER_TICK_INTERVAL = 1000 // 1 second

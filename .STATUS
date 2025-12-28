@@ -3,9 +3,9 @@
 ## Status: active
 ## Phase: 🚀 v0.6.0 - Dashboard & Workflow
 ## Priority: 1
-## Progress: 25
+## Progress: 40
 
-## Focus: Plan A Quick Wins - Dashboard code quality improvements
+## Focus: Plan B Complete - Now implementing session analytics
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -139,17 +139,21 @@ atlas dashboard           # Interactive TUI
   - execFile for safer command execution
   - 65 new presenter tests (1023 total)
 
-## Current Tasks (v0.6.0 - Plan A Quick Wins)
+## Completed Tasks (v0.6.0 - Plan A Quick Wins)
 - [x] A1: Fix CARD_HEIGHT constant duplication (MainView.js)
 - [x] A2: Add error boundaries in renderCards
 - [x] A3: Centralize dialog dimensions in constants.js
 - [x] A4: Add screen.on('destroy') cleanup for dialogs
 - [x] A5: Remove helpers.js re-export indirection layer
 
+## Completed Tasks (v0.6.0 - Plan B Performance)
+- [x] B1: Virtual scrolling for 50+ projects
+- [x] B2: Card pooling (object reuse pattern)
+- [x] B3: Debounced rendering (60fps target)
+
 ## Next Tasks (v0.6.0 - Features)
 - [ ] Session analytics (`atlas stats`)
 - [ ] Data export (`atlas export`)
-- [ ] Plan B: Virtual scrolling for performance
 
 ## Future Enhancements
 - [ ] Remote sync (GitHub/GitLab status)
@@ -161,11 +165,11 @@ atlas dashboard           # Interactive TUI
 None
 
 ## Test Stats
-- Unit Tests: 665+
+- Unit Tests: 700+
 - Integration Tests: 280+
 - E2E Tests: 41
 - Dogfood Tests: 45
-- Total: 1023 passing
+- Total: 1055 passing
 
 ## Documentation (5,239 lines)
 - docs/CLI-REFERENCE.md (839 lines)
@@ -205,7 +209,8 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
-- 2025-12-28: v0.6.0 Started - Plan A Quick Wins, ROADMAP.md created, PROPOSAL-v0.6-improvements.md
+- 2025-12-28: v0.6.0 Plan B COMPLETE - virtual scrolling, card pooling, debouncing (1055 tests)
+- 2025-12-28: v0.6.0 Plan A Complete - all 5 quick wins implemented
 - 2025-12-27: v0.5.6 Architecture refinements (presenter layer, caching, 1023 tests)
 - 2025-12-26: v0.5.4 Release sync - Homebrew formula aligned with docs
 - 2025-12-26: v0.5.0 Configuration system, templates, wizard (926 tests)

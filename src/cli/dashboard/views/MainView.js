@@ -2,10 +2,19 @@
  * Main View - Card Stack Layout
  *
  * Displays project cards in a scrollable list with filtering.
+ *
+ * Performance optimizations (v0.6.0):
+ * - Virtual scrolling: Only renders visible cards + buffer
+ * - Card pooling: Reuses DOM elements instead of destroy/create
+ * - Debounced rendering: Prevents excessive re-renders (60fps target)
  */
 
 import blessed from 'blessed'
-import { CARD_HEIGHT } from '../constants.js'
+import {
+  CARD_HEIGHT,
+  VIRTUAL_SCROLL_BUFFER,
+  RENDER_DEBOUNCE_MS
+} from '../constants.js'
 import {
   getStatusIcon,
   formatProjectType,
@@ -13,6 +22,8 @@ import {
   createMiniProgressBar,
   truncateText
 } from '../../../adapters/presenters/index.js'
+import { createCardPool } from '../CardPool.js'
+import { debounce } from '../../../utils/debounce.js'
 
 /**
  * Create the main view with project cards
@@ -21,13 +32,14 @@ import {
  * @returns {Object} Main view components and methods
  */
 export function createMainView(screen, options = {}) {
-  const MAX_VISIBLE_CARDS = Math.floor((screen.height - 8) / CARD_HEIGHT)
+  // Calculate visible area
+  const getVisibleCardCount = () => Math.floor((screen.height - 8) / CARD_HEIGHT)
 
   // State
-  let projectCards = []
   let selectedCardIndex = 0
   let filteredList = []
   let activeSessionProject = null
+  let scrollOffset = 0 // Tracks virtual scroll position
 
   // Main container
   const mainView = blessed.box({
@@ -121,12 +133,39 @@ export function createMainView(screen, options = {}) {
     inputOnFocus: true
   })
 
-  /**
-   * Create a project card
-   */
-  function createProjectCard(project, index, isSelected, isActive) {
-    const cardTop = index * CARD_HEIGHT
+  // Initialize card pool
+  const cardPool = createCardPool(cardContainer)
 
+  /**
+   * Calculate visible range for virtual scrolling
+   * @returns {Object} { start, end } indices
+   */
+  function getVisibleRange() {
+    const visibleCount = getVisibleCardCount()
+    const buffer = VIRTUAL_SCROLL_BUFFER
+
+    // Calculate start based on scroll position
+    const scrollTop = cardContainer.childBase || 0
+    const startFromScroll = Math.floor(scrollTop / CARD_HEIGHT)
+
+    // Ensure selected card is in range
+    const start = Math.max(0, Math.min(startFromScroll, selectedCardIndex) - buffer)
+    const end = Math.min(
+      filteredList.length - 1,
+      Math.max(startFromScroll + visibleCount, selectedCardIndex) + buffer
+    )
+
+    return { start, end }
+  }
+
+  /**
+   * Generate card content for a project
+   * @param {Object} project - Project data
+   * @param {boolean} isSelected - Whether card is selected
+   * @param {boolean} isActive - Whether project has active session
+   * @returns {Object} Card content configuration
+   */
+  function getCardContent(project, isSelected, isActive) {
     let borderColor = 'gray'
     let bgColor = 'black'
     let nameColor = 'white'
@@ -140,35 +179,13 @@ export function createMainView(screen, options = {}) {
       bgColor = '#111'
     }
 
-    const card = blessed.box({
-      parent: cardContainer,
-      top: cardTop,
-      left: 0,
-      width: '100%-2',
-      height: CARD_HEIGHT - 1,
-      tags: true,
-      border: { type: 'line', fg: borderColor },
-      style: { bg: bgColor }
-    })
-
-    // Project name and status
+    // Line 1: Name and active status
     const statusIcon = getStatusIcon(project.status || 'unknown')
     const activeIndicator = isActive ? '{green-fg}● ACTIVE{/}' : ''
-
     const nameDisplay = isActive
       ? `{bold}{green-fg}${project.name}{/}{/bold}`
       : `{bold}{${nameColor}-fg}${project.name}{/}{/bold}`
-
-    // Line 1: Name and active status
-    blessed.box({
-      parent: card,
-      top: 0,
-      left: 1,
-      width: '100%-4',
-      height: 1,
-      tags: true,
-      content: `${statusIcon} ${nameDisplay}  ${activeIndicator}`
-    })
+    const line1 = `${statusIcon} ${nameDisplay}  ${activeIndicator}`
 
     // Line 2: Type, status, time + progress bar
     const typeStr = formatProjectType(project.type)
@@ -176,68 +193,71 @@ export function createMainView(screen, options = {}) {
     const progress = project.progress || project.metadata?.progress || 0
     const timeInfo = project.lastSession ? formatTimeAgo(project.lastSession) : ''
     const miniProgressBar = progress > 0 ? ` ${createMiniProgressBar(progress)}` : ''
-
-    blessed.box({
-      parent: card,
-      top: 1,
-      left: 1,
-      width: '100%-4',
-      height: 1,
-      tags: true,
-      content: `  {gray-fg}${typeStr} • ${statusStr}${timeInfo ? ' • ' + timeInfo : ''}${miniProgressBar}{/}`
-    })
+    const line2 = `  {gray-fg}${typeStr} • ${statusStr}${timeInfo ? ' • ' + timeInfo : ''}${miniProgressBar}{/}`
 
     // Line 3: Next action or focus
     const nextAction = project.next || project.metadata?.next
     const focusText = project.focus || project.metadata?.focus
     const actionText = nextAction || focusText
+    let line3 = ''
 
-    if (actionText || isSelected) {
-      const displayText = actionText
-        ? `{yellow-fg}→{/} ${truncateText(actionText, 50)}`
-        : isSelected
-          ? '{gray-fg}Press Enter for details, s to start session{/}'
-          : ''
-
-      if (displayText) {
-        blessed.box({
-          parent: card,
-          top: 2,
-          left: 1,
-          width: '100%-4',
-          height: 1,
-          tags: true,
-          content: `  ${displayText}`
-        })
-      }
+    if (actionText) {
+      line3 = `  {yellow-fg}→{/} ${truncateText(actionText, 50)}`
+    } else if (isSelected) {
+      line3 = '  {gray-fg}Press Enter for details, s to start session{/}'
     }
 
-    return card
+    return { borderColor, bgColor, line1, line2, line3 }
   }
 
   /**
-   * Render all project cards
-   * Wrapped in error boundary for graceful degradation
+   * Render visible cards using virtual scrolling and card pool
+   * Core rendering function - optimized for performance
    */
-  function renderCards() {
+  function renderCardsInternal() {
     try {
-      // Clear existing cards
-      for (const card of projectCards) {
-        card.destroy()
-      }
-      projectCards = []
+      const { start, end } = getVisibleRange()
+      const currentIndices = cardPool.getInUseIndices()
+      const neededIndices = new Set()
 
-      // Create new cards
-      for (let i = 0; i < filteredList.length; i++) {
+      // Determine which indices we need
+      for (let i = start; i <= end; i++) {
+        neededIndices.add(i)
+      }
+
+      // Release cards no longer needed
+      for (const index of currentIndices) {
+        if (!neededIndices.has(index)) {
+          const card = cardPool.getCard(index)
+          cardPool.release(card, index)
+        }
+      }
+
+      // Render needed cards
+      for (let i = start; i <= end; i++) {
+        if (i >= filteredList.length) break
+
         const project = filteredList[i]
         const isSelected = i === selectedCardIndex
         const isActive = project.name === activeSessionProject
-        const card = createProjectCard(project, i, isSelected, isActive)
-        projectCards.push(card)
+        const cardTop = i * CARD_HEIGHT
+
+        const card = cardPool.getCard(i)
+        const content = getCardContent(project, isSelected, isActive)
+
+        cardPool.updateCard(card, {
+          top: cardTop,
+          borderColor: content.borderColor,
+          bgColor: content.bgColor,
+          line1: content.line1,
+          line2: content.line2,
+          line3: content.line3
+        })
       }
 
       // Update title bar with count
-      if (filteredList.length > MAX_VISIBLE_CARDS) {
+      const visibleCount = getVisibleCardCount()
+      if (filteredList.length > visibleCount) {
         titleBar.setContent(
           ` {bold}ATLAS{/bold}  {gray-fg}────────────────────────────────────────{/}  ` +
           `{gray-fg}${filteredList.length} projects (scroll for more){/}`
@@ -259,6 +279,15 @@ export function createMainView(screen, options = {}) {
     }
   }
 
+  // Debounced render function for smooth 60fps performance
+  const renderCards = debounce(renderCardsInternal, RENDER_DEBOUNCE_MS)
+
+  // Immediate render for critical updates (selection changes)
+  function renderCardsImmediate() {
+    renderCards.cancel()
+    renderCardsInternal()
+  }
+
   /**
    * Select a card by index
    */
@@ -268,7 +297,8 @@ export function createMainView(screen, options = {}) {
     if (index < 0) return null
 
     selectedCardIndex = index
-    renderCards()
+    // Use immediate render for selection changes (feels responsive)
+    renderCardsImmediate()
     return filteredList[index]
   }
 
@@ -302,6 +332,30 @@ export function createMainView(screen, options = {}) {
     filterBar.setContent(` ${filters.join('  ')}  ${searchDisplay}`)
   }
 
+  /**
+   * Set filtered list and reset selection
+   */
+  function setFilteredList(list) {
+    filteredList = list
+    // Release all cards when list changes
+    cardPool.releaseAll()
+  }
+
+  /**
+   * Get pool statistics for debugging
+   */
+  function getPoolStats() {
+    return cardPool.getStats()
+  }
+
+  /**
+   * Cleanup resources
+   */
+  function destroy() {
+    renderCards.cancel()
+    cardPool.destroy()
+  }
+
   return {
     // Components
     view: mainView,
@@ -313,18 +367,22 @@ export function createMainView(screen, options = {}) {
     searchInput,
 
     // Methods
-    renderCards,
+    renderCards: renderCardsImmediate, // Use immediate for external calls
     selectCard,
     updateCommandBar,
     updateFilterBar,
+    destroy,
 
     // State management
-    setFilteredList: (list) => { filteredList = list },
+    setFilteredList,
     setActiveSession: (project) => { activeSessionProject = project },
     getSelectedIndex: () => selectedCardIndex,
     setSelectedIndex: (idx) => { selectedCardIndex = idx },
     getFilteredList: () => filteredList,
-    getSelectedProject: () => filteredList[selectedCardIndex]
+    getSelectedProject: () => filteredList[selectedCardIndex],
+
+    // Debug
+    getPoolStats
   }
 }
 
