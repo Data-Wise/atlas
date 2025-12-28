@@ -6,3 +6,4 @@
 
 export * from './ProjectPresenter.js'
 export * from './TuiPresenter.js'
+export * from './StatsPresenter.js'

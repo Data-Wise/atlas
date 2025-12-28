@@ -28,11 +28,15 @@ Architecture refinements complete. Ready for v0.6.0 feature development.
 - [x] Card pooling (object reuse pattern)
 - [x] Debounced rendering (60fps target)
 
-### Features
-- [ ] Session analytics (`atlas stats`)
+### Session Analytics (Complete)
+- [x] Session analytics (`atlas stats`)
   - Weekly/monthly summaries
   - Streak history
   - Flow state percentage
+  - Hourly distribution sparkline
+  - Per-project breakdown
+
+### Features
 - [ ] Data export (`atlas export`)
   - JSON export of all data
   - CSV for sessions/captures

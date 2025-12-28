@@ -268,6 +268,20 @@ export class Atlas {
       if (crumb.project) console.log(`             └─ ${crumb.project}`);
     });
   }
+
+  async formatStats(options = {}) {
+    const { formatStatsTable, formatStatsJson, formatStatsText } = await import('./adapters/presenters/StatsPresenter.js');
+    const stats = await this.sessions.stats(options);
+
+    switch (options.format) {
+      case 'json':
+        return formatStatsJson(stats);
+      case 'text':
+        return formatStatsText(stats);
+      default:
+        return formatStatsTable(stats);
+    }
+  }
 }
 
 /**
@@ -409,6 +423,11 @@ class SessionsAPI {
   async current() {
     const sessionRepo = this.container.resolve('SessionRepository');
     return await sessionRepo.findActive();
+  }
+
+  async stats(options = {}) {
+    const statsUseCase = this.container.resolve('GetSessionStatsUseCase');
+    return await statsUseCase.execute(options);
   }
 }
 

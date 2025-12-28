@@ -157,8 +157,13 @@ atlas dashboard           # Interactive TUI
 - [x] C3: MainView integration (backward compatible)
 - [x] C4: 42 new tests for ViewStateManager
 
+## Completed Tasks (v0.6.0 - Session Analytics)
+- [x] GetSessionStatsUseCase with comprehensive metrics
+- [x] StatsPresenter (table/json/text formats)
+- [x] CLI command: `atlas stats [week|month|--days N]`
+- [x] 50 new tests (29 use case + 21 presenter)
+
 ## Next Tasks (v0.6.0 - Features)
-- [ ] Session analytics (`atlas stats`)
 - [ ] Data export (`atlas export`)
 
 ## Future Enhancements
@@ -171,11 +176,11 @@ atlas dashboard           # Interactive TUI
 None
 
 ## Test Stats
-- Unit Tests: 740+
+- Unit Tests: 790+
 - Integration Tests: 280+
 - E2E Tests: 41
-- Dogfood Tests: 56 (new CLI test suite)
-- Total: 1097 passing
+- Dogfood Tests: 56 (CLI test suite)
+- Total: 1147 passing
 
 ## Documentation (5,239 lines)
 - docs/CLI-REFERENCE.md (839 lines)
@@ -215,6 +220,7 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-28: v0.6.0 Session Analytics COMPLETE - atlas stats command (1147 tests)
 - 2025-12-28: v0.6.0 Plan C COMPLETE - ViewStateManager, centralized state (1097 tests)
 - 2025-12-28: v0.6.0 Plan B COMPLETE - virtual scrolling, card pooling, debouncing
 - 2025-12-28: v0.6.0 Plan A Complete - all 5 quick wins implemented

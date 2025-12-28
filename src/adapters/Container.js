@@ -39,6 +39,7 @@ import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
 import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
 import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
+import { GetSessionStatsUseCase } from '../use-cases/session/GetSessionStatsUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 
@@ -169,6 +170,12 @@ export class Container {
   getEndSessionUseCase() {
     return this._resolve('endSessionUseCase', () => {
       return new EndSessionUseCase(this.getSessionRepository(), this.getProjectRepository())
+    })
+  }
+
+  getGetSessionStatsUseCase() {
+    return this._resolve('getSessionStatsUseCase', () => {
+      return new GetSessionStatsUseCase(this.getSessionRepository())
     })
   }
 
@@ -347,6 +354,7 @@ export class Container {
       // Session use cases
       'CreateSessionUseCase': () => this.getCreateSessionUseCase(),
       'EndSessionUseCase': () => this.getEndSessionUseCase(),
+      'GetSessionStatsUseCase': () => this.getGetSessionStatsUseCase(),
       
       // Capture use cases
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
@@ -392,7 +400,8 @@ export class Container {
       // Session
       createSession: this.getCreateSessionUseCase(),
       endSession: this.getEndSessionUseCase(),
-      
+      getSessionStats: this.getGetSessionStatsUseCase(),
+
       // Project
       scanProjects: this.getScanProjectsUseCase(),
       getStatus: this.getGetStatusUseCase(),

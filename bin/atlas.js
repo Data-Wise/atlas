@@ -256,6 +256,27 @@ session
   });
 
 // ============================================================================
+// STATS COMMAND
+// ============================================================================
+
+program
+  .command('stats [period]')
+  .description('Show session analytics (week, month, or custom days)')
+  .option('-d, --days <n>', 'Number of days to analyze', '7')
+  .option('-p, --project <name>', 'Filter by project')
+  .option('--format <format>', 'Output format (table|json|text)', 'table')
+  .action(async (period, options) => {
+    const atlasInstance = getAtlas();
+    const output = await atlasInstance.formatStats({
+      period,
+      days: parseInt(options.days, 10),
+      project: options.project,
+      format: options.format
+    });
+    console.log(output);
+  });
+
+// ============================================================================
 // CAPTURE COMMANDS
 // ============================================================================
 
