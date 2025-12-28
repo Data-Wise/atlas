@@ -307,6 +307,85 @@ describe('Atlas CLI - E2E Tests', () => {
     })
   })
 
+  describe('Stats Command', () => {
+    test('stats --help shows options', () => {
+      const { stdout, exitCode } = runCLI('stats --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Show session analytics')
+      expect(stdout).toContain('--days')
+      expect(stdout).toContain('--project')
+      expect(stdout).toContain('--format')
+    })
+
+    test('stats returns analytics', () => {
+      const { stdout, exitCode } = runCLI('stats')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Session Analytics')
+      expect(stdout).toContain('Total Sessions')
+      expect(stdout).toContain('Total Time')
+    })
+
+    test('stats week returns weekly analytics', () => {
+      const { stdout, exitCode } = runCLI('stats week')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Last 7 Days')
+    })
+
+    test('stats month returns monthly analytics', () => {
+      const { stdout, exitCode } = runCLI('stats month')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Last 30 Days')
+    })
+
+    test('stats --days 14 returns custom period', () => {
+      const { stdout, exitCode } = runCLI('stats --days 14')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('Last 14 Days')
+    })
+
+    test('stats --format json returns valid JSON', () => {
+      const { stdout, exitCode } = runCLI('stats --format json')
+
+      expect(exitCode).toBe(0)
+      expect(() => JSON.parse(stdout)).not.toThrow()
+
+      const stats = JSON.parse(stdout)
+      expect(stats).toHaveProperty('period')
+      expect(stats).toHaveProperty('summary')
+      expect(stats).toHaveProperty('streak')
+      expect(stats).toHaveProperty('byProject')
+    })
+
+    test('stats --format text returns concise summary', () => {
+      const { stdout, exitCode } = runCLI('stats --format text')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('sessions')
+      expect(stdout).toContain('flow state')
+    })
+
+    test('stats --project filters by project', () => {
+      const { stdout, exitCode } = runCLI('stats --project atlas')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('atlas')
+    })
+
+    test('stats executes quickly', () => {
+      const start = Date.now()
+      runCLI('stats')
+      const duration = Date.now() - start
+
+      // Should complete in under 3 seconds
+      expect(duration).toBeLessThan(3000)
+    })
+  })
+
   describe('Context Commands', () => {
     test('where --help shows options', () => {
       const { stdout, exitCode } = runCLI('where --help')
