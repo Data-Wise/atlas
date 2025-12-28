@@ -4,7 +4,7 @@
 # :rocket: Atlas
 **Project State Engine for ADHD-Friendly Workflow**
 
-[![Tests](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml/badge.svg)](https://github.com/Data-Wise/atlas/actions/workflows/tests.yml)
+[![Tests](https://github.com/Data-Wise/atlas/actions/workflows/test.yml/badge.svg)](https://github.com/Data-Wise/atlas/actions/workflows/test.yml)
 [![GitHub release](https://img.shields.io/github/v/release/Data-Wise/atlas)](https://github.com/Data-Wise/atlas/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
