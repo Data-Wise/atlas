@@ -288,6 +288,46 @@ const activeDuration = session.getActiveDuration();
 const summary = session.getSummary();
 ```
 
+### Session Analytics
+
+```javascript
+const stats = await atlas.sessions.stats(options);
+```
+
+**Parameters:**
+- `options` (object):
+  - `days` (number): Days to analyze (default: 7)
+  - `project` (string): Filter by project
+  - `period` (string): Preset period (`week`, `month`)
+
+**Returns:** Analytics object with:
+- `period`: Date range info
+- `summary`: Total sessions, time, flow percentage, completion rate
+- `streak`: Current and longest streak
+- `bestDay`: Most productive day
+- `hourlyDistribution`: Session activity by hour (24 values)
+- `byProject`: Per-project breakdown
+
+**Example:**
+```javascript
+// Weekly stats
+const stats = await atlas.sessions.stats();
+console.log(`Total: ${stats.summary.totalSessions} sessions`);
+console.log(`Flow: ${stats.summary.flowPercentage}%`);
+console.log(`Streak: ${stats.streak.display}`);
+
+// Monthly stats for specific project
+const projectStats = await atlas.sessions.stats({
+  days: 30,
+  project: 'myproject'
+});
+
+// Access per-project breakdown
+stats.byProject.forEach(p => {
+  console.log(`${p.name}: ${p.sessions} sessions, ${p.flowPercentage}% flow`);
+});
+```
+
 ---
 
 ## Capture API

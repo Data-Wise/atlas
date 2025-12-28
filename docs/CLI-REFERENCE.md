@@ -202,6 +202,75 @@ atlas session status
 - Duration and flow state
 - Or "No active session" message
 
+### `atlas stats`
+
+Show session analytics and productivity insights.
+
+```bash
+atlas stats [period] [options]
+
+Arguments:
+  period    Preset period: 'week' (7 days), 'month' (30 days)
+
+Options:
+  -d, --days <n>        Custom number of days to analyze (default: 7)
+  -p, --project <name>  Filter analytics by project
+  --format <format>     Output format: table (default), json, text
+```
+
+**Examples:**
+```bash
+# Weekly summary (default)
+atlas stats
+
+# Monthly summary
+atlas stats month
+
+# Last 2 weeks
+atlas stats --days 14
+
+# Specific project analytics
+atlas stats --project myproject
+
+# JSON output for scripting
+atlas stats --format json
+
+# Concise text summary
+atlas stats --format text
+```
+
+**Output includes:**
+- Total sessions and time
+- Daily average duration
+- Flow sessions percentage (sessions ≥ 15 min)
+- Completion rate
+- Current and longest streak
+- Best day highlight
+- Per-project breakdown (when not filtering)
+
+**Table Output Example:**
+```
+Session Analytics (Last 7 Days)
+═══════════════════════════════════════════════════
+
+  Total Sessions:    12
+  Total Time:        8h 45m
+  Daily Average:     1h 15m
+  Flow Sessions:     8 (67%)
+  Completion Rate:   75%
+
+  Streak:            🔥 3 days (longest: 15)
+  Best Day:          Tuesday (2h 30m)
+
+  By Project:
+  ┌──────────────┬──────────┬─────────┬──────────┐
+  │ Project      │ Sessions │ Time    │ Flow %   │
+  ├──────────────┼──────────┼─────────┼──────────┤
+  │ atlas        │ 5        │ 3h 20m  │ 80%      │
+  │ flow-cli     │ 4        │ 2h 45m  │ 75%      │
+  └──────────────┴──────────┴─────────┴──────────┘
+```
+
 ---
 
 ## Status & Progress

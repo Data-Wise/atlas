@@ -10,6 +10,7 @@ atlas session start <project>    # Start work
 atlas catch "idea"               # Quick capture
 atlas where                      # Show context
 atlas session end                # End with celebration
+atlas stats                      # Session analytics
 
 # Context switching
 atlas park "switching to urgent" # Save context
@@ -27,7 +28,7 @@ atlas dash                       # Launch TUI
 | **Version** | 0.5.6 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,023 (Jest) |
+| **Tests** | 1,156 (Jest) |
 | **Source** | ~17,000 lines |
 
 ## Architecture
@@ -39,14 +40,14 @@ src/
 │   ├── repositories/ # Interfaces (IProjectRepository, etc.)
 │   └── value-objects/# ProjectType, SessionState, TaskPriority
 ├── use-cases/        # Application logic
-│   ├── session/      # CreateSession, EndSession
+│   ├── session/      # CreateSession, EndSession, GetSessionStats
 │   ├── capture/      # CaptureIdea, TriageInbox
 │   ├── context/      # GetContext, Park/Unpark
 │   ├── project/      # GetStatus, GetRecentProjects
 │   └── registry/     # RegisterProject, SyncRegistry
 ├── adapters/         # External interfaces
 │   ├── controllers/  # StatusController
-│   ├── presenters/   # ProjectPresenter, TuiPresenter
+│   ├── presenters/   # ProjectPresenter, TuiPresenter, StatsPresenter
 │   ├── repositories/ # FileSystem*, SQLite* implementations
 │   └── gateways/     # GitGateway, StatusFileGateway
 ├── utils/            # ADHD helpers, config, charts
@@ -132,6 +133,7 @@ atlas
 ├── session
 │   ├── start/end/pause/resume
 │   └── status/history/current
+├── stats                 # Session analytics
 ├── catch/inbox/triage    # Quick capture
 ├── where/trail/crumb     # Context
 ├── park/unpark/parked    # Context switching
@@ -145,7 +147,7 @@ atlas
 ## Testing
 
 ```bash
-npm test                  # All 1,023 tests
+npm test                  # All 1,156 tests
 npm run test:unit         # Unit tests only
 npm run test:e2e          # E2E tests
 npm run test:integration  # Integration tests

@@ -102,6 +102,12 @@ atlas project remove oldproject
 atlas session start medrobust
 atlas session status
 atlas session end "Completed delta method SEs"
+
+# Session analytics
+atlas stats                        # Weekly summary
+atlas stats month                  # Monthly summary
+atlas stats --project medrobust    # Project-specific
+atlas stats --format json          # JSON output
 ```
 
 ### Quick Capture
@@ -210,6 +216,14 @@ atlas dash                     # Alias for dashboard
 - **Celebrations**: Positive reinforcement on achievements
 - **Context restoration**: "Last time you were..." on session start
 - **Anti-perfectionism**: "Good enough" session endings
+
+#### Session Analytics (v0.6.0+)
+Track your productivity patterns with `atlas stats`:
+- **Weekly/monthly summaries**: Total sessions, time, flow percentage
+- **Streak history**: Current and longest streaks
+- **Flow state metrics**: Sessions ≥15min = flow state
+- **Per-project breakdown**: See which projects get the most focus
+- **Multiple formats**: Table, JSON, or concise text output
 
 Preferences for these features can be configured:
 ```bash
