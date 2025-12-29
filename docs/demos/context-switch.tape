@@ -11,10 +11,14 @@ Set Theme "Dracula"
 Set Padding 20
 Set TypingSpeed 50ms
 
-# Working on Project A
-Type "# Deep in Project A..."
+# Start working on Project A
+Type "# Working on Project A..."
 Enter
 Sleep 500ms
+
+Type "atlas session start myproject 'Implementing OAuth flow'"
+Enter
+Sleep 2s
 
 Type "atlas session status"
 Enter
@@ -26,12 +30,12 @@ Enter
 Sleep 1s
 
 # Park current context
-Type "atlas park 'was implementing OAuth, callback almost done'"
+Type "atlas park 'OAuth callback almost done'"
 Enter
 Sleep 2s
 
 # Switch to urgent project
-Type "cd ~/projects/api && atlas session start api 'Fix prod bug'"
+Type "atlas session start api 'Fix prod bug'"
 Enter
 Sleep 2s
 
