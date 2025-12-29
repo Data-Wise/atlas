@@ -44,6 +44,16 @@ Track productivity with `atlas stats`. Weekly/monthly summaries, streaks, and fl
 </div>
 
 <div class="feature-card" markdown>
+### :tomato: Task-Based Focus
+Pomodoro timer with task prompts. Set what you'll focus on, track completion outcomes.
+</div>
+
+<div class="feature-card" markdown>
+### :calendar: Calendar Export
+Export sessions to iCal/ICS format. Import your work history into any calendar app.
+</div>
+
+<div class="feature-card" markdown>
 ### :brain: ADHD-Friendly
 Streak tracking, time blindness helpers, celebrations, and anti-perfectionism features.
 </div>
@@ -121,24 +131,30 @@ atlas dash
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
 
-## :sparkles: What's New in v0.6.3
+## :sparkles: What's New in v0.7.0
 
-!!! tip "Stats Export"
-    Export your analytics to markdown or JSON:
+!!! success "Task-Based Focus"
+    Enhanced Pomodoro with task tracking:
 
-    ```bash
-    atlas stats --export              # Auto-named: atlas-stats-YYYY-MM-DD.md
-    atlas stats --export weekly.md    # Custom filename
-    atlas stats --format json -e      # JSON export
-    ```
+    - Dashboard prompts "What will you focus on?" before timer
+    - Task displayed during focus session
+    - After timer: `c` (completed), `p` (partial), `n` (pivoted)
 
-!!! note "Session Analytics (v0.6.0)"
-    Track your productivity patterns with `atlas stats`:
+!!! tip "Calendar Export"
+    Export sessions to iCal for any calendar app:
 
     ```bash
-    atlas stats           # Weekly summary
-    atlas stats month     # Monthly overview
+    atlas session export sessions.ics    # Export to iCal
+    atlas session export --days 60       # Last 60 days
+    atlas session export --format json   # JSON format
     ```
+
+!!! info "Timeline View"
+    Press `T` in dashboard to see today's sessions on a timeline. Visualize your work patterns with color-coded time blocks.
+
+??? note "Previous: v0.6.x"
+    - **v0.6.3**: Stats export (`--export`, `--format md`)
+    - **v0.6.0**: Session analytics with `atlas stats`
 
 ## :heart: ADHD-Friendly Design
 

@@ -322,6 +322,7 @@ atlas dash
 | `e` | End session | Stop working |
 | `c` | Quick capture | Add an idea |
 | `f` | Focus mode (Pomodoro) | 25-min timer |
+| `T` | Timeline view | Today's time blocks |
 | `d` | Decision helper | "What should I work on?" |
 | `/` | Search | Find a project |
 | `a` | Filter: active only | See active projects |
@@ -331,15 +332,38 @@ atlas dash
 ### Focus Mode (Pomodoro)
 
 1. Press `f` in the dashboard
-2. Minimal UI appears with 25-minute timer
-3. Work without distraction
-4. Press `Space` to pause/resume
-5. Press `Esc` when done
+2. **NEW in v0.7.0:** Prompted "What will you focus on?"
+3. Enter your task (or press Esc to skip)
+4. Minimal UI appears with 25-minute timer showing your task
+5. Work without distraction
+6. Press `Space` to pause/resume
+7. When timer ends: `c` (completed), `p` (partial), `n` (pivoted)
 
 **During focus mode:**
 - `+`/`-` - Adjust timer by 5 minutes
 - `r` - Reset timer
 - `c` - Quick capture (without leaving focus)
+
+### Timeline View (v0.7.0)
+
+Press `T` (Shift+T) to see today's sessions visualized:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ 📅 Today's Time Blocks                               12/29/2025    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  09:00  ████████████████  atlas (45m)                               │
+│  10:00  ░░░░░░░░                                                    │
+│  11:00  ██████████████████████████  research-project (1h 10m)       │
+│  12:00  ░░░░░░░░                                                    │
+│  13:00  ████████  atlas (25m)                                       │
+│                                                                     │
+│  Total: 2h 20m across 3 sessions                                    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+Press `Esc` to return to the main view.
 
 ### Decision Helper
 
@@ -543,6 +567,30 @@ atlas completions fish > ~/.config/fish/completions/atlas.fish
 ```
 
 **Now you get tab completion!**
+
+### Session Export (v0.7.0)
+
+Export your work sessions to calendar apps:
+
+```bash
+# Export to iCal file
+atlas session export sessions.ics
+
+# Export last 60 days
+atlas session export --days 60 sessions.ics
+
+# Export specific project
+atlas session export --project myproject project-sessions.ics
+
+# Export as JSON (for scripting)
+atlas session export --format json > sessions.json
+```
+
+**Works with:**
+- Apple Calendar (double-click the .ics file)
+- Google Calendar (import from settings)
+- Outlook (import calendar)
+- Any app that supports iCal/ICS format
 
 ### Storage Backend
 

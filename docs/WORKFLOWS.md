@@ -177,33 +177,48 @@ atlas unpark
 
 ```mermaid
 flowchart TD
+    subgraph SETUP["Task Setup (v0.7.0)"]
+        A[Press 'f'] --> B["What will you focus on?"]
+        B --> C[Enter task]
+    end
+
     subgraph POMODORO["25-Minute Focus Block"]
-        A[Start Pomodoro] --> B[Work]
-        B --> C{Timer done?}
-        C -->|No| B
-        C -->|Yes| D[Break reminder]
+        C --> D[Work on task]
+        D --> E{Timer done?}
+        E -->|No| D
+        E -->|Yes| F["Did you complete it?"]
+    end
+
+    subgraph COMPLETE["Track Outcome"]
+        F --> G{"c/p/n?"}
+        G -->|c| H[Completed ✓]
+        G -->|p| I[Partial progress]
+        G -->|n| J[Pivoted]
     end
 
     subgraph BREAK["5-Minute Break"]
-        D --> E[Step away]
-        E --> F{Ready?}
-        F -->|Yes| A
-        F -->|No| G[Extend break]
-        G --> F
+        H --> K[Step away]
+        I --> K
+        J --> K
+        K --> L{Ready?}
+        L -->|Yes| A
     end
 ```
 
 **In Dashboard:**
 ```bash
 atlas dash
-# Press 'p' to start Pomodoro
-# Press 'p' again to pause/resume
+# Press 'f' to start focus mode
+# Prompted: "What will you focus on?"
+# Work with task displayed on screen
+# After timer: c (completed), p (partial), n (pivoted)
 ```
 
 **The dashboard shows:**
+- Your focus task prominently displayed
 - Timer countdown
 - Today's completed Pomodoros
-- Break enforcement dialog
+- Break enforcement dialog with task outcome tracking
 
 ---
 
@@ -246,6 +261,59 @@ atlas inbox --triage
 
 !!! tip "ADHD Tip"
     The end-of-day crumb is your gift to morning-you. Be specific!
+
+---
+
+### Timeline View (v0.7.0)
+
+**Goal:** Visualize your work patterns
+
+```bash
+atlas dash
+# Press 'T' (Shift+T) for timeline view
+```
+
+**The timeline shows:**
+- Today's sessions as color-coded time blocks
+- Gaps between sessions
+- Total work time
+- Session count
+
+```
+ 09:00  ████████████████  atlas (45m)
+ 10:00  ░░░░░░░░
+ 11:00  ██████████████████████████  research (1h 10m)
+ 12:00  ░░░░░░░░
+ 13:00  ████████  atlas (25m)
+```
+
+!!! tip "ADHD Tip"
+    The timeline helps with time blindness - see where your time actually went!
+
+---
+
+### Session Export (v0.7.0)
+
+**Goal:** Get your work sessions into your calendar
+
+```bash
+# Export last 30 days to iCal
+atlas session export sessions.ics
+
+# Import into your calendar app
+# - Apple Calendar: double-click the file
+# - Google Calendar: Settings > Import & Export > Import
+# - Outlook: File > Import
+
+# Export specific project
+atlas session export --project myproject project-work.ics
+
+# Export as JSON for analysis
+atlas session export --format json > sessions.json
+```
+
+!!! tip "ADHD Tip"
+    See your focus patterns over time by importing sessions to your calendar. Great for weekly reviews!
 
 ---
 
