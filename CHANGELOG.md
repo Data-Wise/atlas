@@ -2,6 +2,53 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.7.0] - 2025-12-29
+
+### Added
+- **Session Export** (`atlas session export`):
+  - Export sessions to iCal/ICS format for calendar apps
+  - Compatible with Apple Calendar, Google Calendar, Outlook
+  - Filter by days, project, or period (week/month/year/all)
+  - JSON export option for data analysis
+  - Examples:
+    ```bash
+    atlas session export sessions.ics        # Export to iCal
+    atlas session export --days 60           # Last 60 days
+    atlas session export --project myproject # Filter by project
+    atlas session export --format json       # JSON output
+    ```
+
+- **Task-Based Focus** (Dashboard):
+  - "What will you focus on?" prompt before starting Pomodoro
+  - Task displayed prominently during focus timer
+  - Completion tracking after timer ends:
+    - `c` - Completed
+    - `p` - Partial progress
+    - `n` - Pivoted to something else
+  - Outcomes stored in session history
+
+- **Timeline View** (Dashboard):
+  - Press `T` (Shift+T) to enter timeline view
+  - Visual timeline of today's sessions
+  - Color-coded time blocks by project
+  - Shows gaps and total work time
+  - Helps with time blindness awareness
+
+### Changed
+- Dashboard state machine now supports TIMELINE state
+- Focus mode integrates task prompts and outcome tracking
+- Updated help dialog with new keybindings
+
+### Documentation
+- Updated CLI-REFERENCE.md with session export command
+- Updated REFCARD.md with v0.7.0 features
+- Updated TUTORIAL.md with focus mode and export sections
+- Updated WORKFLOWS.md with new workflow diagrams
+- Updated index.md with v0.7.0 feature cards
+
+### Tests
+- 1,192 tests passing (+26 new for ExportSessionsUseCase)
+
 ## [0.6.3] - 2025-12-29
 
 ### Added
