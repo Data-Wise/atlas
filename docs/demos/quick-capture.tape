@@ -4,17 +4,12 @@
 Output quick-capture.gif
 
 Set Shell "zsh"
-Set FontSize 20
-Set Width 1000
-Set Height 600
+Set FontSize 18
+Set Width 800
+Set Height 500
 Set Theme "Dracula"
-Set Padding 20
-Set TypingSpeed 50ms
-
-# Scenario: You're working and have ideas
-Type "# Working on code... sudden idea!"
-Enter
-Sleep 1s
+Set Padding 15
+Set TypingSpeed 40ms
 
 # Quick capture - don't lose the thought
 Type "atlas catch 'use Redis for session cache'"
@@ -27,15 +22,11 @@ Enter
 Sleep 1.5s
 
 # Bug noticed
-Type "atlas catch 'login button misaligned on mobile' --type bug"
+Type "atlas catch 'login button misaligned' --type bug"
 Enter
 Sleep 1.5s
 
-# Later: check inbox
-Type "# Later: Review captured ideas"
-Enter
-Sleep 500ms
-
+# Check inbox
 Type "atlas inbox"
 Enter
 Sleep 2.5s

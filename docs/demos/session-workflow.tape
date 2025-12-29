@@ -4,18 +4,14 @@
 Output session-workflow.gif
 
 Set Shell "zsh"
-Set FontSize 20
-Set Width 1000
-Set Height 600
+Set FontSize 18
+Set Width 800
+Set Height 500
 Set Theme "Dracula"
-Set Padding 20
-Set TypingSpeed 50ms
+Set Padding 15
+Set TypingSpeed 40ms
 
 # Start of day - where was I?
-Type "# Morning: Where was I?"
-Enter
-Sleep 500ms
-
 Type "atlas where"
 Enter
 Sleep 2s
@@ -26,33 +22,21 @@ Enter
 Sleep 2s
 
 # Start working
-Type "# Starting work session"
-Enter
-Sleep 500ms
-
-Type "atlas session start myproject 'Implementing auth flow'"
+Type "atlas session start myproject"
 Enter
 Sleep 2s
 
 # Check status mid-session
-Type "# Check progress"
-Enter
-Sleep 500ms
-
 Type "atlas session status"
 Enter
 Sleep 2s
 
 # Leave a breadcrumb for context
-Type "atlas crumb 'OAuth callback working, need refresh token'"
+Type "atlas crumb 'OAuth callback working'"
 Enter
 Sleep 1.5s
 
 # End session with notes
-Type "# End of session"
-Enter
-Sleep 500ms
-
-Type "atlas session end 'OAuth flow complete, tests passing'"
+Type "atlas session end"
 Enter
 Sleep 3s

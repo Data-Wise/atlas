@@ -4,45 +4,24 @@
 Output stats.gif
 
 Set Shell "zsh"
-Set FontSize 20
-Set Width 1000
-Set Height 600
+Set FontSize 18
+Set Width 800
+Set Height 500
 Set Theme "Dracula"
-Set Padding 20
-Set TypingSpeed 50ms
+Set Padding 15
+Set TypingSpeed 40ms
 
 # Weekly stats (default)
-Type "# How's my week going?"
-Enter
-Sleep 500ms
-
 Type "atlas stats"
 Enter
 Sleep 3s
 
 # Monthly overview
-Type "# Monthly summary"
-Enter
-Sleep 500ms
-
 Type "atlas stats month"
 Enter
 Sleep 3s
 
 # Filter by project
-Type "# Just atlas project"
-Enter
-Sleep 500ms
-
 Type "atlas stats --project atlas"
 Enter
 Sleep 3s
-
-# JSON format for scripts
-Type "# JSON for automation"
-Enter
-Sleep 500ms
-
-Type "atlas stats --format json | head -20"
-Enter
-Sleep 2.5s

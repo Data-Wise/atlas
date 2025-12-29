@@ -3,19 +3,13 @@
 
 Output getting-started.gif
 
-# Settings
 Set Shell "zsh"
-Set FontSize 20
-Set Width 1000
-Set Height 600
+Set FontSize 18
+Set Width 800
+Set Height 500
 Set Theme "Dracula"
-Set Padding 20
-Set TypingSpeed 50ms
-
-# Title
-Type "# Atlas - ADHD-Friendly Project Tracker"
-Enter
-Sleep 1s
+Set Padding 15
+Set TypingSpeed 40ms
 
 # Check where we left off
 Type "atlas where"
@@ -23,7 +17,7 @@ Enter
 Sleep 2s
 
 # Start a session
-Type "atlas session start atlas 'Working on documentation'"
+Type "atlas session start atlas"
 Enter
 Sleep 2s
 
@@ -38,7 +32,7 @@ Enter
 Sleep 2s
 
 # End session
-Type "atlas session end 'Created demo GIFs'"
+Type "atlas session end"
 Enter
 Sleep 2.5s
 
