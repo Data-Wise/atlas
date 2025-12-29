@@ -30,11 +30,28 @@ export class GitGateway {
     }
 
     try {
-      // Get current branch
-      const { stdout: branchOutput } = await execAsync('git branch --show-current', {
-        cwd: projectPath
-      })
-      const branch = branchOutput.trim()
+      // Get current branch (handles detached HEAD in CI)
+      let branch = ''
+      try {
+        const { stdout: branchOutput } = await execAsync('git branch --show-current', {
+          cwd: projectPath
+        })
+        branch = branchOutput.trim()
+      } catch {
+        // Ignore - will try fallback
+      }
+
+      // Fallback for detached HEAD (common in CI)
+      if (!branch) {
+        try {
+          const { stdout: headOutput } = await execAsync('git rev-parse --short HEAD', {
+            cwd: projectPath
+          })
+          branch = `HEAD@${headOutput.trim()}`
+        } catch {
+          branch = 'unknown'
+        }
+      }
 
       // Get git status --porcelain for changes
       const { stdout: statusOutput } = await execAsync('git status --porcelain', {

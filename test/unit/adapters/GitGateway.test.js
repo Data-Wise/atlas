@@ -24,9 +24,9 @@ describe('GitGateway', () => {
     test('returns git status for valid repository', async () => {
       const status = await gateway.getStatus(projectRoot)
 
-      expect(status).toBeTruthy()
-      expect(status.branch).toBeTruthy()
+      expect(status).not.toBeNull()
       expect(typeof status.branch).toBe('string')
+      expect(status.branch.length).toBeGreaterThan(0) // Branch name or HEAD@<sha> in detached HEAD
       expect(typeof status.dirty).toBe('boolean')
       expect(Array.isArray(status.uncommittedFiles)).toBe(true)
       expect(typeof status.ahead).toBe('number')
