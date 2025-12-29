@@ -40,6 +40,7 @@ import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.j
 import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
 import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
 import { GetSessionStatsUseCase } from '../use-cases/session/GetSessionStatsUseCase.js'
+import { ExportSessionsUseCase } from '../use-cases/session/ExportSessionsUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 
@@ -176,6 +177,12 @@ export class Container {
   getGetSessionStatsUseCase() {
     return this._resolve('getSessionStatsUseCase', () => {
       return new GetSessionStatsUseCase(this.getSessionRepository())
+    })
+  }
+
+  getExportSessionsUseCase() {
+    return this._resolve('exportSessionsUseCase', () => {
+      return new ExportSessionsUseCase(this.getSessionRepository())
     })
   }
 
@@ -355,6 +362,7 @@ export class Container {
       'CreateSessionUseCase': () => this.getCreateSessionUseCase(),
       'EndSessionUseCase': () => this.getEndSessionUseCase(),
       'GetSessionStatsUseCase': () => this.getGetSessionStatsUseCase(),
+      'ExportSessionsUseCase': () => this.getExportSessionsUseCase(),
       
       // Capture use cases
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
@@ -401,6 +409,7 @@ export class Container {
       createSession: this.getCreateSessionUseCase(),
       endSession: this.getEndSessionUseCase(),
       getSessionStats: this.getGetSessionStatsUseCase(),
+      exportSessions: this.getExportSessionsUseCase(),
 
       // Project
       scanProjects: this.getScanProjectsUseCase(),

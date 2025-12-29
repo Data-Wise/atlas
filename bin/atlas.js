@@ -274,6 +274,54 @@ session
     }
   });
 
+session
+  .command('export [file]')
+  .description('Export sessions to iCal/ICS format for calendar apps')
+  .option('-d, --days <n>', 'Number of days to export', '30')
+  .option('-p, --project <name>', 'Filter by project')
+  .option('--period <period>', 'Period: week, month, year, all')
+  .option('--format <format>', 'Output format: ical, json', 'ical')
+  .action(async (file, options) => {
+    const atlasInstance = getAtlas();
+    const exportUseCase = atlasInstance.container.resolve('ExportSessionsUseCase');
+
+    const result = await exportUseCase.execute({
+      days: parseInt(options.days, 10),
+      period: options.period,
+      project: options.project,
+      format: options.format
+    });
+
+    if (result.sessionCount === 0) {
+      console.log('No sessions found in the specified period.');
+      return;
+    }
+
+    // Handle file output
+    if (file) {
+      const fs = await import('fs');
+      const path = await import('path');
+
+      // Expand ~ to home directory
+      let filename = file;
+      if (filename.startsWith('~')) {
+        filename = path.join(process.env.HOME, filename.slice(1));
+      }
+
+      fs.writeFileSync(filename, result.content);
+      console.log(`✓ Exported ${result.sessionCount} sessions to ${filename}`);
+    } else {
+      // Generate default filename
+      const fs = await import('fs');
+      const date = new Date().toISOString().split('T')[0];
+      const ext = options.format === 'json' ? 'json' : 'ics';
+      const filename = `atlas-sessions-${date}.${ext}`;
+
+      fs.writeFileSync(filename, result.content);
+      console.log(`✓ Exported ${result.sessionCount} sessions to ${filename}`);
+    }
+  });
+
 // ============================================================================
 // STATS COMMAND
 // ============================================================================
