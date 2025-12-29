@@ -215,7 +215,8 @@ Arguments:
 Options:
   -d, --days <n>        Custom number of days to analyze (default: 7)
   -p, --project <name>  Filter analytics by project
-  --format <format>     Output format: table (default), json, text
+  --format <format>     Output format: table (default), json, text, md
+  -e, --export [file]   Export to file (auto-names if no file given)
 ```
 
 **Examples:**
@@ -237,6 +238,21 @@ atlas stats --format json
 
 # Concise text summary
 atlas stats --format text
+
+# Markdown format
+atlas stats --format md
+
+# Export to auto-named file (atlas-stats-YYYY-MM-DD.md)
+atlas stats --export
+
+# Export to specific file
+atlas stats --export weekly-report.md
+
+# Export JSON data
+atlas stats --format json --export stats.json
+
+# Export monthly report
+atlas stats month --export monthly-review.md
 ```
 
 **Output includes:**

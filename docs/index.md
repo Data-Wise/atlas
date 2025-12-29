@@ -121,14 +121,16 @@ atlas dash
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
 
-## :sparkles: What's New in v0.6.2
+## :sparkles: What's New in v0.6.3
 
-!!! tip "Terminal Demo GIFs"
-    See Atlas in action with animated terminal demos:
+!!! tip "Stats Export"
+    Export your analytics to markdown or JSON:
 
-    - [View all demos](DEMOS.md) - 5 workflow demonstrations
-    - CI workflow generates and optimizes GIFs automatically
-    - PR comments show file sizes for review
+    ```bash
+    atlas stats --export              # Auto-named: atlas-stats-YYYY-MM-DD.md
+    atlas stats --export weekly.md    # Custom filename
+    atlas stats --format json -e      # JSON export
+    ```
 
 !!! note "Session Analytics (v0.6.0)"
     Track your productivity patterns with `atlas stats`:

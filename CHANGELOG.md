@@ -2,6 +2,24 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.6.3] - 2025-12-29
+
+### Added
+- **Stats Export** (`atlas stats --export`):
+  - Export analytics to markdown or JSON files
+  - Auto-generate filename with date: `atlas-stats-YYYY-MM-DD.md`
+  - Markdown format with full report: `--format md`
+  - Examples:
+    ```bash
+    atlas stats --export                    # Auto-named markdown
+    atlas stats --export weekly.md          # Custom filename
+    atlas stats --format json --export      # JSON export
+    ```
+- **CLI Documentation**: Updated CLI-REFERENCE.md with export examples
+
+### Tests
+- 1,166 tests passing (+10 new for markdown export)
+
 ## [0.6.2] - 2025-12-28
 
 ### Added
