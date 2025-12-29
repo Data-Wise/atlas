@@ -270,7 +270,7 @@ export class Atlas {
   }
 
   async formatStats(options = {}) {
-    const { formatStatsTable, formatStatsJson, formatStatsText } = await import('./adapters/presenters/StatsPresenter.js');
+    const { formatStatsTable, formatStatsJson, formatStatsText, formatStatsMarkdown } = await import('./adapters/presenters/StatsPresenter.js');
     const stats = await this.sessions.stats(options);
 
     switch (options.format) {
@@ -278,6 +278,9 @@ export class Atlas {
         return formatStatsJson(stats);
       case 'text':
         return formatStatsText(stats);
+      case 'md':
+      case 'markdown':
+        return formatStatsMarkdown(stats);
       default:
         return formatStatsTable(stats);
     }

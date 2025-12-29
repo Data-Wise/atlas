@@ -283,16 +283,48 @@ program
   .description('Show session analytics (week, month, or custom days)')
   .option('-d, --days <n>', 'Number of days to analyze', '7')
   .option('-p, --project <name>', 'Filter by project')
-  .option('--format <format>', 'Output format (table|json|text)', 'table')
+  .option('--format <format>', 'Output format (table|json|text|md)', 'table')
+  .option('-e, --export [file]', 'Export to file (auto-names if no file given)')
   .action(async (period, options) => {
     const atlasInstance = getAtlas();
+
+    // If exporting, use appropriate format
+    let format = options.format;
+    if (options.export && format === 'table') {
+      // Default to markdown for file export if format not specified
+      format = 'md';
+    }
+
     const output = await atlasInstance.formatStats({
       period,
       days: parseInt(options.days, 10),
       project: options.project,
-      format: options.format
+      format
     });
-    console.log(output);
+
+    // Handle export
+    if (options.export) {
+      const fs = await import('fs');
+      const path = await import('path');
+
+      // Generate filename if not provided
+      let filename = options.export;
+      if (typeof filename !== 'string' || filename === '') {
+        const date = new Date().toISOString().split('T')[0];
+        const ext = format === 'json' ? 'json' : 'md';
+        filename = `atlas-stats-${date}.${ext}`;
+      }
+
+      // Expand ~ to home directory
+      if (filename.startsWith('~')) {
+        filename = path.join(process.env.HOME, filename.slice(1));
+      }
+
+      fs.writeFileSync(filename, output);
+      console.log(`✓ Exported to ${filename}`);
+    } else {
+      console.log(output);
+    }
   });
 
 // ============================================================================
