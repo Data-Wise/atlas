@@ -9,6 +9,12 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
 [![Docs](https://img.shields.io/badge/docs-available-blue)](https://data-wise.github.io/atlas/)
 
+## Demo
+
+![Atlas Demo](docs/demos/getting-started.gif)
+
+**[View all demos →](https://data-wise.github.io/atlas/DEMOS/)**
+
 ## Documentation
 
 **📚 [Full Documentation Site](https://data-wise.github.io/atlas/)**
