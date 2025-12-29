@@ -80,15 +80,9 @@ Streak tracking, time blindness helpers, celebrations, and anti-perfectionism fe
 
 ## :movie_camera: See It In Action
 
-Generate demo GIFs locally with [VHS](https://github.com/charmbracelet/vhs):
+![Getting Started Demo](demos/getting-started.gif)
 
-```bash
-cd docs/demos
-vhs getting-started.tape   # Core workflow overview
-vhs quick-capture.tape     # Capture ideas without losing focus
-vhs context-switch.tape    # Park/unpark for interruptions
-vhs stats.tape             # Session analytics
-```
+[:material-play-circle: View all demos](DEMOS.md){ .md-button }
 
 ## :computer: Basic Usage
 
