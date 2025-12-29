@@ -25,7 +25,7 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.5.6 |
+| **Version** | 0.6.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | 1,156 (Jest) |
@@ -229,6 +229,7 @@ DEBUG=atlas:* atlas status
 
 ## Version History
 
+- **v0.6.0** - Session analytics (`atlas stats`), documentation website
 - **v0.5.6** - Presenter layer, project caching, constants extraction
 - **v0.5.5** - Fix breadcrumb timestamp display
 - **v0.5.3** - Comprehensive documentation, install.sh

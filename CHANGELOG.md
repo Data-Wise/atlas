@@ -2,6 +2,49 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.6.0] - 2025-12-28
+
+### Added
+- **Session Analytics** (`atlas stats`):
+  - Weekly/monthly productivity summaries
+  - Total sessions, time, and daily averages
+  - Flow state percentage (sessions ≥15 min)
+  - Completion rate tracking
+  - Current and longest streak display
+  - Best day highlight
+  - Hourly distribution sparkline
+  - Per-project breakdown
+  - Multiple output formats: `--format table|json|text`
+  - Project filtering: `--project <name>`
+  - Custom periods: `--days <n>`, `week`, `month`
+- **Documentation Website**:
+  - MkDocs Material theme with dark/light mode
+  - Live site: https://data-wise.github.io/atlas/
+  - Auto-deploy via GitHub Actions on docs changes
+  - Feature grid homepage, installation guide
+  - Navigation tabs for all documentation
+  - Mermaid diagram support
+
+### Changed
+- **Performance Improvements** (Plan B):
+  - Virtual scrolling for 50+ projects in dashboard
+  - Card pooling with object reuse pattern
+  - Debounced rendering at 60fps target
+- **State Management** (Plan C):
+  - Centralized ViewStateManager with subscription pattern
+  - Single source of truth for dashboard state
+  - Simplified view updates
+
+### Fixed
+- CARD_HEIGHT constant duplication in MainView.js
+- Dialog cleanup on screen destroy
+- Helpers.js re-export indirection removed
+
+### Tests
+- 1,156 tests passing (up from 1,023)
+- 50 new stats-related tests (use case + presenter)
+- 9 new E2E tests for stats command
+
 ## [0.5.4] - 2025-12-26
 
 ### Changed
