@@ -14,14 +14,14 @@ Set TypingSpeed 40ms
 # Weekly stats (default)
 Type "atlas stats"
 Enter
-Sleep 3s
+Sleep 2.5s
 
 # Monthly overview
 Type "atlas stats month"
 Enter
-Sleep 3s
+Sleep 2.5s
 
 # Filter by project
 Type "atlas stats --project atlas"
 Enter
-Sleep 3s
+Sleep 2.5s
