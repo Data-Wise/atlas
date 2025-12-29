@@ -121,7 +121,7 @@ atlas dash
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
 
-## :sparkles: What's New in v0.6.0
+## :sparkles: What's New in v0.6.1
 
 !!! tip "Session Analytics"
     Track your productivity patterns with the new `atlas stats` command:
@@ -136,6 +136,12 @@ atlas dash
     atlas stats month     # Monthly summary
     atlas stats --project myproject --format json
     ```
+
+!!! success "Friendly Error Messages"
+    Session commands now show helpful messages instead of stack traces:
+
+    - `atlas session start` when session active: "Session already active. End it first..."
+    - `atlas session end` when no session: "No active session to end"
 
 ## :heart: ADHD-Friendly Design
 
