@@ -1,0 +1,230 @@
+name: Demo GIFs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/demos/*.tape'
+      - '.github/workflows/demos.yml'
+  pull_request:
+    paths:
+      - 'docs/demos/*.tape'
+      - '.github/workflows/demos.yml'
+  workflow_dispatch:
+    inputs:
+      regenerate_all:
+        description: 'Regenerate all GIFs even if unchanged'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  validate-tapes:
+    name: Validate Tape Syntax
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tape file syntax
+        run: |
+          echo "Validating tape file syntax..."
+          errors=0
+
+          for tape in docs/demos/*.tape; do
+            echo "Checking $tape..."
+
+            # Check for typed comments (common mistake)
+            if grep -E '^Type "#' "$tape"; then
+              echo "::error file=$tape::Found typed comment - this will cause zsh errors"
+              errors=$((errors + 1))
+            fi
+
+            # Check required settings
+            if ! grep -q "^Set Shell" "$tape"; then
+              echo "::warning file=$tape::Missing 'Set Shell' directive"
+            fi
+
+            if ! grep -q "^Output" "$tape"; then
+              echo "::error file=$tape::Missing 'Output' directive"
+              errors=$((errors + 1))
+            fi
+
+            # Check for reasonable dimensions
+            width=$(grep "^Set Width" "$tape" | grep -oE '[0-9]+' || echo "0")
+            height=$(grep "^Set Height" "$tape" | grep -oE '[0-9]+' || echo "0")
+
+            if [ "$width" -gt 1200 ] || [ "$height" -gt 800 ]; then
+              echo "::warning file=$tape::Large dimensions ($width x $height) may cause issues"
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::error::Found $errors error(s) in tape files"
+            exit 1
+          fi
+
+          echo "All tape files passed validation"
+
+  generate-gifs:
+    name: Generate Demo GIFs
+    runs-on: macos-latest
+    needs: validate-tapes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install VHS
+        run: |
+          brew install charmbracelet/tap/vhs
+          vhs --version
+
+      - name: Install gifsicle
+        run: |
+          brew install gifsicle
+          gifsicle --version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Link atlas globally
+        run: npm link
+
+      - name: Initialize atlas for demos
+        run: |
+          mkdir -p ~/.atlas
+          echo '{"scanPaths":["~/projects"]}' > ~/.atlas/config.json
+          atlas init || true
+
+      - name: Generate GIFs
+        id: generate
+        run: |
+          cd docs/demos
+          failed=""
+          succeeded=""
+
+          for tape in *.tape; do
+            name="${tape%.tape}"
+            echo "::group::Generating $name.gif"
+
+            # Clean up any existing session
+            atlas session end 2>/dev/null || true
+
+            if vhs "$tape" 2>&1; then
+              echo "Successfully generated $name.gif"
+              succeeded="$succeeded $name"
+            else
+              echo "::error::Failed to generate $name.gif"
+              failed="$failed $name"
+            fi
+
+            echo "::endgroup::"
+          done
+
+          # Report results
+          echo "succeeded=${succeeded}" >> $GITHUB_OUTPUT
+          echo "failed=${failed}" >> $GITHUB_OUTPUT
+
+          if [ -n "$failed" ]; then
+            echo "::error::Failed to generate:$failed"
+            exit 1
+          fi
+
+      - name: Optimize GIFs
+        run: |
+          cd docs/demos
+          echo "Optimizing GIFs with gifsicle..."
+
+          for gif in *.gif; do
+            original_size=$(stat -f%z "$gif")
+            gifsicle -O3 --lossy=80 "$gif" -o "${gif%.gif}-opt.gif"
+            mv "${gif%.gif}-opt.gif" "$gif"
+            new_size=$(stat -f%z "$gif")
+
+            savings=$((100 - (new_size * 100 / original_size)))
+            echo "$gif: $(numfmt --to=iec $original_size) → $(numfmt --to=iec $new_size) (-${savings}%)"
+          done
+
+      - name: Verify GIF sizes
+        run: |
+          cd docs/demos
+          echo "GIF file sizes:"
+
+          oversized=""
+          for gif in *.gif; do
+            size=$(stat -f%z "$gif")
+            size_mb=$((size / 1024 / 1024))
+
+            if [ $size_mb -gt 2 ]; then
+              echo "::warning file=docs/demos/$gif::GIF is ${size_mb}MB (>2MB)"
+              oversized="$oversized $gif"
+            fi
+
+            ls -lh "$gif"
+          done
+
+          if [ -n "$oversized" ]; then
+            echo "::warning::Some GIFs are large:$oversized"
+          fi
+
+      - name: Upload GIFs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-gifs
+          path: docs/demos/*.gif
+          retention-days: 7
+
+      - name: Compare with existing GIFs
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "## Demo GIF Changes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          for gif in docs/demos/*.gif; do
+            name=$(basename "$gif")
+            echo "- $name: $(ls -lh "$gif" | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          done
+
+  update-gifs:
+    name: Update GIFs in Repository
+    runs-on: macos-latest
+    needs: generate-gifs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download generated GIFs
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-gifs
+          path: docs/demos/
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet docs/demos/*.gif; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to GIFs"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "GIFs have changed"
+            git diff --stat docs/demos/
+          fi
+
+      - name: Commit updated GIFs
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/demos/*.gif
+          git commit -m "chore: regenerate demo GIFs [skip ci]"
+          git push
