@@ -78,6 +78,18 @@ Streak tracking, time blindness helpers, celebrations, and anti-perfectionism fe
     cd atlas && npm install && npm link
     ```
 
+## :movie_camera: See It In Action
+
+Generate demo GIFs locally with [VHS](https://github.com/charmbracelet/vhs):
+
+```bash
+cd docs/demos
+vhs getting-started.tape   # Core workflow overview
+vhs quick-capture.tape     # Capture ideas without losing focus
+vhs context-switch.tape    # Park/unpark for interruptions
+vhs stats.tape             # Session analytics
+```
+
 ## :computer: Basic Usage
 
 ```bash
@@ -108,11 +120,12 @@ atlas dash
 | Guide | Description |
 |-------|-------------|
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
+| [Quick Reference](REFCARD.md) | Printable command cheat sheet |
+| [Workflows](WORKFLOWS.md) | ADHD-friendly workflow patterns |
 | [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
 | [Configuration](CONFIGURATION.md) | All settings and preferences |
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
-| [Diagrams](DIAGRAMS.md) | Visual architecture diagrams |
 
 ## :sparkles: What's New in v0.6.0
 

@@ -1,0 +1,4 @@
+# Generated GIFs - regenerate with: vhs <tape-file>.tape
+*.gif
+*.mp4
+*.webm
