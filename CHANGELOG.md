@@ -2,6 +2,17 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.6.1] - 2025-12-28
+
+### Fixed
+- **Friendly Error Messages**: Session commands now show user-friendly messages instead of stack traces
+  - `atlas session start` when session already active: "⚠️ Session already active. End it first with: atlas session end"
+  - `atlas session end` when no active session: "ℹ️ No active session to end"
+- **VHS Demo Tapes**: Fixed tape files to use correct syntax (removed typed comments that caused zsh errors)
+
+### Changed
+- Terminal demo GIFs optimized with gifsicle (~30% smaller)
+
 ## [0.6.0] - 2025-12-28
 
 ### Added
