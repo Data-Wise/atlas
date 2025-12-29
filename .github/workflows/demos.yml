@@ -18,6 +18,10 @@ on:
         default: 'false'
         type: boolean
 
+# Required for auto-commit of generated GIFs
+permissions:
+  contents: write
+
 jobs:
   validate-tapes:
     name: Validate Tape Syntax
@@ -193,14 +197,12 @@ jobs:
 
   update-gifs:
     name: Update GIFs in Repository
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: generate-gifs
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download generated GIFs
         uses: actions/download-artifact@v4
@@ -211,13 +213,13 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          if git diff --quiet docs/demos/*.gif; then
+          if git diff --quiet docs/demos/*.gif 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes to GIFs"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "GIFs have changed"
-            git diff --stat docs/demos/
+            git status docs/demos/
           fi
 
       - name: Commit updated GIFs
