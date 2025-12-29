@@ -11,6 +11,7 @@ atlas catch "idea"               # Quick capture
 atlas where                      # Show context
 atlas session end                # End with celebration
 atlas stats                      # Session analytics
+atlas session export             # Export to iCal (v0.7.0)
 
 # Context switching
 atlas park "switching to urgent" # Save context
@@ -18,6 +19,7 @@ atlas unpark                     # Restore context
 
 # Dashboard
 atlas dash                       # Launch TUI
+# Dashboard keys: f=Focus, T=Timeline, z=Zen, ?=Help
 ```
 
 ## Project Overview
@@ -25,10 +27,10 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.6.2 |
+| **Version** | 0.7.0 (dev) |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,156 (Jest) |
+| **Tests** | 1,192 (Jest) |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
 ## Architecture
@@ -55,8 +57,8 @@ src/
 │   └── dashboard/    # Modular dashboard components
 │       ├── constants.js   # Configuration values
 │       ├── helpers.js     # Re-exports from presenters
-│       ├── views/         # MainView, DetailView, FocusView, ZenView
-│       ├── stateMachine.js
+│       ├── views/         # MainView, DetailView, FocusView, ZenView, TimelineView
+│       ├── stateMachine.js # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE
 │       └── timerManager.js
 └── index.js          # Commander.js CLI entry
 ```
@@ -270,6 +272,8 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.7.0** - Session export to iCal, Task-Based Focus, Time Block View
+- **v0.6.3** - Stats export (`--export`, `--format md`)
 - **v0.6.2** - Demo GIF CI workflow, GitGateway detached HEAD fix
 - **v0.6.1** - Friendly error messages for session commands
 - **v0.6.0** - Session analytics (`atlas stats`), documentation website

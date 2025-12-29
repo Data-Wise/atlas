@@ -202,6 +202,48 @@ atlas session status
 - Duration and flow state
 - Or "No active session" message
 
+### `atlas session export`
+
+Export sessions to iCal/ICS format for calendar apps.
+
+```bash
+atlas session export [file] [options]
+
+Arguments:
+  file    Output file path (defaults to stdout or auto-named file)
+
+Options:
+  -d, --days <n>        Number of days to export (default: 30)
+  -p, --project <name>  Filter by project name
+  --period <period>     Preset period: week, month, year, all
+  --format <format>     Output format: ical (default), json
+```
+
+**Examples:**
+```bash
+# Export last 30 days to iCal file
+atlas session export sessions.ics
+
+# Export to stdout (for piping)
+atlas session export
+
+# Export last week
+atlas session export --period week
+
+# Export specific project sessions
+atlas session export --project myproject -d 60 project-sessions.ics
+
+# Export as JSON
+atlas session export --format json > sessions.json
+```
+
+**iCal Output:**
+- Standard RFC 5545 format
+- Compatible with Apple Calendar, Google Calendar, Outlook
+- Each session becomes a calendar event
+- Event summary includes project name
+- Event description includes session notes
+
 ### `atlas stats`
 
 Show session analytics and productivity insights.
@@ -594,6 +636,7 @@ atlas dash
 | `f` | Enter focus mode |
 | `d` | Decision helper |
 | `t` | Cycle themes |
+| `T` | Timeline view (time blocks) |
 | `z` | Zen mode |
 | `q` | Quit |
 | `?` | Show help |
@@ -608,6 +651,24 @@ atlas dash
 | `-` | Subtract 5 minutes |
 | `c` | Quick capture |
 | `Esc` | Exit focus mode |
+
+**Task-Based Focus (v0.7.0):**
+
+When starting a Pomodoro:
+1. Dashboard prompts "What will you focus on?"
+2. Task is displayed during focus session
+3. After timer completes, asks for completion status:
+   - `c` - Completed
+   - `p` - Partial progress
+   - `n` - Pivoted to something else
+
+**Timeline View (v0.7.0):**
+
+Press `T` (Shift+T) to enter the time block view:
+- Visual timeline of today's sessions
+- Color-coded by project
+- Shows session durations and gaps
+- Helps identify work patterns
 
 ---
 

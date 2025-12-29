@@ -83,6 +83,14 @@ flowchart LR
 | `stats` | Weekly summary | `atlas stats` |
 | `stats month` | Monthly summary | `atlas stats month` |
 | `stats --project` | Project-specific | `atlas stats --project atlas` |
+| `stats --export` | Export report | `atlas stats --export weekly.md` |
+
+### Calendar Export (v0.7.0)
+
+| Command | What it does | Example |
+|---------|-------------|---------|
+| `session export` | Export to iCal | `atlas session export sessions.ics` |
+| `session export --format json` | Export as JSON | `atlas session export --format json` |
 
 ### Projects
 
@@ -109,8 +117,14 @@ Start dashboard: `atlas dash`
 | `f` | Toggle focus mode |
 | `z` | Toggle zen mode |
 | `t` | Cycle theme |
+| `T` | Timeline view |
 | `?` | Show help |
 | `q` | Quit |
+
+**Focus Mode (v0.7.0):**
+- Prompts "What will you focus on?" before timer
+- Shows task during Pomodoro
+- After completion: `c` (done), `p` (partial), `n` (pivoted)
 
 ---
 
@@ -227,5 +241,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.6.0 | Made for ADHD brains</em>
+<em>Atlas v0.7.0 | Made for ADHD brains</em>
 </div>
