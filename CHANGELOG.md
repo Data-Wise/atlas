@@ -2,6 +2,24 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.6.2] - 2025-12-28
+
+### Added
+- **Demo GIFs CI Workflow** (`.github/workflows/demos.yml`):
+  - Validates VHS tape file syntax
+  - Generates GIFs on macOS runner
+  - Optimizes with gifsicle (~30% smaller)
+  - Posts PR comment with file sizes table
+  - Auto-commits regenerated GIFs on main
+- **Demo Section in README**: Embedded getting-started GIF with link to all demos
+- **Demos Documentation Page**: `docs/DEMOS.md` with all 5 embedded terminal demos
+- **Reusable Prompts**: `docs/prompts/DEMO-WORKFLOWS.md` for demo creation workflow
+
+### Fixed
+- **GitGateway Detached HEAD**: Handle CI environments where `git branch --show-current` returns empty
+  - Falls back to `HEAD@<sha>` format
+  - Fixes flaky test in GitHub Actions PR checkouts
+
 ## [0.6.1] - 2025-12-28
 
 ### Fixed

@@ -121,27 +121,22 @@ atlas dash
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
 
-## :sparkles: What's New in v0.6.1
+## :sparkles: What's New in v0.6.2
 
-!!! tip "Session Analytics"
-    Track your productivity patterns with the new `atlas stats` command:
+!!! tip "Terminal Demo GIFs"
+    See Atlas in action with animated terminal demos:
 
-    - Weekly/monthly summaries
-    - Streak history and flow state metrics
-    - Per-project breakdown
-    - Multiple output formats (table, JSON, text)
+    - [View all demos](DEMOS.md) - 5 workflow demonstrations
+    - CI workflow generates and optimizes GIFs automatically
+    - PR comments show file sizes for review
+
+!!! note "Session Analytics (v0.6.0)"
+    Track your productivity patterns with `atlas stats`:
 
     ```bash
     atlas stats           # Weekly summary
-    atlas stats month     # Monthly summary
-    atlas stats --project myproject --format json
+    atlas stats month     # Monthly overview
     ```
-
-!!! success "Friendly Error Messages"
-    Session commands now show helpful messages instead of stack traces:
-
-    - `atlas session start` when session active: "Session already active. End it first..."
-    - `atlas session end` when no session: "No active session to end"
 
 ## :heart: ADHD-Friendly Design
 
