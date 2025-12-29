@@ -2,11 +2,42 @@
 
 **Welcome!** This tutorial gets you from zero to productive with Atlas in about 15 minutes.
 
-Atlas is an ADHD-friendly project state engine that helps you:
-- Track what you were working on (context restoration)
-- Capture ideas without losing focus (quick capture)
-- Switch between projects without losing your place (park/unpark)
-- See your progress and maintain streaks
+!!! tip "ADHD-Friendly Design"
+    This tutorial has **"Try This Now"** prompts. Do them! Hands-on learning sticks better than reading.
+
+## What Atlas Does (Visual Overview)
+
+```mermaid
+flowchart LR
+    subgraph YOU["Your Brain"]
+        A[💡 Ideas]
+        B[🎯 Focus]
+        C[❓ Where was I?]
+    end
+
+    subgraph ATLAS["Atlas Helps"]
+        D[catch] --> E[(Inbox)]
+        F[session] --> G[(Tracked Time)]
+        H[where/trail] --> I[(Context)]
+    end
+
+    A --> D
+    B --> F
+    C --> H
+
+    style YOU fill:#fff3cd
+    style ATLAS fill:#d4edda
+```
+
+Atlas helps you:
+
+| Problem | Atlas Solution |
+|---------|----------------|
+| "What was I working on?" | `atlas where` + `atlas trail` |
+| "I'll forget this idea" | `atlas catch "idea"` |
+| "How long have I been at this?" | `atlas session status` |
+| "I need to switch but don't want to lose context" | `atlas park` / `atlas unpark` |
+| "Am I making progress?" | `atlas stats` |
 
 ---
 

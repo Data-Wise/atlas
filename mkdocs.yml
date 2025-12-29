@@ -77,8 +77,10 @@ nav:
   - Home: index.md
   - Getting Started:
     - Tutorial: TUTORIAL.md
+    - Quick Reference: REFCARD.md
     - Installation: getting-started/installation.md
   - User Guide:
+    - Workflows: WORKFLOWS.md
     - CLI Reference: CLI-REFERENCE.md
     - Configuration: CONFIGURATION.md
   - Architecture:
