@@ -10,15 +10,17 @@ export const STATES = {
   BROWSE: 'browse',      // Main project list view
   DETAIL: 'detail',      // Single project detail view
   FOCUS: 'focus',        // Focus mode with timer
-  ZEN: 'zen'             // Minimal zen mode
+  ZEN: 'zen',            // Minimal zen mode
+  TIMELINE: 'timeline'   // Time block view
 }
 
 // Valid transitions between states
 const TRANSITIONS = {
-  [STATES.BROWSE]: [STATES.DETAIL, STATES.FOCUS, STATES.ZEN],
-  [STATES.DETAIL]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN],
-  [STATES.FOCUS]: [STATES.BROWSE, STATES.ZEN],
-  [STATES.ZEN]: [STATES.BROWSE, STATES.FOCUS]
+  [STATES.BROWSE]: [STATES.DETAIL, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE],
+  [STATES.DETAIL]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE],
+  [STATES.FOCUS]: [STATES.BROWSE, STATES.ZEN, STATES.TIMELINE],
+  [STATES.ZEN]: [STATES.BROWSE, STATES.FOCUS, STATES.TIMELINE],
+  [STATES.TIMELINE]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN]
 }
 
 /**

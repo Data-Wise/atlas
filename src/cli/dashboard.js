@@ -682,6 +682,59 @@ export async function runDashboard(atlas, options = {}) {
   screen.append(zenView)
 
   // ============================================================================
+  // TIMELINE VIEW - Time block visualization
+  // ============================================================================
+
+  const timelineView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Timeline header
+  const timelineHeader = blessed.box({
+    parent: timelineView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 3,
+    tags: true,
+    border: { type: 'line', fg: 'cyan' },
+    style: { bg: 'black' },
+    align: 'center'
+  })
+
+  // Timeline content - horizontal timeline
+  const timelineContent = blessed.box({
+    parent: timelineView,
+    top: 3,
+    left: 0,
+    width: '100%',
+    height: '100%-5',
+    tags: true,
+    scrollable: true,
+    style: { bg: 'black' },
+    padding: { left: 2, right: 2 }
+  })
+
+  // Timeline command bar
+  const timelineCommandBar = blessed.box({
+    parent: timelineView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}Esc{/} Back  {cyan-fg}r{/} Refresh  {cyan-fg}f{/} Focus Mode  {cyan-fg}q{/} Quit'
+  })
+
+  screen.append(timelineView)
+
+  // ============================================================================
   // HELPER FUNCTIONS
   // ============================================================================
 
@@ -1422,6 +1475,178 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // TIMELINE VIEW
+  // ============================================================================
+
+  async function showTimelineView() {
+    stateMachine.transition(STATES.TIMELINE)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.hide()
+    timelineView.show()
+
+    await updateTimelineDisplay()
+    screen.render()
+  }
+
+  function exitTimelineView() {
+    stateMachine.transition(STATES.BROWSE)
+    timelineView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  async function updateTimelineDisplay() {
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+
+    // Get today's sessions from repository
+    let todaySessions = []
+    try {
+      const allSessions = await atlas.sessions.history({ limit: 100 })
+      todaySessions = allSessions.filter(s =>
+        s.startTime && new Date(s.startTime).toISOString().startsWith(todayStr)
+      ).sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+    } catch (e) {
+      // Fallback to Pomodoro history if sessions unavailable
+      todaySessions = pomodoroHistory.filter(p =>
+        p.completed.startsWith(todayStr)
+      )
+    }
+
+    // Calculate total focus time
+    const totalMinutes = todaySessions.reduce((sum, s) => {
+      if (s.getDuration) return sum + s.getDuration()
+      return sum + (s.duration || 0)
+    }, 0)
+
+    // Header
+    const dayName = today.toLocaleDateString('en-US', { weekday: 'long' })
+    const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    timelineHeader.setContent(
+      `{bold}{cyan-fg}📅 ${dayName}, ${dateStr}{/}  |  ` +
+      `{green-fg}${todaySessions.length} sessions{/}  |  ` +
+      `{yellow-fg}${totalMinutes} min focused{/}`
+    )
+
+    // Build timeline content
+    if (todaySessions.length === 0) {
+      timelineContent.setContent(
+        `\n\n` +
+        `  {gray-fg}No sessions recorded today.{/}\n\n` +
+        `  {gray-fg}Press {cyan-fg}f{/}{gray-fg} to start a focus session!{/}`
+      )
+    } else {
+      const timelineStr = buildTimelineChart(todaySessions, today)
+      timelineContent.setContent(timelineStr)
+    }
+
+    screen.render()
+  }
+
+  function buildTimelineChart(sessions, today) {
+    const lines = []
+    const startHour = 6 // 6 AM
+    const endHour = 23 // 11 PM
+    const width = Math.min(screen.width - 6, 70)
+
+    // Hour labels
+    let hourLabels = '  '
+    for (let h = startHour; h <= endHour; h += 2) {
+      const label = h.toString().padStart(2)
+      hourLabels += label + '  '
+    }
+    lines.push(`{gray-fg}${hourLabels}{/}`)
+
+    // Timeline bar
+    const minutesInDay = (endHour - startHour) * 60
+    const charPerMinute = width / minutesInDay
+
+    // Build the timeline
+    let timeline = ''
+    let currentMinute = 0
+
+    // Create session blocks
+    const sortedSessions = [...sessions].sort((a, b) =>
+      new Date(a.startTime) - new Date(b.startTime)
+    )
+
+    for (const session of sortedSessions) {
+      const start = new Date(session.startTime)
+      const end = session.endTime ? new Date(session.endTime) : new Date()
+
+      const startMinutes = (start.getHours() - startHour) * 60 + start.getMinutes()
+      const endMinutes = (end.getHours() - startHour) * 60 + end.getMinutes()
+
+      // Skip if outside visible range
+      if (endMinutes < 0 || startMinutes > minutesInDay) continue
+
+      // Gap before this session
+      if (startMinutes > currentMinute) {
+        const gapChars = Math.max(0, Math.floor((startMinutes - currentMinute) * charPerMinute))
+        timeline += '{gray-fg}' + '░'.repeat(gapChars) + '{/}'
+      }
+
+      // Session block
+      const sessionChars = Math.max(1, Math.floor((endMinutes - startMinutes) * charPerMinute))
+      const color = getProjectColor(session.project)
+      timeline += `{${color}-fg}` + '█'.repeat(sessionChars) + '{/}'
+
+      currentMinute = Math.max(currentMinute, endMinutes)
+    }
+
+    // Fill remaining time
+    const now = new Date()
+    const nowMinutes = (now.getHours() - startHour) * 60 + now.getMinutes()
+    if (currentMinute < nowMinutes) {
+      const remaining = Math.floor((nowMinutes - currentMinute) * charPerMinute)
+      timeline += '{gray-fg}' + '░'.repeat(remaining) + '{/}'
+    }
+
+    lines.push('')
+    lines.push(`  ${timeline}`)
+    lines.push('')
+
+    // Session list
+    lines.push(`{bold}  Sessions:{/}`)
+    lines.push('')
+
+    for (const session of sortedSessions) {
+      const start = new Date(session.startTime)
+      const timeStr = start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+      const duration = session.getDuration ? session.getDuration() : (session.duration || 0)
+      const projectName = session.project || 'Unknown'
+      const color = getProjectColor(projectName)
+      const task = session.task ? ` - ${session.task.slice(0, 30)}` : ''
+
+      lines.push(`  {gray-fg}${timeStr}{/}  {${color}-fg}█{/} {bold}${projectName}{/} {gray-fg}(${duration}m)${task}{/}`)
+    }
+
+    // Summary
+    lines.push('')
+    lines.push(`{gray-fg}  ────────────────────────────────────────{/}`)
+
+    const focusBlocks = sortedSessions.length
+    const avgDuration = focusBlocks > 0
+      ? Math.round(sortedSessions.reduce((sum, s) => sum + (s.getDuration ? s.getDuration() : s.duration || 0), 0) / focusBlocks)
+      : 0
+
+    lines.push(`  {cyan-fg}Focus blocks: ${focusBlocks}{/}  |  {yellow-fg}Avg: ${avgDuration}m{/}`)
+
+    return lines.join('\n')
+  }
+
+  function getProjectColor(projectName) {
+    // Simple hash-based color assignment
+    const colors = ['green', 'cyan', 'yellow', 'magenta', 'blue']
+    if (!projectName) return 'gray'
+    const hash = projectName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+    return colors[hash % colors.length]
+  }
+
+  // ============================================================================
   // DECISION HELPER
   // ============================================================================
 
@@ -1580,12 +1805,14 @@ export async function runDashboard(atlas, options = {}) {
     stateMachine.destroy()
   }
 
-  // Escape - back to main (or exit focus/zen mode)
+  // Escape - back to main (or exit focus/zen/timeline mode)
   screen.key(['escape'], () => {
     if (stateMachine.is(STATES.ZEN)) {
       exitZenMode()
     } else if (stateMachine.is(STATES.FOCUS)) {
       exitFocusMode()
+    } else if (stateMachine.is(STATES.TIMELINE)) {
+      exitTimelineView()
     } else if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
     }
@@ -1674,6 +1901,10 @@ export async function runDashboard(atlas, options = {}) {
       resetPomodoro()
       return
     }
+    if (stateMachine.is(STATES.TIMELINE)) {
+      await updateTimelineDisplay()
+      return
+    }
     statusBar.setContent(' {yellow-fg}Refreshing...{/}')
     screen.render()
     if (stateMachine.is(STATES.BROWSE)) {
@@ -1758,9 +1989,12 @@ export async function runDashboard(atlas, options = {}) {
     screen.render()
   })
 
-  // Focus mode: f key (only from main or detail view)
+  // Focus mode: f key (from main, detail, or timeline view)
   screen.key(['f'], () => {
     if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showFocusMode()
+    } else if (stateMachine.is(STATES.TIMELINE)) {
+      timelineView.hide()
       showFocusMode()
     }
   })
@@ -1787,6 +2021,15 @@ export async function runDashboard(atlas, options = {}) {
       // Switch from focus to zen
       focusView.hide()
       showZenMode()
+    }
+  })
+
+  // Timeline view: T key (shift+t)
+  screen.key(['S-t'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showTimelineView()
+    } else if (stateMachine.is(STATES.TIMELINE)) {
+      exitTimelineView()
     }
   })
 
@@ -1853,6 +2096,7 @@ export async function runDashboard(atlas, options = {}) {
   {yellow-fg}a{/}/{yellow-fg}p{/}/{yellow-fg}*{/}      Filter: active/paused/all
   {yellow-fg}d{/}          Decision helper
   {yellow-fg}t{/}          Cycle themes
+  {yellow-fg}T{/}          Timeline view
 
   {bold}{cyan-fg}Focus Mode (f) / Zen Mode (z){/}
   ─────────────────────────────────────────
