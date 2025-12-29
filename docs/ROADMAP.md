@@ -2,68 +2,41 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2025-12-28
+**Last Updated:** 2025-12-29
 
 ---
 
-## Current Version: v0.5.6
+## Current Version: v0.6.3
 
-Architecture refinements complete. Ready for v0.6.0 feature development.
-
----
-
-## v0.6.0 - Dashboard & Workflow (In Progress)
-
-**Theme:** Code quality improvements + workflow automation
-
-### Plan A: Quick Wins (Priority 1) ✅ COMPLETE
-- [x] Fix CARD_HEIGHT constant duplication (MainView.js)
-- [x] Add error boundaries in renderCards
-- [x] Centralize dialog dimensions in constants.js
-- [x] Add screen.on('destroy') cleanup for dialogs
-- [x] Remove helpers.js re-export indirection layer
-
-### Plan B: Performance (Priority 2) ✅ COMPLETE
-- [x] Virtual scrolling for 50+ projects
-- [x] Card pooling (object reuse pattern)
-- [x] Debounced rendering (60fps target)
-
-### Session Analytics (Complete)
-- [x] Session analytics (`atlas stats`)
-  - Weekly/monthly summaries
-  - Streak history
-  - Flow state percentage
-  - Hourly distribution sparkline
-  - Per-project breakdown
-
-### Features
-- [ ] Data export (`atlas export`)
-  - JSON export of all data
-  - CSV for sessions/captures
-  - Markdown report generation
+Stats export feature complete. Ready for v0.7.0 feature development.
 
 ---
 
-## v0.6.1 - Workflow Automation
+## v0.7.0 - Enhanced Focus & Calendar (Next)
 
-### Plan E: Smart Workflows
-- [ ] Smart session suggestions (time-of-day + patterns)
-- [ ] Batch operations (`atlas batch`)
-- [ ] Workflow templates (YAML-based automation)
+**Theme:** Task-based focus, calendar integration, improved workflows
 
-### Features
-- [ ] `atlas stats week` - Weekly summary report
-- [ ] `atlas export --format markdown` - Obsidian-compatible export
-- [ ] Notification integrations (optional desktop notifications)
+See [V0.7.0-ROADMAP.md](./planning/V0.7.0-ROADMAP.md) for detailed planning.
+
+### Tier 1: Core Features
+- [ ] **Task-Based Focus** - Set specific task before starting Pomodoro
+- [ ] **Session Export** - Export sessions to iCal/ics format
+- [ ] **Time Block View** - Dashboard timeline view of today's sessions
+
+### Tier 2: Nice to Have
+- [ ] Calendar Import - Import time blocks from iCal
+- [ ] Desktop Notifications - Break reminders, streak alerts
+- [ ] Multi-Pomodoro Tracking - Track completed pomodoros per session
+
+### Future Considerations
+- [ ] Google Calendar Sync (two-way)
+- [ ] Web Dashboard (REST API + browser)
+- [ ] Apple Notes Sync (daily summary)
+- [ ] GitHub Activity Correlation
 
 ---
 
-## v0.7.0 - Dashboard Evolution
-
-### Plan C: State Management ✅ COMPLETE (moved to v0.6.0)
-- [x] Centralized ViewStateManager
-- [x] Single source of truth for all dashboard state
-- [x] Simplified view updates via subscriptions
+## v0.8.0 - Dashboard Evolution
 
 ### Plan D: Multi-Panel Layout
 - [ ] Split layout option (sidebar + main panel)
@@ -78,7 +51,7 @@ Architecture refinements complete. Ready for v0.6.0 feature development.
 
 ---
 
-## v0.8.0 - Integrations
+## v0.9.0 - Integrations
 
 ### Remote Sync
 - [ ] GitHub Issues sync (read project issues)
@@ -116,6 +89,12 @@ Architecture refinements complete. Ready for v0.6.0 feature development.
 ---
 
 ## Completed Milestones
+
+### v0.6.x Series
+- [x] v0.6.3: Stats export (`--export`, `--format md`)
+- [x] v0.6.2: Demo GIFs CI workflow, GitGateway detached HEAD fix
+- [x] v0.6.1: Friendly error handling for session commands
+- [x] v0.6.0: Session analytics (`atlas stats`), MkDocs site, ViewStateManager
 
 ### v0.5.x Series
 - [x] v0.5.6: Presenter layer, caching, constants extraction
