@@ -25,11 +25,11 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.6.0 |
+| **Version** | 0.6.2 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | 1,156 (Jest) |
-| **Source** | ~17,000 lines |
+| **Docs** | https://data-wise.github.io/atlas/ |
 
 ## Architecture
 
@@ -216,6 +216,46 @@ DEBUG=atlas:* atlas status
 3. Re-export from `src/cli/dashboard/helpers.js` if used by dashboard
 4. Add tests in `test/unit/adapters/presenters/`
 
+## CI Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `test.yml` | Push/PR | Run tests on Node 18/20 |
+| `docs.yml` | Push to main | Deploy MkDocs to GitHub Pages |
+| `demos.yml` | Changes to `docs/demos/*.tape` | Generate terminal demo GIFs |
+
+### Demo GIF Workflow
+
+Terminal demos use [VHS](https://github.com/charmbracelet/vhs) for recording:
+
+```bash
+# Location
+docs/demos/*.tape     # VHS tape files (recording scripts)
+docs/demos/*.gif      # Generated GIFs
+
+# Manual generation (requires vhs + gifsicle)
+cd docs/demos
+vhs getting-started.tape
+gifsicle -O3 --lossy=80 getting-started.gif -o getting-started.gif
+
+# CI auto-generates on changes to tape files
+# PRs get comment with GIF file sizes table
+```
+
+**Tape file syntax:**
+```
+Output demo.gif
+Set Shell "zsh"
+Set FontSize 18
+Set Width 800
+Set Height 500
+Type "atlas stats"
+Enter
+Sleep 2.5s
+```
+
+See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusable prompts.
+
 ## Documentation
 
 | Doc | Purpose |
@@ -226,15 +266,14 @@ DEBUG=atlas:* atlas status
 | [CONFIGURATION.md](docs/CONFIGURATION.md) | Settings |
 | [TUTORIAL.md](docs/TUTORIAL.md) | Getting started |
 | [DIAGRAMS.md](docs/DIAGRAMS.md) | Visual diagrams |
+| [DEMOS.md](docs/DEMOS.md) | Terminal demos |
 
 ## Version History
 
+- **v0.6.2** - Demo GIF CI workflow, GitGateway detached HEAD fix
+- **v0.6.1** - Friendly error messages for session commands
 - **v0.6.0** - Session analytics (`atlas stats`), documentation website
 - **v0.5.6** - Presenter layer, project caching, constants extraction
-- **v0.5.5** - Fix breadcrumb timestamp display
-- **v0.5.3** - Comprehensive documentation, install.sh
-- **v0.5.2** - Template variables and inheritance
-- **v0.5.1** - Park/unpark, template management
-- **v0.5.0** - Configuration system, project templates
+- **v0.5.x** - Park/unpark, templates, configuration wizard
 - **v0.4.x** - ADHD utilities, dashboard redesign
 - **v0.3.x** - Dashboard themes, Pomodoro
