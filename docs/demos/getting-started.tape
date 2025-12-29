@@ -1,5 +1,5 @@
 # Atlas Getting Started Demo
-# Shows the core workflow in ~30 seconds
+# Shows the core workflow: where, session, catch, stats
 
 Output getting-started.gif
 
