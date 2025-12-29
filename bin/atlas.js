@@ -203,9 +203,19 @@ session
       }
     } catch (e) { /* ignore context errors */ }
 
-    const result = await atlasInstance.sessions.start(project);
-    console.log(`🎯 Session started: ${result.project}`);
-    if (result.focus) console.log(`   Focus: ${result.focus}`);
+    try {
+      const result = await atlasInstance.sessions.start(project);
+      console.log(`🎯 Session started: ${result.project}`);
+      if (result.focus) console.log(`   Focus: ${result.focus}`);
+    } catch (error) {
+      if (error.message.includes('Active session exists')) {
+        console.error(`⚠️  Session already active. End it first with: atlas session end`);
+        process.exit(1);
+      } else {
+        console.error(`❌ Error starting session: ${error.message}`);
+        process.exit(1);
+      }
+    }
   });
 
 session
@@ -223,22 +233,31 @@ session
       streakCount = status?.streak?.current || 0;
     } catch (e) { /* ignore */ }
 
-    const result = await atlasInstance.sessions.end(note);
-    console.log(`✓ Session ended (${result.duration})`);
+    try {
+      const result = await atlasInstance.sessions.end(note);
+      console.log(`✓ Session ended (${result.duration})`);
 
-    // Show celebration
-    const celebration = CelebrationHelper.getCelebration({
-      duration,
-      outcome: 'completed',
-      streak: streakCount
-    });
-    console.log(`\n${celebration.emoji} ${celebration.message}`);
-
-    // Show milestones if any
-    if (celebration.milestones.length > 0) {
-      celebration.milestones.forEach(m => {
-        console.log(`   ${m.icon} ${m.message}`);
+      // Show celebration
+      const celebration = CelebrationHelper.getCelebration({
+        duration,
+        outcome: 'completed',
+        streak: streakCount
       });
+      console.log(`\n${celebration.emoji} ${celebration.message}`);
+
+      // Show milestones if any
+      if (celebration.milestones.length > 0) {
+        celebration.milestones.forEach(m => {
+          console.log(`   ${m.icon} ${m.message}`);
+        });
+      }
+    } catch (error) {
+      if (error.message.includes('No active session')) {
+        console.log(`ℹ️  No active session to end`);
+      } else {
+        console.error(`❌ Error ending session: ${error.message}`);
+        process.exit(1);
+      }
     }
   });
 
