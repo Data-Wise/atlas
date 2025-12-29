@@ -9,7 +9,9 @@ import {
   DIALOG_HELP,
   DIALOG_SESSION_PROMPT,
   DIALOG_BREAK_REMINDER,
-  DIALOG_DECISION_HELPER
+  DIALOG_DECISION_HELPER,
+  DIALOG_TASK_PROMPT,
+  DIALOG_TASK_COMPLETE
 } from './constants.js'
 
 // Track active dialogs for cleanup on screen destroy
@@ -320,4 +322,120 @@ export function showDecisionHelper(screen, options, onClose) {
     if (onClose) onClose()
     screen.render()
   })
+}
+
+/**
+ * Show task prompt dialog (for Task-Based Focus)
+ * @param {Object} screen - Blessed screen instance
+ * @param {Function} onSubmit - Callback with task text
+ * @param {Function} onSkip - Callback when skipped
+ */
+export function showTaskPrompt(screen, onSubmit, onSkip) {
+  const promptBox = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: DIALOG_TASK_PROMPT.width,
+    height: DIALOG_TASK_PROMPT.height,
+    tags: true,
+    border: { type: 'line', fg: 'green' },
+    label: ' {bold}🎯 What will you focus on?{/} ',
+    style: { bg: 'black' }
+  })
+
+  const input = blessed.textbox({
+    parent: promptBox,
+    top: 1,
+    left: 1,
+    width: DIALOG_TASK_PROMPT.width - 4,
+    height: 1,
+    style: { fg: 'white', bg: 'black' },
+    inputOnFocus: true
+  })
+
+  const hint = blessed.box({
+    parent: promptBox,
+    bottom: 0,
+    left: 1,
+    width: DIALOG_TASK_PROMPT.width - 4,
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: '{gray-fg}Enter: Submit | Esc: Skip{/}'
+  })
+
+  screen.append(promptBox)
+  registerDialog(promptBox)
+  input.focus()
+  screen.render()
+
+  input.on('submit', (value) => {
+    screen.remove(promptBox)
+    unregisterDialog(promptBox)
+    if (value?.trim() && onSubmit) {
+      onSubmit(value.trim())
+    } else if (onSkip) {
+      onSkip()
+    }
+    screen.render()
+  })
+
+  input.on('cancel', () => {
+    screen.remove(promptBox)
+    unregisterDialog(promptBox)
+    if (onSkip) onSkip()
+    screen.render()
+  })
+}
+
+/**
+ * Show task completion dialog (after Pomodoro completes)
+ * @param {Object} screen - Blessed screen instance
+ * @param {Object} options - Task info
+ * @param {Function} onComplete - Callback with outcome
+ */
+export function showTaskComplete(screen, options, onComplete) {
+  const { task = 'Focus session', sessionNumber = 1, pomodoroMinutes = 25 } = options
+
+  const completeBox = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: DIALOG_TASK_COMPLETE.width,
+    height: DIALOG_TASK_COMPLETE.height,
+    tags: true,
+    border: { type: 'line', fg: 'green' },
+    label: ' {bold}{green-fg}🍅 Pomodoro Complete!{/} ',
+    style: { bg: 'black' },
+    content: `
+
+  {bold}{cyan-fg}Session #${sessionNumber}{/} - ${pomodoroMinutes} minutes
+
+  {bold}Task:{/}
+  "${task.length > 35 ? task.slice(0, 35) + '...' : task}"
+
+  {bold}Did you complete it?{/}
+
+  {green-fg}[c]{/} ✓ Completed
+  {yellow-fg}[p]{/} ◐ Partial progress
+  {blue-fg}[n]{/} → Pivoted to something else
+
+  {gray-fg}Then take a 5-min break!{/}
+    `
+  })
+
+  screen.append(completeBox)
+  registerDialog(completeBox)
+  completeBox.focus()
+  screen.render()
+
+  const cleanup = (outcome) => {
+    screen.remove(completeBox)
+    unregisterDialog(completeBox)
+    if (onComplete) onComplete(outcome)
+    screen.render()
+  }
+
+  completeBox.key(['c'], () => cleanup('completed'))
+  completeBox.key(['p'], () => cleanup('partial'))
+  completeBox.key(['n'], () => cleanup('pivoted'))
+  completeBox.key(['escape', 'enter', 'space'], () => cleanup('completed'))
 }

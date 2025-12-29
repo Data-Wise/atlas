@@ -38,6 +38,8 @@ export const DIALOG_SESSION_PROMPT = { width: 50, height: 3 }
 export const DIALOG_BREAK_REMINDER = { width: 50, height: 12 }
 export const DIALOG_DECISION_HELPER = { width: 60, height: 18 }
 export const DIALOG_FOCUS_TIMER = { width: 50, height: 15 }
+export const DIALOG_TASK_PROMPT = { width: 55, height: 5 }
+export const DIALOG_TASK_COMPLETE = { width: 50, height: 16 }
 
 // Time of day boundaries (hours)
 export const MORNING_START = 6

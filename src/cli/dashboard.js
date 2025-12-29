@@ -105,6 +105,8 @@ export async function runDashboard(atlas, options = {}) {
   let pomodoroMinutes = DEFAULT_POMODORO_MINUTES
   let breakReminder = false
   let timerInterval = null
+  let focusTask = null // Current task for Task-Based Focus
+  let taskOutcomes = [] // Track task completion history
 
   // Theme state
   const themes = {
@@ -1012,19 +1014,80 @@ export async function runDashboard(atlas, options = {}) {
   // ============================================================================
 
   function showFocusMode() {
-    stateMachine.transition(STATES.FOCUS)
-    mainView.hide()
-    detailView.hide()
-    zenView.hide()
-    focusView.show()
-
-    // Start pomodoro if not already running
+    // Show task prompt before starting focus mode
     if (!pomodoroActive) {
+      showTaskPromptDialog()
+    } else {
+      // Already in a Pomodoro, just show focus view
+      stateMachine.transition(STATES.FOCUS)
+      mainView.hide()
+      detailView.hide()
+      zenView.hide()
+      focusView.show()
+      updateFocusTimer()
+      screen.render()
+    }
+  }
+
+  function showTaskPromptDialog() {
+    const promptBox = blessed.box({
+      top: 'center',
+      left: 'center',
+      width: 55,
+      height: 5,
+      tags: true,
+      border: { type: 'line', fg: 'green' },
+      label: ' {bold}🎯 What will you focus on?{/} ',
+      style: { bg: 'black' }
+    })
+
+    const input = blessed.textbox({
+      parent: promptBox,
+      top: 1,
+      left: 1,
+      width: 49,
+      height: 1,
+      style: { fg: 'white', bg: 'black' },
+      inputOnFocus: true
+    })
+
+    const hint = blessed.box({
+      parent: promptBox,
+      bottom: 0,
+      left: 1,
+      width: 49,
+      height: 1,
+      tags: true,
+      style: { fg: 'gray', bg: 'black' },
+      content: '{gray-fg}Enter: Start focus | Esc: Skip{/}'
+    })
+
+    screen.append(promptBox)
+    input.focus()
+    screen.render()
+
+    const startFocus = (task) => {
+      screen.remove(promptBox)
+      focusTask = task || null
+
+      stateMachine.transition(STATES.FOCUS)
+      mainView.hide()
+      detailView.hide()
+      zenView.hide()
+      focusView.show()
       startPomodoro()
+      updateFocusTimer()
+      screen.render()
     }
 
-    updateFocusTimer()
-    screen.render()
+    input.on('submit', (value) => {
+      startFocus(value?.trim() || null)
+    })
+
+    input.on('cancel', () => {
+      screen.remove(promptBox)
+      screen.render()
+    })
   }
 
   function exitFocusMode() {
@@ -1112,6 +1175,13 @@ export async function runDashboard(atlas, options = {}) {
       sessionInfo = `{green-fg}●{/} {bold}${activeSessionProject}{/}`
     }
 
+    // Current task display
+    let taskLine = ''
+    if (focusTask) {
+      const truncatedTask = focusTask.length > 35 ? focusTask.slice(0, 35) + '...' : focusTask
+      taskLine = `{cyan-fg}🎯 ${truncatedTask}{/}\n\n`
+    }
+
     // Status indicator
     const statusIcon = pomodoroActive
       ? (breakReminder ? '{yellow-fg}☕ BREAK TIME{/}' : '{green-fg}● FOCUSING{/}')
@@ -1126,8 +1196,9 @@ export async function runDashboard(atlas, options = {}) {
       : '{gray-fg}Start your first Pomodoro!{/}'
 
     focusTimer.setContent(
-      `\n\n` +
+      `\n` +
       `${sessionInfo}\n\n` +
+      `${taskLine}` +
       `{bold}${statusIcon}{/}\n\n` +
       `{bold}{white-fg}${timeStr}{/}\n\n` +
       `${progressBar}\n\n` +
@@ -1139,11 +1210,14 @@ export async function runDashboard(atlas, options = {}) {
 
   function showBreakReminder() {
     // Record completed Pomodoro in history
-    pomodoroHistory.push({
+    const completedPomodoro = {
       completed: new Date().toISOString(),
       duration: pomodoroMinutes,
-      project: activeSessionProject || 'unknown'
-    })
+      project: activeSessionProject || 'unknown',
+      task: focusTask || null,
+      outcome: null
+    }
+    pomodoroHistory.push(completedPomodoro)
 
     // Play terminal bell
     process.stdout.write('\x07')
@@ -1151,7 +1225,79 @@ export async function runDashboard(atlas, options = {}) {
     // Enable break enforcement
     breakEnforced = true
 
-    // Show break dialog
+    // If there's a task, show task completion dialog
+    if (focusTask) {
+      showTaskCompleteDialog(completedPomodoro)
+    } else {
+      showStandardBreakDialog()
+    }
+  }
+
+  function showTaskCompleteDialog(pomodoro) {
+    const truncatedTask = focusTask.length > 30 ? focusTask.slice(0, 30) + '...' : focusTask
+
+    const completeBox = blessed.box({
+      top: 'center',
+      left: 'center',
+      width: 50,
+      height: 16,
+      tags: true,
+      border: { type: 'line', fg: 'green' },
+      label: ' {bold}{green-fg}🍅 Pomodoro Complete!{/} ',
+      style: { bg: 'black' },
+      content: `
+
+  {bold}{cyan-fg}Session #${pomodoroHistory.length}{/} - ${pomodoroMinutes} minutes
+
+  {bold}Task:{/}
+  "${truncatedTask}"
+
+  {bold}Did you complete it?{/}
+
+  {green-fg}[c]{/} ✓ Completed
+  {yellow-fg}[p]{/} ◐ Partial progress
+  {blue-fg}[n]{/} → Pivoted to something else
+
+  {gray-fg}Then take a 5-min break!{/}
+      `
+    })
+
+    screen.append(completeBox)
+    completeBox.focus()
+    screen.render()
+
+    const handleOutcome = (outcome) => {
+      // Record outcome
+      pomodoro.outcome = outcome
+      taskOutcomes.push({
+        task: focusTask,
+        outcome,
+        timestamp: new Date().toISOString()
+      })
+
+      breakEnforced = false
+      screen.remove(completeBox)
+      focusTask = null // Clear task for next Pomodoro
+      resetPomodoro()
+      focusTimer.focus()
+      screen.render()
+    }
+
+    completeBox.key(['c'], () => handleOutcome('completed'))
+    completeBox.key(['p'], () => handleOutcome('partial'))
+    completeBox.key(['n'], () => handleOutcome('pivoted'))
+    completeBox.key(['enter', 'space'], () => handleOutcome('completed'))
+
+    completeBox.key(['escape', 'q'], () => {
+      pomodoro.outcome = 'skipped'
+      breakEnforced = false
+      screen.remove(completeBox)
+      focusTask = null
+      exitFocusMode()
+    })
+  }
+
+  function showStandardBreakDialog() {
     const breakBox = blessed.box({
       top: 'center',
       left: 'center',
@@ -1165,7 +1311,7 @@ export async function runDashboard(atlas, options = {}) {
 
   {bold}{green-fg}✓ Pomodoro Complete!{/}
 
-  {cyan-fg}Session #{pomodoroHistory.length}{/} - ${pomodoroMinutes} minutes
+  {cyan-fg}Session #${pomodoroHistory.length}{/} - ${pomodoroMinutes} minutes
 
   Take a 5-minute break to:
   • Stretch & move around

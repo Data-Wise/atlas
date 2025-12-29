@@ -3,9 +3,9 @@
 ## Status: active
 ## Phase: 🚧 v0.7.0 Development - Enhanced Focus & Calendar
 ## Priority: 1
-## Progress: 33
+## Progress: 66
 
-## Focus: Session export complete, working on Task-Based Focus
+## Focus: Session export + Task-Based Focus complete, ready for Time Block View
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -165,7 +165,7 @@ atlas dashboard           # Interactive TUI
 
 ## Next Tasks (v0.7.0 - Roadmap)
 - [x] Session export to iCal format (atlas session export)
-- [ ] Task-based focus (set task before Pomodoro)
+- [x] Task-based focus (set task before Pomodoro)
 - [ ] Time block view in dashboard
 
 ## Future Enhancements
@@ -223,6 +223,7 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-29: v0.7.0 Task-Based Focus - dashboard prompts "What will you focus on?"
 - 2025-12-29: v0.7.0 Session Export - atlas session export to iCal (1192 tests)
 - 2025-12-29: v0.6.3 RELEASED - stats export (--export, --format md), 1166 tests
 - 2025-12-29: v0.6.2 RELEASED - Demo GIFs CI workflow, GitGateway fix
