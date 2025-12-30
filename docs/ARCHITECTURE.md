@@ -107,7 +107,9 @@ src/
 │   │   └── GetRecentProjectsUseCase.js
 │   ├── session/                # Session management
 │   │   ├── CreateSessionUseCase.js
-│   │   └── EndSessionUseCase.js
+│   │   ├── EndSessionUseCase.js
+│   │   ├── GetSessionStatsUseCase.js
+│   │   └── ExportSessionsUseCase.js  # v0.7.0: iCal/JSON export
 │   ├── capture/                # Quick capture
 │   │   ├── CaptureIdeaUseCase.js
 │   │   ├── GetInboxUseCase.js
@@ -159,7 +161,8 @@ src/
 │           ├── MainView.js     # Card-based project list
 │           ├── DetailView.js   # Project details panel
 │           ├── FocusView.js    # Pomodoro timer view
-│           └── ZenView.js      # Minimal focus mode
+│           ├── ZenView.js      # Minimal focus mode
+│           └── TimelineView.js # Time block visualization (v0.7.0)
 │
 ├── utils/                       # Shared utilities
 │   ├── Config.js               # Configuration management

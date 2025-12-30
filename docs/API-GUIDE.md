@@ -328,6 +328,52 @@ stats.byProject.forEach(p => {
 });
 ```
 
+### Session Export (v0.7.0)
+
+```javascript
+const result = await atlas.sessions.export(options);
+```
+
+**Parameters:**
+- `options` (object):
+  - `days` (number): Days to export (default: 30)
+  - `project` (string): Filter by project
+  - `period` (string): Preset period (`week`, `month`, `year`, `all`)
+  - `format` (string): Output format (`ical`, `json`)
+
+**Returns:** Object with:
+- `content`: iCal string or JSON string
+- `sessions`: Number of sessions exported
+- `format`: Format used
+
+**Example:**
+```javascript
+// Export to iCal format
+const { content } = await atlas.sessions.export({
+  days: 30,
+  format: 'ical'
+});
+
+// Write to file
+import { writeFileSync } from 'fs';
+writeFileSync('sessions.ics', content);
+
+// Export specific project as JSON
+const result = await atlas.sessions.export({
+  project: 'myproject',
+  days: 60,
+  format: 'json'
+});
+const sessions = JSON.parse(result.content);
+console.log(`Exported ${sessions.length} sessions`);
+```
+
+**iCal Output:**
+The iCal export follows RFC 5545 and works with:
+- Apple Calendar (double-click .ics file)
+- Google Calendar (Settings → Import)
+- Outlook (File → Import)
+
 ---
 
 ## Capture API
