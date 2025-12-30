@@ -149,7 +149,7 @@ test_json() {
 
 echo -e "${BOLD}"
 echo "╔═══════════════════════════════════════════════════════════╗"
-echo "║     ATLAS - Non-Interactive Dogfooding Test v0.6.0       ║"
+echo "║     ATLAS - Non-Interactive Dogfooding Test v0.7.0       ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo -e "${DIM}Using: $ATLAS${NC}"
@@ -162,7 +162,7 @@ echo -e "${DIM}Test dir: $TEST_DIR${NC}"
 header "1. Version & Help"
 
 test_matches "Version format" "$ATLAS --version" "^[0-9]+\.[0-9]+\.[0-9]+$"
-test_contains "Version is 0.6.x" "$ATLAS --version" "0.6"
+test_contains "Version is 0.7.x" "$ATLAS --version" "0.7"
 test_contains "Help shows usage" "$ATLAS --help" "Usage: atlas"
 test_contains "Help shows session cmd" "$ATLAS --help" "session"
 test_contains "Help shows project cmd" "$ATLAS --help" "project"
