@@ -4,8 +4,8 @@
  * Migrates data between storage backends (FileSystem ↔ SQLite)
  */
 
-import { join } from 'path'
-import { existsSync } from 'fs'
+import { join } from 'node:path'
+import { existsSync } from 'node:fs'
 import { readFile } from 'fs/promises'
 
 // Import repositories

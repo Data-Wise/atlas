@@ -4,8 +4,8 @@
  */
 
 import { readFile, writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { Capture } from '../../domain/entities/Capture.js';
 
 export class FileSystemCaptureRepository {

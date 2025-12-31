@@ -6,8 +6,8 @@
  */
 
 import { readFile, writeFile } from 'fs/promises'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 
 export class StatusFileGateway {
   /**

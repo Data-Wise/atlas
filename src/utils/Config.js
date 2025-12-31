@@ -10,8 +10,8 @@
  */
 
 import { readFile, writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import { join } from 'path'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 
 const DEFAULT_CONFIG = {
   scanPaths: [`${process.env.HOME}/projects`],

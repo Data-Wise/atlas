@@ -10,8 +10,8 @@
  * For production, could use a library like awilix or bottlejs.
  */
 
-import { join } from 'path'
-import { homedir } from 'os'
+import { join } from 'node:path'
+import { homedir } from 'node:os'
 
 // FileSystem repositories
 import { FileSystemSessionRepository } from './repositories/FileSystemSessionRepository.js'
