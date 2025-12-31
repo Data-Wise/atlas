@@ -531,6 +531,61 @@ atlas trail --days 30
 
 ---
 
+## Daily Planning (v0.8.0+)
+
+### `atlas plan`
+
+Start the morning ritual - a guided daily planning flow.
+
+```bash
+atlas plan [options]
+
+Options:
+  -e, --ecosystem <path>    Scan ecosystem path for project statuses
+```
+
+**Examples:**
+```bash
+# Start morning planning ritual
+atlas plan
+
+# Include ecosystem scan
+atlas plan --ecosystem ~/projects/dev-tools
+```
+
+**The planning ritual includes:**
+- Yesterday's work summary
+- Current streak display
+- Inbox items for quick triage
+- Smart suggestions for today
+- Energy level selection (high/medium/low)
+- Focus selection for the day
+
+**Output:**
+```
+🌅 Morning Planning Ritual
+═══════════════════════════════════════════════════
+
+Yesterday's Sessions:
+  atlas     2h 15m  ████████████░░░░  Completed: Phase 5 dashboard
+  flow-cli  45m     █████░░░░░░░░░░░  WIP: Template system
+
+🔥 Current streak: 5 days
+
+📥 Inbox (3 items):
+  • Check VanderWeele appendix (idea)
+  • Add rate limiting (task)
+  • Safari login bug (bug)
+
+💡 Suggestions:
+  → Continue atlas session (2h 15m yesterday)
+  → Triage 3 inbox items
+
+Energy level today? [H]igh / [M]edium / [L]ow
+```
+
+---
+
 ## Context Parking (v0.5.1+)
 
 ### `atlas park`
@@ -637,6 +692,8 @@ atlas dash
 | `d` | Decision helper |
 | `t` | Cycle themes |
 | `T` | Timeline view (time blocks) |
+| `e` | Ecosystem view (v0.8.0) |
+| `p` | Plan view - morning ritual (v0.8.0) |
 | `z` | Zen mode |
 | `q` | Quit |
 | `?` | Show help |
@@ -669,6 +726,24 @@ Press `T` (Shift+T) to enter the time block view:
 - Color-coded by project
 - Shows session durations and gaps
 - Helps identify work patterns
+
+**Ecosystem View (v0.8.0):**
+
+Press `e` to see all projects across your ecosystem:
+- Scans ~/projects/dev-tools for .STATUS files
+- Shows project status, progress, and priority
+- Displays focus/next action for selected project
+- Navigate with arrow keys, `Enter` for detail
+- Useful for managing 10+ projects
+
+**Plan View (v0.8.0):**
+
+Press `p` to enter the morning planning ritual:
+- Yesterday's session summary
+- Current streak display
+- Inbox items pending triage
+- Smart suggestions based on history
+- Helps start the day with intention
 
 ---
 

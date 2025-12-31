@@ -114,7 +114,8 @@ src/
 │   │   ├── CreateSessionUseCase.js
 │   │   ├── EndSessionUseCase.js
 │   │   ├── GetSessionStatsUseCase.js
-│   │   └── ExportSessionsUseCase.js  # v0.7.0: iCal/JSON export
+│   │   ├── ExportSessionsUseCase.js  # v0.7.0: iCal/JSON export
+│   │   └── PlanDayUseCase.js         # v0.8.0: Morning ritual data
 │   ├── capture/                # Quick capture
 │   │   ├── CaptureIdeaUseCase.js
 │   │   ├── GetInboxUseCase.js
@@ -143,7 +144,8 @@ src/
 │   │   ├── SQLiteCaptureRepository.js
 │   │   └── SQLiteBreadcrumbRepository.js
 │   ├── gateways/               # External system interfaces
-│   │   └── StatusFileGateway.js
+│   │   ├── StatusFileGateway.js
+│   │   └── StatusFileParser.js # .STATUS file YAML parser (v0.8.0)
 │   ├── presenters/             # Formatting and presentation logic
 │   │   ├── ProjectPresenter.js # UI-agnostic formatters
 │   │   ├── TuiPresenter.js     # blessed-specific formatters
@@ -167,7 +169,9 @@ src/
 │           ├── DetailView.js   # Project details panel
 │           ├── FocusView.js    # Pomodoro timer view
 │           ├── ZenView.js      # Minimal focus mode
-│           └── TimelineView.js # Time block visualization (v0.7.0)
+│           ├── TimelineView.js # Time block visualization (v0.7.0)
+│           ├── EcosystemView.js # Multi-project ecosystem view (v0.8.0)
+│           └── PlanView.js     # Morning ritual planning view (v0.8.0)
 │
 ├── mcp/                         # Model Context Protocol server (v0.7.0)
 │   ├── index.js                # MCP server entry point
@@ -555,6 +559,53 @@ graph TB
     Dashboard --> Streak
     Dashboard --> Time
 ```
+
+## Dashboard State Machine (v0.8.0)
+
+The dashboard uses a state machine pattern for view management:
+
+```mermaid
+stateDiagram-v2
+    [*] --> BROWSE
+    BROWSE --> DETAIL: Enter on project
+    BROWSE --> FOCUS: f key
+    BROWSE --> ZEN: z key
+    BROWSE --> TIMELINE: T key
+    BROWSE --> ECOSYSTEM: e key
+    BROWSE --> PLAN: p key
+
+    DETAIL --> BROWSE: Escape
+    DETAIL --> FOCUS: f key
+
+    FOCUS --> BROWSE: Escape
+    FOCUS --> ZEN: z key
+
+    ZEN --> BROWSE: Escape
+    ZEN --> FOCUS: f key
+
+    TIMELINE --> BROWSE: Escape
+    TIMELINE --> FOCUS: f key
+
+    ECOSYSTEM --> BROWSE: Escape
+    ECOSYSTEM --> DETAIL: Enter on project
+    ECOSYSTEM --> FOCUS: f key
+
+    PLAN --> BROWSE: Escape
+    PLAN --> FOCUS: Start session
+```
+
+**States:**
+| State | View | Purpose |
+|-------|------|---------|
+| `BROWSE` | MainView | Default card-based project list |
+| `DETAIL` | DetailView | Single project details panel |
+| `FOCUS` | FocusView | Pomodoro timer with task |
+| `ZEN` | ZenView | Minimal distraction mode |
+| `TIMELINE` | TimelineView | Time block visualization |
+| `ECOSYSTEM` | EcosystemView | Multi-project ecosystem overview |
+| `PLAN` | PlanView | Morning ritual daily planning |
+
+**Implementation:** `src/cli/dashboard/stateMachine.js`
 
 ## Template System
 

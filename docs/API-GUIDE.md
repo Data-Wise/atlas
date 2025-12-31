@@ -374,6 +374,48 @@ The iCal export follows RFC 5545 and works with:
 - Google Calendar (Settings → Import)
 - Outlook (File → Import)
 
+### Plan Day (v0.8.0)
+
+```javascript
+const plan = await atlas.sessions.planDay(options);
+```
+
+**Parameters:**
+- `options` (object):
+  - `ecosystemPath` (string): Path to scan for .STATUS files
+
+**Returns:** Planning data object with:
+- `yesterdaySessions`: Array of yesterday's sessions
+- `streak`: Current streak info
+- `inboxItems`: Pending inbox captures
+- `suggestions`: Smart suggestions for today
+- `parkedContexts`: Any parked work contexts
+
+**Example:**
+```javascript
+// Get daily planning data
+const plan = await atlas.sessions.planDay();
+
+console.log(`🔥 Streak: ${plan.streak.display}`);
+console.log(`📥 ${plan.inboxItems.length} inbox items`);
+
+// Show yesterday's work
+plan.yesterdaySessions.forEach(s => {
+  console.log(`  ${s.project}: ${s.duration}m`);
+});
+
+// Show suggestions
+plan.suggestions.forEach(s => {
+  console.log(`💡 ${s.text}`);
+});
+
+// With ecosystem scan
+const ecoplan = await atlas.sessions.planDay({
+  ecosystemPath: '~/projects/dev-tools'
+});
+console.log(`Found ${ecoplan.ecosystemProjects.length} ecosystem projects`);
+```
+
 ---
 
 ## Capture API
@@ -579,6 +621,41 @@ const result2 = await atlas.sync({
   removeOrphans: true
 });
 ```
+
+### StatusFileParser (v0.8.0)
+
+Directly parse .STATUS files from any directory:
+
+```javascript
+const parser = atlas.container.resolve('StatusFileParser');
+
+// Parse a single .STATUS file
+const status = await parser.parse('/path/to/.STATUS');
+console.log(status.name);      // Project name
+console.log(status.status);    // "active"
+console.log(status.progress);  // 75
+console.log(status.focus);     // Current focus text
+console.log(status.next);      // Next action
+
+// Scan a directory tree for .STATUS files
+const results = await parser.scanDirectory('~/projects/dev-tools', {
+  maxDepth: 2  // Limit recursion depth
+});
+
+results.forEach(({ path, parsed }) => {
+  console.log(`${parsed.name}: ${parsed.status} (${parsed.progress}%)`);
+});
+```
+
+**Parsed fields:**
+- `name` (string): Project name from file
+- `type` (string): Project type (node, r-package, etc.)
+- `status` (string): Status value
+- `progress` (number): 0-100 percentage
+- `priority` (number): 1-3 priority level
+- `phase` (string): Current phase text
+- `focus` (string): Current focus text
+- `next` (string): Next action item
 
 ---
 
