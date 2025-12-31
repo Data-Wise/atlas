@@ -31,3 +31,6 @@ npm-debug.log*
 
 # Atlas data (local only)
 .atlas-local/
+
+# Claude Code local settings
+.claude/
