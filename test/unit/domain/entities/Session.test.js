@@ -331,8 +331,66 @@ describe('Session Entity', () => {
         duration: expect.any(Number),
         state: 'active',
         outcome: null,
-        isFlowState: false
+        isFlowState: false,
+        energyLevel: null
       })
+    })
+
+    test('getSummary includes energyLevel when set', () => {
+      const session = new Session('id-1', 'rmediation', {
+        task: 'Focus work',
+        energyLevel: 'high'
+      })
+
+      const summary = session.getSummary()
+
+      expect(summary.energyLevel).toBe('high')
+    })
+  })
+
+  describe('Energy Level', () => {
+    test('creates session with energyLevel', () => {
+      const session = new Session('id-1', 'rmediation', {
+        energyLevel: 'high'
+      })
+
+      expect(session.energyLevel).toBe('high')
+    })
+
+    test('energyLevel defaults to null', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      expect(session.energyLevel).toBeNull()
+    })
+
+    test('accepts valid energy levels: high, medium, low', () => {
+      const high = new Session('id-1', 'p', { energyLevel: 'high' })
+      const medium = new Session('id-2', 'p', { energyLevel: 'medium' })
+      const low = new Session('id-3', 'p', { energyLevel: 'low' })
+
+      expect(high.energyLevel).toBe('high')
+      expect(medium.energyLevel).toBe('medium')
+      expect(low.energyLevel).toBe('low')
+    })
+
+    test('throws error for invalid energy level', () => {
+      expect(() => new Session('id-1', 'rmediation', {
+        energyLevel: 'super'
+      })).toThrow('Invalid energy level: super')
+    })
+
+    test('setEnergyLevel updates energy level', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      session.setEnergyLevel('medium')
+
+      expect(session.energyLevel).toBe('medium')
+    })
+
+    test('setEnergyLevel throws for invalid level', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      expect(() => session.setEnergyLevel('extreme')).toThrow('Invalid energy level: extreme')
     })
   })
 })

@@ -38,6 +38,9 @@ export class Session {
     this.outcome = null
     this.context = options.context || {}
 
+    // ADHD-friendly: track energy level for task matching
+    this.energyLevel = options.energyLevel || null // high, medium, low, or null
+
     // Domain events (not persisted)
     this._events = []
 
@@ -64,6 +67,12 @@ export class Session {
 
     if (this.task && this.task.length > 500) {
       throw new Error('Task description too long (max 500 characters)')
+    }
+
+    // Validate energy level if provided
+    const validEnergyLevels = ['high', 'medium', 'low']
+    if (this.energyLevel && !validEnergyLevels.includes(this.energyLevel)) {
+      throw new Error(`Invalid energy level: ${this.energyLevel}. Must be one of: ${validEnergyLevels.join(', ')}`)
     }
   }
 
@@ -196,7 +205,20 @@ export class Session {
       duration: this.getDuration(),
       state: this.state.value,
       outcome: this.outcome,
-      isFlowState: this.isInFlowState()
+      isFlowState: this.isInFlowState(),
+      energyLevel: this.energyLevel
     }
+  }
+
+  /**
+   * Set energy level for the session
+   * @param {string} level - Energy level (high, medium, low)
+   */
+  setEnergyLevel(level) {
+    const validEnergyLevels = ['high', 'medium', 'low']
+    if (!validEnergyLevels.includes(level)) {
+      throw new Error(`Invalid energy level: ${level}. Must be one of: ${validEnergyLevels.join(', ')}`)
+    }
+    this.energyLevel = level
   }
 }
