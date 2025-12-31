@@ -1,11 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.8.0 Phase 1 Complete - Ecosystem Hub
+## Phase: 🚀 v0.8.0 Phase 2 Complete - Morning Ritual
 ## Priority: 1
-## Progress: 80
+## Progress: 100
 
-## Focus: Phase 1 complete (StatusFileParser wired); Next: Phase 2 (Morning Ritual)
+## Focus: All phases complete! Ready for v0.8.0 release
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -180,10 +180,10 @@ atlas dashboard           # Interactive TUI
 - [x] `atlas sync --from-status` command (finds 23 projects)
 - [x] EcosystemView wired to StatusFileParser for real data
 
-### Phase 2: ADHD Depth - Morning Ritual
-- [ ] `atlas plan` command with guided daily planning
-- [ ] Add energyLevel to Session entity
-- [ ] PlanView in dashboard
+### Phase 2: ADHD Depth - Morning Ritual ✅
+- [x] `atlas plan` command with guided daily planning
+- [x] Add energyLevel to Session entity
+- [x] PlanView in dashboard ('p' key)
 
 ### Phase 3: Time Estimation ✅
 - [x] Add estimatedMinutes to Session
@@ -256,6 +256,13 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-30: v0.8.0 Phase 2 COMPLETE - Morning Ritual
+  - PlanDayUseCase already implemented (gets yesterday, streak, inbox, suggestions)
+  - Session.energyLevel already implemented (high/medium/low)
+  - `atlas plan` CLI already working with ecosystem scan
+  - Created PlanView dashboard component ('p' key)
+  - PLAN state added to stateMachine with transitions
+  - 54 stateMachine tests, 181 dashboard tests passing
 - 2025-12-30: v0.8.0 Phase 1 COMPLETE - Ecosystem Hub
   - StatusFileParser already implemented (35 tests)
   - SyncFromStatusUseCase already implemented
