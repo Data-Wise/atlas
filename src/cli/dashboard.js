@@ -805,6 +805,102 @@ export async function runDashboard(atlas, options = {}) {
   let ecosystemSelectedIndex = 0
 
   // ============================================================================
+  // PLAN VIEW (Morning Ritual)
+  // ============================================================================
+
+  const planView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Plan title bar
+  const planTitle = blessed.box({
+    parent: planView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Yesterday summary
+  const planYesterday = blessed.box({
+    parent: planView,
+    top: 2,
+    left: 1,
+    width: '48%',
+    height: 6,
+    tags: true,
+    border: { type: 'line', fg: 'gray' },
+    label: ' 📅 Yesterday ',
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Streak display
+  const planStreak = blessed.box({
+    parent: planView,
+    top: 2,
+    right: 1,
+    width: '48%',
+    height: 6,
+    tags: true,
+    border: { type: 'line', fg: 'gray' },
+    label: ' 🔥 Streak ',
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Suggestions list
+  const planSuggestions = blessed.box({
+    parent: planView,
+    top: 9,
+    left: 1,
+    width: '100%-2',
+    height: '50%-3',
+    tags: true,
+    border: { type: 'line', fg: 'cyan' },
+    label: ' 💡 Suggestions ',
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: { ch: '│', style: { fg: 'gray' } },
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Stats footer
+  const planStats = blessed.box({
+    parent: planView,
+    bottom: 2,
+    left: 1,
+    width: '100%-2',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' }
+  })
+
+  // Command bar
+  const planCommandBar = blessed.box({
+    parent: planView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}↑↓{/} Navigate  {cyan-fg}Enter{/} Execute  {cyan-fg}e{/} Energy  {cyan-fg}s{/} Start Session  {cyan-fg}Esc{/} Back'
+  })
+
+  screen.append(planView)
+
+  // Plan state
+  let planData = null
+  let planSelectedIndex = 0
+  let planEnergyLevel = null
+
+  // ============================================================================
   // HELPER FUNCTIONS
   // ============================================================================
 
@@ -1865,6 +1961,130 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // PLAN VIEW (Morning Ritual)
+  // ============================================================================
+
+  async function showPlanView() {
+    stateMachine.transition(STATES.PLAN)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.hide()
+    timelineView.hide()
+    ecosystemView.hide()
+    planView.show()
+
+    await updatePlanDisplay()
+    screen.render()
+  }
+
+  function exitPlanView() {
+    stateMachine.transition(STATES.BROWSE)
+    planView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  async function updatePlanDisplay() {
+    // Get plan data using PlanDayUseCase
+    const planUseCase = atlas.container.resolve('PlanDayUseCase')
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
+
+    try {
+      planData = await planUseCase.execute({
+        ecosystemPath: join(homedir(), 'projects', 'dev-tools')
+      })
+    } catch (error) {
+      planData = { greeting: 'Hello!', suggestions: [], inbox: [], parkedContexts: [], activeProjects: [] }
+    }
+
+    planSelectedIndex = Math.min(planSelectedIndex, Math.max(0, (planData.suggestions?.length || 1) - 1))
+
+    // Title with greeting
+    const greeting = planData.greeting || 'Hello!'
+    const energyStr = planEnergyLevel ? `{cyan-fg}Energy: ${planEnergyLevel}{/}` : '{gray-fg}Energy: not set{/}'
+    planTitle.setContent(` {bold}${greeting}{/}  ─────────────────────────  ${energyStr}`)
+
+    // Yesterday summary
+    const yesterday = planData.yesterday || {}
+    if (yesterday.hasSessions) {
+      planYesterday.setContent(
+        ` {white-fg}${yesterday.sessionCount} sessions{/}\n` +
+        ` {cyan-fg}${yesterday.hours}h ${yesterday.minutes}m{/} total\n` +
+        ` {green-fg}${yesterday.completionRate}%{/} completed\n` +
+        ` Last: {yellow-fg}${yesterday.lastProject || 'unknown'}{/}`
+      )
+    } else {
+      planYesterday.setContent(
+        ` {gray-fg}No sessions yesterday{/}\n\n` +
+        ` {yellow-fg}Fresh start today!{/}`
+      )
+    }
+
+    // Streak display
+    const streak = planData.streak || {}
+    const streakDisplay = streak.display || '🔥'
+    planStreak.setContent(
+      ` Current: {bold}{green-fg}${streak.current || 0} days{/}\n` +
+      ` Longest: {cyan-fg}${streak.longest || 0} days{/}\n` +
+      ` ${streakDisplay}\n` +
+      ` {gray-fg}${streak.message || ''}{/}`
+    )
+
+    // Suggestions
+    const suggestions = planData.suggestions || []
+    const lines = []
+    const SUGGESTION_ICONS = {
+      unpark: '⏸️',
+      triage: '📥',
+      focus: '🎯',
+      continue: '▶️',
+      streak: '🔥'
+    }
+
+    if (suggestions.length === 0) {
+      lines.push(' {gray-fg}No suggestions - start fresh!{/}')
+    } else {
+      suggestions.forEach((s, i) => {
+        const isSelected = i === planSelectedIndex
+        const prefix = isSelected ? '{inverse} ► {/}' : '   '
+        const icon = SUGGESTION_ICONS[s.type] || '💡'
+
+        lines.push(`${prefix}${icon} {white-fg}${s.message}{/}`)
+        if (s.action && isSelected) {
+          lines.push(`     {cyan-fg}→ ${s.action}{/}`)
+        }
+        lines.push('')
+      })
+    }
+
+    planSuggestions.setContent(lines.join('\n'))
+
+    // Stats footer
+    const inboxCount = planData.inbox?.length || 0
+    const parkedCount = planData.parkedContexts?.length || 0
+    const activeCount = planData.activeProjects?.length || 0
+
+    planStats.setContent(
+      ` {cyan-fg}📥 ${inboxCount} inbox{/}  │  ` +
+      `{yellow-fg}⏸️ ${parkedCount} parked{/}  │  ` +
+      `{green-fg}🟢 ${activeCount} active{/}`
+    )
+
+    screen.render()
+  }
+
+  function cyclePlanEnergyLevel() {
+    const levels = [null, 'high', 'medium', 'low']
+    const currentIndex = levels.indexOf(planEnergyLevel)
+    planEnergyLevel = levels[(currentIndex + 1) % levels.length]
+    updatePlanDisplay()
+    return planEnergyLevel
+  }
+
+  // ============================================================================
   // DECISION HELPER
   // ============================================================================
 
@@ -2033,6 +2253,8 @@ export async function runDashboard(atlas, options = {}) {
       exitTimelineView()
     } else if (stateMachine.is(STATES.ECOSYSTEM)) {
       exitEcosystemView()
+    } else if (stateMachine.is(STATES.PLAN)) {
+      exitPlanView()
     } else if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
     }
@@ -2259,6 +2481,15 @@ export async function runDashboard(atlas, options = {}) {
       showEcosystemView()
     } else if (stateMachine.is(STATES.ECOSYSTEM)) {
       exitEcosystemView()
+    }
+  })
+
+  // Plan view (morning ritual): p key
+  screen.key(['p'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showPlanView()
+    } else if (stateMachine.is(STATES.PLAN)) {
+      exitPlanView()
     }
   })
 
