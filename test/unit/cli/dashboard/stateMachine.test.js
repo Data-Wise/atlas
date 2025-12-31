@@ -15,10 +15,11 @@ describe('Dashboard State Machine', () => {
       expect(STATES.FOCUS).toBe('focus')
       expect(STATES.ZEN).toBe('zen')
       expect(STATES.TIMELINE).toBe('timeline')
+      expect(STATES.ECOSYSTEM).toBe('ecosystem')
     })
 
-    it('should have exactly 5 states', () => {
-      expect(Object.keys(STATES)).toHaveLength(5)
+    it('should have exactly 6 states', () => {
+      expect(Object.keys(STATES)).toHaveLength(6)
     })
   })
 
@@ -162,6 +163,27 @@ describe('Dashboard State Machine', () => {
       const sm = createStateMachine({ initial: STATES.TIMELINE })
       expect(sm.transition(STATES.BROWSE)).toBe(true)
     })
+
+    it('should allow BROWSE -> ECOSYSTEM', () => {
+      const sm = createStateMachine()
+      expect(sm.transition(STATES.ECOSYSTEM)).toBe(true)
+      expect(sm.getState()).toBe(STATES.ECOSYSTEM)
+    })
+
+    it('should allow ECOSYSTEM -> BROWSE', () => {
+      const sm = createStateMachine({ initial: STATES.ECOSYSTEM })
+      expect(sm.transition(STATES.BROWSE)).toBe(true)
+    })
+
+    it('should allow ECOSYSTEM -> DETAIL', () => {
+      const sm = createStateMachine({ initial: STATES.ECOSYSTEM })
+      expect(sm.transition(STATES.DETAIL)).toBe(true)
+    })
+
+    it('should allow ECOSYSTEM -> FOCUS', () => {
+      const sm = createStateMachine({ initial: STATES.ECOSYSTEM })
+      expect(sm.transition(STATES.FOCUS)).toBe(true)
+    })
   })
 
   describe('canTransition()', () => {
@@ -171,6 +193,7 @@ describe('Dashboard State Machine', () => {
       expect(sm.canTransition(STATES.FOCUS)).toBe(true)
       expect(sm.canTransition(STATES.ZEN)).toBe(true)
       expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
+      expect(sm.canTransition(STATES.ECOSYSTEM)).toBe(true)
     })
 
     it('should return false for disallowed transitions', () => {
