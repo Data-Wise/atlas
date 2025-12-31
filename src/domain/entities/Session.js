@@ -72,8 +72,9 @@ export class Session {
    * @param {string} outcome - Session outcome (completed, cancelled, interrupted)
    */
   end(outcome = 'completed') {
-    if (this.state.isEnded()) {
-      throw new Error('Session is already ended')
+    const newState = new SessionState(SessionState.ENDED)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot end session: invalid transition from '${this.state.value}' to 'ended'`)
     }
 
     const validOutcomes = ['completed', 'cancelled', 'interrupted']
@@ -82,7 +83,7 @@ export class Session {
     }
 
     this.endTime = new Date()
-    this.state = new SessionState(SessionState.ENDED)
+    this.state = newState
     this.outcome = outcome
 
     this._events.push(new SessionEndedEvent(this.id, outcome, this.getDuration()))
@@ -92,12 +93,13 @@ export class Session {
    * Business Rule: Pause active session
    */
   pause() {
-    if (!this.state.isActive()) {
-      throw new Error('Can only pause active sessions')
+    const newState = new SessionState(SessionState.PAUSED)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot pause session: invalid transition from '${this.state.value}' to 'paused'`)
     }
 
     this.pausedAt = new Date()
-    this.state = new SessionState(SessionState.PAUSED)
+    this.state = newState
 
     this._events.push(new SessionPausedEvent(this.id))
   }
@@ -106,8 +108,9 @@ export class Session {
    * Business Rule: Resume paused session
    */
   resume() {
-    if (!this.state.isPaused()) {
-      throw new Error('Can only resume paused sessions')
+    const newState = new SessionState(SessionState.ACTIVE)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot resume session: invalid transition from '${this.state.value}' to 'active'`)
     }
 
     if (this.pausedAt) {
@@ -117,7 +120,7 @@ export class Session {
 
     this.resumedAt = new Date()
     this.pausedAt = null
-    this.state = new SessionState(SessionState.ACTIVE)
+    this.state = newState
 
     this._events.push(new SessionResumedEvent(this.id))
   }
