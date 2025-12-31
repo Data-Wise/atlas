@@ -1742,30 +1742,34 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   async function updateEcosystemDisplay() {
-    // Get all registered projects
-    ecosystemProjects = allProjects || []
+    // Use StatusFileParser to scan for .STATUS files in dev-tools ecosystem
+    const statusFileParser = atlas.container.resolve('StatusFileParser')
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
 
-    // Parse .STATUS data for each project (simplified inline parsing)
-    const projectsWithStatus = ecosystemProjects.map(p => {
-      const statusData = {
-        name: p.name || 'Unknown',
-        path: p.path,
-        type: p.type?.value || 'unknown',
-        status: 'unknown',
-        progress: 0,
-        priority: 3,
-        phase: ''
-      }
+    // Scan ~/projects/dev-tools for .STATUS files
+    const rootPath = join(homedir(), 'projects', 'dev-tools')
+    let scanResults = []
 
-      // Check if project has metadata with status info
-      if (p.metadata) {
-        if (p.metadata.status) statusData.status = p.metadata.status
-        if (p.metadata.progress) statusData.progress = p.metadata.progress
-        if (p.metadata.priority) statusData.priority = p.metadata.priority
-      }
+    try {
+      scanResults = await statusFileParser.scanDirectory(rootPath, { maxDepth: 2 })
+    } catch (error) {
+      // Fall back to registered projects if scan fails
+      scanResults = []
+    }
 
-      return statusData
-    })
+    // Convert scan results to project format
+    const projectsWithStatus = scanResults.map(({ path, parsed }) => ({
+      name: parsed.name || 'Unknown',
+      path: path,
+      type: parsed.type || 'unknown',
+      status: parsed.status || 'unknown',
+      progress: parsed.progress || 0,
+      priority: parsed.priority || 3,
+      phase: parsed.phase || '',
+      focus: parsed.focus || '',
+      next: parsed.next || ''
+    }))
 
     // Sort: active first, then by priority, then by name
     projectsWithStatus.sort((a, b) => {
@@ -1837,6 +1841,13 @@ export async function runDashboard(atlas, options = {}) {
           `{${priorityColor}-fg}P${project.priority}{/} ` +
           `{gray-fg}${typeStr}{/}`
         )
+
+        // Show focus/next for selected project
+        if (isSelected && (project.focus || project.next)) {
+          const detail = project.focus || project.next
+          const truncated = detail.length > 50 ? detail.slice(0, 47) + '...' : detail
+          lines.push(`     {cyan-fg}→ ${truncated}{/}`)
+        }
 
         globalIndex++
       }
