@@ -4,9 +4,10 @@
 
 ---
 
-## The 5 Commands You'll Use Daily
+## The 6 Commands You'll Use Daily
 
 ```bash
+atlas plan              # Morning planning (v0.8.0)
 atlas session start     # Start working
 atlas catch "idea"      # Capture thought
 atlas where             # Where was I?
@@ -92,6 +93,13 @@ flowchart LR
 | `session export` | Export to iCal | `atlas session export sessions.ics` |
 | `session export --format json` | Export as JSON | `atlas session export --format json` |
 
+### Morning Ritual (v0.8.0)
+
+| Command | What it does | Example |
+|---------|-------------|---------|
+| `plan` | Guided daily planning | `atlas plan` |
+| `sync --from-status` | Import from .STATUS files | `atlas sync --from-status` |
+
 ### Projects
 
 | Command | What it does | Example |
@@ -111,17 +119,21 @@ Start dashboard: `atlas dash`
 | `j` / `k` | Navigate up/down |
 | `Enter` | Select project |
 | `s` | Start session |
-| `e` | End session |
 | `c` | Quick capture |
-| `p` | Start Pomodoro |
 | `f` | Toggle focus mode |
 | `z` | Toggle zen mode |
 | `t` | Cycle theme |
 | `T` | Timeline view |
+| `e` | Ecosystem view (v0.8.0) |
+| `p` | Plan view (v0.8.0) |
 | `?` | Show help |
 | `q` | Quit |
 
-**Focus Mode (v0.7.0):**
+**v0.8.0 Views:**
+- `e` - Ecosystem: See all dev-tools projects from .STATUS files
+- `p` - Plan: Morning ritual with yesterday's work, inbox, focus
+
+**Focus Mode:**
 - Prompts "What will you focus on?" before timer
 - Shows task during Pomodoro
 - After completion: `c` (done), `p` (partial), `n` (pivoted)
@@ -130,10 +142,10 @@ Start dashboard: `atlas dash`
 
 ## Common Workflows
 
-### Morning Start
+### Morning Start (v0.8.0)
 ```bash
-atlas where              # Remember yesterday
-atlas session start      # Begin work
+atlas plan               # Guided planning (shows yesterday, inbox, streak)
+atlas session start      # Begin work with focus set
 ```
 
 ### Got an Idea
@@ -241,5 +253,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.7.0 | Made for ADHD brains</em>
+<em>Atlas v0.8.0 | Made for ADHD brains</em>
 </div>

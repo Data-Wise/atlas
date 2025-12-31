@@ -2,60 +2,52 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2025-12-30
+**Last Updated:** 2025-12-31
 
 ---
 
-## Current Version: v0.7.0
+## Current Version: v0.8.0
 
-Task-based focus, session export to iCal, timeline view, and MCP server.
-
----
-
-## v0.7.1 - Polish & Integration (Next)
-
-**Theme:** MCP enhancements, documentation, stability
-
-### Planned Features
-- [ ] Morning planning command (`atlas plan`)
-- [ ] Time estimation tracking (estimated vs actual)
-- [ ] Energy level tracking for sessions
-- [ ] Ecosystem dashboard view (.STATUS file scanning)
-
-### Nice to Have
-- [ ] Calendar Import - Import time blocks from iCal
-- [ ] Desktop Notifications - Break reminders, streak alerts
-- [ ] Multi-Pomodoro Tracking - Track completed pomodoros per session
-
-### Future Considerations
-- [ ] Google Calendar Sync (two-way)
-- [ ] Web Dashboard (REST API + browser)
-- [ ] Apple Notes Sync (daily summary)
-- [ ] GitHub Activity Correlation
+Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 ---
 
-## v0.8.0 - Dashboard Evolution
+## v0.9.0 - TUI Modernization + Visual Evolution (Next)
 
-### Plan D: Multi-Panel Layout
-- [ ] Split layout option (sidebar + main panel)
-- [ ] Triple layout for power users
-- [ ] Panel resize with keyboard
-- [ ] Persistent layout preference
+**Theme:** Technical debt reduction, then visual enhancements
 
-### Features
-- [ ] Keyboard macro system
-- [ ] Custom dashboard keybindings
-- [ ] Project grouping/folders
+### Sprint 1: TUI Modernization 🔧
+- [ ] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed)
+- [ ] Extract ViewRenderer.js from dashboard.js
+- [ ] Extract dialog components to `dialogs/` directory
+- [ ] Reduce dashboard.js from 2,303 to <1,000 lines
+- [ ] Add view transition integration tests
+
+### Sprint 2: Visual Evolution 🎨
+- [ ] GitHub-style heatmap view (`h` key)
+- [ ] Sparkline history per project card
+- [ ] Focus score calculator
+- [ ] Enhanced theme system (dracula, nord, gruvbox)
+
+**Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
 
 ---
 
-## v0.9.0 - Integrations
+## v0.10.0 - Temporal Intelligence
+
+### Analytics
+- [ ] Pattern detection ("most productive Tuesday mornings")
+- [ ] Velocity analytics (sessions/week, trends)
+- [ ] Prediction engine ("this will take ~2.5 hours")
+
+---
+
+## v0.11.0 - Platform Expansion
 
 ### Remote Sync
 - [ ] GitHub Issues sync (read project issues)
 - [ ] GitLab integration
-- [ ] Linear.app integration
+- [ ] Google Calendar Sync (two-way)
 
 ### IDE Extensions
 - [ ] VS Code extension for .STATUS editing
@@ -89,8 +81,16 @@ Task-based focus, session export to iCal, timeline view, and MCP server.
 
 ## Completed Milestones
 
+### v0.8.x Series
+- [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
+  - `atlas plan` - Guided daily planning with energy tracking
+  - `atlas sync --from-status` - Import from .STATUS files
+  - EcosystemView (`e` key) - Cross-project dashboard
+  - PlanView (`p` key) - Morning ritual in dashboard
+  - Homebrew auto-update workflow
+
 ### v0.7.x Series
-- [x] v0.7.0: Task-Based Focus, Session Export (iCal), Timeline View, MCP Server (10 tools)
+- [x] v0.7.0: Task-Based Focus, Session Export (iCal), Timeline View
 
 ### v0.6.x Series
 - [x] v0.6.3: Stats export (`--export`, `--format md`)
