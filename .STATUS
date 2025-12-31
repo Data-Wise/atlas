@@ -6,7 +6,7 @@
 ## Progress: 100
 
 ## Focus: v0.8.0 released with Ecosystem Hub, Morning Ritual, MCP Server
-## Next: Merge Homebrew PR, plan v0.9.0 features
+## Next: Choose v0.9.0 direction (A: Temporal, B: Visual, C: Platform, D: TUI)
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -201,12 +201,27 @@ atlas dashboard           # Interactive TUI
 - [x] `e` keyboard shortcut for ecosystem view
 - [x] Cross-project metrics and progress bars
 
-## Future Enhancements
+## v0.9.0 Roadmap (Proposed)
+
+### Option A: Temporal Intelligence 📊
+- [ ] Pattern detection ("most productive Tuesday mornings")
+- [ ] Velocity analytics (sessions/week, trends)
+- [ ] Prediction engine ("this will take ~2.5 hours")
+
+### Option B: Visual Evolution 🎨
+- [ ] GitHub-style heatmap in dashboard ('h' key)
+- [ ] Sparkline history per project
+- [ ] Focus score (daily productivity rating)
+
+### Option C: Platform Expansion 🌐
 - [ ] Remote sync (GitHub/GitLab status)
 - [ ] Web dashboard with real-time sync
 - [ ] VS Code extension for .STATUS editing
-- [ ] Native Zellij integration flag
+
+### Option D: TUI Modernization 🔧
 - [ ] Evaluate blessed replacement (ink, terminal-kit)
+- [ ] Reduce dashboard.js size (2,303 lines)
+- [ ] Native Zellij integration flag
 
 ## Blockers
 None
