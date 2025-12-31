@@ -736,6 +736,75 @@ export async function runDashboard(atlas, options = {}) {
   screen.append(timelineView)
 
   // ============================================================================
+  // ECOSYSTEM VIEW - Multi-project overview
+  // ============================================================================
+
+  const ecosystemView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Ecosystem header
+  const ecosystemHeader = blessed.box({
+    parent: ecosystemView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' },
+    content: ' {bold}ECOSYSTEM{/}  {gray-fg}────────────────────────────────────────────────{/}'
+  })
+
+  // Stats summary
+  const ecosystemStats = blessed.box({
+    parent: ecosystemView,
+    top: 1,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' },
+    content: ''
+  })
+
+  // Project list
+  const ecosystemList = blessed.box({
+    parent: ecosystemView,
+    top: 3,
+    left: 1,
+    width: '100%-2',
+    height: '100%-5',
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: { ch: '│', style: { fg: 'gray' } },
+    tags: true,
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Ecosystem command bar
+  const ecosystemCommandBar = blessed.box({
+    parent: ecosystemView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}↑↓{/} Navigate  {cyan-fg}Enter{/} View  {cyan-fg}f{/} Focus  {cyan-fg}Esc{/} Back  {cyan-fg}q{/} Quit'
+  })
+
+  screen.append(ecosystemView)
+
+  // Ecosystem state
+  let ecosystemProjects = []
+  let ecosystemSelectedIndex = 0
+
+  // ============================================================================
   // HELPER FUNCTIONS
   // ============================================================================
 
@@ -1648,6 +1717,143 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // ECOSYSTEM VIEW
+  // ============================================================================
+
+  async function showEcosystemView() {
+    stateMachine.transition(STATES.ECOSYSTEM)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.hide()
+    timelineView.hide()
+    ecosystemView.show()
+
+    await updateEcosystemDisplay()
+    screen.render()
+  }
+
+  function exitEcosystemView() {
+    stateMachine.transition(STATES.BROWSE)
+    ecosystemView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  async function updateEcosystemDisplay() {
+    // Get all registered projects
+    ecosystemProjects = allProjects || []
+
+    // Parse .STATUS data for each project (simplified inline parsing)
+    const projectsWithStatus = ecosystemProjects.map(p => {
+      const statusData = {
+        name: p.name || 'Unknown',
+        path: p.path,
+        type: p.type?.value || 'unknown',
+        status: 'unknown',
+        progress: 0,
+        priority: 3,
+        phase: ''
+      }
+
+      // Check if project has metadata with status info
+      if (p.metadata) {
+        if (p.metadata.status) statusData.status = p.metadata.status
+        if (p.metadata.progress) statusData.progress = p.metadata.progress
+        if (p.metadata.priority) statusData.priority = p.metadata.priority
+      }
+
+      return statusData
+    })
+
+    // Sort: active first, then by priority, then by name
+    projectsWithStatus.sort((a, b) => {
+      if (a.status === 'active' && b.status !== 'active') return -1
+      if (a.status !== 'active' && b.status === 'active') return 1
+      if (a.priority !== b.priority) return a.priority - b.priority
+      return a.name.localeCompare(b.name)
+    })
+
+    // Update stats bar
+    const activeCount = projectsWithStatus.filter(p => p.status === 'active').length
+    const totalProgress = projectsWithStatus.reduce((sum, p) => sum + (p.progress || 0), 0)
+    const avgProgress = projectsWithStatus.length > 0 ? Math.round(totalProgress / projectsWithStatus.length) : 0
+
+    ecosystemStats.setContent(
+      ` {green-fg}${activeCount}{/} Active  │  ` +
+      `{cyan-fg}${projectsWithStatus.length}{/} Total  │  ` +
+      `{yellow-fg}${avgProgress}%{/} Avg Progress`
+    )
+
+    // Build project list content
+    const lines = []
+    const STATUS_ICONS = {
+      active: '🟢',
+      stable: '✅',
+      released: '🚀',
+      paused: '⏸️',
+      draft: '📝',
+      archived: '📦',
+      unknown: '❓'
+    }
+
+    const PRIORITY_COLORS = { 1: 'red', 2: 'yellow', 3: 'cyan' }
+
+    // Group by status
+    const grouped = {
+      active: projectsWithStatus.filter(p => p.status === 'active'),
+      stable: projectsWithStatus.filter(p => ['stable', 'released'].includes(p.status)),
+      paused: projectsWithStatus.filter(p => p.status === 'paused'),
+      draft: projectsWithStatus.filter(p => p.status === 'draft'),
+      other: projectsWithStatus.filter(p => !['active', 'stable', 'released', 'paused', 'draft'].includes(p.status))
+    }
+
+    let globalIndex = 0
+    const addGroup = (title, groupProjects) => {
+      if (groupProjects.length === 0) return
+
+      lines.push(`{bold}{white-fg}${title}{/} (${groupProjects.length})`)
+      lines.push('')
+
+      for (const project of groupProjects) {
+        const isSelected = globalIndex === ecosystemSelectedIndex
+        const prefix = isSelected ? '{inverse} ► {/}' : '   '
+        const statusIcon = STATUS_ICONS[project.status] || STATUS_ICONS.unknown
+        const priorityColor = PRIORITY_COLORS[project.priority] || 'white'
+
+        // Progress bar
+        const barWidth = 12
+        const filled = Math.round((project.progress / 100) * barWidth)
+        const empty = barWidth - filled
+        const color = project.progress >= 75 ? 'green' : project.progress >= 50 ? 'yellow' : 'cyan'
+        const progressBar = `{${color}-fg}${'█'.repeat(filled)}{/}{gray-fg}${'░'.repeat(empty)}{/}`
+
+        const name = project.name.padEnd(20).slice(0, 20)
+        const typeStr = (project.type || '').slice(0, 12).padEnd(12)
+
+        lines.push(
+          `${prefix}${statusIcon} {bold}${name}{/} ${progressBar} ` +
+          `{${priorityColor}-fg}P${project.priority}{/} ` +
+          `{gray-fg}${typeStr}{/}`
+        )
+
+        globalIndex++
+      }
+      lines.push('')
+    }
+
+    addGroup('🔥 Active Projects', grouped.active)
+    addGroup('✅ Stable/Released', grouped.stable)
+    addGroup('⏸️  Paused', grouped.paused)
+    addGroup('📝 Draft', grouped.draft)
+    addGroup('📦 Other', grouped.other)
+
+    ecosystemList.setContent(lines.join('\n'))
+    screen.render()
+  }
+
+  // ============================================================================
   // DECISION HELPER
   // ============================================================================
 
@@ -1814,6 +2020,8 @@ export async function runDashboard(atlas, options = {}) {
       exitFocusMode()
     } else if (stateMachine.is(STATES.TIMELINE)) {
       exitTimelineView()
+    } else if (stateMachine.is(STATES.ECOSYSTEM)) {
+      exitEcosystemView()
     } else if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
     }
@@ -2031,6 +2239,15 @@ export async function runDashboard(atlas, options = {}) {
       showTimelineView()
     } else if (stateMachine.is(STATES.TIMELINE)) {
       exitTimelineView()
+    }
+  })
+
+  // Ecosystem view: e key
+  screen.key(['e'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showEcosystemView()
+    } else if (stateMachine.is(STATES.ECOSYSTEM)) {
+      exitEcosystemView()
     }
   })
 
