@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "atlas": "./bin/atlas.js"
+    "atlas": "./bin/atlas.js",
+    "atlas-mcp": "./src/mcp/index.js"
   },
   "exports": {
     ".": "./src/index.js"
@@ -60,6 +61,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
     "better-sqlite3": "^12.5.0",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.11.0",
