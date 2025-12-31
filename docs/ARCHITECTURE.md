@@ -6,8 +6,8 @@ Atlas follows **Clean Architecture** principles, ensuring separation of concerns
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         CLI / Dashboard                          │
-│                    (bin/atlas.js, src/cli/)                      │
+│                    CLI / Dashboard / MCP Server                  │
+│              (bin/atlas.js, src/cli/, src/mcp/)                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                          Adapters                                │
 │         Controllers, Repositories, Gateways, Events             │
@@ -28,6 +28,7 @@ graph TB
         CLI[CLI Commands<br/>bin/atlas.js]
         Dashboard[TUI Dashboard<br/>src/cli/dashboard.js]
         API[Programmatic API<br/>src/index.js]
+        MCP[MCP Server<br/>src/mcp/index.js]
     end
 
     subgraph "Application Layer"
@@ -61,6 +62,10 @@ graph TB
     Dashboard --> UC_Session
     API --> UC_Project
     API --> UC_Session
+    MCP --> UC_Project
+    MCP --> UC_Session
+    MCP --> UC_Capture
+    MCP --> UC_Context
 
     UC_Project --> Entities
     UC_Session --> Entities
@@ -163,6 +168,10 @@ src/
 │           ├── FocusView.js    # Pomodoro timer view
 │           ├── ZenView.js      # Minimal focus mode
 │           └── TimelineView.js # Time block visualization (v0.7.0)
+│
+├── mcp/                         # Model Context Protocol server (v0.7.0)
+│   ├── index.js                # MCP server entry point
+│   └── formatters.js           # Response formatting functions
 │
 ├── utils/                       # Shared utilities
 │   ├── Config.js               # Configuration management
@@ -582,6 +591,41 @@ flowchart TD
 - `{{github_user}}` - From config
 - `{{parent}}` - Parent template content (for inheritance)
 
+## MCP Server (v0.7.0)
+
+Atlas exposes project intelligence via [Model Context Protocol](https://modelcontextprotocol.io/), enabling Claude to query and control your workflow.
+
+```mermaid
+graph LR
+    subgraph "MCP Server"
+        Server[Atlas MCP<br/>src/mcp/index.js]
+        Formatters[Formatters<br/>src/mcp/formatters.js]
+    end
+
+    subgraph "Tools (10)"
+        Read[Read Tools<br/>get_context, get_projects,<br/>get_sessions, get_trail,<br/>get_inbox, plan]
+        Write[Write Tools<br/>start_session, end_session,<br/>capture, breadcrumb]
+    end
+
+    subgraph "Resources (2)"
+        Res1[atlas://session/current]
+        Res2[atlas://context]
+    end
+
+    Server --> Read
+    Server --> Write
+    Server --> Res1
+    Server --> Res2
+    Server --> Formatters
+```
+
+**Integration Points:**
+- Uses Atlas core APIs (`atlas.sessions`, `atlas.capture`, `atlas.context`)
+- Formatters convert domain objects to MCP-friendly text responses
+- Resources provide real-time JSON data for session/context
+
+**See also:** [MCP Server Documentation](./MCP-SERVER.md)
+
 ## Testing Architecture
 
 ```
@@ -591,8 +635,11 @@ test/
 │   ├── domain/             # Entity tests
 │   ├── use-cases/          # Use case tests
 │   ├── utils/              # Utility tests
-│   └── adapters/           # Adapter tests
-│       └── presenters/     # Presenter tests
+│   ├── adapters/           # Adapter tests
+│   │   └── presenters/     # Presenter tests
+│   └── mcp/                # MCP server tests (v0.7.0)
+│       ├── mcpServer.test.js
+│       └── formatters.test.js
 ├── integration/            # Integration tests
 │   ├── repositories/       # Repository tests
 │   └── *.test.js          # Feature tests
@@ -603,7 +650,7 @@ test/
 
 **Test Commands:**
 ```bash
-npm test                  # All 1,023 tests
+npm test                  # All 1,486 tests
 npm run test:debug        # With --detectOpenHandles
 npm run test:unit         # Unit tests only
 npm run test:coverage     # With coverage report

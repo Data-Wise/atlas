@@ -2,28 +2,27 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2025-12-29
+**Last Updated:** 2025-12-30
 
 ---
 
-## Current Version: v0.6.3
+## Current Version: v0.7.0
 
-Stats export feature complete. Ready for v0.7.0 feature development.
+Task-based focus, session export to iCal, timeline view, and MCP server.
 
 ---
 
-## v0.7.0 - Enhanced Focus & Calendar (Next)
+## v0.7.1 - Polish & Integration (Next)
 
-**Theme:** Task-based focus, calendar integration, improved workflows
+**Theme:** MCP enhancements, documentation, stability
 
-See [V0.7.0-ROADMAP.md](./planning/V0.7.0-ROADMAP.md) for detailed planning.
+### Planned Features
+- [ ] Morning planning command (`atlas plan`)
+- [ ] Time estimation tracking (estimated vs actual)
+- [ ] Energy level tracking for sessions
+- [ ] Ecosystem dashboard view (.STATUS file scanning)
 
-### Tier 1: Core Features
-- [ ] **Task-Based Focus** - Set specific task before starting Pomodoro
-- [ ] **Session Export** - Export sessions to iCal/ics format
-- [ ] **Time Block View** - Dashboard timeline view of today's sessions
-
-### Tier 2: Nice to Have
+### Nice to Have
 - [ ] Calendar Import - Import time blocks from iCal
 - [ ] Desktop Notifications - Break reminders, streak alerts
 - [ ] Multi-Pomodoro Tracking - Track completed pomodoros per session
@@ -89,6 +88,9 @@ See [V0.7.0-ROADMAP.md](./planning/V0.7.0-ROADMAP.md) for detailed planning.
 ---
 
 ## Completed Milestones
+
+### v0.7.x Series
+- [x] v0.7.0: Task-Based Focus, Session Export (iCal), Timeline View, MCP Server (10 tools)
 
 ### v0.6.x Series
 - [x] v0.6.3: Stats export (`--export`, `--format md`)
