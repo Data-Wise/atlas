@@ -1,11 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.8.0 Phase 5 Complete - Ecosystem Dashboard
+## Phase: 🚀 v0.8.0 Phase 1 Complete - Ecosystem Hub
 ## Priority: 1
-## Progress: 60
+## Progress: 80
 
-## Focus: Phases 3-5 complete; Next: Phase 1-2 (StatusFileParser, Morning Ritual)
+## Focus: Phase 1 complete (StatusFileParser wired); Next: Phase 2 (Morning Ritual)
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -174,10 +174,11 @@ atlas dashboard           # Interactive TUI
 - [x] All 1,275 tests passing (+83 new)
 
 ## v0.8.0 Roadmap (A+B Combined)
-### Phase 1: Ecosystem Hub
-- [ ] StatusFileParser gateway for .STATUS YAML
-- [ ] SyncFromStatusUseCase for ecosystem import
-- [ ] `atlas sync --from-status` command
+### Phase 1: Ecosystem Hub ✅
+- [x] StatusFileParser gateway for .STATUS YAML (35 tests)
+- [x] SyncFromStatusUseCase for ecosystem import
+- [x] `atlas sync --from-status` command (finds 23 projects)
+- [x] EcosystemView wired to StatusFileParser for real data
 
 ### Phase 2: ADHD Depth - Morning Ritual
 - [ ] `atlas plan` command with guided daily planning
@@ -255,6 +256,13 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-30: v0.8.0 Phase 1 COMPLETE - Ecosystem Hub
+  - StatusFileParser already implemented (35 tests)
+  - SyncFromStatusUseCase already implemented
+  - `atlas sync --from-status` CLI already implemented
+  - EcosystemView now scans ~/projects/dev-tools for .STATUS files
+  - Shows 23 projects with real status/progress/focus data
+  - Displays focus/next action for selected project
 - 2025-12-30: v0.8.0 Phases 3-5 COMPLETE - Time Estimation, MCP Server, Ecosystem Dashboard
   - Phase 3: Session.estimatedMinutes, GetSessionStatsUseCase.calculateEstimationStats()
   - Phase 4: MCP server (src/mcp/) with tools, resources, prompts
