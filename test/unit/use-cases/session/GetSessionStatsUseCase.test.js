@@ -21,6 +21,7 @@ describe('GetSessionStatsUseCase', () => {
       startTime,
       endTime: overrides.endTime || new Date(startTime.getTime() + duration * 60 * 1000),
       outcome: overrides.outcome || 'completed',
+      estimatedMinutes: overrides.estimatedMinutes || null,
       getDuration: () => duration,
       ...overrides
     }
@@ -299,6 +300,133 @@ describe('GetSessionStatsUseCase', () => {
       const result = await useCase.execute({ days: 0 })
 
       expect(result.period.days).toBe(7) // Falls back to default
+    })
+  })
+
+  describe('estimation stats calculation', () => {
+    it('should return hasData: false when no sessions have estimates', async () => {
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 30 }),
+        createMockSession({ duration: 45 })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.hasData).toBe(false)
+      expect(result.estimation.sessionsWithEstimates).toBe(0)
+      expect(result.estimation.message).toBe('No sessions with time estimates yet')
+    })
+
+    it('should only count completed sessions with estimates', async () => {
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 30, estimatedMinutes: 25, outcome: 'completed' }),
+        createMockSession({ duration: 30, estimatedMinutes: 25, outcome: 'cancelled' }), // Not counted
+        createMockSession({ duration: 30, outcome: 'completed' }) // No estimate
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.hasData).toBe(true)
+      expect(result.estimation.sessionsWithEstimates).toBe(1)
+    })
+
+    it('should calculate underestimate bias correctly', async () => {
+      // Estimated 20 min, took 30 min = underestimate by 50%
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 30, estimatedMinutes: 20, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.hasData).toBe(true)
+      expect(result.estimation.averagePercentageOff).toBe(50) // (30-20)/20 * 100
+      expect(result.estimation.bias).toBe('underestimate')
+      expect(result.estimation.underestimates).toBe(1)
+      expect(result.estimation.overestimates).toBe(0)
+    })
+
+    it('should calculate overestimate bias correctly', async () => {
+      // Estimated 40 min, took 20 min = overestimate by 50%
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 20, estimatedMinutes: 40, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.hasData).toBe(true)
+      expect(result.estimation.averagePercentageOff).toBe(-50) // (20-40)/40 * 100
+      expect(result.estimation.bias).toBe('overestimate')
+      expect(result.estimation.underestimates).toBe(0)
+      expect(result.estimation.overestimates).toBe(1)
+    })
+
+    it('should count accurate estimates (within 10%)', async () => {
+      // Estimated 30 min, took 32 min = 6.7% off (accurate)
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 32, estimatedMinutes: 30, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.accurate).toBe(1)
+      expect(result.estimation.accuracyRate).toBe(100)
+    })
+
+    it('should calculate average across multiple sessions', async () => {
+      mockSessionRepository.list.mockResolvedValue([
+        // Session 1: estimated 20, actual 30 = +50% off
+        createMockSession({ duration: 30, estimatedMinutes: 20, outcome: 'completed' }),
+        // Session 2: estimated 40, actual 20 = -50% off
+        createMockSession({ duration: 20, estimatedMinutes: 40, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.sessionsWithEstimates).toBe(2)
+      expect(result.estimation.averagePercentageOff).toBe(0) // (50 + -50) / 2
+      expect(result.estimation.bias).toBe('balanced')
+    })
+
+    it('should generate positive message for high accuracy', async () => {
+      // All within 10%
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 30, estimatedMinutes: 30, outcome: 'completed' }),
+        createMockSession({ duration: 31, estimatedMinutes: 30, outcome: 'completed' }),
+        createMockSession({ duration: 29, estimatedMinutes: 30, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.accuracyRate).toBe(100)
+      expect(result.estimation.message).toContain('Great estimation')
+    })
+
+    it('should suggest buffer for chronic underestimators', async () => {
+      // Consistently underestimate by >20%
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 40, estimatedMinutes: 20, outcome: 'completed' }),
+        createMockSession({ duration: 50, estimatedMinutes: 25, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.bias).toBe('underestimate')
+      expect(result.estimation.message).toContain('underestimate')
+      expect(result.estimation.message).toContain('buffer')
+    })
+
+    it('should encourage overestimators', async () => {
+      // Consistently overestimate by >20%
+      mockSessionRepository.list.mockResolvedValue([
+        createMockSession({ duration: 15, estimatedMinutes: 30, outcome: 'completed' }),
+        createMockSession({ duration: 20, estimatedMinutes: 40, outcome: 'completed' })
+      ])
+
+      const result = await useCase.execute()
+
+      expect(result.estimation.bias).toBe('overestimate')
+      expect(result.estimation.message).toContain('overestimate')
+      expect(result.estimation.message).toContain('faster than you think')
     })
   })
 })

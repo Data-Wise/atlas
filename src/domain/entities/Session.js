@@ -41,6 +41,10 @@ export class Session {
     // ADHD-friendly: track energy level for task matching
     this.energyLevel = options.energyLevel || null // high, medium, low, or null
 
+    // Time estimation tracking (ADHD-friendly: helps calibrate time perception)
+    // Use explicit undefined check to properly validate 0 as invalid
+    this.estimatedMinutes = options.estimatedMinutes !== undefined ? options.estimatedMinutes : null
+
     // Domain events (not persisted)
     this._events = []
 
@@ -73,6 +77,16 @@ export class Session {
     const validEnergyLevels = ['high', 'medium', 'low']
     if (this.energyLevel && !validEnergyLevels.includes(this.energyLevel)) {
       throw new Error(`Invalid energy level: ${this.energyLevel}. Must be one of: ${validEnergyLevels.join(', ')}`)
+    }
+
+    // Validate estimated minutes if provided
+    if (this.estimatedMinutes !== null) {
+      if (typeof this.estimatedMinutes !== 'number' || this.estimatedMinutes <= 0) {
+        throw new Error('Estimated minutes must be a positive number')
+      }
+      if (this.estimatedMinutes > 480) { // 8 hours max
+        throw new Error('Estimated minutes cannot exceed 480 (8 hours)')
+      }
     }
   }
 
@@ -206,7 +220,9 @@ export class Session {
       state: this.state.value,
       outcome: this.outcome,
       isFlowState: this.isInFlowState(),
-      energyLevel: this.energyLevel
+      energyLevel: this.energyLevel,
+      estimatedMinutes: this.estimatedMinutes,
+      estimationAccuracy: this.getEstimationAccuracy()
     }
   }
 
@@ -220,5 +236,53 @@ export class Session {
       throw new Error(`Invalid energy level: ${level}. Must be one of: ${validEnergyLevels.join(', ')}`)
     }
     this.energyLevel = level
+  }
+
+  /**
+   * Set estimated minutes for the session
+   * @param {number} minutes - Estimated duration in minutes
+   */
+  setEstimatedMinutes(minutes) {
+    if (typeof minutes !== 'number' || minutes <= 0) {
+      throw new Error('Estimated minutes must be a positive number')
+    }
+    if (minutes > 480) {
+      throw new Error('Estimated minutes cannot exceed 480 (8 hours)')
+    }
+    this.estimatedMinutes = minutes
+  }
+
+  /**
+   * Get estimation accuracy (how well the estimate matched actual duration)
+   * Only meaningful for ended sessions with estimates
+   * @returns {Object|null} Accuracy info or null if not applicable
+   */
+  getEstimationAccuracy() {
+    if (!this.estimatedMinutes || !this.state.isEnded()) {
+      return null
+    }
+
+    const actual = this.getDuration()
+    const estimated = this.estimatedMinutes
+    const difference = actual - estimated
+    const percentageOff = estimated > 0 ? Math.round((difference / estimated) * 100) : 0
+
+    return {
+      estimated,
+      actual,
+      difference, // positive = took longer (underestimated), negative = took less (overestimated)
+      percentageOff, // positive = underestimated, negative = overestimated
+      wasUnderestimate: difference > 0,
+      wasOverestimate: difference < 0,
+      wasAccurate: Math.abs(percentageOff) <= 10 // within 10% is considered accurate
+    }
+  }
+
+  /**
+   * Check if session has an estimate
+   * @returns {boolean}
+   */
+  hasEstimate() {
+    return this.estimatedMinutes !== null && this.estimatedMinutes > 0
   }
 }

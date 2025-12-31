@@ -369,5 +369,285 @@ describe('PlanDayUseCase', () => {
 
       expect(result.ecosystem).toBeUndefined()
     })
+
+    test('returns null on scan error', async () => {
+      statusParser.scanDirectory = async () => {
+        throw new Error('Permission denied')
+      }
+
+      const result = await useCase.execute({ ecosystemPath: '/forbidden' })
+
+      expect(result.ecosystem).toBeNull()
+    })
+
+    test('includes high priority and in-progress items', async () => {
+      statusParser.scanResults = [
+        { path: '/p1', parsed: { name: 'p1', status: 'active', progress: 50, priority: 1 } },
+        { path: '/p2', parsed: { name: 'p2', status: 'active', progress: 75, priority: 2 } }
+      ]
+      statusParser.summarize = (results) => ({
+        total: 2,
+        byPriority: { 1: [{ name: 'p1' }], 2: [{ name: 'p2' }], 3: [] },
+        byProgress: { complete: [], inProgress: [{ name: 'p1' }, { name: 'p2' }], notStarted: [] }
+      })
+
+      const result = await useCase.execute({ ecosystemPath: '/projects' })
+
+      expect(result.ecosystem.highPriority).toHaveLength(1)
+      expect(result.ecosystem.inProgress).toHaveLength(2)
+    })
+  })
+
+  describe('execute() - Streak calculation', () => {
+    test('includes streak info in result', async () => {
+      const result = await useCase.execute({})
+
+      expect(result.streak).toBeDefined()
+      expect(result.streak).toHaveProperty('current')
+      expect(result.streak).toHaveProperty('longest')
+      expect(result.streak).toHaveProperty('display')
+      expect(result.streak).toHaveProperty('message')
+    })
+
+    test('calculates streak from last 30 days of sessions', async () => {
+      // Create sessions for the past 3 days (to build a streak)
+      const today = new Date()
+      const yesterday = new Date(today)
+      yesterday.setDate(yesterday.getDate() - 1)
+      const twoDaysAgo = new Date(today)
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'p', startTime: today, endTime: today },
+        { id: 's2', project: 'p', startTime: yesterday, endTime: yesterday },
+        { id: 's3', project: 'p', startTime: twoDaysAgo, endTime: twoDaysAgo }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.streak.current).toBeGreaterThanOrEqual(0)
+    })
+  })
+
+  describe('execute() - Yesterday summary details', () => {
+    test('calculates total duration correctly', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      yesterday.setHours(10, 0, 0, 0)
+
+      const endTime1 = new Date(yesterday)
+      endTime1.setHours(11, 0, 0, 0) // 60 min
+
+      const startTime2 = new Date(yesterday)
+      startTime2.setHours(14, 0, 0, 0)
+      const endTime2 = new Date(yesterday)
+      endTime2.setHours(14, 30, 0, 0) // 30 min
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'p1', task: 'Task 1', startTime: yesterday, endTime: endTime1, outcome: 'completed' },
+        { id: 's2', project: 'p2', task: 'Task 2', startTime: startTime2, endTime: endTime2, outcome: 'completed' }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.yesterday.hasSessions).toBe(true)
+      expect(result.yesterday.sessionCount).toBe(2)
+      expect(result.yesterday.totalMinutes).toBe(90)
+      expect(result.yesterday.hours).toBe(1)
+      expect(result.yesterday.minutes).toBe(30)
+    })
+
+    test('calculates completion rate correctly', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      yesterday.setHours(10, 0, 0, 0)
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'p', startTime: yesterday, endTime: yesterday, outcome: 'completed' },
+        { id: 's2', project: 'p', startTime: yesterday, endTime: yesterday, outcome: 'completed' },
+        { id: 's3', project: 'p', startTime: yesterday, endTime: yesterday, outcome: 'interrupted' },
+        { id: 's4', project: 'p', startTime: yesterday, endTime: yesterday, outcome: 'cancelled' }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.yesterday.completedCount).toBe(2)
+      expect(result.yesterday.completionRate).toBe(50)
+    })
+
+    test('tracks unique projects', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      yesterday.setHours(10, 0, 0, 0)
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'project-a', startTime: yesterday, endTime: yesterday },
+        { id: 's2', project: 'project-a', startTime: yesterday, endTime: yesterday },
+        { id: 's3', project: 'project-b', startTime: yesterday, endTime: yesterday }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.yesterday.projects).toHaveLength(2)
+      expect(result.yesterday.projects).toContain('project-a')
+      expect(result.yesterday.projects).toContain('project-b')
+    })
+
+    test('tracks last task and project', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      yesterday.setHours(10, 0, 0, 0)
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'project-a', task: 'Latest task', startTime: yesterday, endTime: yesterday }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.yesterday.lastTask).toBe('Latest task')
+      expect(result.yesterday.lastProject).toBe('project-a')
+    })
+  })
+
+  describe('execute() - Suggestions priority and sorting', () => {
+    test('sorts suggestions by priority', async () => {
+      // Set up data to generate multiple suggestion types
+      captureRepo.captures = [
+        { id: 'p1', status: 'parked', project: 'parked-proj', text: 'Parked', createdAt: new Date() },
+        ...Array(8).fill(null).map((_, i) => ({
+          id: `i${i}`,
+          status: 'inbox',
+          text: `Inbox ${i}`,
+          type: 'idea',
+          createdAt: new Date()
+        }))
+      ]
+      projectRepo.projects = [
+        { id: 'p1', name: 'p1-project', metadata: { status: 'active', priority: 1 } }
+      ]
+
+      const result = await useCase.execute({})
+
+      // Should have multiple suggestions
+      expect(result.suggestions.length).toBeGreaterThan(0)
+
+      // Should be sorted by priority (lower number = higher priority)
+      for (let i = 1; i < result.suggestions.length; i++) {
+        expect(result.suggestions[i].priority).toBeGreaterThanOrEqual(result.suggestions[i - 1].priority)
+      }
+    })
+
+    test('suggests continuing yesterday work', async () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      yesterday.setHours(10, 0, 0, 0)
+
+      sessionRepo.sessions = [
+        { id: 's1', project: 'yesterday-project', task: 'Previous task', startTime: yesterday, endTime: yesterday }
+      ]
+
+      const result = await useCase.execute({})
+
+      const continueSuggestion = result.suggestions.find(s => s.type === 'continue')
+      expect(continueSuggestion).toBeDefined()
+      expect(continueSuggestion.message).toContain('yesterday-project')
+      expect(continueSuggestion.action).toContain('yesterday-project')
+    })
+  })
+
+  describe('execute() - Active projects edge cases', () => {
+    test('handles repository errors gracefully', async () => {
+      projectRepo.list = async () => {
+        throw new Error('Database error')
+      }
+
+      const result = await useCase.execute({})
+
+      expect(result.activeProjects).toEqual([])
+    })
+
+    test('includes in-progress status projects', async () => {
+      projectRepo.projects = [
+        { id: 'p1', name: 'in-progress-proj', metadata: { status: 'in-progress', priority: 2 } }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.activeProjects).toHaveLength(1)
+      expect(result.activeProjects[0].status).toBe('in-progress')
+    })
+
+    test('uses description as fallback for focus', async () => {
+      projectRepo.projects = [
+        { id: 'p1', name: 'proj', description: 'Project description', metadata: { status: 'active' } }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.activeProjects[0].focus).toBe('Project description')
+    })
+
+    test('limits active projects to 10', async () => {
+      projectRepo.projects = Array(15).fill(null).map((_, i) => ({
+        id: `p${i}`,
+        name: `project-${i}`,
+        metadata: { status: 'active', priority: 2 }
+      }))
+
+      const result = await useCase.execute({})
+
+      expect(result.activeProjects).toHaveLength(10)
+    })
+  })
+
+  describe('execute() - Parked contexts details', () => {
+    test('includes context information', async () => {
+      captureRepo.captures = [
+        {
+          id: 'p1',
+          status: 'parked',
+          project: 'atlas',
+          text: 'Working on tests',
+          createdAt: new Date(),
+          context: { branch: 'feature/tests', lastFile: 'Session.test.js' }
+        }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.parkedContexts[0].context).toEqual({
+        branch: 'feature/tests',
+        lastFile: 'Session.test.js'
+      })
+    })
+
+    test('handles captures without context field', async () => {
+      captureRepo.captures = [
+        { id: 'p1', status: 'parked', project: 'atlas', text: 'No context', createdAt: new Date() }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.parkedContexts[0].context).toEqual({})
+    })
+  })
+
+  describe('execute() - Inbox item details', () => {
+    test('includes all inbox item fields', async () => {
+      const createdAt = new Date()
+      captureRepo.captures = [
+        { id: 'i1', status: 'inbox', text: 'New feature idea', type: 'idea', project: 'atlas', createdAt }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.inbox[0]).toEqual({
+        id: 'i1',
+        text: 'New feature idea',
+        type: 'idea',
+        project: 'atlas',
+        createdAt
+      })
+    })
   })
 })

@@ -15,7 +15,7 @@ import { sparkline } from './TuiPresenter.js'
  */
 export function formatStatsTable(stats) {
   const lines = []
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period } = stats
+  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
 
   // Header
   const periodLabel = period.projectFilter
@@ -48,6 +48,20 @@ export function formatStatsTable(stats) {
   }
 
   lines.push('')
+
+  // Estimation accuracy
+  if (estimation && estimation.hasData) {
+    lines.push('  Time Estimation:')
+    lines.push(`    ${estimation.message}`)
+    lines.push(`    Estimates used:  ${estimation.sessionsWithEstimates}`)
+    lines.push(`    Accuracy rate:   ${estimation.accuracyRate}% (within 10%)`)
+    if (estimation.bias !== 'balanced') {
+      const biasAmount = Math.abs(estimation.averagePercentageOff)
+      const biasDir = estimation.bias === 'underestimate' ? 'under' : 'over'
+      lines.push(`    Tendency:        ${biasAmount}% ${biasDir}estimate`)
+    }
+    lines.push('')
+  }
 
   // Hourly distribution
   if (hourlyDistribution.some(v => v > 0)) {
@@ -94,7 +108,7 @@ export function formatStatsJson(stats) {
  * @returns {string} Plain text output
  */
 export function formatStatsText(stats) {
-  const { summary, streak, period } = stats
+  const { summary, streak, estimation, period } = stats
   const lines = []
 
   lines.push(`Stats for last ${period.days} days${period.projectFilter ? ` (${period.projectFilter})` : ''}:`)
@@ -103,6 +117,10 @@ export function formatStatsText(stats) {
 
   if (streak.current > 0) {
     lines.push(`  ${streak.display}`)
+  }
+
+  if (estimation && estimation.hasData) {
+    lines.push(`  Estimation: ${estimation.message}`)
   }
 
   return lines.join('\n')
@@ -114,7 +132,7 @@ export function formatStatsText(stats) {
  * @returns {string} Markdown formatted output
  */
 export function formatStatsMarkdown(stats) {
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period } = stats
+  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
   const lines = []
   const date = new Date().toISOString().split('T')[0]
 
@@ -151,6 +169,23 @@ export function formatStatsMarkdown(stats) {
     lines.push('No active streak')
   }
   lines.push('')
+
+  // Estimation accuracy section
+  if (estimation && estimation.hasData) {
+    lines.push('## Time Estimation')
+    lines.push('')
+    lines.push(`> ${estimation.message}`)
+    lines.push('')
+    lines.push('| Metric | Value |')
+    lines.push('|--------|-------|')
+    lines.push(`| Sessions with estimates | ${estimation.sessionsWithEstimates} |`)
+    lines.push(`| Accuracy rate (±10%) | ${estimation.accuracyRate}% |`)
+    lines.push(`| Average deviation | ${estimation.averagePercentageOff > 0 ? '+' : ''}${estimation.averagePercentageOff}% |`)
+    lines.push(`| Underestimates | ${estimation.underestimates} |`)
+    lines.push(`| Overestimates | ${estimation.overestimates} |`)
+    lines.push(`| Accurate | ${estimation.accurate} |`)
+    lines.push('')
+  }
 
   // Best day
   if (bestDay) {
@@ -260,6 +295,27 @@ export function getPeriodLabel(days) {
   return `Last ${days} Days`
 }
 
+/**
+ * Format estimation bias for display with color hints
+ * @param {Object} estimation - Estimation stats
+ * @returns {Object} { display, color }
+ */
+export function formatEstimationDisplay(estimation) {
+  if (!estimation || !estimation.hasData) {
+    return { display: 'No data', color: 'gray' }
+  }
+  if (estimation.accuracyRate >= 70) {
+    return { display: `${estimation.accuracyRate}% accurate`, color: 'green' }
+  }
+  if (estimation.bias === 'underestimate') {
+    return { display: `${Math.abs(estimation.averagePercentageOff)}% under`, color: 'yellow' }
+  }
+  if (estimation.bias === 'overestimate') {
+    return { display: `${Math.abs(estimation.averagePercentageOff)}% over`, color: 'cyan' }
+  }
+  return { display: 'Balanced', color: 'white' }
+}
+
 export default {
   formatStatsTable,
   formatStatsJson,
@@ -269,5 +325,6 @@ export default {
   formatStatLine,
   formatStreakDisplay,
   formatFlowDisplay,
+  formatEstimationDisplay,
   getPeriodLabel
 }

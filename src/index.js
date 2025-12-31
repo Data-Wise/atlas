@@ -519,13 +519,21 @@ class SessionsAPI {
     this.container = container;
   }
 
-  async start(project) {
+  async start(project, options = {}) {
     const createSession = this.container.resolve('CreateSessionUseCase');
-    const session = await createSession.execute({ project: project || 'default' });
+    const session = await createSession.execute({
+      project: project || 'default',
+      task: options.task,
+      energyLevel: options.energyLevel,
+      estimatedMinutes: options.estimatedMinutes
+    });
     return {
       project: session.project,
+      task: session.task,
       focus: session.focus,
-      startTime: session.startTime
+      startTime: session.startTime,
+      energyLevel: session.energyLevel,
+      estimatedMinutes: session.estimatedMinutes
     };
   }
 

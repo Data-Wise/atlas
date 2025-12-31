@@ -187,7 +187,10 @@ const session = program.command('session').description('Session management');
 session
   .command('start [project]')
   .description('Start a work session')
-  .action(async (project) => {
+  .option('-t, --task <task>', 'Task description')
+  .option('-e, --estimate <minutes>', 'Estimated duration in minutes', parseInt)
+  .option('--energy <level>', 'Energy level: high, medium, low')
+  .action(async (project, options) => {
     const atlasInstance = getAtlas();
 
     // Get context restoration before starting
@@ -204,8 +207,21 @@ session
     } catch (e) { /* ignore context errors */ }
 
     try {
-      const result = await atlasInstance.sessions.start(project);
+      const result = await atlasInstance.sessions.start(project, {
+        task: options.task,
+        estimatedMinutes: options.estimate,
+        energyLevel: options.energy
+      });
       console.log(`🎯 Session started: ${result.project}`);
+      if (result.task && result.task !== 'Work session') {
+        console.log(`   Task: ${result.task}`);
+      }
+      if (result.estimatedMinutes) {
+        console.log(`   Estimate: ${result.estimatedMinutes} min`);
+      }
+      if (result.energyLevel) {
+        console.log(`   Energy: ${result.energyLevel}`);
+      }
       if (result.focus) console.log(`   Focus: ${result.focus}`);
     } catch (error) {
       if (error.message.includes('Active session exists')) {
