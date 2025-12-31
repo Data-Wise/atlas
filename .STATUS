@@ -270,11 +270,14 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
-- 2025-12-31: v0.8.0 RELEASED - Ecosystem Hub, Morning Ritual, MCP Server
+- 2025-12-31: v0.8.0 RELEASE SESSION COMPLETE
   - Tagged v0.8.0, created GitHub release
-  - Homebrew workflow auto-created PR to homebrew-tap
-  - Added HOMEBREW_TAP_GITHUB_TOKEN secret to atlas and aiterm repos
-  - CI/CD: Homebrew formula auto-updates on release
+  - Created PAT, added HOMEBREW_TAP_GITHUB_TOKEN to atlas + aiterm
+  - Homebrew PR merged, formula now auto-updates on release
+  - Updated CLAUDE.md with v0.8.0 knowledge
+  - Created V0.9.0-ROADMAP.md (TUI Modernization + Visual Evolution)
+  - Updated docs site: index.md, REFCARD.md, ROADMAP.md
+  - Selected v0.9.0 direction: Sprint 1 (TUI), Sprint 2 (Visual)
 - 2025-12-30: v0.8.0 DOCS SYNC - All documentation updated for release
   - CLI-REFERENCE.md: Added atlas plan command, e/p dashboard shortcuts
   - ARCHITECTURE.md: Added PlanView, EcosystemView, state machine diagram
