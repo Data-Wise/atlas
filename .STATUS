@@ -1,11 +1,11 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: 🚀 v0.8.0 Phase 1 - Ecosystem Hub
+## Phase: 🚀 v0.8.0 Phase 5 Complete - Ecosystem Dashboard
 ## Priority: 1
-## Progress: 0
+## Progress: 60
 
-## Focus: Phase 1 - StatusFileParser and ecosystem sync
+## Focus: Phases 3-5 complete; Next: Phase 1-2 (StatusFileParser, Morning Ritual)
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -184,20 +184,20 @@ atlas dashboard           # Interactive TUI
 - [ ] Add energyLevel to Session entity
 - [ ] PlanView in dashboard
 
-### Phase 3: Time Estimation
-- [ ] Add estimatedMinutes to Session
-- [ ] Track estimation accuracy in stats
-- [ ] Show "You typically underestimate by X%"
+### Phase 3: Time Estimation ✅
+- [x] Add estimatedMinutes to Session
+- [x] Track estimation accuracy in stats
+- [x] Show "You typically underestimate by X%"
 
-### Phase 4: MCP Server
-- [ ] Create Atlas MCP server (src/mcp/)
-- [ ] Expose tools: get_projects, get_context, capture
-- [ ] Register in ~/.claude/settings.json
+### Phase 4: MCP Server ✅
+- [x] Create Atlas MCP server (src/mcp/)
+- [x] Expose tools: get_projects, get_context, capture
+- [x] Register in ~/.claude/settings.json
 
-### Phase 5: Ecosystem Dashboard
-- [ ] EcosystemView showing all dev-tools projects
-- [ ] `e` keyboard shortcut for ecosystem view
-- [ ] Cross-project metrics and progress bars
+### Phase 5: Ecosystem Dashboard ✅
+- [x] EcosystemView showing all dev-tools projects
+- [x] `e` keyboard shortcut for ecosystem view
+- [x] Cross-project metrics and progress bars
 
 ## Future Enhancements
 - [ ] Remote sync (GitHub/GitLab status)
@@ -255,6 +255,12 @@ _flow_has_atlas && _flow_atlas session start "$project"
 - flow-cli: ~/projects/dev-tools/flow-cli
 
 ## Session Log
+- 2025-12-30: v0.8.0 Phases 3-5 COMPLETE - Time Estimation, MCP Server, Ecosystem Dashboard
+  - Phase 3: Session.estimatedMinutes, GetSessionStatsUseCase.calculateEstimationStats()
+  - Phase 4: MCP server (src/mcp/) with tools, resources, prompts
+  - Phase 5: EcosystemView dashboard component, 'e' keyboard shortcut
+  - ECOSYSTEM state in stateMachine.js with proper transitions
+  - 50 stateMachine tests, 153 dashboard tests passing
 - 2025-12-30: v0.8.0 Sprint 0 COMPLETE - Architecture Quick Wins (+83 tests, 1275 total)
   - Session.end/pause/resume use canTransitionTo() for state validation
   - BusinessRules.js constants file (19 domain constants)
