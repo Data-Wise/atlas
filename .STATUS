@@ -6,7 +6,7 @@
 ## Progress: 100
 
 ## Focus: v0.8.0 released with Ecosystem Hub, Morning Ritual, MCP Server
-## Next: Choose v0.9.0 direction (A: Temporal, B: Visual, C: Platform, D: TUI)
+## Next: v0.9.0 Sprint 1 - TUI Modernization (Option D)
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -201,26 +201,24 @@ atlas dashboard           # Interactive TUI
 - [x] `e` keyboard shortcut for ecosystem view
 - [x] Cross-project metrics and progress bars
 
-## v0.9.0 Roadmap (Proposed)
+## v0.9.0 Roadmap (Selected: D + B)
 
-### Option A: Temporal Intelligence 📊
-- [ ] Pattern detection ("most productive Tuesday mornings")
-- [ ] Velocity analytics (sessions/week, trends)
-- [ ] Prediction engine ("this will take ~2.5 hours")
+### Sprint 1: TUI Modernization 🔧 (Option D)
+- [ ] Evaluate blessed alternatives (ink, terminal-kit, blessed-contrib fork)
+- [ ] Extract MainView rendering logic to ViewRenderer.js
+- [ ] Extract dialog components to dialogs/ directory
+- [ ] Reduce dashboard.js from 2,303 lines to <1,000
+- [ ] Add integration tests for view transitions
 
-### Option B: Visual Evolution 🎨
-- [ ] GitHub-style heatmap in dashboard ('h' key)
-- [ ] Sparkline history per project
+### Sprint 2: Visual Evolution 🎨 (Option B)
+- [ ] GitHub-style heatmap view ('h' key)
+- [ ] Sparkline history per project card
 - [ ] Focus score (daily productivity rating)
+- [ ] Enhanced theme system (more color schemes)
 
-### Option C: Platform Expansion 🌐
-- [ ] Remote sync (GitHub/GitLab status)
-- [ ] Web dashboard with real-time sync
-- [ ] VS Code extension for .STATUS editing
-
-### Option D: TUI Modernization 🔧
-- [ ] Evaluate blessed replacement (ink, terminal-kit)
-- [ ] Reduce dashboard.js size (2,303 lines)
+### Future (v0.10.0+)
+- [ ] Temporal Intelligence (pattern detection, predictions)
+- [ ] Platform Expansion (remote sync, web dashboard)
 - [ ] Native Zellij integration flag
 
 ## Blockers
