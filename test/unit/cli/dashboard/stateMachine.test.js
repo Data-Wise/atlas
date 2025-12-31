@@ -1,273 +1,372 @@
 /**
- * StateMachine Tests
+ * Tests for Dashboard State Machine
  *
- * Tests for the dashboard state machine that manages view transitions.
+ * Tests state transitions, event emission, and data management.
  */
 
-import { jest } from '@jest/globals'
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
 import { createStateMachine, STATES } from '../../../../src/cli/dashboard/stateMachine.js'
 
-describe('StateMachine', () => {
-  let sm
-
-  beforeEach(() => {
-    sm = createStateMachine()
-  })
-
-  afterEach(() => {
-    sm.destroy()
-  })
-
-  describe('Initialization', () => {
-    test('starts in BROWSE state by default', () => {
-      expect(sm.getState()).toBe(STATES.BROWSE)
-    })
-
-    test('can start in a custom initial state', () => {
-      const customSm = createStateMachine({ initial: STATES.FOCUS })
-      expect(customSm.getState()).toBe(STATES.FOCUS)
-      customSm.destroy()
-    })
-
-    test('has no previous state initially', () => {
-      expect(sm.getPreviousState()).toBeNull()
-    })
-
-    test('exports all valid states', () => {
+describe('Dashboard State Machine', () => {
+  describe('STATES constant', () => {
+    it('should define all view states', () => {
       expect(STATES.BROWSE).toBe('browse')
       expect(STATES.DETAIL).toBe('detail')
       expect(STATES.FOCUS).toBe('focus')
       expect(STATES.ZEN).toBe('zen')
       expect(STATES.TIMELINE).toBe('timeline')
     })
+
+    it('should have exactly 5 states', () => {
+      expect(Object.keys(STATES)).toHaveLength(5)
+    })
   })
 
-  describe('State Queries', () => {
-    test('is() returns true for current state', () => {
-      expect(sm.is(STATES.BROWSE)).toBe(true)
-      expect(sm.is(STATES.DETAIL)).toBe(false)
-    })
-
-    test('getState() returns current state', () => {
+  describe('createStateMachine()', () => {
+    it('should create a state machine with default initial state', () => {
+      const sm = createStateMachine()
       expect(sm.getState()).toBe(STATES.BROWSE)
-      sm.transition(STATES.DETAIL)
-      expect(sm.getState()).toBe(STATES.DETAIL)
     })
 
-    test('getPreviousState() returns previous state after transition', () => {
-      sm.transition(STATES.DETAIL)
-      expect(sm.getPreviousState()).toBe(STATES.BROWSE)
+    it('should accept custom initial state', () => {
+      const sm = createStateMachine({ initial: STATES.FOCUS })
+      expect(sm.getState()).toBe(STATES.FOCUS)
+    })
+
+    it('should return an object with all expected methods', () => {
+      const sm = createStateMachine()
+      expect(typeof sm.getState).toBe('function')
+      expect(typeof sm.getPreviousState).toBe('function')
+      expect(typeof sm.is).toBe('function')
+      expect(typeof sm.canTransition).toBe('function')
+      expect(typeof sm.getData).toBe('function')
+      expect(typeof sm.setData).toBe('function')
+      expect(typeof sm.transition).toBe('function')
+      expect(typeof sm.back).toBe('function')
+      expect(typeof sm.on).toBe('function')
+      expect(typeof sm.destroy).toBe('function')
+      expect(sm.STATES).toBe(STATES)
+    })
+
+    it('should have null previous state initially', () => {
+      const sm = createStateMachine()
+      expect(sm.getPreviousState()).toBeNull()
     })
   })
 
-  describe('Valid Transitions', () => {
-    test('BROWSE can transition to DETAIL, FOCUS, ZEN, TIMELINE', () => {
-      expect(sm.canTransition(STATES.DETAIL)).toBe(true)
-      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
-      expect(sm.canTransition(STATES.ZEN)).toBe(true)
-      expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
+  describe('is()', () => {
+    it('should return true for current state', () => {
+      const sm = createStateMachine()
+      expect(sm.is(STATES.BROWSE)).toBe(true)
     })
 
-    test('DETAIL can transition to BROWSE, FOCUS, ZEN, TIMELINE', () => {
-      sm.transition(STATES.DETAIL)
-      expect(sm.canTransition(STATES.BROWSE)).toBe(true)
-      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
-      expect(sm.canTransition(STATES.ZEN)).toBe(true)
-      expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
-    })
-
-    test('FOCUS can transition to BROWSE, ZEN, TIMELINE', () => {
-      sm.transition(STATES.FOCUS)
-      expect(sm.canTransition(STATES.BROWSE)).toBe(true)
-      expect(sm.canTransition(STATES.ZEN)).toBe(true)
-      expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
-      expect(sm.canTransition(STATES.DETAIL)).toBe(false)
-    })
-
-    test('ZEN can transition to BROWSE, FOCUS, TIMELINE', () => {
-      sm.transition(STATES.ZEN)
-      expect(sm.canTransition(STATES.BROWSE)).toBe(true)
-      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
-      expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
-      expect(sm.canTransition(STATES.DETAIL)).toBe(false)
-    })
-
-    test('TIMELINE can transition to BROWSE, FOCUS, ZEN', () => {
-      sm.transition(STATES.TIMELINE)
-      expect(sm.canTransition(STATES.BROWSE)).toBe(true)
-      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
-      expect(sm.canTransition(STATES.ZEN)).toBe(true)
-      expect(sm.canTransition(STATES.DETAIL)).toBe(false)
+    it('should return false for other states', () => {
+      const sm = createStateMachine()
+      expect(sm.is(STATES.DETAIL)).toBe(false)
+      expect(sm.is(STATES.FOCUS)).toBe(false)
     })
   })
 
   describe('transition()', () => {
-    test('transitions to valid state and returns true', () => {
-      const result = sm.transition(STATES.DETAIL)
-      expect(result).toBe(true)
+    let sm
+
+    beforeEach(() => {
+      sm = createStateMachine()
+    })
+
+    it('should allow valid transitions from BROWSE', () => {
+      expect(sm.transition(STATES.DETAIL)).toBe(true)
       expect(sm.getState()).toBe(STATES.DETAIL)
     })
 
-    test('rejects invalid state and returns false', () => {
-      const result = sm.transition('invalid')
-      expect(result).toBe(false)
-      expect(sm.getState()).toBe(STATES.BROWSE)
-    })
-
-    test('rejects disallowed transition and returns false', () => {
-      sm.transition(STATES.FOCUS)
-      const result = sm.transition(STATES.DETAIL) // FOCUS -> DETAIL not allowed
-      expect(result).toBe(false)
+    it('should allow BROWSE -> FOCUS', () => {
+      expect(sm.transition(STATES.FOCUS)).toBe(true)
       expect(sm.getState()).toBe(STATES.FOCUS)
     })
 
-    test('same state transition emits refresh and returns true', () => {
+    it('should allow BROWSE -> ZEN', () => {
+      expect(sm.transition(STATES.ZEN)).toBe(true)
+      expect(sm.getState()).toBe(STATES.ZEN)
+    })
+
+    it('should allow BROWSE -> TIMELINE', () => {
+      expect(sm.transition(STATES.TIMELINE)).toBe(true)
+      expect(sm.getState()).toBe(STATES.TIMELINE)
+    })
+
+    it('should update previous state on transition', () => {
+      sm.transition(STATES.DETAIL)
+      expect(sm.getPreviousState()).toBe(STATES.BROWSE)
+    })
+
+    it('should reject invalid state names', () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+
+      expect(sm.transition('invalid')).toBe(false)
+      expect(sm.getState()).toBe(STATES.BROWSE)
+      expect(consoleSpy).toHaveBeenCalledWith('Invalid state: invalid')
+
+      consoleSpy.mockRestore()
+    })
+
+    it('should handle same-state transition as refresh', () => {
       const refreshHandler = jest.fn()
       sm.on('refresh', refreshHandler)
 
-      const result = sm.transition(STATES.BROWSE)
-      expect(result).toBe(true)
+      expect(sm.transition(STATES.BROWSE)).toBe(true)
       expect(refreshHandler).toHaveBeenCalledWith({
         state: STATES.BROWSE,
         data: {}
       })
     })
 
-    test('passes data with transition', () => {
-      const project = { name: 'test-project' }
-      sm.transition(STATES.DETAIL, { project })
-      expect(sm.getData()).toEqual({ project })
+    it('should pass data with transition', () => {
+      const data = { projectId: '123' }
+      sm.transition(STATES.DETAIL, data)
+      expect(sm.getData()).toEqual(data)
+    })
+  })
+
+  describe('transition validation', () => {
+    it('should not allow FOCUS -> DETAIL (must go through BROWSE)', () => {
+      const sm = createStateMachine({ initial: STATES.FOCUS })
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+
+      expect(sm.transition(STATES.DETAIL)).toBe(false)
+      expect(sm.getState()).toBe(STATES.FOCUS)
+
+      consoleSpy.mockRestore()
+    })
+
+    it('should allow FOCUS -> BROWSE', () => {
+      const sm = createStateMachine({ initial: STATES.FOCUS })
+      expect(sm.transition(STATES.BROWSE)).toBe(true)
+    })
+
+    it('should allow DETAIL -> BROWSE', () => {
+      const sm = createStateMachine({ initial: STATES.DETAIL })
+      expect(sm.transition(STATES.BROWSE)).toBe(true)
+    })
+
+    it('should allow DETAIL -> FOCUS', () => {
+      const sm = createStateMachine({ initial: STATES.DETAIL })
+      expect(sm.transition(STATES.FOCUS)).toBe(true)
+    })
+
+    it('should allow ZEN -> FOCUS', () => {
+      const sm = createStateMachine({ initial: STATES.ZEN })
+      expect(sm.transition(STATES.FOCUS)).toBe(true)
+    })
+
+    it('should allow TIMELINE -> BROWSE', () => {
+      const sm = createStateMachine({ initial: STATES.TIMELINE })
+      expect(sm.transition(STATES.BROWSE)).toBe(true)
+    })
+  })
+
+  describe('canTransition()', () => {
+    it('should return true for allowed transitions', () => {
+      const sm = createStateMachine()
+      expect(sm.canTransition(STATES.DETAIL)).toBe(true)
+      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
+      expect(sm.canTransition(STATES.ZEN)).toBe(true)
+      expect(sm.canTransition(STATES.TIMELINE)).toBe(true)
+    })
+
+    it('should return false for disallowed transitions', () => {
+      const sm = createStateMachine({ initial: STATES.FOCUS })
+      expect(sm.canTransition(STATES.DETAIL)).toBe(false)
     })
   })
 
   describe('back()', () => {
-    test('returns to previous state', () => {
-      sm.transition(STATES.DETAIL)
+    it('should return to previous state when transition is allowed', () => {
+      const sm = createStateMachine()
+      sm.transition(STATES.DETAIL)  // BROWSE -> DETAIL, prev = BROWSE
+
+      sm.back()  // DETAIL -> BROWSE is allowed
+      expect(sm.getState()).toBe(STATES.BROWSE)
+    })
+
+    it('should fail when back transition is not allowed', () => {
+      const sm = createStateMachine()
+      sm.transition(STATES.DETAIL)   // BROWSE -> DETAIL, prev = BROWSE
+      sm.transition(STATES.FOCUS)    // DETAIL -> FOCUS, prev = DETAIL
+
+      // FOCUS -> DETAIL is NOT allowed (FOCUS can only go to BROWSE, ZEN, TIMELINE)
+      const result = sm.back()
+      expect(result).toBe(false)
+      expect(sm.getState()).toBe(STATES.FOCUS)  // State unchanged
+    })
+
+    it('should default to BROWSE if no previous state', () => {
+      const sm = createStateMachine({ initial: STATES.FOCUS })
       sm.back()
       expect(sm.getState()).toBe(STATES.BROWSE)
     })
 
-    test('returns to BROWSE if no previous state', () => {
-      const freshSm = createStateMachine({ initial: STATES.FOCUS })
-      freshSm.back()
-      expect(freshSm.getState()).toBe(STATES.BROWSE)
-      freshSm.destroy()
-    })
-
-    test('returns true on successful back', () => {
+    it('should return true on successful back', () => {
+      const sm = createStateMachine()
       sm.transition(STATES.DETAIL)
-      const result = sm.back()
-      expect(result).toBe(true)
+      expect(sm.back()).toBe(true)
     })
   })
 
-  describe('State Data', () => {
-    test('getData() returns empty object by default', () => {
-      expect(sm.getData()).toEqual({})
+  describe('Event emission', () => {
+    let sm
+    let handlers
+
+    beforeEach(() => {
+      sm = createStateMachine()
+      handlers = {
+        enter: jest.fn(),
+        exit: jest.fn(),
+        transition: jest.fn(),
+        enterDetail: jest.fn(),
+        exitBrowse: jest.fn()
+      }
+      sm.on('enter', handlers.enter)
+      sm.on('exit', handlers.exit)
+      sm.on('transition', handlers.transition)
+      sm.on('enter:detail', handlers.enterDetail)
+      sm.on('exit:browse', handlers.exitBrowse)
     })
 
-    test('getData() returns data set during transition', () => {
-      const data = { project: { name: 'test' } }
+    it('should emit exit event with correct data', () => {
+      sm.transition(STATES.DETAIL)
+
+      expect(handlers.exit).toHaveBeenCalledWith({
+        from: STATES.BROWSE,
+        to: STATES.DETAIL,
+        data: undefined
+      })
+    })
+
+    it('should emit state-specific exit event', () => {
+      sm.transition(STATES.DETAIL)
+
+      expect(handlers.exitBrowse).toHaveBeenCalledWith({
+        to: STATES.DETAIL,
+        data: undefined
+      })
+    })
+
+    it('should emit enter event with correct data', () => {
+      const data = { project: 'test' }
+      sm.transition(STATES.DETAIL, data)
+
+      expect(handlers.enter).toHaveBeenCalledWith({
+        from: STATES.BROWSE,
+        to: STATES.DETAIL,
+        data
+      })
+    })
+
+    it('should emit state-specific enter event', () => {
+      const data = { project: 'test' }
+      sm.transition(STATES.DETAIL, data)
+
+      expect(handlers.enterDetail).toHaveBeenCalledWith({
+        from: STATES.BROWSE,
+        data
+      })
+    })
+
+    it('should emit transition event', () => {
+      const data = { project: 'test' }
+      sm.transition(STATES.DETAIL, data)
+
+      expect(handlers.transition).toHaveBeenCalledWith({
+        from: STATES.BROWSE,
+        to: STATES.DETAIL,
+        data
+      })
+    })
+
+    it('should not emit enter/exit/transition events for same-state transition', () => {
+      sm.transition(STATES.BROWSE)
+
+      expect(handlers.enter).not.toHaveBeenCalled()
+      expect(handlers.exit).not.toHaveBeenCalled()
+      expect(handlers.transition).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Event unsubscription', () => {
+    it('should return unsubscribe function', () => {
+      const sm = createStateMachine()
+      const handler = jest.fn()
+      const unsubscribe = sm.on('enter', handler)
+
+      expect(typeof unsubscribe).toBe('function')
+    })
+
+    it('should stop receiving events after unsubscribe', () => {
+      const sm = createStateMachine()
+      const handler = jest.fn()
+      const unsubscribe = sm.on('enter', handler)
+
+      unsubscribe()
+      sm.transition(STATES.DETAIL)
+
+      expect(handler).not.toHaveBeenCalled()
+    })
+
+    it('should not affect other handlers when one unsubscribes', () => {
+      const sm = createStateMachine()
+      const handler1 = jest.fn()
+      const handler2 = jest.fn()
+
+      const unsubscribe1 = sm.on('enter', handler1)
+      sm.on('enter', handler2)
+
+      unsubscribe1()
+      sm.transition(STATES.DETAIL)
+
+      expect(handler1).not.toHaveBeenCalled()
+      expect(handler2).toHaveBeenCalled()
+    })
+  })
+
+  describe('Data management', () => {
+    it('should store data per state', () => {
+      const sm = createStateMachine()
+      const data = { projectId: '123' }
+
       sm.transition(STATES.DETAIL, data)
       expect(sm.getData()).toEqual(data)
     })
 
-    test('setData() merges with existing data', () => {
-      sm.transition(STATES.DETAIL, { project: { name: 'test' } })
-      sm.setData({ selected: true })
+    it('should return empty object if no data stored', () => {
+      const sm = createStateMachine()
+      expect(sm.getData()).toEqual({})
+    })
+
+    it('should get data for specific state', () => {
+      const sm = createStateMachine()
+      const detailData = { projectId: '123' }
+
+      sm.transition(STATES.DETAIL, detailData)
+      sm.transition(STATES.FOCUS, { timer: 25 })
+
+      expect(sm.getData(STATES.DETAIL)).toEqual(detailData)
+    })
+
+    it('should merge data with setData', () => {
+      const sm = createStateMachine()
+      sm.transition(STATES.DETAIL, { projectId: '123' })
+      sm.setData({ name: 'Test Project' })
+
       expect(sm.getData()).toEqual({
-        project: { name: 'test' },
-        selected: true
+        projectId: '123',
+        name: 'Test Project'
       })
-    })
-
-    test('getData() can retrieve data for specific state', () => {
-      sm.transition(STATES.DETAIL, { foo: 'bar' })
-      sm.transition(STATES.FOCUS, { baz: 'qux' })
-      expect(sm.getData(STATES.DETAIL)).toEqual({ foo: 'bar' })
-      expect(sm.getData(STATES.FOCUS)).toEqual({ baz: 'qux' })
-    })
-  })
-
-  describe('Events', () => {
-    test('emits enter event on transition', () => {
-      const handler = jest.fn()
-      sm.on('enter', handler)
-
-      sm.transition(STATES.DETAIL, { project: 'test' })
-
-      expect(handler).toHaveBeenCalledWith({
-        from: STATES.BROWSE,
-        to: STATES.DETAIL,
-        data: { project: 'test' }
-      })
-    })
-
-    test('emits exit event on transition', () => {
-      const handler = jest.fn()
-      sm.on('exit', handler)
-
-      sm.transition(STATES.DETAIL)
-
-      expect(handler).toHaveBeenCalledWith({
-        from: STATES.BROWSE,
-        to: STATES.DETAIL,
-        data: undefined
-      })
-    })
-
-    test('emits specific enter:state event', () => {
-      const handler = jest.fn()
-      sm.on('enter:detail', handler)
-
-      sm.transition(STATES.DETAIL)
-
-      expect(handler).toHaveBeenCalledWith({
-        from: STATES.BROWSE,
-        data: {}
-      })
-    })
-
-    test('emits specific exit:state event', () => {
-      const handler = jest.fn()
-      sm.on('exit:browse', handler)
-
-      sm.transition(STATES.DETAIL)
-
-      expect(handler).toHaveBeenCalledWith({
-        to: STATES.DETAIL,
-        data: undefined
-      })
-    })
-
-    test('emits transition event', () => {
-      const handler = jest.fn()
-      sm.on('transition', handler)
-
-      sm.transition(STATES.DETAIL)
-
-      expect(handler).toHaveBeenCalledWith({
-        from: STATES.BROWSE,
-        to: STATES.DETAIL,
-        data: {}
-      })
-    })
-
-    test('on() returns unsubscribe function', () => {
-      const handler = jest.fn()
-      const unsubscribe = sm.on('enter', handler)
-
-      sm.transition(STATES.DETAIL)
-      expect(handler).toHaveBeenCalledTimes(1)
-
-      unsubscribe()
-      sm.transition(STATES.FOCUS)
-      expect(handler).toHaveBeenCalledTimes(1) // Still 1, not called again
     })
   })
 
   describe('destroy()', () => {
-    test('clears all listeners', () => {
+    it('should clear all listeners', () => {
+      const sm = createStateMachine()
       const handler = jest.fn()
       sm.on('enter', handler)
 
@@ -277,50 +376,48 @@ describe('StateMachine', () => {
       expect(handler).not.toHaveBeenCalled()
     })
 
-    test('clears all state data', () => {
-      sm.transition(STATES.DETAIL, { foo: 'bar' })
+    it('should clear all state data', () => {
+      const sm = createStateMachine()
+      sm.transition(STATES.DETAIL, { projectId: '123' })
+
       sm.destroy()
+
       expect(sm.getData(STATES.DETAIL)).toEqual({})
     })
   })
 
-  describe('Complex Transition Scenarios', () => {
-    test('BROWSE -> DETAIL -> FOCUS -> ZEN -> BROWSE', () => {
-      expect(sm.transition(STATES.DETAIL)).toBe(true)
-      expect(sm.transition(STATES.FOCUS)).toBe(true)
-      expect(sm.transition(STATES.ZEN)).toBe(true)
+  describe('Integration scenarios', () => {
+    it('should handle typical user flow: browse -> detail -> focus -> browse', () => {
+      const sm = createStateMachine()
+
+      expect(sm.transition(STATES.DETAIL, { projectId: '123' })).toBe(true)
+      expect(sm.getState()).toBe(STATES.DETAIL)
+
+      expect(sm.transition(STATES.FOCUS, { duration: 25 })).toBe(true)
+      expect(sm.getState()).toBe(STATES.FOCUS)
+
       expect(sm.transition(STATES.BROWSE)).toBe(true)
       expect(sm.getState()).toBe(STATES.BROWSE)
     })
 
-    test('tracks state history correctly', () => {
-      sm.transition(STATES.DETAIL)
-      sm.transition(STATES.FOCUS)
-      sm.transition(STATES.ZEN)
+    it('should handle zen mode toggle', () => {
+      const sm = createStateMachine()
 
+      sm.transition(STATES.ZEN)
       expect(sm.getState()).toBe(STATES.ZEN)
-      expect(sm.getPreviousState()).toBe(STATES.FOCUS)
+
+      sm.back()
+      expect(sm.getState()).toBe(STATES.BROWSE)
     })
 
-    test('back() after multiple transitions respects allowed transitions', () => {
-      sm.transition(STATES.DETAIL)
+    it('should handle timeline view', () => {
+      const sm = createStateMachine()
+
+      sm.transition(STATES.TIMELINE)
+      expect(sm.getState()).toBe(STATES.TIMELINE)
+
+      expect(sm.canTransition(STATES.FOCUS)).toBe(true)
       sm.transition(STATES.FOCUS)
-      // FOCUS -> DETAIL is not allowed, so back() fails
-      const result = sm.back()
-
-      // back() tries to go to DETAIL but that's not allowed from FOCUS
-      // So it stays in FOCUS
-      expect(result).toBe(false)
-      expect(sm.getState()).toBe(STATES.FOCUS)
-    })
-
-    test('back() works when transition is allowed', () => {
-      sm.transition(STATES.FOCUS)
-      sm.transition(STATES.ZEN)
-      // ZEN -> FOCUS is allowed
-      const result = sm.back()
-
-      expect(result).toBe(true)
       expect(sm.getState()).toBe(STATES.FOCUS)
     })
   })

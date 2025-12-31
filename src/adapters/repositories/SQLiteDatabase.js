@@ -6,8 +6,8 @@
  */
 
 import Database from 'better-sqlite3'
-import { join, dirname } from 'path'
-import { mkdirSync, existsSync } from 'fs'
+import { join, dirname } from 'node:path'
+import { mkdirSync, existsSync } from 'node:fs'
 
 export class SQLiteDatabase {
   static SCHEMA_VERSION = 1

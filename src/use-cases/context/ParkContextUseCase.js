@@ -11,7 +11,7 @@
  * - User-provided note about where they were
  */
 
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { Capture } from '../../domain/entities/Capture.js';
 
 export class ParkContextUseCase {

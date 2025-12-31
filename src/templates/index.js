@@ -5,9 +5,9 @@
  * Supports custom user templates from ~/.atlas/templates/
  */
 
-import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, unlinkSync } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 
 const USER_TEMPLATES_DIR = join(homedir(), '.atlas', 'templates');
 
