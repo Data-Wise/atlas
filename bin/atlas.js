@@ -376,6 +376,31 @@ program
   });
 
 // ============================================================================
+// PLANNING COMMAND
+// ============================================================================
+
+program
+  .command('plan')
+  .description('Morning planning ritual - review yesterday, plan today')
+  .option('--ecosystem <path>', 'Scan .STATUS files in directory')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const atlasInstance = getAtlas();
+
+    if (options.json) {
+      const plan = await atlasInstance.sessions.plan({
+        ecosystemPath: options.ecosystem
+      });
+      console.log(JSON.stringify(plan, null, 2));
+    } else {
+      const output = await atlasInstance.formatPlan({
+        ecosystemPath: options.ecosystem
+      });
+      console.log(output);
+    }
+  });
+
+// ============================================================================
 // CAPTURE COMMANDS
 // ============================================================================
 

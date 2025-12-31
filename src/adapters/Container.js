@@ -42,6 +42,7 @@ import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUse
 import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
 import { GetSessionStatsUseCase } from '../use-cases/session/GetSessionStatsUseCase.js'
 import { ExportSessionsUseCase } from '../use-cases/session/ExportSessionsUseCase.js'
+import { PlanDayUseCase } from '../use-cases/session/PlanDayUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
@@ -185,6 +186,17 @@ export class Container {
   getExportSessionsUseCase() {
     return this._resolve('exportSessionsUseCase', () => {
       return new ExportSessionsUseCase(this.getSessionRepository())
+    })
+  }
+
+  getPlanDayUseCase() {
+    return this._resolve('planDayUseCase', () => {
+      return new PlanDayUseCase({
+        sessionRepository: this.getSessionRepository(),
+        captureRepository: this.getCaptureRepository(),
+        projectRepository: this.getProjectRepository(),
+        statusFileParser: this.getStatusFileParser()
+      })
     })
   }
 
@@ -380,6 +392,7 @@ export class Container {
       'EndSessionUseCase': () => this.getEndSessionUseCase(),
       'GetSessionStatsUseCase': () => this.getGetSessionStatsUseCase(),
       'ExportSessionsUseCase': () => this.getExportSessionsUseCase(),
+      'PlanDayUseCase': () => this.getPlanDayUseCase(),
       
       // Capture use cases
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
@@ -429,6 +442,7 @@ export class Container {
       endSession: this.getEndSessionUseCase(),
       getSessionStats: this.getGetSessionStatsUseCase(),
       exportSessions: this.getExportSessionsUseCase(),
+      planDay: this.getPlanDayUseCase(),
 
       // Project
       scanProjects: this.getScanProjectsUseCase(),
