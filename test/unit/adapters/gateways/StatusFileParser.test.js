@@ -122,6 +122,129 @@ checkpoint: Strategic refocus complete
     })
   })
 
+  describe('parse() - Markdown edge cases', () => {
+    test('parses version and updated fields', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `## Project: versioned
+## Status: released
+## Version: 2.1.0
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.version).toBe('2.1.0')
+    })
+
+    test('handles empty file', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '')
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.status).toBe('unknown')
+      expect(result.progress).toBe(0)
+    })
+
+    test('parses next field in markdown format', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `## Status: active
+next: Add more tests
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.next).toBe('Add more tests')
+    })
+
+    test('handles whitespace in values', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `## Project:   spaced-name
+## Status:  active
+## Progress:   50
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.name).toBe('spaced-name')
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(50)
+    })
+
+    test('handles case-insensitive keys', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `## PROJECT: upper-case
+## STATUS: Active
+## PROGRESS: 75
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.name).toBe('upper-case')
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(75)
+    })
+  })
+
+  describe('parse() - YAML edge cases', () => {
+    test('parses name as alternative to project', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `name: named-project
+status: active
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.name).toBe('named-project')
+    })
+
+    test('handles comments in YAML', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `# This is a comment
+status: active
+# Another comment
+progress: 50
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(50)
+    })
+
+    test('handles updated field', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `status: active
+updated: 2025-12-30
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.updated).toBe('2025-12-30')
+    })
+
+    test('handles invalid progress values gracefully', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `status: active
+progress: not-a-number
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.progress).toBe(0)
+    })
+
+    test('handles invalid priority values gracefully', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `status: active
+priority: invalid
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.priority).toBe(3)
+    })
+  })
+
   describe('parse() - Error handling', () => {
     test('returns null for non-existent file', async () => {
       const result = await parser.parse('/nonexistent/path/.STATUS')
@@ -196,6 +319,51 @@ checkpoint: Strategic refocus complete
       expect(results[0].file).toBe(join(project, '.STATUS'))
       expect(results[0].parsed).toBeDefined()
     })
+
+    test('uses custom exclude list', async () => {
+      const keep = join(testDir, 'node_modules', 'keep-this')
+      const exclude = join(testDir, 'custom_exclude')
+
+      await mkdir(keep, { recursive: true })
+      await mkdir(exclude, { recursive: true })
+
+      await writeFile(join(keep, '.STATUS'), '## Status: active')
+      await writeFile(join(exclude, '.STATUS'), '## Status: active')
+
+      // Custom exclude list that doesn't include node_modules
+      const results = await parser.scanDirectory(testDir, {
+        exclude: ['custom_exclude']
+      })
+
+      expect(results).toHaveLength(1)
+      expect(results[0].path).toContain('node_modules')
+    })
+
+    test('handles empty directory', async () => {
+      const results = await parser.scanDirectory(testDir)
+
+      expect(results).toHaveLength(0)
+    })
+
+    test('skips hidden directories by default', async () => {
+      const hidden = join(testDir, '.hidden-dir')
+      await mkdir(hidden, { recursive: true })
+      await writeFile(join(hidden, '.STATUS'), '## Status: active')
+
+      const results = await parser.scanDirectory(testDir)
+
+      expect(results).toHaveLength(0)
+    })
+
+    test('handles .STATUS file at root directory', async () => {
+      await writeFile(join(testDir, '.STATUS'), '## Status: active')
+
+      const results = await parser.scanDirectory(testDir)
+
+      // Root .STATUS IS found - the scanner finds .STATUS at any level
+      expect(results).toHaveLength(1)
+      expect(results[0].parsed.status).toBe('active')
+    })
   })
 
   describe('summarize()', () => {
@@ -251,6 +419,76 @@ checkpoint: Strategic refocus complete
       expect(summary.byStatus).toEqual({})
       expect(summary.byPriority).toEqual({ 1: [], 2: [], 3: [] })
       expect(summary.byProgress.complete).toEqual([])
+    })
+
+    test('clamps priority values to valid range', async () => {
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active', progress: 50, priority: -5 } },  // -5 → clamped to 1
+        { path: '/b', parsed: { status: 'active', progress: 50, priority: 5 } },   // 5 → clamped to 3
+        { path: '/c', parsed: { status: 'active', progress: 50, priority: 10 } }   // 10 → clamped to 3
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      // -5 clamps to 1, 5 and 10 clamp to 3
+      expect(summary.byPriority[1]).toHaveLength(1)
+      expect(summary.byPriority[3]).toHaveLength(2)
+    })
+
+    test('treats priority 0 as missing (defaults to 3)', async () => {
+      // Note: priority=0 is treated as falsy/missing by the || operator
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active', progress: 50, priority: 0 } }
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      // 0 is treated as "no priority specified" → defaults to 3
+      expect(summary.byPriority[3]).toHaveLength(1)
+    })
+
+    test('handles missing priority values', async () => {
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active', progress: 50 } } // no priority
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      expect(summary.byPriority[3]).toHaveLength(1)
+    })
+
+    test('handles missing progress values', async () => {
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active' } } // no progress
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      expect(summary.byProgress.notStarted).toHaveLength(1)
+    })
+
+    test('includes path in grouped results', async () => {
+      const scanResults = [
+        { path: '/projects/atlas', parsed: { name: 'atlas', status: 'active', progress: 50, priority: 1 } }
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      expect(summary.byStatus.active[0].path).toBe('/projects/atlas')
+      expect(summary.byStatus.active[0].name).toBe('atlas')
+    })
+
+    test('categorizes edge progress values correctly', async () => {
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active', progress: 99, priority: 1 } },
+        { path: '/b', parsed: { status: 'active', progress: 100, priority: 1 } },
+        { path: '/c', parsed: { status: 'active', progress: 101, priority: 1 } } // edge case
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      expect(summary.byProgress.inProgress).toHaveLength(1) // 99%
+      expect(summary.byProgress.complete).toHaveLength(2)   // 100% and 101%
     })
   })
 })

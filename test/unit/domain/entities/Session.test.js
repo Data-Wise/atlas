@@ -332,7 +332,9 @@ describe('Session Entity', () => {
         state: 'active',
         outcome: null,
         isFlowState: false,
-        energyLevel: null
+        energyLevel: null,
+        estimatedMinutes: null,
+        estimationAccuracy: null
       })
     })
 
@@ -391,6 +393,150 @@ describe('Session Entity', () => {
       const session = new Session('id-1', 'rmediation')
 
       expect(() => session.setEnergyLevel('extreme')).toThrow('Invalid energy level: extreme')
+    })
+  })
+
+  describe('Estimated Minutes', () => {
+    test('creates session with estimatedMinutes', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 30
+      })
+
+      expect(session.estimatedMinutes).toBe(30)
+    })
+
+    test('estimatedMinutes defaults to null', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      expect(session.estimatedMinutes).toBeNull()
+    })
+
+    test('throws error for non-positive estimated minutes', () => {
+      expect(() => new Session('id-1', 'rmediation', {
+        estimatedMinutes: 0
+      })).toThrow('Estimated minutes must be a positive number')
+
+      expect(() => new Session('id-1', 'rmediation', {
+        estimatedMinutes: -10
+      })).toThrow('Estimated minutes must be a positive number')
+    })
+
+    test('throws error for non-numeric estimated minutes', () => {
+      expect(() => new Session('id-1', 'rmediation', {
+        estimatedMinutes: 'thirty'
+      })).toThrow('Estimated minutes must be a positive number')
+    })
+
+    test('throws error for estimated minutes over 8 hours', () => {
+      expect(() => new Session('id-1', 'rmediation', {
+        estimatedMinutes: 500
+      })).toThrow('Estimated minutes cannot exceed 480 (8 hours)')
+    })
+
+    test('setEstimatedMinutes updates estimate', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      session.setEstimatedMinutes(45)
+
+      expect(session.estimatedMinutes).toBe(45)
+    })
+
+    test('setEstimatedMinutes throws for invalid value', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      expect(() => session.setEstimatedMinutes(0)).toThrow('Estimated minutes must be a positive number')
+      expect(() => session.setEstimatedMinutes(500)).toThrow('Estimated minutes cannot exceed 480 (8 hours)')
+    })
+
+    test('hasEstimate returns false when no estimate', () => {
+      const session = new Session('id-1', 'rmediation')
+
+      expect(session.hasEstimate()).toBe(false)
+    })
+
+    test('hasEstimate returns true when estimate provided', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 25
+      })
+
+      expect(session.hasEstimate()).toBe(true)
+    })
+  })
+
+  describe('Estimation Accuracy', () => {
+    test('getEstimationAccuracy returns null for active session', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 30
+      })
+
+      expect(session.getEstimationAccuracy()).toBeNull()
+    })
+
+    test('getEstimationAccuracy returns null for session without estimate', () => {
+      const session = new Session('id-1', 'rmediation')
+      session.end('completed')
+
+      expect(session.getEstimationAccuracy()).toBeNull()
+    })
+
+    test('getEstimationAccuracy calculates accuracy for ended session', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 30
+      })
+
+      // Simulate 45 minutes of work (50% over estimate)
+      session.startTime = new Date(Date.now() - 45 * 60 * 1000)
+      session.end('completed')
+
+      const accuracy = session.getEstimationAccuracy()
+
+      expect(accuracy).not.toBeNull()
+      expect(accuracy.estimated).toBe(30)
+      expect(accuracy.actual).toBeGreaterThanOrEqual(44)
+      expect(accuracy.actual).toBeLessThanOrEqual(46)
+      expect(accuracy.wasUnderestimate).toBe(true)
+      expect(accuracy.wasOverestimate).toBe(false)
+    })
+
+    test('getEstimationAccuracy detects overestimate', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 60
+      })
+
+      // Simulate 30 minutes of work (50% under estimate)
+      session.startTime = new Date(Date.now() - 30 * 60 * 1000)
+      session.end('completed')
+
+      const accuracy = session.getEstimationAccuracy()
+
+      expect(accuracy.wasOverestimate).toBe(true)
+      expect(accuracy.wasUnderestimate).toBe(false)
+      expect(accuracy.percentageOff).toBeLessThan(0)
+    })
+
+    test('getEstimationAccuracy detects accurate estimate', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 30
+      })
+
+      // Simulate 32 minutes of work (within 10%)
+      session.startTime = new Date(Date.now() - 32 * 60 * 1000)
+      session.end('completed')
+
+      const accuracy = session.getEstimationAccuracy()
+
+      expect(accuracy.wasAccurate).toBe(true)
+    })
+
+    test('getSummary includes estimation info', () => {
+      const session = new Session('id-1', 'rmediation', {
+        estimatedMinutes: 25
+      })
+
+      const summary = session.getSummary()
+
+      expect(summary.estimatedMinutes).toBe(25)
+      expect(summary.estimationAccuracy).toBeNull() // null because session is active
     })
   })
 })

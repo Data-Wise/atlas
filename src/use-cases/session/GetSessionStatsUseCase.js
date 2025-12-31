@@ -139,6 +139,9 @@ export class GetSessionStatsUseCase {
     // Daily breakdown (last N days)
     const dailyBreakdown = this.calculateDailyBreakdown(sessions, days)
 
+    // Time estimation accuracy
+    const estimationStats = this.calculateEstimationStats(sessions)
+
     return {
       period: {
         days,
@@ -160,7 +163,8 @@ export class GetSessionStatsUseCase {
       bestDay,
       hourlyDistribution,
       byProject,
-      dailyBreakdown
+      dailyBreakdown,
+      estimation: estimationStats
     }
   }
 
@@ -307,5 +311,76 @@ export class GetSessionStatsUseCase {
 
     // Return as sorted array (most recent first)
     return Object.values(daily).sort((a, b) => b.date.localeCompare(a.date))
+  }
+
+  /**
+   * Calculate time estimation accuracy statistics
+   * @private
+   */
+  calculateEstimationStats(sessions) {
+    // Filter to completed sessions with estimates
+    const sessionsWithEstimates = sessions.filter(s =>
+      s.estimatedMinutes &&
+      s.estimatedMinutes > 0 &&
+      s.outcome === 'completed'
+    )
+
+    if (sessionsWithEstimates.length === 0) {
+      return {
+        hasData: false,
+        sessionsWithEstimates: 0,
+        message: 'No sessions with time estimates yet'
+      }
+    }
+
+    // Calculate accuracy metrics
+    let totalPercentageOff = 0
+    let underestimates = 0
+    let overestimates = 0
+    let accurate = 0
+
+    for (const session of sessionsWithEstimates) {
+      const actual = session.getDuration?.() || 0
+      const estimated = session.estimatedMinutes
+      const difference = actual - estimated
+      const percentageOff = estimated > 0 ? (difference / estimated) * 100 : 0
+
+      totalPercentageOff += percentageOff
+
+      if (Math.abs(percentageOff) <= 10) {
+        accurate++
+      } else if (percentageOff > 0) {
+        underestimates++
+      } else {
+        overestimates++
+      }
+    }
+
+    const averagePercentageOff = Math.round(totalPercentageOff / sessionsWithEstimates.length)
+    const accuracyRate = Math.round((accurate / sessionsWithEstimates.length) * 100)
+
+    // Generate human-friendly message
+    let message = ''
+    if (accuracyRate >= 70) {
+      message = `Great estimation! ${accuracyRate}% of estimates were accurate.`
+    } else if (averagePercentageOff > 20) {
+      message = `You tend to underestimate by ${averagePercentageOff}%. Try adding a buffer.`
+    } else if (averagePercentageOff < -20) {
+      message = `You tend to overestimate by ${Math.abs(averagePercentageOff)}%. You're faster than you think!`
+    } else {
+      message = `Your estimates are fairly balanced. ${accuracyRate}% were accurate.`
+    }
+
+    return {
+      hasData: true,
+      sessionsWithEstimates: sessionsWithEstimates.length,
+      averagePercentageOff,        // positive = underestimate, negative = overestimate
+      accuracyRate,                // % within 10% of estimate
+      underestimates,              // count of sessions that took longer
+      overestimates,               // count of sessions that took less
+      accurate,                    // count of sessions within 10%
+      bias: averagePercentageOff > 0 ? 'underestimate' : averagePercentageOff < 0 ? 'overestimate' : 'balanced',
+      message
+    }
   }
 }

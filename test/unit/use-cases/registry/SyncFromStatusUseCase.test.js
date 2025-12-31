@@ -313,4 +313,335 @@ describe('SyncFromStatusUseCase', () => {
       expect(progressCalls[1].name).toBe('b')
     })
   })
+
+  describe('execute() - Type handling', () => {
+    test('sets project type from parsed data', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/r-pkg',
+          file: '/projects/r-pkg/.STATUS',
+          parsed: { name: 'r-pkg', status: 'active', type: 'r-package' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/r-pkg')
+      expect(saved.type.value).toBe('r-package')
+    })
+
+    test('falls back to general for invalid type', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/unknown',
+          file: '/projects/unknown/.STATUS',
+          parsed: { name: 'unknown', status: 'active', type: 'invalid-type-xyz' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/unknown')
+      expect(saved.type.value).toBe('general')
+    })
+
+    test('preserves existing type when updating with invalid type', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.type = { value: 'node' }
+      existing.metadata = { status: 'draft' }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', type: 'not-a-real-type' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/existing')
+      expect(saved.type.value).toBe('node')
+    })
+  })
+
+  describe('execute() - Description handling', () => {
+    test('preserves existing description when updating', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.description = 'Original description'
+      existing.metadata = { status: 'draft' }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', focus: 'New focus' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/existing')
+      expect(saved.description).toBe('Original description')
+    })
+
+    test('sets description from focus when no existing description', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.metadata = { status: 'draft' }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', focus: 'New focus' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/existing')
+      expect(saved.description).toBe('New focus')
+    })
+  })
+
+  describe('execute() - Metadata handling', () => {
+    test('preserves extra metadata fields when updating', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.metadata = { status: 'draft', customField: 'preserved', tags: ['important'] }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', progress: 50 }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/existing')
+      expect(saved.metadata.status).toBe('active')
+      expect(saved.metadata.progress).toBe(50)
+      expect(saved.metadata.customField).toBe('preserved')
+      expect(saved.metadata.tags).toEqual(['important'])
+    })
+
+    test('stores phase and version from parsed data', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/versioned',
+          file: '/projects/versioned/.STATUS',
+          parsed: {
+            name: 'versioned',
+            status: 'released',
+            phase: 'v2.0.0 Development',
+            version: '1.5.0'
+          }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/versioned')
+      expect(saved.metadata.phase).toBe('v2.0.0 Development')
+      expect(saved.metadata.version).toBe('1.5.0')
+    })
+
+    test('adds syncedAt timestamp', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/synced',
+          file: '/projects/synced/.STATUS',
+          parsed: { name: 'synced', status: 'active' }
+        }
+      ]
+
+      const beforeSync = new Date()
+      await useCase.execute({ rootPath: '/projects' })
+      const afterSync = new Date()
+
+      const saved = await projectRepo.findByPath('/projects/synced')
+      const syncedAt = new Date(saved.metadata.syncedAt)
+      expect(syncedAt.getTime()).toBeGreaterThanOrEqual(beforeSync.getTime())
+      expect(syncedAt.getTime()).toBeLessThanOrEqual(afterSync.getTime())
+    })
+  })
+
+  describe('execute() - Change detection', () => {
+    test('detects phase changes', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.metadata = { status: 'active', phase: 'Phase 1' }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', phase: 'Phase 2' }
+        }
+      ]
+
+      const result = await useCase.execute({ rootPath: '/projects' })
+
+      expect(result.updated).toHaveLength(1)
+      expect(result.updated[0].changes).toContain('phase: Phase 1 → Phase 2')
+    })
+
+    test('detects priority changes', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.metadata = { status: 'active', priority: 3 }
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active', priority: 1 }
+        }
+      ]
+
+      const result = await useCase.execute({ rootPath: '/projects' })
+
+      expect(result.updated).toHaveLength(1)
+      expect(result.updated[0].changes).toContain('priority: 3 → 1')
+    })
+
+    test('handles undefined metadata gracefully', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      // No metadata set at all
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active' }
+        }
+      ]
+
+      const result = await useCase.execute({ rootPath: '/projects' })
+
+      expect(result.updated).toHaveLength(1)
+      expect(result.updated[0].changes).toContain('status: none → active')
+    })
+  })
+
+  describe('execute() - ID generation', () => {
+    test('generates ID from project name', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/my-project',
+          file: '/projects/my-project/.STATUS',
+          parsed: { name: 'My Project', status: 'active' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/my-project')
+      expect(saved.id).toBe('my-project')
+    })
+
+    test('sanitizes special characters in ID', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/special',
+          file: '/projects/special/.STATUS',
+          parsed: { name: 'Project @#$ Special!', status: 'active' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/special')
+      expect(saved.id).toBe('project-special')
+    })
+
+    test('handles names with leading/trailing dashes', async () => {
+      statusParser.scanResults = [
+        {
+          path: '/projects/dashed',
+          file: '/projects/dashed/.STATUS',
+          parsed: { name: '---Dashed Project---', status: 'active' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/dashed')
+      expect(saved.id).toBe('dashed-project')
+    })
+  })
+
+  describe('execute() - Scan options passthrough', () => {
+    test('passes maxDepth option to scanner', async () => {
+      let receivedOptions = null
+      statusParser.scanDirectory = async (rootPath, options) => {
+        receivedOptions = options
+        return []
+      }
+
+      await useCase.execute({
+        rootPath: '/projects',
+        options: { maxDepth: 5 }
+      })
+
+      expect(receivedOptions.maxDepth).toBe(5)
+    })
+
+    test('passes exclude option to scanner', async () => {
+      let receivedOptions = null
+      statusParser.scanDirectory = async (rootPath, options) => {
+        receivedOptions = options
+        return []
+      }
+
+      await useCase.execute({
+        rootPath: '/projects',
+        options: { exclude: ['node_modules', '.git', 'vendor'] }
+      })
+
+      expect(receivedOptions.exclude).toEqual(['node_modules', '.git', 'vendor'])
+    })
+  })
+
+  describe('execute() - Statistics preservation', () => {
+    test('preserves lastAccessedAt when updating', async () => {
+      const existing = new Project('existing-id', 'existing', { path: '/projects/existing' })
+      existing.metadata = { status: 'draft' }
+      existing.lastAccessedAt = new Date('2025-01-01')
+      await projectRepo.save(existing)
+
+      statusParser.scanResults = [
+        {
+          path: '/projects/existing',
+          file: '/projects/existing/.STATUS',
+          parsed: { name: 'existing', status: 'active' }
+        }
+      ]
+
+      await useCase.execute({ rootPath: '/projects' })
+
+      const saved = await projectRepo.findByPath('/projects/existing')
+      expect(saved.lastAccessedAt.toISOString()).toBe(new Date('2025-01-01').toISOString())
+    })
+  })
+
+  describe('execute() - Empty results', () => {
+    test('returns empty results when no .STATUS files found', async () => {
+      statusParser.scanResults = []
+
+      const result = await useCase.execute({ rootPath: '/projects' })
+
+      expect(result.scanned).toBe(0)
+      expect(result.synced).toEqual([])
+      expect(result.created).toEqual([])
+      expect(result.updated).toEqual([])
+      expect(result.summary.total).toBe(0)
+    })
+  })
 })

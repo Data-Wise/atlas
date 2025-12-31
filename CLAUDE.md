@@ -30,7 +30,8 @@ atlas dash                       # Launch TUI
 | **Version** | 0.7.0 (dev) |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,192 (Jest) |
+| **Tests** | 1,428 (Jest) |
+| **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
 ## Architecture
@@ -53,6 +54,8 @@ src/
 │   ├── repositories/ # FileSystem*, SQLite* implementations
 │   └── gateways/     # GitGateway, StatusFileGateway
 ├── utils/            # ADHD helpers, config, charts
+├── mcp/              # MCP server for Claude integration
+│   └── index.js      # Tools: get_context, start_session, capture, etc.
 ├── cli/              # Dashboard TUI (blessed)
 │   └── dashboard/    # Modular dashboard components
 │       ├── constants.js   # Configuration values
@@ -149,7 +152,7 @@ atlas
 ## Testing
 
 ```bash
-npm test                  # All 1,156 tests
+npm test                  # All 1,428 tests
 npm run test:unit         # Unit tests only
 npm run test:e2e          # E2E tests
 npm run test:integration  # Integration tests
@@ -269,10 +272,11 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 | [TUTORIAL.md](docs/TUTORIAL.md) | Getting started |
 | [DIAGRAMS.md](docs/DIAGRAMS.md) | Visual diagrams |
 | [DEMOS.md](docs/DEMOS.md) | Terminal demos |
+| [MCP-SERVER.md](docs/MCP-SERVER.md) | MCP integration |
 
 ## Version History
 
-- **v0.7.0** - Session export to iCal, Task-Based Focus, Time Block View
+- **v0.7.0** - Session export, Task-Based Focus, Time Estimation, MCP Server
 - **v0.6.3** - Stats export (`--export`, `--format md`)
 - **v0.6.2** - Demo GIF CI workflow, GitGateway detached HEAD fix
 - **v0.6.1** - Friendly error messages for session commands
