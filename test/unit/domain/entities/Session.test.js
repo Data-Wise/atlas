@@ -88,7 +88,7 @@ describe('Session Entity', () => {
       const session = new Session('id-1', 'rmediation')
       session.end('completed')
 
-      expect(() => session.end('completed')).toThrow('Session is already ended')
+      expect(() => session.end('completed')).toThrow("Cannot end session: invalid transition from 'ended' to 'ended'")
     })
 
     test('throws error for invalid outcome', () => {
@@ -122,7 +122,7 @@ describe('Session Entity', () => {
       const session = new Session('id-1', 'rmediation')
       session.pause()
 
-      expect(() => session.pause()).toThrow('Can only pause active sessions')
+      expect(() => session.pause()).toThrow("Cannot pause session: invalid transition from 'paused' to 'paused'")
     })
 
     test('resumes paused session', () => {
@@ -139,7 +139,7 @@ describe('Session Entity', () => {
     test('throws error when resuming non-paused session', () => {
       const session = new Session('id-1', 'rmediation')
 
-      expect(() => session.resume()).toThrow('Can only resume paused sessions')
+      expect(() => session.resume()).toThrow("Cannot resume session: invalid transition from 'active' to 'active'")
     })
 
     test('tracks total paused time correctly', () => {

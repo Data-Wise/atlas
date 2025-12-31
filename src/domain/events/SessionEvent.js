@@ -1,10 +1,13 @@
 /**
  * Base class for session events
+ * All events are immutable after construction
  */
 export class SessionEvent {
   constructor(sessionId) {
     this.sessionId = sessionId
     this.timestamp = new Date()
+    // Note: Subclasses call Object.freeze(this) after setting their properties
+    // Base class freezing would prevent subclass property assignment
   }
 }
 

@@ -155,11 +155,11 @@ export async function runDashboard(atlas, options = {}) {
 
   // Apply current theme to widgets
   function applyTheme() {
-    statusBar.style.bg = currentTheme.primary
+    // Apply to actual widgets that exist
+    titleBar.style.bg = currentTheme.primary
     filterBar.style.bg = 'black'
-    projectsTable.options.border.fg = currentTheme.primary
-    sidebar.options.border.fg = currentTheme.primary
     commandBar.style.bg = currentTheme.primary
+    // Note: projectsTable and sidebar are legacy shims - skip them
     screen.render()
   }
 
@@ -286,17 +286,18 @@ export async function runDashboard(atlas, options = {}) {
     style: { fg: 'gray', bg: 'black' }
   })
 
-  // Legacy compatibility aliases
-  const statusBar = titleBar
-  const projectsTable = {
+  // Compatibility shims for old code paths
+  // TODO: Refactor callers to use new widget names directly, then remove these
+  const statusBar = titleBar // Used for status messages throughout
+  const projectsTable = { // Shim for focus management
     rows: { selected: 0, emit: () => {} },
     setData: () => {},
     focus: () => cardContainer.focus()
   }
-  const sidebar = blessed.box({ hidden: true })
-  const activitySpark = { setData: () => {} }
-  const statsBox = blessed.box({ setContent: () => {} })
-  const capturesBox = blessed.box({ setContent: () => {} })
+  const sidebar = blessed.box({ hidden: true }) // Unused but referenced
+  const activitySpark = { setData: () => {} } // Unused stub
+  const statsBox = blessed.box({ setContent: () => {} }) // Unused stub
+  const capturesBox = blessed.box({ setContent: () => {} }) // Unused stub
 
   screen.append(mainView)
 
