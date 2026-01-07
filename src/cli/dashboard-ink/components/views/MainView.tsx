@@ -9,11 +9,14 @@ interface Project {
   status: string;
   progress: number;
   focus?: string;
+  path?: string;
+  next?: string;
 }
 
 interface MainViewProps {
   projects: Project[];
   onQuit: () => void;
+  onSelectProject?: (project: Project) => void;
 }
 
 /**
@@ -27,7 +30,7 @@ interface MainViewProps {
  * - Enter: Select project (detail view - not implemented in POC)
  * - q: Quit
  */
-export const MainView: React.FC<MainViewProps> = ({ projects, onQuit }) => {
+export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Keyboard navigation
@@ -38,9 +41,12 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit }) => {
       setSelectedIndex((prev) => Math.min(prev + 1, projects.length - 1));
     } else if (input === 'k' || key.upArrow) {
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
-    } else if (key.return) {
-      // In full implementation, would show detail view
-      // For POC, just highlight the selection
+    } else if (key.return && onSelectProject) {
+      // Show detail view for selected project
+      const selectedProject = projects[selectedIndex];
+      if (selectedProject) {
+        onSelectProject(selectedProject);
+      }
     }
   });
 
