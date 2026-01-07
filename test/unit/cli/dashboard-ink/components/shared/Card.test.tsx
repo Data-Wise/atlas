@@ -222,8 +222,11 @@ describe('Card Component', () => {
         />
       );
 
-      // Should still render without crashing
-      expect(lastFrame()).toContain('150%');
+      const frame = lastFrame();
+      // Should display actual percentage
+      expect(frame).toContain('150%');
+      // Progress bar should be clamped to 100% (all filled)
+      expect(frame).toContain('████████████████████');
     });
 
     it('should handle negative progress', () => {
@@ -235,8 +238,11 @@ describe('Card Component', () => {
         />
       );
 
-      // Should still render without crashing
-      expect(lastFrame()).toContain('-10%');
+      const frame = lastFrame();
+      // Should display actual percentage
+      expect(frame).toContain('-10%');
+      // Progress bar should be clamped to 0% (all empty)
+      expect(frame).toContain('░░░░░░░░░░░░░░░░░░░░');
     });
   });
 });

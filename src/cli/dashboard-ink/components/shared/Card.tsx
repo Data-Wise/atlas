@@ -35,7 +35,9 @@ export const Card: React.FC<CardProps> = ({ project, isSelected }) => {
   // Create progress bar
   const createProgressBar = (progress: number): string => {
     const width = 20;
-    const filled = Math.round((progress / 100) * width);
+    // Clamp progress to 0-100 range for visual display
+    const clampedProgress = Math.max(0, Math.min(100, progress));
+    const filled = Math.round((clampedProgress / 100) * width);
     const empty = width - filled;
     return '█'.repeat(filled) + '░'.repeat(empty);
   };
