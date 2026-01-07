@@ -1,0 +1,97 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Text, useInput } from 'ink';
+import { Card } from '../shared/Card.js';
+
+interface Project {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  progress: number;
+  focus?: string;
+}
+
+interface MainViewProps {
+  projects: Project[];
+  onQuit: () => void;
+}
+
+/**
+ * MainView Component
+ *
+ * Displays the main dashboard with a card stack of projects.
+ * Replicates the functionality of the blessed MainView.
+ *
+ * Keyboard shortcuts:
+ * - j/k or ↓/↑: Navigate cards
+ * - Enter: Select project (detail view - not implemented in POC)
+ * - q: Quit
+ */
+export const MainView: React.FC<MainViewProps> = ({ projects, onQuit }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Keyboard navigation
+  useInput((input, key) => {
+    if (input === 'q') {
+      onQuit();
+    } else if (input === 'j' || key.downArrow) {
+      setSelectedIndex((prev) => Math.min(prev + 1, projects.length - 1));
+    } else if (input === 'k' || key.upArrow) {
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (key.return) {
+      // In full implementation, would show detail view
+      // For POC, just highlight the selection
+    }
+  });
+
+  // Auto-scroll to keep selected card visible (simple implementation)
+  const visibleProjects = projects.slice(
+    Math.max(0, selectedIndex - 2),
+    Math.min(projects.length, selectedIndex + 3)
+  );
+
+  return (
+    <Box flexDirection="column" width="100%" height="100%">
+      {/* Header */}
+      <Box
+        borderStyle="single"
+        borderColor="cyan"
+        paddingX={1}
+        marginBottom={1}
+      >
+        <Text bold color="cyan">
+          Atlas Dashboard (Ink POC)
+        </Text>
+        <Text color="gray"> - {projects.length} projects</Text>
+      </Box>
+
+      {/* Card Stack */}
+      <Box flexDirection="column" flexGrow={1}>
+        {visibleProjects.map((project, index) => {
+          const actualIndex = projects.indexOf(project);
+          return (
+            <Card
+              key={project.id}
+              project={project}
+              isSelected={actualIndex === selectedIndex}
+              onSelect={() => setSelectedIndex(actualIndex)}
+            />
+          );
+        })}
+      </Box>
+
+      {/* Command Bar */}
+      <Box
+        borderStyle="single"
+        borderColor="gray"
+        paddingX={1}
+        marginTop={1}
+      >
+        <Text color="gray">
+          j/k: Navigate • Enter: Select • q: Quit
+        </Text>
+        <Text color="cyan"> [{selectedIndex + 1}/{projects.length}]</Text>
+      </Box>
+    </Box>
+  );
+};

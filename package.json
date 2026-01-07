@@ -61,6 +61,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@inkjs/ui": "^2.0.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "better-sqlite3": "^12.5.0",
     "blessed": "^0.1.81",
@@ -68,14 +69,19 @@
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "glob": "^10.3.10",
+    "ink": "^6.6.0",
     "open": "^11.0.0",
+    "react": "^19.2.3",
     "ws": "^8.18.3",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@types/react": "^19.2.7",
     "eslint": "^8.57.1",
     "express": "^5.2.1",
+    "ink-testing-library": "^4.0.0",
     "jest": "^29.7.0",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0"
   }
 }
