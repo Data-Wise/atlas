@@ -649,9 +649,9 @@ program
 program
   .command('dashboard')
   .alias('dash')
-  .description('Launch interactive dashboard TUI')
+  .description('Launch interactive dashboard TUI (Ink-powered)')
   .action(async () => {
-    const { runDashboard } = await import('../src/cli/dashboard.js');
+    const { runDashboard } = await import('../src/cli/dashboard-ink-launcher.js');
     await runDashboard(getAtlas());
   });
 
