@@ -32,6 +32,11 @@
     "test:dashboard": "bash test/interactive-dashboard-test.sh",
     "test:cli": "bash tests/cli/automated-tests.sh",
     "test:cli-ui": "bash tests/cli/interactive-tests.sh",
+    "test:ink": "npm test -- --testPathPattern=test/.*dashboard-ink",
+    "test:ink:unit": "npm test -- --testPathPattern=test/unit/.*dashboard-ink",
+    "test:ink:e2e": "npm test -- --testPathPattern=test/e2e/dashboard-ink",
+    "test:ink:dogfood": "bash test/dogfood/dashboard-ink/basic-functionality.sh",
+    "test:ink:all": "npm run test:ink && npm run test:ink:dogfood",
     "lint": "eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
     "start": "node bin/atlas.js",
@@ -76,6 +81,8 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@swc/core": "^1.15.8",
+    "@swc/jest": "^0.2.39",
     "@types/react": "^19.2.7",
     "eslint": "^8.57.1",
     "express": "^5.2.1",
