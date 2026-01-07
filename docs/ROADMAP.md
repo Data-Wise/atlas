@@ -12,19 +12,19 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 ---
 
-## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 83%)
+## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 50%)
 
 **Theme:** Technical debt reduction, then visual enhancements
 
-### Sprint 1: TUI Modernization 🔧 (5/6 Complete)
+### Sprint 1: TUI Modernization 🔧 ✅ COMPLETE (6/6)
 - [x] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed) ✅
 - [x] Build Ink POC with MainView and Card components ✅
 - [x] Migrate all 7 views to Ink (Detail, Focus, Zen, Timeline, Ecosystem, Plan) ✅
 - [x] Implement state management with React integration ✅
 - [x] Add integration tests (25 tests, all passing) ✅
-- [ ] Remove blessed dependency and switch to Ink as default 🔄
+- [x] Remove blessed dependency and switch to Ink as default ✅
 
-**Progress:** Ink migration complete, all views functional and tested. Only blessed removal remains.
+**Progress:** Sprint 1 COMPLETE! Ink is now default, 73% code reduction achieved.
 
 ### Sprint 2: Visual Evolution 🎨
 - [ ] GitHub-style heatmap view (`h` key)
