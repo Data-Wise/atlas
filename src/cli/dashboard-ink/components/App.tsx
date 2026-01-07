@@ -5,6 +5,7 @@ import { DetailView } from './views/DetailView.js';
 import { FocusView } from './views/FocusView.js';
 import { ZenView } from './views/ZenView.js';
 import { TimelineView } from './views/TimelineView.js';
+import { EcosystemView } from './views/EcosystemView.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
 
 interface Project {
@@ -113,9 +114,23 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     setCurrentView(STATES.TIMELINE);
   };
 
+  const showEcosystemView = () => {
+    stateMachine.transition(STATES.ECOSYSTEM);
+    setCurrentView(STATES.ECOSYSTEM);
+  };
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
+      case STATES.ECOSYSTEM:
+        return (
+          <EcosystemView
+            onBack={showMainView}
+            onSelectProject={showDetailView}
+            onFocus={showFocusView}
+          />
+        );
+
       case STATES.TIMELINE:
         return (
           <TimelineView
@@ -160,6 +175,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             onFocus={showFocusView}
             onZen={showZenView}
             onTimeline={showTimelineView}
+            onEcosystem={showEcosystemView}
           />
         );
     }
