@@ -17,6 +17,7 @@ interface MainViewProps {
   projects: Project[];
   onQuit: () => void;
   onSelectProject?: (project: Project) => void;
+  onFocus?: () => void;
 }
 
 /**
@@ -30,7 +31,7 @@ interface MainViewProps {
  * - Enter: Select project (detail view - not implemented in POC)
  * - q: Quit
  */
-export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject }) => {
+export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject, onFocus }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Keyboard navigation
@@ -47,6 +48,9 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
       if (selectedProject) {
         onSelectProject(selectedProject);
       }
+    } else if (input === 'f' && onFocus) {
+      // Enter focus mode
+      onFocus();
     }
   });
 
@@ -94,7 +98,7 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
         marginTop={1}
       >
         <Text color="gray">
-          j/k: Navigate • Enter: Select • q: Quit
+          j/k: Navigate • Enter: Select • f: Focus • q: Quit
         </Text>
         <Text color="cyan"> [{selectedIndex + 1}/{projects.length}]</Text>
       </Box>

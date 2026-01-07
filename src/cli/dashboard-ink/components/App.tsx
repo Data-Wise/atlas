@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useInput } from 'ink';
 import { MainView } from './views/MainView.js';
 import { DetailView } from './views/DetailView.js';
+import { FocusView } from './views/FocusView.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
 
 interface Project {
@@ -95,9 +96,23 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     setSelectedProject(project);
   };
 
+  const showFocusView = () => {
+    stateMachine.transition(STATES.FOCUS);
+    setCurrentView(STATES.FOCUS);
+  };
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
+      case STATES.FOCUS:
+        return (
+          <FocusView
+            project={selectedProject?.name}
+            task={selectedProject?.focus}
+            onBack={showMainView}
+          />
+        );
+
       case STATES.DETAIL:
         return selectedProject ? (
           <DetailView
@@ -113,6 +128,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             projects={mockProjects}
             onQuit={onExit}
             onSelectProject={showDetailView}
+            onFocus={showFocusView}
           />
         );
     }
