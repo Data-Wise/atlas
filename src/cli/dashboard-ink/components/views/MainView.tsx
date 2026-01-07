@@ -20,6 +20,7 @@ interface MainViewProps {
   onFocus?: () => void;
   onZen?: () => void;
   onTimeline?: () => void;
+  onEcosystem?: () => void;
 }
 
 /**
@@ -33,7 +34,7 @@ interface MainViewProps {
  * - Enter: Select project (detail view - not implemented in POC)
  * - q: Quit
  */
-export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject, onFocus, onZen, onTimeline }) => {
+export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject, onFocus, onZen, onTimeline, onEcosystem }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Keyboard navigation
@@ -59,6 +60,9 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
     } else if (input === 'T' && onTimeline) {
       // Enter timeline view (Shift+t)
       onTimeline();
+    } else if (input === 'e' && onEcosystem) {
+      // Enter ecosystem view
+      onEcosystem();
     }
   });
 
@@ -106,7 +110,7 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
         marginTop={1}
       >
         <Text color="gray">
-          j/k: Navigate • Enter: Select • f: Focus • z: Zen • T: Timeline • q: Quit
+          j/k: Navigate • Enter: Select • f: Focus • z: Zen • T: Timeline • e: Ecosystem • q: Quit
         </Text>
         <Text color="cyan"> [{selectedIndex + 1}/{projects.length}]</Text>
       </Box>
