@@ -108,7 +108,7 @@ describe('MainView Component', () => {
   });
 
   describe('Keyboard Navigation', () => {
-    it('should navigate down with j key', () => {
+    it('should navigate down with j key', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
@@ -119,25 +119,30 @@ describe('MainView Component', () => {
       // Press 'j' to move down
       stdin.write('j');
 
+      // Wait for state update
+      await new Promise(resolve => setTimeout(resolve, 10));
+
       // Should move to position 2
       expect(lastFrame()).toContain('[2/3]');
     });
 
-    it('should navigate up with k key', () => {
+    it('should navigate up with k key', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
 
       // Move down first
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[2/3]');
 
       // Then move up
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/3]');
     });
 
-    it('should not navigate above first project', () => {
+    it('should not navigate above first project', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
@@ -147,44 +152,51 @@ describe('MainView Component', () => {
 
       // Try to move up
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // Should stay at position 1
       expect(lastFrame()).toContain('[1/3]');
     });
 
-    it('should not navigate below last project', () => {
+    it('should not navigate below last project', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
 
       // Move to last project
       stdin.write('j'); // position 2
+      await new Promise(resolve => setTimeout(resolve, 10));
       stdin.write('j'); // position 3
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[3/3]');
 
       // Try to move down
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // Should stay at position 3
       expect(lastFrame()).toContain('[3/3]');
     });
 
-    it('should navigate down with down arrow', () => {
+    it('should navigate down with down arrow', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
 
       stdin.write('\x1B[B'); // Down arrow ANSI code
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[2/3]');
     });
 
-    it('should navigate up with up arrow', () => {
+    it('should navigate up with up arrow', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
 
       stdin.write('j'); // Move down first
+      await new Promise(resolve => setTimeout(resolve, 10));
       stdin.write('\x1B[A'); // Up arrow ANSI code
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/3]');
     });
 
@@ -198,12 +210,13 @@ describe('MainView Component', () => {
       expect(mockOnQuit).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle Enter key without crashing', () => {
+    it('should handle Enter key without crashing', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={mockProjects} onQuit={mockOnQuit} />
       );
 
       stdin.write('\r'); // Enter key
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // Should still render (Enter does nothing in POC)
       expect(lastFrame()).toContain('Atlas Dashboard');
@@ -228,7 +241,7 @@ describe('MainView Component', () => {
       expect(lastFrame()).toContain('[1/10]');
     });
 
-    it('should handle 100 projects', () => {
+    it('should handle 100 projects', async () => {
       const manyProjects = Array.from({ length: 100 }, (_, i) => ({
         id: `${i + 1}`,
         name: `project-${i + 1}`,
@@ -247,6 +260,7 @@ describe('MainView Component', () => {
       for (let i = 0; i < 50; i++) {
         stdin.write('j');
       }
+      await new Promise(resolve => setTimeout(resolve, 50)); // Longer delay for many operations
 
       expect(lastFrame()).toContain('[51/100]');
     });
@@ -262,21 +276,23 @@ describe('MainView Component', () => {
       expect(lastFrame()).toContain('[1/1]');
     });
 
-    it('should not allow navigation with one project', () => {
+    it('should not allow navigation with one project', async () => {
       const { lastFrame, stdin } = render(
         <MainView projects={[mockProjects[0]]} onQuit={mockOnQuit} />
       );
 
       stdin.write('j'); // Try to move down
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/1]');
 
       stdin.write('k'); // Try to move up
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/1]');
     });
   });
 
   describe('Visual Scrolling', () => {
-    it('should show visible window of projects', () => {
+    it('should show visible window of projects', async () => {
       // Create enough projects to test scrolling
       const manyProjects = Array.from({ length: 10 }, (_, i) => ({
         id: `${i + 1}`,
@@ -294,6 +310,7 @@ describe('MainView Component', () => {
       for (let i = 0; i < 5; i++) {
         stdin.write('j');
       }
+      await new Promise(resolve => setTimeout(resolve, 30)); // Wait for all 5 updates
 
       // Should show project-6 (index 5) in the view
       const frame = lastFrame();

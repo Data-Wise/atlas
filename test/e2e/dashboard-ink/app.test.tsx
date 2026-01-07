@@ -66,7 +66,7 @@ describe('Ink Dashboard App - E2E', () => {
   });
 
   describe('Navigation Flow', () => {
-    it('should navigate through all projects', () => {
+    it('should navigate through all projects', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Start at project 1
@@ -74,67 +74,78 @@ describe('Ink Dashboard App - E2E', () => {
 
       // Navigate to project 2
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[2/5]');
 
       // Navigate to project 3
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[3/5]');
 
       // Navigate to project 4
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[4/5]');
 
       // Navigate to project 5
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[5/5]');
     });
 
-    it('should navigate forward and backward', () => {
+    it('should navigate forward and backward', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Move forward
       stdin.write('j');
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 20));
       expect(lastFrame()).toContain('[3/5]');
 
       // Move backward
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[2/5]');
 
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/5]');
     });
 
-    it('should use arrow keys for navigation', () => {
+    it('should use arrow keys for navigation', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Down arrow
       stdin.write('\x1B[B');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[2/5]');
 
       // Up arrow
       stdin.write('\x1B[A');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('[1/5]');
     });
 
-    it('should stay within bounds at top', () => {
+    it('should stay within bounds at top', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Try to go above first project
       stdin.write('k');
       stdin.write('k');
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 20));
 
       expect(lastFrame()).toContain('[1/5]');
     });
 
-    it('should stay within bounds at bottom', () => {
+    it('should stay within bounds at bottom', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Navigate to last project
       for (let i = 0; i < 10; i++) {
         stdin.write('j');
       }
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       expect(lastFrame()).toContain('[5/5]');
     });
@@ -161,13 +172,14 @@ describe('Ink Dashboard App - E2E', () => {
   });
 
   describe('Visual Consistency', () => {
-    it('should maintain layout after navigation', () => {
+    it('should maintain layout after navigation', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Navigate multiple times
       stdin.write('j');
       stdin.write('j');
       stdin.write('k');
+      await new Promise(resolve => setTimeout(resolve, 30));
 
       const frame = lastFrame();
 
@@ -209,11 +221,12 @@ describe('Ink Dashboard App - E2E', () => {
       expect(frame).toContain('100%');
     });
 
-    it('should load flow-cli project data', () => {
+    it('should load flow-cli project data', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Navigate to second project
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       const frame = lastFrame();
 
@@ -222,23 +235,26 @@ describe('Ink Dashboard App - E2E', () => {
       expect(frame).toContain('stable');
     });
 
-    it('should show different statuses', () => {
+    it('should show different statuses', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Navigate through projects to see different statuses
       expect(lastFrame()).toContain('active'); // atlas
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('stable'); // flow-cli
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('active'); // mcp-server
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('paused'); // rmediation
     });
 
-    it('should show progress values ranging from 0-100', () => {
+    it('should show progress values ranging from 0-100', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Project 1: 100%
@@ -246,27 +262,32 @@ describe('Ink Dashboard App - E2E', () => {
 
       // Navigate through to see different progress values
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('95%');
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('80%');
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('60%');
 
       stdin.write('j');
+      await new Promise(resolve => setTimeout(resolve, 10));
       expect(lastFrame()).toContain('45%');
     });
   });
 
   describe('Stress Tests', () => {
-    it('should handle rapid navigation', () => {
+    it('should handle rapid navigation', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Rapid down navigation
       for (let i = 0; i < 20; i++) {
         stdin.write('j');
       }
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for all updates
 
       // Should be at last project
       expect(lastFrame()).toContain('[5/5]');
@@ -275,24 +296,26 @@ describe('Ink Dashboard App - E2E', () => {
       for (let i = 0; i < 20; i++) {
         stdin.write('k');
       }
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for all updates
 
       // Should be at first project
       expect(lastFrame()).toContain('[1/5]');
     });
 
-    it('should handle mixed key presses', () => {
+    it('should handle mixed key presses', async () => {
       const { lastFrame, stdin } = render(<App onExit={mockOnExit} />);
 
       // Mix of navigation and other keys
-      stdin.write('j');
-      stdin.write('\r'); // Enter
-      stdin.write('k');
-      stdin.write('\x1B[B'); // Down arrow
-      stdin.write('j');
+      stdin.write('j');      // pos 1 -> 2
+      stdin.write('\r');     // Enter (no-op)
+      stdin.write('k');      // pos 2 -> 1
+      stdin.write('\x1B[B'); // Down arrow: pos 1 -> 2
+      stdin.write('j');      // pos 2 -> 3
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       // Should still render correctly
       expect(lastFrame()).toContain('Atlas Dashboard');
-      expect(lastFrame()).toContain('[2/5]'); // j, k, down, j = position 2
+      expect(lastFrame()).toContain('[3/5]'); // Final position is 3
     });
   });
 
@@ -309,7 +332,7 @@ describe('Ink Dashboard App - E2E', () => {
       expect(renderTime).toBeLessThan(1000);
     });
 
-    it('should handle navigation without lag', () => {
+    it('should handle navigation without lag', async () => {
       const { stdin } = render(<App onExit={mockOnExit} />);
 
       const startTime = Date.now();
@@ -318,12 +341,13 @@ describe('Ink Dashboard App - E2E', () => {
       for (let i = 0; i < 10; i++) {
         stdin.write('j');
       }
+      await new Promise(resolve => setTimeout(resolve, 50)); // Wait for all updates
 
       const endTime = Date.now();
       const navTime = endTime - startTime;
 
-      // Navigation should be fast
-      expect(navTime).toBeLessThan(100);
+      // Navigation should be fast (including our wait time)
+      expect(navTime).toBeLessThan(200);
     });
   });
 });
