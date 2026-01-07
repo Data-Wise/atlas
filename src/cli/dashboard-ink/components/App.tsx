@@ -4,6 +4,7 @@ import { MainView } from './views/MainView.js';
 import { DetailView } from './views/DetailView.js';
 import { FocusView } from './views/FocusView.js';
 import { ZenView } from './views/ZenView.js';
+import { TimelineView } from './views/TimelineView.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
 
 interface Project {
@@ -107,9 +108,22 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     setCurrentView(STATES.ZEN);
   };
 
+  const showTimelineView = () => {
+    stateMachine.transition(STATES.TIMELINE);
+    setCurrentView(STATES.TIMELINE);
+  };
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
+      case STATES.TIMELINE:
+        return (
+          <TimelineView
+            onBack={showMainView}
+            onFocus={showFocusView}
+          />
+        );
+
       case STATES.ZEN:
         return (
           <ZenView
@@ -145,6 +159,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             onSelectProject={showDetailView}
             onFocus={showFocusView}
             onZen={showZenView}
+            onTimeline={showTimelineView}
           />
         );
     }
