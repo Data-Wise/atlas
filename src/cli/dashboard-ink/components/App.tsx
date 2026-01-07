@@ -3,6 +3,7 @@ import { useInput } from 'ink';
 import { MainView } from './views/MainView.js';
 import { DetailView } from './views/DetailView.js';
 import { FocusView } from './views/FocusView.js';
+import { ZenView } from './views/ZenView.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
 
 interface Project {
@@ -101,9 +102,23 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     setCurrentView(STATES.FOCUS);
   };
 
+  const showZenView = () => {
+    stateMachine.transition(STATES.ZEN);
+    setCurrentView(STATES.ZEN);
+  };
+
   // Render current view
   const renderView = () => {
     switch (currentView) {
+      case STATES.ZEN:
+        return (
+          <ZenView
+            project={selectedProject?.name}
+            task={selectedProject?.focus}
+            onBack={showMainView}
+          />
+        );
+
       case STATES.FOCUS:
         return (
           <FocusView
@@ -129,6 +144,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             onQuit={onExit}
             onSelectProject={showDetailView}
             onFocus={showFocusView}
+            onZen={showZenView}
           />
         );
     }
