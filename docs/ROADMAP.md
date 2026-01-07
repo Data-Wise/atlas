@@ -2,7 +2,7 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2025-12-31
+**Last Updated:** 2026-01-07
 
 ---
 
@@ -12,16 +12,19 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 ---
 
-## v0.9.0 - TUI Modernization + Visual Evolution (Next)
+## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 83%)
 
 **Theme:** Technical debt reduction, then visual enhancements
 
-### Sprint 1: TUI Modernization 🔧
-- [ ] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed)
-- [ ] Extract ViewRenderer.js from dashboard.js
-- [ ] Extract dialog components to `dialogs/` directory
-- [ ] Reduce dashboard.js from 2,303 to <1,000 lines
-- [ ] Add view transition integration tests
+### Sprint 1: TUI Modernization 🔧 (5/6 Complete)
+- [x] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed) ✅
+- [x] Build Ink POC with MainView and Card components ✅
+- [x] Migrate all 7 views to Ink (Detail, Focus, Zen, Timeline, Ecosystem, Plan) ✅
+- [x] Implement state management with React integration ✅
+- [x] Add integration tests (25 tests, all passing) ✅
+- [ ] Remove blessed dependency and switch to Ink as default 🔄
+
+**Progress:** Ink migration complete, all views functional and tested. Only blessed removal remains.
 
 ### Sprint 2: Visual Evolution 🎨
 - [ ] GitHub-style heatmap view (`h` key)
