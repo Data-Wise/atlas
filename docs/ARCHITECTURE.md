@@ -101,7 +101,7 @@ src/
 │   │   ├── ICaptureRepository.js
 │   │   └── IBreadcrumbRepository.js
 │   ├── constants/              # Centralized domain constants
-│   │   ├── BusinessRules.js   # Session thresholds, valid outcomes, defaults
+│   │   ├── BusinessRules.js   # Session thresholds, focus score weights/tiers, defaults
 │   │   └── index.js           # Re-exports
 │   ├── gateways/              # Gateway interfaces (dependency inversion)
 │   │   └── IStatusFileParser.js  # .STATUS file parser interface
@@ -155,7 +155,8 @@ src/
 │   ├── presenters/             # Formatting and presentation logic
 │   │   ├── ProjectPresenter.js # UI-agnostic formatters
 │   │   ├── TuiPresenter.js     # blessed-specific formatters
-│   │   ├── StatsPresenter.js   # Analytics formatters
+│   │   ├── StatsPresenter.js   # Analytics, sparklines, heatmap grid
+│   │   ├── FocusScorePresenter.js  # Focus tier icons, labels, colors (v0.9.1)
 │   │   └── index.js            # Re-exports
 │   ├── controllers/            # Presentation controllers
 │   │   └── StatusController.js
@@ -168,21 +169,25 @@ src/
 │   ├── dashboard-ink/          # ✨ v0.9.x Ink TUI (default)
 │   │   ├── components/         # Leaf components
 │   │   │   ├── App.tsx         # Root component, state machine driver
-│   │   │   ├── SidebarPanel.tsx  # Compact project list (D2, v0.9.1)
-│   │   │   ├── InspectorPanel.tsx # Detail + Pomodoro right panel (D3, v0.9.1)
+│   │   │   ├── SidebarPanel.tsx  # Compact list + sparklines + focus tiers
+│   │   │   ├── InspectorPanel.tsx # Detail + Pomodoro + heatmap + focus score
 │   │   │   ├── shared/
-│   │   │   │   └── Card.tsx    # Project card component
+│   │   │   │   ├── Card.tsx    # Project card component
+│   │   │   │   └── HeatmapComponent.tsx  # ✨ Activity heatmap (v0.9.1)
 │   │   │   └── views/
 │   │   │       ├── MainView.tsx    # Card stack (BROWSE)
 │   │   │       ├── DetailView.tsx  # Project details (DETAIL)
 │   │   │       ├── FocusView.tsx   # Pomodoro timer (FOCUS)
 │   │   │       ├── ZenView.tsx     # Minimal mode (ZEN)
 │   │   │       ├── TimelineView.tsx # Time blocks (TIMELINE)
-│   │   │       ├── EcosystemView.tsx # Multi-project (ECOSYSTEM)
+│   │   │       ├── EcosystemView.tsx # Multi-project + compact heatmap
 │   │   │       └── PlanView.tsx    # Morning ritual (PLAN)
-│   │   └── lib/
-│   │       ├── LayoutManager.tsx   # ✨ Layout engine: SINGLE/SPLIT/TRIPLE (D1, v0.9.1)
-│   │       └── stateMachine.ts     # View state machine
+│   │   ├── lib/
+│   │   │   ├── LayoutManager.tsx   # ✨ Layout engine: SINGLE/SPLIT/TRIPLE
+│   │   │   ├── ThemeContext.tsx     # ✨ 5 themes + ThemeProvider (v0.9.1)
+│   │   │   └── stateMachine.ts     # View state machine
+│   │   ├── types.ts               # Shared Project type (+ focusScore, recentActivity)
+│   │   └── constants.ts           # STATUS_ICON, STATUS_COLOR maps
 │   └── dashboard/              # Legacy blessed components
 │       ├── constants.js
 │       ├── helpers.js

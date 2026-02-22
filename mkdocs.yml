@@ -82,6 +82,7 @@ nav:
     - Installation: getting-started/installation.md
   - User Guide:
     - Workflows: WORKFLOWS.md
+    - Visual Guide: VISUAL-GUIDE.md
     - CLI Reference: CLI-REFERENCE.md
     - Configuration: CONFIGURATION.md
   - Architecture:

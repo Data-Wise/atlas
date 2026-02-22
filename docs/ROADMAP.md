@@ -6,13 +6,13 @@
 
 ---
 
-## Current Version: v0.9.0
+## Current Version: v0.9.1
 
-TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, MCP Server.
+Visual Enhancements — themes, focus score, sparklines, activity heatmap.
 
 ---
 
-## v0.9.x - Visual Evolution (Remaining Items)
+## v0.9.x - Visual Evolution ✅ COMPLETE
 
 **Theme:** Technical debt reduction, then visual enhancements
 
@@ -24,20 +24,17 @@ TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, M
 - [x] Add integration tests (25 tests, all passing) ✅
 - [x] Remove blessed dependency and switch to Ink as default ✅
 
-**Progress:** Sprint 1 COMPLETE! Ink is now default, 73% code reduction achieved.
+### Sprint 2: Visual Evolution 🎨 ✅ COMPLETE (8/8)
+- [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅
+- [x] **SidebarPanel** — compact project list column (25-28%) ✅
+- [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅
+- [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅
+- [x] **Theme system** — 5 themes (default, nord, solarized, mono, high-contrast) ✅
+- [x] **Focus score** — weighted quality metric with tier classification ✅
+- [x] **Sidebar sparklines** — inline activity charts with trend coloring ✅
+- [x] **Activity heatmap** — GitHub-style grid in full and compact modes ✅
 
-### Sprint 2: Visual Evolution 🎨 (In Progress)
-- [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅ D1 done
-- [x] **SidebarPanel** — compact project list column (25-28%) ✅ D2 done
-- [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅ D3 done
-- [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅ D4 done
-- [ ] GitHub-style heatmap view (`h` key)
-- [ ] Sparkline history per project card
-- [ ] Focus score calculator
-- [ ] Enhanced theme system (dracula, nord, gruvbox)
-
-**Branch:** `feature/multi-panel-dashboard`  
-**Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
+**Branch:** `feature/visual-enhancements`
 
 ---
 
@@ -91,9 +88,11 @@ TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, M
 
 ### v0.9.x Series
 - [x] v0.9.0 Sprint 1: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
-- [x] v0.9.1 D1: LayoutManager — SINGLE/SPLIT/TRIPLE engine, Tab key cycle
-- [x] v0.9.1 D2: SidebarPanel — compact list, j/k, windowing, inbox badge
-- [x] v0.9.1 D3: InspectorPanel — detail + live Pomodoro timer, breadcrumbs
+- [x] v0.9.1 D1-D4: Multi-panel layout (LayoutManager, SidebarPanel, InspectorPanel, wiring)
+- [x] v0.9.1 Visual: Theme system — 5 built-in themes, ThemeProvider, useTheme hook
+- [x] v0.9.1 Visual: Focus score — weighted formula, 5-tier classification
+- [x] v0.9.1 Visual: Sidebar sparklines — 5-day activity charts with trend coloring
+- [x] v0.9.1 Visual: Activity heatmap — GitHub-style grid, full + compact modes
 - [x] v0.9.1 D4: Wire into App.tsx \u2705
 
 ### v0.8.x Series
