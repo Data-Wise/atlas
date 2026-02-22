@@ -31,13 +31,13 @@ flowchart LR
 
 Atlas helps you:
 
-| Problem | Atlas Solution |
-|---------|----------------|
-| "What was I working on?" | `atlas where` + `atlas trail` |
-| "I'll forget this idea" | `atlas catch "idea"` |
-| "How long have I been at this?" | `atlas session status` |
+| Problem                                           | Atlas Solution                |
+| ------------------------------------------------- | ----------------------------- |
+| "What was I working on?"                          | `atlas where` + `atlas trail` |
+| "I'll forget this idea"                           | `atlas catch "idea"`          |
+| "How long have I been at this?"                   | `atlas session status`        |
 | "I need to switch but don't want to lose context" | `atlas park` / `atlas unpark` |
-| "Am I making progress?" | `atlas stats` |
+| "Am I making progress?"                           | `atlas stats`                 |
 
 ---
 
@@ -314,20 +314,21 @@ atlas dash
 
 ### Try This Now #7: Navigate the Dashboard
 
-| Key | Action | Try It |
-|-----|--------|--------|
-| `↑↓` | Move between projects | Navigate up/down |
-| `Enter` | View project details | Select a project |
-| `s` | Start session | Start working |
-| `e` | End session | Stop working |
-| `c` | Quick capture | Add an idea |
-| `f` | Focus mode (Pomodoro) | 25-min timer |
-| `T` | Timeline view | Today's time blocks |
-| `d` | Decision helper | "What should I work on?" |
-| `/` | Search | Find a project |
-| `a` | Filter: active only | See active projects |
-| `*` | Clear filter | Show all |
-| `q` | Quit | Exit dashboard |
+| Key     | Action                | Try It                   |
+| ------- | --------------------- | ------------------------ |
+| `↑↓`    | Move between projects | Navigate up/down         |
+| `Enter` | View project details  | Select a project         |
+| `s`     | Start session         | Start working            |
+| `e`     | End session           | Stop working             |
+| `c`     | Quick capture         | Add an idea              |
+| `f`     | Focus mode (Pomodoro) | 25-min timer             |
+| `T`     | Timeline view         | Today's time blocks      |
+| `Tab`   | **Cycle layout mode** | Single → Split → Triple  |
+| `d`     | Decision helper       | "What should I work on?" |
+| `/`     | Search                | Find a project           |
+| `a`     | Filter: active only   | See active projects      |
+| `*`     | Clear filter          | Show all                 |
+| `q`     | Quit                  | Exit dashboard           |
 
 ### Focus Mode (Pomodoro)
 
@@ -364,6 +365,38 @@ Press `T` (Shift+T) to see today's sessions visualized:
 ```
 
 Press `Esc` to return to the main view.
+
+### Multi-Panel Layout (v0.9.1)
+
+Press `Tab` to cycle through three layout modes without leaving the dashboard:
+
+```
+▣ SINGLE (default)        ▥ SPLIT                ▦ TRIPLE
+┌────────────────┬──    ┌────┬─────────┬──    ┌────┬──────┬───────┬──
+│ Card stack     │      │Side│ Card   │      │Side│ Card │ Timer │
+│ All views fill │      │list│ stack  │      │list│ stack│ Detail│
+└────────────────┴──    ────┴─────────┘         ────┴──────┴───────┘
+100% width            28% sidebar + 72%       25% + 47% + 28%
+```
+
+**Try it:**
+1. Press `Tab` once → **Split** view: project list sidebar + main content
+2. Press `Tab` again → **Triple** view: sidebar + content + inspector panel
+3. Press `Tab` again → back to **Single** (full screen)
+4. Press `Shift+Tab` → cycle keyboard focus between panels
+
+**Sidebar rows look like this:**
+```
+│ ● atlas       75% │  <- active (green)
+│ ◐ flow-cli    95% │  <- paused (yellow)
+│ ● mcp-server  80% ⏱│  <- has running session
+```
+
+**Status icons:** `●` active • `◐` paused • `◆` stable • `✓` complete • `○` planning • `✗` blocked  
+**`⏱`** marks the project with your active timer  
+**`📥N`** shows in the sidebar header when you have N unprocessed inbox items
+
+**Layout indicator** appears in the command bar: `▣ Single` / `▥ Split` / `▦ Triple`
 
 ### Decision Helper
 
@@ -647,17 +680,17 @@ atlas status myproject --set active --create
 
 ### Essential Commands
 
-| Command | What It Does |
-|---------|-------------|
-| `atlas session start [project]` | Begin working |
-| `atlas session end [note]` | Stop working |
-| `atlas catch "text"` | Quick capture |
-| `atlas where` | Where was I? |
-| `atlas park [note]` | Save context |
-| `atlas unpark` | Restore context |
-| `atlas dash` | Visual dashboard |
-| `atlas inbox` | See captured items |
-| `atlas trail` | Breadcrumb history |
+| Command                         | What It Does       |
+| ------------------------------- | ------------------ |
+| `atlas session start [project]` | Begin working      |
+| `atlas session end [note]`      | Stop working       |
+| `atlas catch "text"`            | Quick capture      |
+| `atlas where`                   | Where was I?       |
+| `atlas park [note]`             | Save context       |
+| `atlas unpark`                  | Restore context    |
+| `atlas dash`                    | Visual dashboard   |
+| `atlas inbox`                   | See captured items |
+| `atlas trail`                   | Breadcrumb history |
 
 ### Quick Setup
 
@@ -799,11 +832,11 @@ brew install zellij
 ```
 
 **Why Zellij + Atlas:**
-| Zellij | Atlas | Combined Benefit |
-|--------|-------|------------------|
-| Session persistence | Park/unpark | Full context survival |
-| Visual keybindings | ADHD helpers | Less to remember |
-| Named sessions | Project registry | One command restores everything |
+| Zellij              | Atlas            | Combined Benefit                |
+| ------------------- | ---------------- | ------------------------------- |
+| Session persistence | Park/unpark      | Full context survival           |
+| Visual keybindings  | ADHD helpers     | Less to remember                |
+| Named sessions      | Project registry | One command restores everything |
 
 **The Perfect Layout:**
 ```
@@ -847,16 +880,16 @@ zellij attach myproject
 ```
 
 **Zellij Cheatsheet:**
-| Keys | Action |
-|------|--------|
-| `Alt + ←→↑↓` | Navigate between panes |
-| `Ctrl+P, D` | Split pane down |
-| `Ctrl+P, R` | Split pane right |
-| `Ctrl+P, X` | Close pane |
-| `Ctrl+P, Z` | Zoom (fullscreen pane) |
-| `Ctrl+P, F` | Floating pane (overlay) |
-| `Ctrl+O, D` | Detach session |
-| `Ctrl+O, W` | Session manager |
+| Keys         | Action                  |
+| ------------ | ----------------------- |
+| `Alt + ←→↑↓` | Navigate between panes  |
+| `Ctrl+P, D`  | Split pane down         |
+| `Ctrl+P, R`  | Split pane right        |
+| `Ctrl+P, X`  | Close pane              |
+| `Ctrl+P, Z`  | Zoom (fullscreen pane)  |
+| `Ctrl+P, F`  | Floating pane (overlay) |
+| `Ctrl+O, D`  | Detach session          |
+| `Ctrl+O, W`  | Session manager         |
 
 **Auto-Start Zellij (optional):**
 ```bash

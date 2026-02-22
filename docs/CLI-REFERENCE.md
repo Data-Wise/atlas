@@ -674,40 +674,42 @@ atlas dash
 
 **Keyboard Shortcuts:**
 
-| Key | Action |
-|-----|--------|
-| `↑↓` | Navigate projects |
-| `Enter` | Open project detail |
-| `Esc` | Back / Exit focus mode |
-| `/` | Search/filter projects |
-| `a` | Filter: active only |
-| `p` | Filter: paused only |
-| `*` | Clear filter (show all) |
-| `s` | Start session |
-| `e` | End session |
-| `c` | Quick capture |
-| `r` | Refresh data |
-| `o` | Open project folder |
-| `f` | Enter focus mode |
-| `d` | Decision helper |
-| `t` | Cycle themes |
-| `T` | Timeline view (time blocks) |
-| `e` | Ecosystem view (v0.8.0) |
-| `p` | Plan view - morning ritual (v0.8.0) |
-| `z` | Zen mode |
-| `q` | Quit |
-| `?` | Show help |
+| Key         | Action                                    |
+| ----------- | ----------------------------------------- |
+| `↑↓`        | Navigate projects                         |
+| `Enter`     | Open project detail                       |
+| `Esc`       | Back / Exit focus mode                    |
+| `/`         | Search/filter projects                    |
+| `a`         | Filter: active only                       |
+| `p`         | Filter: paused only                       |
+| `*`         | Clear filter (show all)                   |
+| `s`         | Start session                             |
+| `e`         | End session                               |
+| `c`         | Quick capture                             |
+| `r`         | Refresh data                              |
+| `o`         | Open project folder                       |
+| `f`         | Enter focus mode                          |
+| `d`         | Decision helper                           |
+| `t`         | Cycle themes                              |
+| `T`         | Timeline view (time blocks)               |
+| `e`         | Ecosystem view (v0.8.0)                   |
+| `p`         | Plan view - morning ritual (v0.8.0)       |
+| `z`         | Zen mode                                  |
+| `Tab`       | **Cycle layout mode** (v0.9.1)            |
+| `Shift+Tab` | Cycle panel focus in split/triple layouts |
+| `q`         | Quit                                      |
+| `?`         | Show help                                 |
 
 **Focus Mode Keys:**
 
-| Key | Action |
-|-----|--------|
+| Key     | Action             |
+| ------- | ------------------ |
 | `Space` | Pause/Resume timer |
-| `r` | Reset timer |
-| `+` | Add 5 minutes |
-| `-` | Subtract 5 minutes |
-| `c` | Quick capture |
-| `Esc` | Exit focus mode |
+| `r`     | Reset timer        |
+| `+`     | Add 5 minutes      |
+| `-`     | Subtract 5 minutes |
+| `c`     | Quick capture      |
+| `Esc`   | Exit focus mode    |
 
 **Task-Based Focus (v0.7.0):**
 
@@ -744,6 +746,51 @@ Press `p` to enter the morning planning ritual:
 - Inbox items pending triage
 - Smart suggestions based on history
 - Helps start the day with intention
+
+**Multi-Panel Layout (v0.9.1):**
+
+Press `Tab` to cycle through three layout modes:
+
+```
+▣ SINGLE (default) ▥ SPLIT             ▦ TRIPLE
+┌─────────────┐     ┌────┬───────┬─────────┬────┐
+│ Full View    │     │Side│ Main  │     │Side│ Main  │Inspector│
+│              │     │    │       │     │    │       │         │
+│ All 7 views  │     ┬────┴───────┘     ┴────┴───────┴─────────┴────┘
+└─────────────┘     28% + 72%         25% + 47% + 28%
+```
+
+- **`Tab`** → cycles `Single → Split → Triple → Single`
+- **`Shift+Tab`** → cycles keyboard focus between visible panels
+- Layout mode indicator `▣/▥/▦` shown in command bar
+- SINGLE mode is a transparent pass-through (no overhead)
+
+**Sidebar Panel (Split and Triple modes):**
+
+The sidebar shows a compact project list at 25–28% width:
+
+```
+┌────────────────────────┬ ...
+│ Projects 5  📥2 │     <- header: count + inbox badge
+├────────────────────────┤
+│ ● atlas       75% │     <- ● icon + name + progress %
+│ ◐ flow-cli    95% │     <- ◐ paused icon = yellow
+│ ● mcp-server  80% ⏱│     <- ⏱ = has active session
+│ ◐ rmediation  60% │
+├────────────────────────┤
+│ j/k: nav Enter: open  │     <- focus hint (changes when inactive)
+└────────────────────────┘
+```
+
+| Feature       | Detail                                                                      |
+| ------------- | --------------------------------------------------------------------------- |
+| Row format    | `icon name   xx%` (14-char name, 4-char progress)                           |
+| Status icons  | `●` active, `◐` paused, `◆` stable, `✓` complete, `○` planning, `✗` blocked |
+| Session badge | `⏱` appended to row with a running timer                                    |
+| Inbox badge   | `📥N` in header when N captures are unprocessed                              |
+| Windowing     | 12 visible rows with scroll indicator `1-12/25`                             |
+| Navigation    | `j`/`k` or `↑`/`↓`, only fires when sidebar has focus                       |
+| Select        | `Enter` opens project in main panel                                         |
 
 ---
 
@@ -1034,22 +1081,22 @@ atlas completions fish > ~/.config/fish/completions/atlas.fish
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ATLAS_CONFIG` | Config directory path | `~/.atlas` |
-| `ATLAS_STORAGE` | Storage backend | `filesystem` |
+| Variable        | Description           | Default      |
+| --------------- | --------------------- | ------------ |
+| `ATLAS_CONFIG`  | Config directory path | `~/.atlas`   |
+| `ATLAS_STORAGE` | Storage backend       | `filesystem` |
 
 ---
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Invalid arguments |
-| 3 | Project not found |
-| 4 | Session error |
+| Code | Meaning           |
+| ---- | ----------------- |
+| 0    | Success           |
+| 1    | General error     |
+| 2    | Invalid arguments |
+| 3    | Project not found |
+| 4    | Session error     |
 
 ---
 

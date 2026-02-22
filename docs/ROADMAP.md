@@ -26,12 +26,17 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 **Progress:** Sprint 1 COMPLETE! Ink is now default, 73% code reduction achieved.
 
-### Sprint 2: Visual Evolution 🎨
+### Sprint 2: Visual Evolution 🎨 (In Progress)
+- [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅ D1 done
+- [ ] SidebarPanel.tsx — compact project list column (D2)
+- [ ] InspectorPanel.tsx — detail + Pomodoro right panel (D3)
+- [ ] Wire multi-panel into App.tsx + LayoutStatusBar in command bar (D4)
 - [ ] GitHub-style heatmap view (`h` key)
 - [ ] Sparkline history per project card
 - [ ] Focus score calculator
 - [ ] Enhanced theme system (dracula, nord, gruvbox)
 
+**Branch:** `feature/multi-panel-dashboard`  
 **Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
 
 ---
@@ -83,6 +88,10 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 ---
 
 ## Completed Milestones
+
+### v0.9.x Series
+- [x] v0.9.0 Sprint 1: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
+- [ ] v0.9.1: Multi-Panel Layout — Tab cycles Single/Split/Triple dashboard layouts (in progress)
 
 ### v0.8.x Series
 - [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation

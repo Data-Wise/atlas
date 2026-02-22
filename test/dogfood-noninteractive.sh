@@ -366,6 +366,224 @@ test_contains "Extended in list" "$ATLAS template list" "my-node"
 test_succeeds "Delete extended template" "$ATLAS template delete my-node"
 
 # ============================================================================
+# 16. LAYOUT MANAGER - D1 (feature/multi-panel-dashboard)
+# ============================================================================
+
+header "16. LayoutManager D1 - Multi-Panel Layout Constants"
+
+LAYOUT_SRC="$(dirname "$0")/../src/cli/dashboard-ink/lib/LayoutManager.tsx"
+
+# Confirm the file exists
+test_succeeds "LayoutManager.tsx exists" "ls '$LAYOUT_SRC'"
+
+# Run all constant checks via inline node + tsx (uses --import for ESM transform)
+LAYOUT_NODE="node --import ../atlas/node_modules/tsx/dist/esm/index.cjs"
+
+# 1. LAYOUT enum values present
+test_contains "LAYOUT.SINGLE = 'single'" \
+  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
+  '"single"'
+
+test_contains "LAYOUT.SPLIT = 'split'" \
+  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
+  '"split"'
+
+test_contains "LAYOUT.TRIPLE = 'triple'" \
+  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
+  '"triple"'
+
+# 2. Key exports are present in the source file (static grep — no tsx needed)
+test_contains "Exports useLayout hook" \
+  "grep -c 'export function useLayout' '$LAYOUT_SRC'" \
+  "1"
+
+test_contains "Exports LayoutManager component" \
+  "grep -c 'export const LayoutManager' '$LAYOUT_SRC'" \
+  "1"
+
+test_contains "Exports PanelBox component" \
+  "grep -c 'export const PanelBox' '$LAYOUT_SRC'" \
+  "1"
+
+test_contains "Exports LayoutStatusBar component" \
+  "grep -c 'export const LayoutStatusBar' '$LAYOUT_SRC'" \
+  "1"
+
+# 3. Width percentages: verify they sum to 100 per mode (grep + awk)
+# SINGLE: main=100
+test_contains "SINGLE mode main=100% in source" \
+  "grep 'widthPct: 100' '$LAYOUT_SRC'" \
+  "widthPct: 100"
+
+# SPLIT: sidebar=28, main=72  (28+72=100)
+test_contains "SPLIT sidebar=28 in source" \
+  "grep -A2 'sidebar.*widthPct' '$LAYOUT_SRC' | grep '28'" \
+  "28"
+
+test_contains "SPLIT main=72 in source" \
+  "grep 'widthPct: 72' '$LAYOUT_SRC'" \
+  "widthPct: 72"
+
+# TRIPLE: sidebar=25, main=47, inspector=28  (25+47+28=100)
+test_contains "TRIPLE sidebar=25 in source" \
+  "grep 'widthPct: 25' '$LAYOUT_SRC'" \
+  "widthPct: 25"
+
+test_contains "TRIPLE main=47 in source" \
+  "grep 'widthPct: 47' '$LAYOUT_SRC'" \
+  "widthPct: 47"
+
+# inspector=28 shared with SPLIT sidebar — already tested above
+
+# 4. Ink imports present (component depends on ink)
+test_contains "Imports Box from ink" \
+  "grep \"from 'ink'\" '$LAYOUT_SRC'" \
+  "Box"
+
+test_contains "Imports useInput from ink" \
+  "grep \"from 'ink'\" '$LAYOUT_SRC'" \
+  "useInput"
+
+# 5. Layout cycle order in source
+test_contains "LAYOUT_CYCLE starts with SINGLE" \
+  "grep -A3 'LAYOUT_CYCLE' '$LAYOUT_SRC' | head -4" \
+  "SINGLE"
+
+test_contains "LAYOUT_CYCLE includes SPLIT" \
+  "grep -A3 'LAYOUT_CYCLE' '$LAYOUT_SRC'" \
+  "SPLIT"
+
+test_contains "LAYOUT_CYCLE includes TRIPLE" \
+  "grep -A3 'LAYOUT_CYCLE' '$LAYOUT_SRC'" \
+  "TRIPLE"
+
+# 6. Tab key wiring present
+test_contains "Tab key cycles layout" \
+  "grep 'key.tab' '$LAYOUT_SRC'" \
+  "key.tab"
+
+# 7. Shift+Tab focus cycling present
+test_contains "Shift+Tab cycles panel focus" \
+  "grep 'key.shift' '$LAYOUT_SRC'" \
+  "key.shift"
+
+echo ""
+echo -e "  ${DIM}LayoutManager D1 dogfood complete${NC}"
+
+# ============================================================================
+# 17. SIDEBAR PANEL - D2 (feature/multi-panel-dashboard)
+# ============================================================================
+
+header "17. SidebarPanel D2 - Compact Project List Column"
+
+SIDEBAR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/SidebarPanel.tsx"
+
+# File present
+test_succeeds "SidebarPanel.tsx exists" "ls '$SIDEBAR_SRC'"
+
+# 1. Exports
+test_contains "Exports SidebarPanel component" \
+  "grep -c 'export const SidebarPanel' '$SIDEBAR_SRC'" "1"
+
+test_contains "Exports SidebarProject interface" \
+  "grep -c 'export interface SidebarProject' '$SIDEBAR_SRC'" "1"
+
+# 2. Status icons — all 6 must be in source
+test_contains "Status icon: active ●" \
+  "grep \"'●'\" '$SIDEBAR_SRC'" "'●'"
+
+test_contains "Status icon: paused ◐" \
+  "grep \"'◐'\" '$SIDEBAR_SRC'" "'◐'"
+
+test_contains "Status icon: stable ◆" \
+  "grep \"'◆'\" '$SIDEBAR_SRC'" "'◆'"
+
+test_contains "Status icon: complete ✓" \
+  "grep \"'✓'\" '$SIDEBAR_SRC'" "'✓'"
+
+test_contains "Status icon: planning ○" \
+  "grep \"'○'\" '$SIDEBAR_SRC'" "'○'"
+
+test_contains "Status icon: blocked ✗" \
+  "grep \"'✗'\" '$SIDEBAR_SRC'" "'✗'"
+
+# 3. Status colours
+test_contains "Status colour: active=green" \
+  "grep \"active.*'green'\" '$SIDEBAR_SRC'" "green"
+
+test_contains "Status colour: paused=yellow" \
+  "grep \"paused.*'yellow'\" '$SIDEBAR_SRC'" "yellow"
+
+test_contains "Status colour: blocked=red" \
+  "grep \"blocked.*'red'\" '$SIDEBAR_SRC'" "red"
+
+# 4. Progress formatter — padStart(4)
+test_contains "fmtProgress uses padStart(4)" \
+  "grep 'padStart(4)' '$SIDEBAR_SRC'" "padStart(4)"
+
+test_contains "fmtProgress clamps to 0–100" \
+  "grep 'Math.max(0, Math.min(100' '$SIDEBAR_SRC'" "Math.max"
+
+# 5. Truncate helper — Unicode ellipsis
+test_contains "truncate uses Unicode ellipsis (…)" \
+  "grep '…' '$SIDEBAR_SRC'" "…"
+
+# 6. Windowing — 12-row window
+test_contains "Window size is 12 rows" \
+  "grep 'WINDOW = 12' '$SIDEBAR_SRC'" "WINDOW = 12"
+
+test_contains "windowStart calculation present" \
+  "grep 'windowStart' '$SIDEBAR_SRC'" "windowStart"
+
+test_contains "Visible slice uses WINDOW" \
+  "grep 'WINDOW + WINDOW' '$SIDEBAR_SRC' || grep 'windowStart + WINDOW' '$SIDEBAR_SRC'" "WINDOW"
+
+# 7. isActive guard
+test_contains "isActive guard in useInput" \
+  "grep 'if (!isActive) return' '$SIDEBAR_SRC'" "if (!isActive) return"
+
+# 8. Keyboard navigation — j/k + arrows
+test_contains "j key navigation" \
+  "grep \"input === 'j'\" '$SIDEBAR_SRC'" "input === 'j'"
+
+test_contains "k key navigation" \
+  "grep \"input === 'k'\" '$SIDEBAR_SRC'" "input === 'k'"
+
+test_contains "downArrow navigation" \
+  "grep 'key.downArrow' '$SIDEBAR_SRC'" "downArrow"
+
+test_contains "upArrow navigation" \
+  "grep 'key.upArrow' '$SIDEBAR_SRC'" "upArrow"
+
+# 9. Enter / select
+test_contains "Enter fires onSelectProject" \
+  "grep 'onSelectProject(p)' '$SIDEBAR_SRC'" "onSelectProject"
+
+# 10. Inbox badge
+test_contains "Inbox badge uses pendingCaptures" \
+  "grep 'pendingCaptures' '$SIDEBAR_SRC'" "pendingCaptures"
+
+test_contains "Inbox badge icon is 📥" \
+  "grep '📥' '$SIDEBAR_SRC'" "📥"
+
+# 11. Active session indicator
+test_contains "activeProjectId prop present" \
+  "grep 'activeProjectId' '$SIDEBAR_SRC'" "activeProjectId"
+
+test_contains "Session timer icon ⏱ present" \
+  "grep '⏱' '$SIDEBAR_SRC'" "⏱"
+
+# 12. Ink imports
+test_contains "Imports Box from ink" \
+  "grep \"from 'ink'\" '$SIDEBAR_SRC'" "Box"
+
+test_contains "Imports useInput from ink" \
+  "grep \"from 'ink'\" '$SIDEBAR_SRC'" "useInput"
+
+echo ""
+echo -e "  ${DIM}SidebarPanel D2 dogfood complete${NC}"
+
+# ============================================================================
 # CLEANUP
 # ============================================================================
 
@@ -404,3 +622,4 @@ else
   echo -e "${RED}${BOLD}✗ $FAILED of $TOTAL tests failed${NC}"
   exit 1
 fi
+
