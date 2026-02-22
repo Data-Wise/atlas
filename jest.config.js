@@ -20,6 +20,10 @@ export default {
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   testPathIgnorePatterns: ['/node_modules/'],
+  // Transform ESM-only packages but skip blessed (has legacy octal escapes that break SWC strict mode)
+  transformIgnorePatterns: [
+    '/node_modules/(?!.*/(ink|ink-testing-library|cli-truncate|slice-ansi|string-width|wrap-ansi|ansi-regex|ansi-escapes|ansi-styles|emoji-regex|is-fullwidth-code-point|cli-boxes|yoga-layout|yoga-wasm-web|ws|widest-line|chalk|strip-ansi|type-fest|environment)/)(?!.*\\.mjs$)',
+  ],
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
