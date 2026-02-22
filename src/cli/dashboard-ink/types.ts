@@ -16,4 +16,12 @@ export interface Project {
   next?: string;
   /** Project priority level (used by EcosystemView) */
   priority?: number;
+  /** Focus score 0-100 (from GetSessionStatsUseCase) */
+  focusScore?: number;
+  /** Focus tier classification */
+  focusTier?: {
+    symbol: string;
+    color: string;
+    label: string;
+  };
 }

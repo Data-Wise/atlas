@@ -7,6 +7,7 @@
 
 import { formatDuration } from './ProjectPresenter.js'
 import { sparkline } from './TuiPresenter.js'
+import { formatFocusScore } from './FocusScorePresenter.js'
 
 /**
  * Format stats as a table for CLI display
@@ -15,7 +16,7 @@ import { sparkline } from './TuiPresenter.js'
  */
 export function formatStatsTable(stats) {
   const lines = []
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
+  const { summary, streak, focusScore, bestDay, hourlyDistribution, byProject, period, estimation } = stats
 
   // Header
   const periodLabel = period.projectFilter
@@ -33,6 +34,12 @@ export function formatStatsTable(stats) {
   lines.push('  Daily Average:     ' + formatDuration(summary.dailyAverageMinutes))
   lines.push(`  Flow Sessions:     ${summary.flowSessions} (${summary.flowPercentage}%)`)
   lines.push(`  Completion Rate:   ${summary.completionRate}%`)
+
+  // Focus score
+  if (focusScore) {
+    lines.push(`  Focus Score:       ${formatFocusScore(focusScore.score)}`)
+  }
+
   lines.push('')
 
   // Streak
@@ -132,7 +139,7 @@ export function formatStatsText(stats) {
  * @returns {string} Markdown formatted output
  */
 export function formatStatsMarkdown(stats) {
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
+  const { summary, streak, focusScore, bestDay, hourlyDistribution, byProject, period, estimation } = stats
   const lines = []
   const date = new Date().toISOString().split('T')[0]
 
@@ -157,6 +164,9 @@ export function formatStatsMarkdown(stats) {
   lines.push(`| Daily Average | ${formatDuration(summary.dailyAverageMinutes)} |`)
   lines.push(`| Flow Sessions | ${summary.flowSessions} (${summary.flowPercentage}%) |`)
   lines.push(`| Completion Rate | ${summary.completionRate}% |`)
+  if (focusScore) {
+    lines.push(`| Focus Score | ${formatFocusScore(focusScore.score)} |`)
+  }
   lines.push('')
 
   // Streak section
