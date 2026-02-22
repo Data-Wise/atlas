@@ -30,7 +30,7 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 - [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅ D1 done
 - [x] **SidebarPanel** — compact project list column (25-28%) ✅ D2 done
 - [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅ D3 done
-- [ ] Wire multi-panel into App.tsx + LayoutStatusBar in command bar (D4)
+- [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅ D4 done
 - [ ] GitHub-style heatmap view (`h` key)
 - [ ] Sparkline history per project card
 - [ ] Focus score calculator

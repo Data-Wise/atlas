@@ -3,10 +3,10 @@
 ## Status: active
 ## Phase: 🚧 feature/multi-panel-dashboard - In Progress
 ## Priority: 1
-## Progress: 80
+## Progress: 100
 
-## Focus: Multi-panel dashboard — D1+D2+D3+D5 complete, wiring App.tsx next
-## Next: D4 - Wire LayoutManager + panels into App.tsx
+## Focus: Multi-panel dashboard v0.9.1 COMPLETE — D1+D2+D3+D4+D5 all done
+## Next: Run full dogfood + integration suite, then PR to main
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -152,12 +152,20 @@ atlas dashboard           # Interactive TUI
 - [x] Focus hint footer swaps on isActive toggle
 - File: `src/cli/dashboard-ink/components/InspectorPanel.tsx`
 
-### D4: Wire into App.tsx 🔜
-- [ ] Import `useLayout`, `LayoutManager`, `PanelBox`
-- [ ] Replace bare `renderView()` return with `<LayoutManager>` wrapper
-- [ ] Pass sidebar/inspector only when layout !== SINGLE
-- [ ] Add `LayoutStatusBar` to command bar in MainView
-- [ ] Tab key hint in command bar
+### D4: Wire into App.tsx ✅ COMPLETE
+- [x] Import `useLayout`, `LayoutManager`, `LayoutStatusBar` from `LayoutManager.tsx`
+- [x] Import `SidebarPanel`, `InspectorPanel` from components
+- [x] `useLayout({ initial: LAYOUT.SINGLE })` drives Tab/Shift+Tab
+- [x] `<LayoutManager>` render-prop wraps all three columns
+- [x] `sidebar &&` renders `<SidebarPanel>` (28% / 25% per mode)
+- [x] Centre `<Box>` renders `renderCurrentView()` unchanged
+- [x] `inspector &&` renders `<InspectorPanel>` (28%)
+- [x] `handleSidebarIndexChange` keeps inspector in sync even without Enter
+- [x] `handleSidebarSelect` fires `showDetailView` only when in BROWSE
+- [x] `<LayoutStatusBar>` in command bar (flex-end)
+- [x] `pendingCaptures=2`, `activeProjectId=atlas.id` for visual demo
+- [x] `sessionSeconds=300`, `breadcrumbs=MOCK_CRUMBS` for inspector demo
+- File: `src/cli/dashboard-ink/components/App.tsx` (rewritten, 240 LOC)
 
 ### D5: Tests ✅ COMPLETE
 - [x] `test/integration/dashboard-ink/layoutManager.test.js` (30 tests — D1)
