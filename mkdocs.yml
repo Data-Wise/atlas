@@ -87,6 +87,7 @@ nav:
   - Architecture:
     - Overview: ARCHITECTURE.md
     - Diagrams: DIAGRAMS.md
+    - Integrations: INTEGRATIONS.md
   - Developer:
     - API Guide: API-GUIDE.md
     - MCP Server: MCP-SERVER.md

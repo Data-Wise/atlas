@@ -140,11 +140,15 @@ atlas project remove old-project
 Start a new work session.
 
 ```bash
-atlas session start [project] [task]
+atlas session start [project] [options]
 
 Arguments:
   project    Project name (optional if in project directory)
-  task       Task description (optional)
+
+Options:
+  -t, --task <task>           Task description
+  -e, --estimate <minutes>    Estimated duration in minutes
+  --energy <level>            Energy level: high, medium, low
 ```
 
 **Examples:**
@@ -156,7 +160,10 @@ atlas session start
 atlas session start myproject
 
 # Start with task description
-atlas session start myproject "Implement user authentication"
+atlas session start myproject -t "Implement user authentication"
+
+# Start with estimate and energy level
+atlas session start myproject -t "Fix bug" -e 30 --energy high
 ```
 
 **Output includes:**
@@ -541,7 +548,8 @@ Start the morning ritual - a guided daily planning flow.
 atlas plan [options]
 
 Options:
-  -e, --ecosystem <path>    Scan ecosystem path for project statuses
+  --ecosystem <path>    Scan ecosystem path for project statuses
+  --json                Output as JSON
 ```
 
 **Examples:**
@@ -551,6 +559,9 @@ atlas plan
 
 # Include ecosystem scan
 atlas plan --ecosystem ~/projects/dev-tools
+
+# Output plan as JSON
+atlas plan --json
 ```
 
 **The planning ritual includes:**
@@ -953,6 +964,8 @@ Options:
   -w, --watch             Watch mode (5s interval)
   -p, --paths <paths>     Comma-separated paths to scan
   --remove-orphans        Remove projects whose paths no longer exist
+  --from-status           Scan for .STATUS files in ecosystem
+  --report                Show ecosystem summary without syncing
 ```
 
 **Examples:**
@@ -968,6 +981,12 @@ atlas sync --watch
 
 # Sync specific paths
 atlas sync --paths ~/projects,~/work
+
+# Scan ecosystem for .STATUS files
+atlas sync --from-status
+
+# Generate ecosystem status report
+atlas sync --report
 ```
 
 ---
@@ -1014,22 +1033,39 @@ Interactive configuration wizard.
 atlas config setup
 ```
 
-### Preferences
+### `atlas config prefs`
 
+Manage underlying preferences for Atlas.
+
+#### `atlas config prefs show`
+Display all preferences.
 ```bash
-# Show all preferences
 atlas config prefs show
+```
 
-# Get specific preference
+#### `atlas config prefs get`
+Get a specific preference value.
+```bash
+atlas config prefs get <path>
 atlas config prefs get adhd.showStreak
+```
 
-# Set preference
+#### `atlas config prefs set`
+Set a specific preference value.
+```bash
+atlas config prefs set <path> <value>
 atlas config prefs set adhd.celebrationLevel enthusiastic
+```
 
-# Reset to defaults
+#### `atlas config prefs reset`
+Reset all preferences to default.
+```bash
 atlas config prefs reset
+```
 
-# Show default values
+#### `atlas config prefs defaults`
+Show the default preference values.
+```bash
 atlas config prefs defaults
 ```
 
