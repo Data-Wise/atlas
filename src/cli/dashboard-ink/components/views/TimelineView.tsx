@@ -3,6 +3,7 @@ import { Box, Text, useInput } from 'ink';
 
 interface TimelineViewProps {
   onBack: () => void;
+  onQuit: () => void;
   onFocus?: () => void;
 }
 
@@ -30,7 +31,7 @@ interface Session {
  * - f: Start focus mode
  * - q: Quit
  */
-export const TimelineView: React.FC<TimelineViewProps> = ({ onBack, onFocus }) => {
+export const TimelineView: React.FC<TimelineViewProps> = ({ onBack, onQuit, onFocus }) => {
   // Mock today's sessions for POC
   const [sessions] = useState<Session[]>([
     {
@@ -63,7 +64,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ onBack, onFocus }) =
     } else if (input === 'f' && onFocus) {
       onFocus();
     } else if (input === 'q') {
-      process.exit(0);
+      onQuit();
     }
   });
 

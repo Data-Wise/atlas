@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
-
-interface EcosystemProject {
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  priority: number;
-  focus?: string;
-  next?: string;
-}
+import type { Project } from '../../types.js';
 
 interface EcosystemViewProps {
   onBack: () => void;
-  onSelectProject?: (project: any) => void;
+  onQuit: () => void;
+  onSelectProject?: (project: Project) => void;
   onFocus?: () => void;
 }
 
@@ -35,10 +27,11 @@ interface EcosystemViewProps {
  * - Esc/e: Back to main view
  * - q: Quit
  */
-export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectProject, onFocus }) => {
+export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, onSelectProject, onFocus }) => {
   // Mock ecosystem projects for POC
-  const [projects] = useState<EcosystemProject[]>([
+  const [projects] = useState<Project[]>([
     {
+      id: '1',
       name: 'atlas',
       type: 'node-package',
       status: 'active',
@@ -47,6 +40,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
       focus: 'v0.9.0 Sprint 1 - TUI Modernization',
     },
     {
+      id: '2',
       name: 'flow-cli',
       type: 'zsh-package',
       status: 'stable',
@@ -55,6 +49,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
       focus: 'Maintenance mode',
     },
     {
+      id: '3',
       name: 'mcp-server-statistical-research',
       type: 'mcp-server',
       status: 'active',
@@ -63,6 +58,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
       focus: 'Add Zotero integration',
     },
     {
+      id: '4',
       name: 'rmediation',
       type: 'r-package',
       status: 'paused',
@@ -71,6 +67,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
       next: 'CRAN submission prep',
     },
     {
+      id: '5',
       name: 'causal-inference',
       type: 'teaching',
       status: 'active',
@@ -79,6 +76,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
       focus: 'Week 3 lecture materials',
     },
     {
+      id: '6',
       name: 'examify',
       type: 'app',
       status: 'draft',
@@ -101,21 +99,12 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
     } else if (key.return && onSelectProject) {
       const selectedProject = projects[selectedIndex];
       if (selectedProject) {
-        // Convert to full project format for compatibility
-        onSelectProject({
-          id: selectedIndex.toString(),
-          name: selectedProject.name,
-          type: selectedProject.type,
-          status: selectedProject.status,
-          progress: selectedProject.progress,
-          focus: selectedProject.focus,
-          next: selectedProject.next,
-        });
+        onSelectProject(selectedProject);
       }
     } else if (input === 'f' && onFocus) {
       onFocus();
     } else if (input === 'q') {
-      process.exit(0);
+      onQuit();
     }
   });
 
@@ -150,10 +139,10 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
   };
 
   // Build flat list for navigation
-  const flatProjects: Array<{ title?: string; project?: EcosystemProject; globalIndex: number }> = [];
+  const flatProjects: Array<{ title?: string; project?: Project; globalIndex: number }> = [];
   let globalIndex = 0;
 
-  const addGroup = (title: string, groupProjects: EcosystemProject[]) => {
+  const addGroup = (title: string, groupProjects: Project[]) => {
     if (groupProjects.length === 0) return;
     flatProjects.push({ title, globalIndex: -1 });
     groupProjects.forEach((project) => {
@@ -201,7 +190,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
             const project = item.project;
             const isSelected = item.globalIndex === selectedIndex;
             const statusIcon = STATUS_ICONS[project.status] || STATUS_ICONS.unknown;
-            const priorityColor = getPriorityColor(project.priority);
+            const priorityColor = getPriorityColor(project.priority ?? 3);
 
             // Progress bar
             const barWidth = 12;
@@ -221,7 +210,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onSelectPr
                   <Text color={color}>{progressBar.substring(0, filled)}</Text>
                   <Text color="gray">{progressBar.substring(filled)}</Text>
                   <Text> </Text>
-                  <Text color={priorityColor}>P{project.priority}</Text>
+                  <Text color={priorityColor}>P{project.priority ?? 3}</Text>
                   <Text> </Text>
                   <Text color="gray">{(project.type || '').slice(0, 12).padEnd(12)}</Text>
                 </Box>

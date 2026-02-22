@@ -30,19 +30,7 @@ import { createStateMachine, STATES } from '../lib/stateMachine.js';
 import { useLayout, LayoutManager, LayoutStatusBar, LAYOUT } from '../lib/LayoutManager.js';
 import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
-
-// ─── Project type (shared shape) ─────────────────────────────────────────────
-
-interface Project {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  focus?: string;
-  path?: string;
-  next?: string;
-}
+import type { Project } from '../types.js';
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -123,41 +111,55 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   // ── Sidebar controlled selection ──────────────────────────────────────────
   const [sidebarIndex, setSidebarIndex] = useState(0);
 
-  // ── View transitions ──────────────────────────────────────────────────────
+  // ── View transitions (state machine is authoritative) ─────────────────────
   const showMainView = () => {
-    stateMachine.transition(STATES.BROWSE);
-    setCurrentView(STATES.BROWSE);
+    const ok = stateMachine.transition(STATES.BROWSE);
+    if (ok) {
+      setCurrentView(STATES.BROWSE);
+    }
   };
 
   const showDetailView = (project: Project) => {
-    stateMachine.transition(STATES.DETAIL, { project });
-    setCurrentView(STATES.DETAIL);
-    setSelectedProject(project);
+    const ok = stateMachine.transition(STATES.DETAIL, { project });
+    if (ok) {
+      setCurrentView(STATES.DETAIL);
+      setSelectedProject(project);
+    }
   };
 
   const showFocusView = () => {
-    stateMachine.transition(STATES.FOCUS);
-    setCurrentView(STATES.FOCUS);
+    const ok = stateMachine.transition(STATES.FOCUS);
+    if (ok) {
+      setCurrentView(STATES.FOCUS);
+    }
   };
 
   const showZenView = () => {
-    stateMachine.transition(STATES.ZEN);
-    setCurrentView(STATES.ZEN);
+    const ok = stateMachine.transition(STATES.ZEN);
+    if (ok) {
+      setCurrentView(STATES.ZEN);
+    }
   };
 
   const showTimelineView = () => {
-    stateMachine.transition(STATES.TIMELINE);
-    setCurrentView(STATES.TIMELINE);
+    const ok = stateMachine.transition(STATES.TIMELINE);
+    if (ok) {
+      setCurrentView(STATES.TIMELINE);
+    }
   };
 
   const showEcosystemView = () => {
-    stateMachine.transition(STATES.ECOSYSTEM);
-    setCurrentView(STATES.ECOSYSTEM);
+    const ok = stateMachine.transition(STATES.ECOSYSTEM);
+    if (ok) {
+      setCurrentView(STATES.ECOSYSTEM);
+    }
   };
 
   const showPlanView = () => {
-    stateMachine.transition(STATES.PLAN);
-    setCurrentView(STATES.PLAN);
+    const ok = stateMachine.transition(STATES.PLAN);
+    if (ok) {
+      setCurrentView(STATES.PLAN);
+    }
   };
 
   // ── Sidebar → main panel sync ──────────────────────────────────────────────
@@ -179,13 +181,13 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const renderCurrentView = () => {
     switch (currentView) {
       case STATES.PLAN:
-        return <PlanView onBack={showMainView} onStartSession={showFocusView} />;
+        return <PlanView onBack={showMainView} onQuit={onExit} onStartSession={showFocusView} />;
 
       case STATES.ECOSYSTEM:
-        return <EcosystemView onBack={showMainView} onSelectProject={showDetailView} onFocus={showFocusView} />;
+        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} />;
 
       case STATES.TIMELINE:
-        return <TimelineView onBack={showMainView} onFocus={showFocusView} />;
+        return <TimelineView onBack={showMainView} onQuit={onExit} onFocus={showFocusView} />;
 
       case STATES.ZEN:
         return <ZenView project={selectedProject?.name} task={selectedProject?.focus} onBack={showMainView} />;

@@ -126,11 +126,9 @@ export function useLayout(options: UseLayoutOptions = {}): UseLayoutResult {
 
   // Tab key: cycle layout
   useInput((input, key) => {
-    if (key.tab) {
+    if (key.tab && !key.shift) {
       cycleLayout();
-    }
-    // Shift+Tab: cycle panels within a split/triple layout
-    if (key.shift && key.tab && layout !== LAYOUT.SINGLE) {
+    } else if (key.shift && key.tab && layout !== LAYOUT.SINGLE) {
       setFocus(prev => {
         if (layout === LAYOUT.SPLIT) {
           return prev === 'sidebar' ? 'main' : 'sidebar';
