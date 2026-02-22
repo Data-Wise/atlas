@@ -379,8 +379,8 @@ describe('InspectorPanel source contract', () => {
     expect(src).toContain('export const InspectorPanel');
   });
 
-  it('exports InspectorProject interface', () => {
-    expect(src).toContain('export interface InspectorProject');
+  it('imports Project type from shared types', () => {
+    expect(src).toContain("from '../types.js'");
   });
 
   it('renders empty state when no project prop', () => {

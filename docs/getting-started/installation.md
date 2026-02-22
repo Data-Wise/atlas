@@ -87,7 +87,7 @@ Enable tab completion for your shell:
 
 ```bash
 atlas --version
-# Should output: 0.8.0 (or current version)
+# Should output: 0.9.0 (or current version)
 
 atlas --help
 # Shows available commands

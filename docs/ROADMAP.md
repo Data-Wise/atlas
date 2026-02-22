@@ -2,17 +2,17 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-01-07
+**Last Updated:** 2026-02-21
 
 ---
 
-## Current Version: v0.8.0
+## Current Version: v0.9.0
 
-Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
+TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, MCP Server.
 
 ---
 
-## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 75%)
+## v0.9.x - Visual Evolution (Remaining Items)
 
 **Theme:** Technical debt reduction, then visual enhancements
 

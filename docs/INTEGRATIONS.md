@@ -171,7 +171,7 @@ flow status <project> # atlas.get_project_state("project-name")
 | Formula | Version | Source | Runtime |
 |---------|---------|--------|---------|
 | aiterm | v0.6.0 | PyPI | Python |
-| atlas | v0.8.0 | npm | Node.js |
+| atlas | v0.9.0 | npm | Node.js |
 | examark | v0.6.6 | npm | Node.js |
 | flow-cli | v4.8.1 | GitHub | ZSH |
 | mcp-bridge | v1.0.0 | npm | Node.js |

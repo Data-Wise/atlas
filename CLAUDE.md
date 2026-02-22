@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.8.0 |
+| **Version** | 0.9.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | 1,410 (Jest) |
@@ -288,6 +288,11 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.9.0** - Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
+  - React Ink replaces blessed (7 views migrated)
+  - LayoutManager: SINGLE/SPLIT/TRIPLE modes (`Tab` key)
+  - SidebarPanel + InspectorPanel with live Pomodoro timer
+  - BusinessRules domain constants, Gateway interfaces
 - **v0.8.0** - Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
   - `atlas plan` - Guided daily planning with energy tracking
   - `atlas sync --from-status` - Import from .STATUS files
