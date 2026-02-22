@@ -37,21 +37,18 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 
 ## ✅ Just Completed (2026-02-22)
 - Released v0.9.1 to GitHub, Homebrew, docs site
-- Theme system: 5 built-in themes (default, nord, solarized, mono, high-contrast)
-- Focus score: weighted quality metric with 5-tier classification
-- Sidebar sparklines: 5-day activity charts with trend coloring
-- Activity heatmap: GitHub-style 13-week grid (full + compact modes)
-- Fixed flaky UnparkContext sort test (Node 18 CI)
-- New Visual Guide + Visual Features tutorial
-- Updated Tutorial, CLI Reference, Architecture, Roadmap docs
+- Fixed flaky UnparkContext sort test (Node 18 CI), merged to main
+- Synced 4 docs (REFCARD, CONFIGURATION, DIAGRAMS, API-GUIDE) with v0.9.1 gaps
+- Designed Ink real data wiring feature (Context + hooks approach)
+- Created worktree + 5-increment orchestration plan
 
 ## 🔴 Blockers
 - None
 
 ## 🔧 Active Worktrees
-None
+- `feature/ink-real-data` — Wire real data into Ink dashboard (5 increments)
 
 ## 🎯 Next Action
-A) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
-B) Wire real session data into Ink dashboard (currently mock data)
+A) Implement Ink real data wiring (`cd ~/.git-worktrees/atlas/feature-ink-real-data`)
+B) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
 C) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
