@@ -687,29 +687,24 @@ atlas dash
 
 | Key         | Action                                    |
 | ----------- | ----------------------------------------- |
-| `↑↓`        | Navigate projects                         |
+| `↑↓` / `j`/`k` | Navigate projects                     |
 | `Enter`     | Open project detail                       |
-| `Esc`       | Back / Exit focus mode                    |
-| `/`         | Search/filter projects                    |
-| `a`         | Filter: active only                       |
-| `p`         | Filter: paused only                       |
-| `*`         | Clear filter (show all)                   |
-| `s`         | Start session                             |
-| `e`         | End session                               |
-| `c`         | Quick capture                             |
-| `r`         | Refresh data                              |
-| `o`         | Open project folder                       |
-| `f`         | Enter focus mode                          |
-| `d`         | Decision helper                           |
-| `t`         | Cycle themes                              |
-| `T`         | Timeline view (time blocks)               |
-| `e`         | Ecosystem view (v0.8.0)                   |
-| `p`         | Plan view - morning ritual (v0.8.0)       |
+| `Esc`       | Back / Exit current view                  |
+| `f`         | Enter focus mode (Pomodoro)               |
 | `z`         | Zen mode                                  |
-| `Tab`       | **Cycle layout mode** (v0.9.1)            |
+| `T`         | Timeline view (time blocks)               |
+| `e`         | Ecosystem view (multi-project overview)   |
+| `p`         | Plan view (morning ritual)                |
+| `c`         | Quick capture                             |
+| `t`         | Cycle themes                              |
+| `Tab`       | Cycle layout: SINGLE → SPLIT → TRIPLE    |
 | `Shift+Tab` | Cycle panel focus in split/triple layouts |
 | `q`         | Quit                                      |
 | `?`         | Show help                                 |
+
+> **Note:** The legacy blessed dashboard (`atlas dash --blessed`) uses different
+> bindings: `e` = End session, `s` = Start session, `p` = Filter paused,
+> `a` = Filter active, `/` = Search.
 
 **Focus Mode Keys:**
 

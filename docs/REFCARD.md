@@ -118,21 +118,14 @@ Start dashboard: `atlas dash`
 | ----------- | ------------------------------------------------ |
 | `j` / `k`   | Navigate up/down                                 |
 | `Enter`     | Select project                                   |
-| `s`         | Start session                                    |
-| `c`         | Quick capture                                    |
-| Key         | Action                                           |
-| ----------- | -----------------------------------------        |
-| `j` / `k`   | Navigate up/down                                 |
-| `Enter`     | Select project                                   |
-| `s`         | Start session                                    |
-| `c`         | Quick capture                                    |
-| `f`         | Toggle focus mode                                |
-| `z`         | Toggle zen mode                                  |
-| `t`         | Cycle theme                                      |
+| `f`         | Focus mode (Pomodoro)                            |
+| `z`         | Zen mode                                         |
 | `T`         | Timeline view                                    |
-| `e`         | Ecosystem view (v0.8.0)                          |
-| `p`         | Plan view (v0.8.0)                               |
-| `Tab`       | **Cycle layout mode** (v0.9.1)                   |
+| `e`         | Ecosystem view                                   |
+| `p`         | Plan view (morning ritual)                       |
+| `c`         | Quick capture                                    |
+| `t`         | Cycle theme                                      |
+| `Tab`       | Cycle layout (SINGLE/SPLIT/TRIPLE)               |
 | `Shift+Tab` | Cycle panel focus (split/triple)                 |
 | `Space`     | Pause/resume Pomodoro (inspector focused)        |
 | `r`         | Reset Pomodoro timer (inspector focused, paused) |
