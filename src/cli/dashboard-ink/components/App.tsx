@@ -18,7 +18,7 @@
  */
 
 import React, { useState } from 'react';
-import { Box } from 'ink';
+import { Box, Text } from 'ink';
 import { MainView }     from './views/MainView.js';
 import { DetailView }   from './views/DetailView.js';
 import { FocusView }    from './views/FocusView.js';
@@ -32,75 +32,7 @@ import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
 import { ThemeProvider } from '../lib/ThemeContext.js';
-
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const MOCK_PROJECTS: Project[] = [
-  {
-    id: '1',
-    name: 'atlas',
-    type: 'node-package',
-    status: 'active',
-    progress: 100,
-    focus: 'v0.9.1 Multi-Panel Dashboard',
-    path: '/Users/dt/projects/dev-tools/atlas',
-    next: 'Wire panels into App.tsx, Run integration tests',
-    recentActivity: [20, 35, 60, 80, 90],
-    focusScore: 75,
-    focusTier: { symbol: '◕', color: 'green', label: 'strong' },
-  },
-  {
-    id: '2',
-    name: 'flow-cli',
-    type: 'zsh-package',
-    status: 'stable',
-    progress: 95,
-    focus: 'Maintenance mode',
-    path: '/Users/dt/projects/dev-tools/flow-cli',
-    recentActivity: [60, 40, 25, 15, 10],
-    focusScore: 40,
-    focusTier: { symbol: '◑', color: 'cyan', label: 'steady' },
-  },
-  {
-    id: '3',
-    name: 'mcp-server-statistical-research',
-    type: 'mcp-server',
-    status: 'active',
-    progress: 80,
-    focus: 'Add Zotero integration',
-    path: '/Users/dt/projects/dev-tools/mcp-servers/statistical-research',
-    next: 'Implement citation endpoint',
-    recentActivity: [40, 40, 50, 60, 55],
-    focusScore: 90,
-    focusTier: { symbol: '●', color: 'greenBright', label: 'deep' },
-  },
-  {
-    id: '4',
-    name: 'rmediation',
-    type: 'r-package',
-    status: 'paused',
-    progress: 60,
-    focus: 'CRAN submission prep',
-    path: '/Users/dt/projects/r-packages/rmediation',
-    next: 'Complete documentation, Add vignette',
-    recentActivity: [10, 5, 0, 15, 30],
-    focusScore: 25,
-    focusTier: { symbol: '◔', color: 'yellow', label: 'warming' },
-  },
-  {
-    id: '5',
-    name: 'causal-inference',
-    type: 'teaching',
-    status: 'active',
-    progress: 45,
-    focus: 'Week 3 lecture materials',
-    path: '/Users/dt/projects/teaching/causal-inference',
-    next: 'Record lecture video',
-    recentActivity: [25, 0, 0, 0, 0],
-    focusScore: 10,
-    focusTier: { symbol: '○', color: 'gray', label: 'drift' },
-  },
-];
+import { useProjects } from '../hooks/useProjects.js';
 
 // Mock breadcrumbs for the inspector (would come from atlas.context.trail() in production)
 const MOCK_CRUMBS = [
@@ -129,10 +61,13 @@ const MOCK_HEATMAP_GRID = generateMockHeatmapGrid();
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
+  // ── Real data hooks ─────────────────────────────────────────────────────────
+  const { projects, loading, error } = useProjects();
+
   // ── State machine ──────────────────────────────────────────────────────────
   const [stateMachine] = useState(() => createStateMachine({ initial: STATES.BROWSE }));
   const [currentView, setCurrentView] = useState<string>(STATES.BROWSE);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(MOCK_PROJECTS[0]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // ── Layout hook (Tab cycles modes, Shift+Tab cycles focus) ────────────────
   const {
@@ -207,7 +142,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const handleSidebarIndexChange = (idx: number) => {
     setSidebarIndex(idx);
     // Keep inspector in sync even without Enter
-    setSelectedProject(MOCK_PROJECTS[idx] ?? null);
+    setSelectedProject(projects[idx] ?? null);
   };
 
   // ── Current view renderer ─────────────────────────────────────────────────
@@ -235,9 +170,12 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
       case STATES.BROWSE:
       default:
+        if (loading && projects.length === 0) {
+          return <Box padding={1}><Text dimColor>Loading projects...</Text></Box>;
+        }
         return (
           <MainView
-            projects={MOCK_PROJECTS}
+            projects={projects}
             onQuit={onExit}
             onSelectProject={showDetailView}
             onFocus={showFocusView}
@@ -264,13 +202,13 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                 {sidebar && (
                   <Box width={`${sidebar.widthPct}%`} height="100%">
                     <SidebarPanel
-                      projects={MOCK_PROJECTS}
+                      projects={projects}
                       selectedIndex={sidebarIndex}
                       onSelect={handleSidebarIndexChange}
                       onSelectProject={handleSidebarSelect}
                       isActive={sidebar.isActive}
                       pendingCaptures={2}                    // mock: 2 inbox items
-                      activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
+                      activeProjectId={projects[0].id} // mock: atlas has active session
                     />
                   </Box>
                 )}
