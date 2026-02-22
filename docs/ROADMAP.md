@@ -92,8 +92,7 @@ Visual Enhancements — themes, focus score, sparklines, activity heatmap.
 - [x] v0.9.1 Visual: Theme system — 5 built-in themes, ThemeProvider, useTheme hook
 - [x] v0.9.1 Visual: Focus score — weighted formula, 5-tier classification
 - [x] v0.9.1 Visual: Sidebar sparklines — 5-day activity charts with trend coloring
-- [x] v0.9.1 Visual: Activity heatmap — GitHub-style grid, full + compact modes
-- [x] v0.9.1 D4: Wire into App.tsx \u2705
+- [x] v0.9.1 Visual: Activity heatmap — GitHub-style grid, full + compact modes \u2705
 
 ### v0.8.x Series
 - [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
