@@ -77,6 +77,7 @@ nav:
   - Home: index.md
   - Getting Started:
     - Tutorial: TUTORIAL.md
+    - Visual Features: tutorials/visual-features.md
     - Demos: DEMOS.md
     - Quick Reference: REFCARD.md
     - Installation: getting-started/installation.md

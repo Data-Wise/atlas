@@ -385,15 +385,17 @@ Press `Tab` to cycle through three layout modes without leaving the dashboard:
 3. Press `Tab` again → back to **Single** (full screen)
 4. Press `Shift+Tab` → cycle keyboard focus between panels
 
-**Sidebar rows look like this:**
+**Sidebar rows look like this (v0.9.1):**
 ```
-│ ● atlas       75% │  <- active (green)
-│ ◐ flow-cli    95% │  <- paused (yellow)
-│ ● mcp-server  80% ⏱│  <- has running session
+│ ● atlas       75% ▂▃▅▇█│  <- deep focus (green) + sparkline
+│ ◔ flow-cli    95% █▅▃▂▁│  <- warming tier (yellow) + declining
+│ ◕ mcp-server  80% ▃▃▅▆█⏱│  <- strong focus + active session
+│ ◑ rmediation  60% ▂▁··▂│  <- steady tier (cyan)
 ```
 
-**Status icons:** `●` active • `◐` paused • `◆` stable • `✓` complete • `○` planning • `✗` blocked  
-**`⏱`** marks the project with your active timer  
+**Focus tier icons (v0.9.1):** `●` deep (80+) • `◕` strong (60-79) • `◑` steady (40-59) • `◔` warming (20-39) • `○` drift (0-19)
+**Sparklines:** 5-day activity history using `▁▂▃▄▅▆▇█` — green = trending up, yellow = trending down
+**`⏱`** marks the project with your active timer
 **`📥N`** shows in the sidebar header when you have N unprocessed inbox items
 
 **Inspector panel (Triple mode — right column):**
@@ -402,17 +404,22 @@ Press `Tab` to cycle through three layout modes without leaving the dashboard:
 │ 🎯 atlas                │  ← selected project
 │ node-package            │
 │ ● active  75% ██████░░  │  ← status + 8-char bar
+│ Focus  ◕ 72 strong      │  ← focus score + tier (v0.9.1)
 │ ─────────────────────── │
 │ Focus                   │
 │ Implementing auth flow  │
 │ Next                    │
 │ · Add OAuth provider    │  ← up to 3 next actions
-│ · Write tests           │
 │ ─────────────────────── │
 │ ⏱ SESSION               │
 │ 24:10  ██████░░         │  ← live Pomodoro countdown
 │ ● FOCUSING              │  → ◑ PAUSED → ☕ BREAK TIME
-│ Space: pause  r: reset  │  ← only when inspector focused
+│ ─────────────────────── │
+│ Activity (13w)          │  ← heatmap header (v0.9.1)
+│ Mon ·░▒▓█·░▒▓█·░▒      │  7-day × 13-week grid
+│ Tue ·····░░▒▒▓▓█        │  using ·░▒▓█ characters
+│ ...                     │
+│ 🔥 4d streak  23 sess   │  ← summary line
 │ ─────────────────────── │
 │ Recent                  │
 │ · stuck on OAuth …      │  ← last 3 breadcrumbs
@@ -424,6 +431,30 @@ When inspector is focused (`Shift+Tab` to reach it):
 - `Shift+Tab` → move focus to next panel
 
 **Layout indicator** appears in the command bar: `▣ Single` / `▥ Split` / `▦ Triple`
+
+### Themes (v0.9.1)
+
+Press `t` in the dashboard to cycle through 5 built-in themes:
+
+| Theme | Look | Best for |
+|-------|------|----------|
+| `default` | Purple accents, warm grays | General use |
+| `nord` | Arctic blue palette | Dark terminals |
+| `solarized` | Warm tans and blues | Light or dark |
+| `mono` | Pure grayscale | Minimal distraction |
+| `high-contrast` | Maximum readability | Accessibility |
+
+All panels, sparklines, heatmap, and focus tier colors adapt to the selected theme.
+
+### Focus Score (v0.9.1)
+
+`atlas stats` now includes a focus score — a weighted quality metric:
+
+```
+Focus Score:       ◕ 72 strong
+```
+
+The score combines duration (30%), flow sessions (30%), completion rate (25%), and consistency (15%). See the [Visual Guide](./VISUAL-GUIDE.md) for the full formula and tier breakdown.
 
 
 ### Decision Helper
@@ -808,8 +839,10 @@ atlas config prefs reset
 # Terminal too small
 # Resize terminal to at least 80x24
 
-# Try different theme
+# Try different theme (v0.9.1)
 # Press 't' in dashboard to cycle themes
+# 'mono' theme works best on limited-color terminals
+# 'high-contrast' theme helps in bright rooms
 ```
 
 ### Lost parked context?
