@@ -12,7 +12,7 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 ---
 
-## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 50%)
+## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 75%)
 
 **Theme:** Technical debt reduction, then visual enhancements
 
@@ -94,7 +94,7 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 - [x] v0.9.1 D1: LayoutManager — SINGLE/SPLIT/TRIPLE engine, Tab key cycle
 - [x] v0.9.1 D2: SidebarPanel — compact list, j/k, windowing, inbox badge
 - [x] v0.9.1 D3: InspectorPanel — detail + live Pomodoro timer, breadcrumbs
-- [ ] v0.9.1 D4: Wire into App.tsx (in progress)
+- [x] v0.9.1 D4: Wire into App.tsx \u2705
 
 ### v0.8.x Series
 - [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation

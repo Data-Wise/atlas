@@ -109,7 +109,7 @@ Dashboard color theme.
 
 **Type:** `string`
 **Default:** `"default"`
-**Options:** `"default"`, `"minimal"`, `"colorful"`
+**Options:** `"default"`, `"dark"`, `"minimal"`
 
 ```json
 {
@@ -311,6 +311,37 @@ Enable minimal distraction mode by default.
 **Type:** `boolean`
 **Default:** `false`
 
+### `defaultLayout`
+
+Default layout mode for the Ink dashboard (v0.9.1).
+
+**Type:** `string`
+**Default:** `"single"`
+**Options:** `"single"`, `"split"`, `"triple"`
+
+```json
+{
+  "preferences": {
+    "dashboard": {
+      "defaultLayout": "triple"
+    }
+  }
+}
+```
+
+---
+
+## MCP Server Settings (v0.8.0)
+
+The MCP server reads configuration from environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ATLAS_DATA_DIR` | Override data directory | `~/.atlas` |
+| `ATLAS_STORAGE` | Override storage backend | `filesystem` |
+
+No additional configuration needed beyond standard `~/.atlas/config.json`.
+
 ---
 
 ## Template Variables
@@ -349,6 +380,7 @@ atlas config prefs set templateVariables.github_user johndoe
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ATLAS_CONFIG` | Override config directory | `~/.atlas` |
+| `ATLAS_DATA_DIR` | Override data directory (MCP) | `~/.atlas` |
 | `ATLAS_STORAGE` | Override storage backend | `filesystem` |
 
 **Example:**
@@ -438,7 +470,8 @@ Full default configuration:
       "refreshInterval": 1000,
       "showProjectCards": true,
       "maxRecentProjects": 5,
-      "zenMode": false
+      "zenMode": false,
+      "defaultLayout": "single"
     },
     "templateVariables": {}
   }
