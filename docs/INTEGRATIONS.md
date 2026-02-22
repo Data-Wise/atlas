@@ -142,6 +142,7 @@ flow status <project> # atlas.get_project_state("project-name")
 | **nexus** | Bun | Knowledge workflow (Obsidian, courses) | Claude Desktop, CLI |
 | **rforge** | npm | R package ecosystem management | Claude Desktop, CLI |
 | **obsidian-ops** | Python/uv | Obsidian vault operations | Claude Desktop, CLI |
+| **atlas** | npm | Project state, sessions, captures | Claude Desktop, CLI |
 | **playwright** | npx | Browser automation | Claude Desktop, CLI |
 | **docling** | Python/uv | PDF processing | Claude Desktop, CLI |
 | **github** | npx | GitHub API integration | Claude Desktop, CLI |
@@ -326,7 +327,7 @@ homebrew-tap
 | `~/.claude/settings.json` | MCP server config (Desktop/CLI) | Claude Desktop, Claude CLI |
 | `~/projects/dev-tools/claude-mcp/MCP_SERVER_CONFIG.json` | MCP config (browser) | claude.ai browser extension |
 | `~/.config/zsh/.zshrc` | Shell configuration | flow-cli, aiterm shell integration |
-| `~/.config/atlas/` | Atlas state storage | atlas |
+| `~/.atlas/` | Atlas state storage | atlas |
 
 ### Project Configuration
 
@@ -447,10 +448,10 @@ brew reinstall data-wise/tap/<formula>
 - **flow-cli architecture**: https://data-wise.github.io/flow-cli/
 - **MCP Server List**: `~/projects/dev-tools/_MCP_SERVERS.md`
 - **Project Standards**: `flow-cli/docs/conventions/`
-- **Atlas Documentation**: (coming soon)
+- **Atlas Documentation**: https://data-wise.github.io/atlas/
 
 ---
 
 **Maintained by:** Atlas (source of truth for relationships)
-**Last Audit:** 2026-01-07
-**Next Review:** Q1 2026 (when atlas integration launches)
+**Last Audit:** 2026-02-21
+**Next Review:** Q2 2026

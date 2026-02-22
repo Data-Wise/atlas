@@ -58,6 +58,16 @@ Export sessions to iCal/ICS format. Import your work history into any calendar a
 Streak tracking, time blindness helpers, celebrations, and anti-perfectionism features.
 </div>
 
+<div class="feature-card" markdown>
+### :desktop_computer: Multi-Panel Dashboard
+Ink-powered TUI with SINGLE/SPLIT/TRIPLE layouts. Sidebar, inspector, and Pomodoro timer.
+</div>
+
+<div class="feature-card" markdown>
+### :robot: MCP Server
+Expose Atlas to Claude via Model Context Protocol. 10 tools for sessions, captures, and context.
+</div>
+
 </div>
 
 ## :zap: Quick Start
@@ -130,6 +140,8 @@ atlas dash
 | [Configuration](CONFIGURATION.md) | All settings and preferences |
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
+| [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
+| [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
 ## :sparkles: What's New in v0.8.0
 
@@ -167,6 +179,14 @@ atlas dash
     - Add estimates when starting sessions
     - Stats show estimation accuracy
     - "You typically underestimate by X%"
+
+!!! abstract "v0.9.x: Multi-Panel Dashboard"
+    Modern Ink-powered TUI replacing blessed:
+
+    - **LayoutManager**: `Tab` cycles SINGLE / SPLIT / TRIPLE layouts
+    - **SidebarPanel**: Compact project list with inbox badge
+    - **InspectorPanel**: Project detail + live Pomodoro timer
+    - 73% code reduction, 7 views migrated to React Ink
 
 ??? note "Previous: v0.7.x"
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
