@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { Project } from '../../types.js';
+import { useTheme } from '../../lib/ThemeContext.js';
+import { HeatmapComponent } from '../shared/HeatmapComponent.js';
+import { formatHeatmapGrid } from '../../../../adapters/presenters/StatsPresenter.js';
+
+interface HeatmapCell {
+  date: string;
+  value: number;
+  level: number;
+}
 
 interface EcosystemViewProps {
   onBack: () => void;
   onQuit: () => void;
   onSelectProject?: (project: Project) => void;
   onFocus?: () => void;
+  /** Pre-computed heatmap grid for global activity */
+  heatmapGrid?: HeatmapCell[][];
+  /** Streak days for heatmap summary */
+  streakDays?: number;
+  /** Total sessions for heatmap summary */
+  totalSessions?: number;
 }
 
 /**
@@ -27,7 +42,8 @@ interface EcosystemViewProps {
  * - Esc/e: Back to main view
  * - q: Quit
  */
-export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, onSelectProject, onFocus }) => {
+export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, onSelectProject, onFocus, heatmapGrid, streakDays, totalSessions }) => {
+  const theme = useTheme();
   // Mock ecosystem projects for POC
   const [projects] = useState<Project[]>([
     {
@@ -119,10 +135,10 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
     unknown: '❓',
   };
 
-  // Priority colors
+  // Priority colors (never use red — ADHD principle)
   const getPriorityColor = (priority: number): string => {
-    const colors: Record<number, string> = { 1: 'red', 2: 'yellow', 3: 'cyan' };
-    return colors[priority] || 'white';
+    const colors: Record<number, string> = { 1: theme.focus.paused, 2: theme.text.accent, 3: theme.text.secondary };
+    return colors[priority] || theme.text.primary;
   };
 
   // Calculate statistics
@@ -165,13 +181,26 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
 
       {/* Stats bar */}
       <Box paddingX={1}>
-        <Text color="green">{activeCount}</Text>
+        <Text color={theme.status.active}>{activeCount}</Text>
         <Text> Active  │  </Text>
-        <Text color="cyan">{projects.length}</Text>
+        <Text color={theme.text.accent}>{projects.length}</Text>
         <Text> Total  │  </Text>
-        <Text color="yellow">{avgProgress}%</Text>
+        <Text color={theme.focus.paused}>{avgProgress}%</Text>
         <Text> Avg Progress</Text>
       </Box>
+
+      {/* Global activity heatmap (compact 4-day mode) */}
+      {heatmapGrid && heatmapGrid.length > 0 && (
+        <Box paddingX={1} marginTop={1}>
+          <HeatmapComponent
+            grid={heatmapGrid}
+            weeks={heatmapGrid[0]?.length ?? 13}
+            compact={true}
+            streakDays={streakDays}
+            totalSessions={totalSessions}
+          />
+        </Box>
+      )}
 
       {/* Project list */}
       <Box flexDirection="column" flexGrow={1} paddingX={1} paddingTop={1}>
@@ -197,7 +226,7 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
             const filled = Math.round((project.progress / 100) * barWidth);
             const empty = barWidth - filled;
             const color =
-              project.progress >= 75 ? 'green' : project.progress >= 50 ? 'yellow' : 'cyan';
+              project.progress >= 75 ? theme.chart.progressFilled : project.progress >= 50 ? theme.focus.paused : theme.text.accent;
             const progressBar = '█'.repeat(filled) + '░'.repeat(empty);
 
             return (
@@ -208,17 +237,17 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
                   <Text bold>{project.name.padEnd(20).slice(0, 20)}</Text>
                   <Text> </Text>
                   <Text color={color}>{progressBar.substring(0, filled)}</Text>
-                  <Text color="gray">{progressBar.substring(filled)}</Text>
+                  <Text color={theme.chart.progressEmpty}>{progressBar.substring(filled)}</Text>
                   <Text> </Text>
                   <Text color={priorityColor}>P{project.priority ?? 3}</Text>
                   <Text> </Text>
-                  <Text color="gray">{(project.type || '').slice(0, 12).padEnd(12)}</Text>
+                  <Text color={theme.text.muted}>{(project.type || '').slice(0, 12).padEnd(12)}</Text>
                 </Box>
 
                 {/* Show focus/next for selected project */}
                 {isSelected && (project.focus || project.next) && (
                   <Box marginLeft={5}>
-                    <Text color="cyan">
+                    <Text color={theme.text.accent}>
                       → {(project.focus || project.next || '').slice(0, 50)}
                     </Text>
                   </Box>
@@ -231,16 +260,16 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
       </Box>
 
       {/* Command bar */}
-      <Box borderStyle="single" borderColor="gray" paddingX={1}>
-        <Text color="cyan">↑↓</Text>
+      <Box borderStyle="single" borderColor={theme.panel.borderInactive} paddingX={1}>
+        <Text color={theme.text.accent}>↑↓</Text>
         <Text> Navigate  </Text>
-        <Text color="cyan">Enter</Text>
+        <Text color={theme.text.accent}>Enter</Text>
         <Text> View  </Text>
-        <Text color="cyan">f</Text>
+        <Text color={theme.text.accent}>f</Text>
         <Text> Focus  </Text>
-        <Text color="cyan">Esc</Text>
+        <Text color={theme.text.accent}>Esc</Text>
         <Text> Back  </Text>
-        <Text color="cyan">q</Text>
+        <Text color={theme.text.accent}>q</Text>
         <Text> Quit</Text>
       </Box>
     </Box>

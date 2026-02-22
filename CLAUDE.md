@@ -31,10 +31,10 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.9.0 |
+| **Version** | 0.9.1 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,410 (Jest) |
+| **Tests** | 1,827 (Jest) |
 | **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
@@ -288,6 +288,12 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.9.1** - Visual Enhancements: Theme System, Focus Score, Sparklines, Heatmap
+  - ThemeContext with 5 built-in themes (default, nord, solarized, mono, high-contrast)
+  - Focus score calculation with tier classification (○◔◑◕●)
+  - Sidebar inline sparklines with trend coloring
+  - Activity heatmap (full 7-day + compact 4-day modes)
+  - HeatmapComponent shared component, FocusScorePresenter, formatHeatmapGrid
 - **v0.9.0** - Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
   - React Ink replaces blessed (7 views migrated)
   - LayoutManager: SINGLE/SPLIT/TRIPLE modes (`Tab` key)
@@ -311,7 +317,15 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## v0.9.x Status
 
-**v0.9.0-v0.9.1** — TUI Modernization (complete):
+**v0.9.1** — Visual Enhancements (complete):
+- ThemeContext: 5 themes with ThemeProvider/useTheme hook
+- Focus score: weighted formula → tier classification (deep/strong/steady/warming/drift)
+- Sidebar sparklines: inline activity charts with trend coloring
+- Activity heatmap: GitHub-style grid (·░▒▓█) in full and compact modes
+- FocusScorePresenter, formatHeatmapGrid, HeatmapComponent shared component
+- All components use theme-aware colors (no hardcoded values)
+
+**v0.9.0** — TUI Modernization (complete):
 - React Ink dashboard with TypeScript (replacing blessed)
 - LayoutManager: SINGLE/SPLIT/TRIPLE layouts (Tab to cycle)
 - SidebarPanel: Compact project list with windowing

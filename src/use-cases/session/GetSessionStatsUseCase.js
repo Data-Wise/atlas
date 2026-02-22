@@ -143,6 +143,19 @@ export class GetSessionStatsUseCase {
     // Time estimation accuracy
     const estimationStats = this.calculateEstimationStats(sessions)
 
+    // Focus score
+    const summary = {
+      totalSessions,
+      totalMinutes,
+      flowSessions: flowSessions.length,
+      flowPercentage,
+      completedSessions: completedSessions.length,
+      completionRate,
+      dailyAverageMinutes,
+      activeDays
+    }
+    const focusScore = this.calculateFocusScore(summary, streak)
+
     return {
       period: {
         days,
@@ -150,17 +163,9 @@ export class GetSessionStatsUseCase {
         endDate: now,
         projectFilter
       },
-      summary: {
-        totalSessions,
-        totalMinutes,
-        flowSessions: flowSessions.length,
-        flowPercentage,
-        completedSessions: completedSessions.length,
-        completionRate,
-        dailyAverageMinutes,
-        activeDays
-      },
+      summary,
       streak,
+      focusScore,
       bestDay,
       hourlyDistribution,
       byProject,
@@ -312,6 +317,103 @@ export class GetSessionStatsUseCase {
 
     // Return as sorted array (most recent first)
     return Object.values(daily).sort((a, b) => b.date.localeCompare(a.date))
+  }
+
+  /**
+   * Calculate weighted focus score (0-100) with tier classification
+   *
+   * Components:
+   *   duration    (30%) — average session length vs thresholds
+   *   flow        (30%) — percentage of sessions reaching flow state
+   *   completion  (25%) — session completion rate
+   *   consistency (15%) — streak / active days ratio
+   *
+   * @param {Object} summary - Summary stats from calculateStats
+   * @param {Object} streak  - Streak data
+   * @returns {Object} { score, grade, tier, components }
+   */
+  calculateFocusScore(summary, streak) {
+    const {
+      FOCUS_SCORE_WEIGHT_DURATION: wD,
+      FOCUS_SCORE_WEIGHT_FLOW: wF,
+      FOCUS_SCORE_WEIGHT_COMPLETION: wC,
+      FOCUS_SCORE_WEIGHT_CONSISTENCY: wCon,
+      FOCUS_SCORE_DURATION_EXCELLENT: durExc,
+      FOCUS_SCORE_DURATION_GOOD: durGood,
+      FOCUS_SCORE_DURATION_FAIR: durFair,
+      FOCUS_TIER_DEEP,
+      FOCUS_TIER_STRONG,
+      FOCUS_TIER_STEADY,
+      FOCUS_TIER_WARMING,
+    } = BusinessRules
+
+    // Duration component: average session length
+    const avgDuration = summary.totalSessions > 0
+      ? summary.totalMinutes / summary.totalSessions
+      : 0
+    let durationScore
+    if (avgDuration >= durExc) durationScore = 100
+    else if (avgDuration >= durGood) durationScore = 60 + ((avgDuration - durGood) / (durExc - durGood)) * 40
+    else if (avgDuration >= durFair) durationScore = 30 + ((avgDuration - durFair) / (durGood - durFair)) * 30
+    else durationScore = avgDuration > 0 ? (avgDuration / durFair) * 30 : 0
+
+    // Flow component: percentage of flow sessions
+    const flowScore = summary.flowPercentage
+
+    // Completion component: completion rate
+    const completionScore = summary.completionRate
+
+    // Consistency component: streak strength relative to period
+    const consistencyScore = Math.min(100, (streak.current / 7) * 100)
+
+    // Weighted total
+    const score = Math.round(
+      durationScore * wD +
+      flowScore * wF +
+      completionScore * wC +
+      consistencyScore * wCon
+    )
+
+    const clampedScore = Math.max(0, Math.min(100, score))
+
+    // Grade
+    let grade
+    if (clampedScore >= 90) grade = 'A'
+    else if (clampedScore >= 80) grade = 'A'
+    else if (clampedScore >= 70) grade = 'B'
+    else if (clampedScore >= 60) grade = 'B'
+    else if (clampedScore >= 50) grade = 'C'
+    else if (clampedScore >= 40) grade = 'C'
+    else if (clampedScore >= 20) grade = 'D'
+    else grade = 'F'
+
+    // Tier classification
+    const TIERS = [
+      { min: FOCUS_TIER_DEEP,    symbol: '●', label: 'deep' },
+      { min: FOCUS_TIER_STRONG,  symbol: '◕', label: 'strong' },
+      { min: FOCUS_TIER_STEADY,  symbol: '◑', label: 'steady' },
+      { min: FOCUS_TIER_WARMING, symbol: '◔', label: 'warming' },
+      { min: 0,                  symbol: '○', label: 'drift' },
+    ]
+    const tierDef = TIERS.find(t => clampedScore >= t.min)
+    const tierIndex = TIERS.indexOf(tierDef)
+    const tier = {
+      symbol: tierDef.symbol,
+      label: tierDef.label,
+      index: 4 - tierIndex, // 0=drift, 4=deep
+    }
+
+    return {
+      score: clampedScore,
+      grade,
+      tier,
+      components: {
+        duration: Math.round(durationScore),
+        flow: Math.round(flowScore),
+        completion: Math.round(completionScore),
+        consistency: Math.round(consistencyScore),
+      }
+    }
   }
 
   /**

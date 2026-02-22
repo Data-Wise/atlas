@@ -136,6 +136,7 @@ atlas dash
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
 | [Quick Reference](REFCARD.md) | Printable command cheat sheet |
 | [Workflows](WORKFLOWS.md) | ADHD-friendly workflow patterns |
+| [Visual Guide](VISUAL-GUIDE.md) | Themes, focus score, sparklines, heatmap |
 | [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
 | [Configuration](CONFIGURATION.md) | All settings and preferences |
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
@@ -143,39 +144,45 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.9.0
+## :sparkles: What's New in v0.9.1
 
-!!! success "Ink TUI Modernization"
-    Modern React Ink dashboard replacing blessed:
+!!! success "Visual Enhancements"
+    Rich visual feedback across the entire dashboard:
 
-    - **73% code reduction** — 7 views migrated to React Ink
-    - **LayoutManager**: `Tab` cycles SINGLE / SPLIT / TRIPLE layouts
-    - **SidebarPanel**: Compact project list with inbox badge
-    - **InspectorPanel**: Project detail + live Pomodoro timer
+    - **Theme System**: 5 built-in themes (default, nord, solarized, mono, high-contrast) — press `t` to cycle
+    - **Focus Score**: Weighted quality metric (○◔◑◕●) with tier classification
+    - **Sparklines**: Inline activity charts (▁▂▃▅█) in sidebar rows with trend coloring
+    - **Activity Heatmap**: GitHub-style grid (·░▒▓█) in InspectorPanel and EcosystemView
 
-!!! tip "Multi-Panel Dashboard"
-    Three layout modes for different workflows:
+!!! tip "Focus Score & Tiers"
+    Understand your work quality at a glance:
 
-    - `Tab` (1x) **Single**: Full-screen (default)
-    - `Tab` (2x) **Split**: Sidebar 28% + Main 72%
-    - `Tab` (3x) **Triple**: Sidebar 25% + Main 47% + Inspector 28%
-    - `Shift+Tab` to cycle panel focus
+    - **● Deep** (80-100): Sustained, flow-rich sessions
+    - **◕ Strong** (60-79): Good balance of duration and flow
+    - **◑ Steady** (40-59): Regular engagement
+    - **◔ Warming** (20-39): Building momentum
+    - **○ Drift** (0-19): Getting started
 
-!!! info "MCP Server (10 Tools)"
-    Atlas works with Claude via MCP:
+    See [Visual Guide](VISUAL-GUIDE.md) for the full calculation formula.
 
-    - Read: `get_context`, `get_projects`, `get_sessions`, `get_trail`, `get_inbox`
-    - Write: `start_session`, `end_session`, `capture`, `breadcrumb`, `plan`
-    - See [MCP-SERVER.md](MCP-SERVER.md) for setup
+!!! info "Activity Heatmap"
+    13-week activity overview with two display modes:
 
-!!! note "Ecosystem Hub & Morning Ritual"
-    Cross-project dashboard and guided planning:
+    - **Full mode** (InspectorPanel): 7 rows — all days of the week
+    - **Compact mode** (EcosystemView): 4 rows — Mon/Wed/Fri/Sat
+    - Shows streak, total sessions, and best day summary
 
-    - Press `e` for EcosystemView — scans `.STATUS` files
-    - Press `p` for PlanView — yesterday's work, inbox, streak
-    - `atlas plan` for guided daily planning
+!!! note "Theme System"
+    Five color themes optimized for terminal readability:
+
+    - `default` — Purple accents, warm grays
+    - `nord` — Arctic blue palette
+    - `solarized` — Ethan Schoonover's classic
+    - `mono` — Pure grayscale
+    - `high-contrast` — Maximum readability
 
 ??? note "Previous Releases"
+    - **v0.9.0**: Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
     - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
     - **v0.6.x**: Session analytics, stats export

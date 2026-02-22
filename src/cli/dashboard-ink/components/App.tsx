@@ -31,6 +31,7 @@ import { useLayout, LayoutManager, LayoutStatusBar, LAYOUT } from '../lib/Layout
 import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
+import { ThemeProvider } from '../lib/ThemeContext.js';
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'v0.9.1 Multi-Panel Dashboard',
     path: '/Users/dt/projects/dev-tools/atlas',
     next: 'Wire panels into App.tsx, Run integration tests',
+    recentActivity: [20, 35, 60, 80, 90],
+    focusScore: 75,
+    focusTier: { symbol: '◕', color: 'green', label: 'strong' },
   },
   {
     id: '2',
@@ -53,6 +57,9 @@ const MOCK_PROJECTS: Project[] = [
     progress: 95,
     focus: 'Maintenance mode',
     path: '/Users/dt/projects/dev-tools/flow-cli',
+    recentActivity: [60, 40, 25, 15, 10],
+    focusScore: 40,
+    focusTier: { symbol: '◑', color: 'cyan', label: 'steady' },
   },
   {
     id: '3',
@@ -63,6 +70,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'Add Zotero integration',
     path: '/Users/dt/projects/dev-tools/mcp-servers/statistical-research',
     next: 'Implement citation endpoint',
+    recentActivity: [40, 40, 50, 60, 55],
+    focusScore: 90,
+    focusTier: { symbol: '●', color: 'greenBright', label: 'deep' },
   },
   {
     id: '4',
@@ -73,6 +83,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'CRAN submission prep',
     path: '/Users/dt/projects/r-packages/rmediation',
     next: 'Complete documentation, Add vignette',
+    recentActivity: [10, 5, 0, 15, 30],
+    focusScore: 25,
+    focusTier: { symbol: '◔', color: 'yellow', label: 'warming' },
   },
   {
     id: '5',
@@ -83,6 +96,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'Week 3 lecture materials',
     path: '/Users/dt/projects/teaching/causal-inference',
     next: 'Record lecture video',
+    recentActivity: [25, 0, 0, 0, 0],
+    focusScore: 10,
+    focusTier: { symbol: '○', color: 'gray', label: 'drift' },
   },
 ];
 
@@ -92,6 +108,23 @@ const MOCK_CRUMBS = [
   'InspectorPanel timer resets correctly on session change',
   'SidebarPanel windowing: 12-row limit verified',
 ];
+
+// Mock heatmap grid (7 rows × 13 cols) — would come from formatHeatmapGrid(dailyBreakdown) in production
+function generateMockHeatmapGrid(): Array<Array<{ date: string; value: number; level: number }>> {
+  const grid: Array<Array<{ date: string; value: number; level: number }>> = [];
+  for (let row = 0; row < 7; row++) {
+    const cols: Array<{ date: string; value: number; level: number }> = [];
+    for (let col = 0; col < 13; col++) {
+      // Simulate increasing activity towards recent weeks
+      const base = Math.random() * (col / 13) * 4;
+      const level = Math.min(4, Math.round(base));
+      cols.push({ date: '', value: level * 15, level });
+    }
+    grid.push(cols);
+  }
+  return grid;
+}
+const MOCK_HEATMAP_GRID = generateMockHeatmapGrid();
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
@@ -184,7 +217,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         return <PlanView onBack={showMainView} onQuit={onExit} onStartSession={showFocusView} />;
 
       case STATES.ECOSYSTEM:
-        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} />;
+        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} heatmapGrid={MOCK_HEATMAP_GRID} streakDays={4} totalSessions={23} />;
 
       case STATES.TIMELINE:
         return <TimelineView onBack={showMainView} onQuit={onExit} onFocus={showFocusView} />;
@@ -219,55 +252,60 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <Box flexDirection="column" width="100%" height="100%">
+    <ThemeProvider>
+      <Box flexDirection="column" width="100%" height="100%">
 
-      {/* Main content area — LayoutManager handles SINGLE / SPLIT / TRIPLE */}
-      <Box flexGrow={1}>
-        <LayoutManager layout={layout} focusPanel={focusPanel}>
-          {({ sidebar, main, inspector }) => (
-            <>
-              {/* Left panel: project list (SPLIT + TRIPLE only) */}
-              {sidebar && (
-                <Box width={`${sidebar.widthPct}%`} height="100%">
-                  <SidebarPanel
-                    projects={MOCK_PROJECTS}
-                    selectedIndex={sidebarIndex}
-                    onSelect={handleSidebarIndexChange}
-                    onSelectProject={handleSidebarSelect}
-                    isActive={sidebar.isActive}
-                    pendingCaptures={2}                    // mock: 2 inbox items
-                    activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
-                  />
+        {/* Main content area — LayoutManager handles SINGLE / SPLIT / TRIPLE */}
+        <Box flexGrow={1}>
+          <LayoutManager layout={layout} focusPanel={focusPanel}>
+            {({ sidebar, main, inspector }) => (
+              <>
+                {/* Left panel: project list (SPLIT + TRIPLE only) */}
+                {sidebar && (
+                  <Box width={`${sidebar.widthPct}%`} height="100%">
+                    <SidebarPanel
+                      projects={MOCK_PROJECTS}
+                      selectedIndex={sidebarIndex}
+                      onSelect={handleSidebarIndexChange}
+                      onSelectProject={handleSidebarSelect}
+                      isActive={sidebar.isActive}
+                      pendingCaptures={2}                    // mock: 2 inbox items
+                      activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
+                    />
+                  </Box>
+                )}
+
+                {/* Center panel: current view */}
+                <Box width={`${main.widthPct}%`} height="100%">
+                  {renderCurrentView()}
                 </Box>
-              )}
 
-              {/* Center panel: current view */}
-              <Box width={`${main.widthPct}%`} height="100%">
-                {renderCurrentView()}
-              </Box>
+                {/* Right panel: inspector + Pomodoro (TRIPLE only) */}
+                {inspector && (
+                  <Box width={`${inspector.widthPct}%`} height="100%">
+                    <InspectorPanel
+                      project={selectedProject ?? undefined}
+                      isActive={inspector.isActive}
+                      sessionSeconds={300}        // mock: 5 min into session
+                      pomodoroLength={25}
+                      breadcrumbs={MOCK_CRUMBS}
+                      heatmapGrid={MOCK_HEATMAP_GRID}
+                      streakDays={4}
+                      totalSessions={23}
+                    />
+                  </Box>
+                )}
+              </>
+            )}
+          </LayoutManager>
+        </Box>
 
-              {/* Right panel: inspector + Pomodoro (TRIPLE only) */}
-              {inspector && (
-                <Box width={`${inspector.widthPct}%`} height="100%">
-                  <InspectorPanel
-                    project={selectedProject ?? undefined}
-                    isActive={inspector.isActive}
-                    sessionSeconds={300}        // mock: 5 min into session
-                    pomodoroLength={25}
-                    breadcrumbs={MOCK_CRUMBS}
-                  />
-                </Box>
-              )}
-            </>
-          )}
-        </LayoutManager>
+        {/* Command bar — LayoutStatusBar at the right end */}
+        <Box paddingX={1} justifyContent="flex-end">
+          <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
+        </Box>
+
       </Box>
-
-      {/* Command bar — LayoutStatusBar at the right end */}
-      <Box paddingX={1} justifyContent="flex-end">
-        <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
-      </Box>
-
-    </Box>
+    </ThemeProvider>
   );
 };

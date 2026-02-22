@@ -7,6 +7,7 @@
 
 import { formatDuration } from './ProjectPresenter.js'
 import { sparkline } from './TuiPresenter.js'
+import { formatFocusScore } from './FocusScorePresenter.js'
 
 /**
  * Format stats as a table for CLI display
@@ -15,7 +16,7 @@ import { sparkline } from './TuiPresenter.js'
  */
 export function formatStatsTable(stats) {
   const lines = []
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
+  const { summary, streak, focusScore, bestDay, hourlyDistribution, byProject, period, estimation } = stats
 
   // Header
   const periodLabel = period.projectFilter
@@ -33,6 +34,12 @@ export function formatStatsTable(stats) {
   lines.push('  Daily Average:     ' + formatDuration(summary.dailyAverageMinutes))
   lines.push(`  Flow Sessions:     ${summary.flowSessions} (${summary.flowPercentage}%)`)
   lines.push(`  Completion Rate:   ${summary.completionRate}%`)
+
+  // Focus score
+  if (focusScore) {
+    lines.push(`  Focus Score:       ${formatFocusScore(focusScore.score)}`)
+  }
+
   lines.push('')
 
   // Streak
@@ -132,7 +139,7 @@ export function formatStatsText(stats) {
  * @returns {string} Markdown formatted output
  */
 export function formatStatsMarkdown(stats) {
-  const { summary, streak, bestDay, hourlyDistribution, byProject, period, estimation } = stats
+  const { summary, streak, focusScore, bestDay, hourlyDistribution, byProject, period, estimation } = stats
   const lines = []
   const date = new Date().toISOString().split('T')[0]
 
@@ -157,6 +164,9 @@ export function formatStatsMarkdown(stats) {
   lines.push(`| Daily Average | ${formatDuration(summary.dailyAverageMinutes)} |`)
   lines.push(`| Flow Sessions | ${summary.flowSessions} (${summary.flowPercentage}%) |`)
   lines.push(`| Completion Rate | ${summary.completionRate}% |`)
+  if (focusScore) {
+    lines.push(`| Focus Score | ${formatFocusScore(focusScore.score)} |`)
+  }
   lines.push('')
 
   // Streak section
@@ -316,6 +326,107 @@ export function formatEstimationDisplay(estimation) {
   return { display: 'Balanced', color: 'white' }
 }
 
+/**
+ * Extract per-project sparkline data from session list
+ *
+ * Returns an array of `days` numbers, each = total session minutes for that day.
+ * Newest day is last (index days-1).
+ *
+ * @param {Array} sessions - Raw session objects with startTime and getDuration()
+ * @param {string} projectName - Filter to this project name
+ * @param {number} [days=5] - Number of days to bucket
+ * @returns {number[]} Array of length `days`
+ */
+export function projectSparklineData(sessions, projectName, days = 5) {
+  const buckets = new Array(days).fill(0)
+  const now = Date.now()
+
+  for (const session of sessions) {
+    if (!session.startTime) continue
+    if (session.project !== projectName) continue
+
+    const startMs = new Date(session.startTime).getTime()
+    const daysAgo = Math.floor((now - startMs) / (24 * 60 * 60 * 1000))
+
+    if (daysAgo >= 0 && daysAgo < days) {
+      // Index: 0 = oldest, days-1 = today
+      const idx = days - 1 - daysAgo
+      buckets[idx] += session.getDuration?.() || 0
+    }
+  }
+
+  return buckets
+}
+
+/**
+ * Build a heatmap grid from daily breakdown data
+ *
+ * Returns a 7-row × N-col grid where:
+ *   Row 0 = Monday, Row 6 = Sunday
+ *   Col 0 = oldest week, Col N-1 = most recent week
+ *
+ * Each cell: { date, value, level: 0-4 }
+ *   Level 0 = no activity, Level 4 = peak
+ *
+ * @param {Array} dailyBreakdown - Array of { date, dayName, sessions, minutes }
+ * @param {Object} [options]
+ * @param {number} [options.weeks=13] - Number of weeks to include
+ * @param {string} [options.metric='minutes'] - 'minutes' or 'sessions'
+ * @returns {Array<Array<{ date: string, value: number, level: number }>>} 7 rows × weeks cols
+ */
+export function formatHeatmapGrid(dailyBreakdown, { weeks = 13, metric = 'minutes' } = {}) {
+  // Build date → value map
+  const dateMap = {}
+  for (const day of dailyBreakdown) {
+    dateMap[day.date] = metric === 'sessions' ? day.sessions : day.minutes
+  }
+
+  // Find max value for normalization
+  const values = Object.values(dateMap)
+  const maxVal = values.length > 0 ? Math.max(...values) : 0
+
+  // Build grid: 7 rows × weeks cols
+  const grid = Array.from({ length: 7 }, () => Array(weeks).fill(null))
+  const today = new Date()
+
+  // Walk backwards from today for weeks*7 days
+  for (let d = 0; d < weeks * 7; d++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - d)
+    const dateStr = date.toISOString().split('T')[0]
+
+    // dayOfWeek: 0=Sunday, convert to Monday=0
+    const jsDay = date.getDay()
+    const row = jsDay === 0 ? 6 : jsDay - 1 // Mon=0, Sun=6
+
+    // Column: weeks-1 = current week, 0 = oldest
+    const weeksAgo = Math.floor(d / 7)
+    const col = weeks - 1 - weeksAgo
+
+    if (col >= 0 && col < weeks) {
+      const value = dateMap[dateStr] || 0
+      const level = maxVal > 0 ? Math.ceil((value / maxVal) * 4) : 0
+
+      grid[row][col] = {
+        date: dateStr,
+        value,
+        level: value === 0 ? 0 : Math.max(1, Math.min(4, level)),
+      }
+    }
+  }
+
+  // Fill any null cells with empty
+  for (let r = 0; r < 7; r++) {
+    for (let c = 0; c < weeks; c++) {
+      if (!grid[r][c]) {
+        grid[r][c] = { date: '', value: 0, level: 0 }
+      }
+    }
+  }
+
+  return grid
+}
+
 export default {
   formatStatsTable,
   formatStatsJson,
@@ -326,5 +437,7 @@ export default {
   formatStreakDisplay,
   formatFlowDisplay,
   formatEstimationDisplay,
-  getPeriodLabel
+  getPeriodLabel,
+  projectSparklineData,
+  formatHeatmapGrid,
 }
