@@ -109,6 +109,23 @@ const MOCK_CRUMBS = [
   'SidebarPanel windowing: 12-row limit verified',
 ];
 
+// Mock heatmap grid (7 rows × 13 cols) — would come from formatHeatmapGrid(dailyBreakdown) in production
+function generateMockHeatmapGrid(): Array<Array<{ date: string; value: number; level: number }>> {
+  const grid: Array<Array<{ date: string; value: number; level: number }>> = [];
+  for (let row = 0; row < 7; row++) {
+    const cols: Array<{ date: string; value: number; level: number }> = [];
+    for (let col = 0; col < 13; col++) {
+      // Simulate increasing activity towards recent weeks
+      const base = Math.random() * (col / 13) * 4;
+      const level = Math.min(4, Math.round(base));
+      cols.push({ date: '', value: level * 15, level });
+    }
+    grid.push(cols);
+  }
+  return grid;
+}
+const MOCK_HEATMAP_GRID = generateMockHeatmapGrid();
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
@@ -200,7 +217,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         return <PlanView onBack={showMainView} onQuit={onExit} onStartSession={showFocusView} />;
 
       case STATES.ECOSYSTEM:
-        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} />;
+        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} heatmapGrid={MOCK_HEATMAP_GRID} streakDays={4} totalSessions={23} />;
 
       case STATES.TIMELINE:
         return <TimelineView onBack={showMainView} onQuit={onExit} onFocus={showFocusView} />;
@@ -272,6 +289,9 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                       sessionSeconds={300}        // mock: 5 min into session
                       pomodoroLength={25}
                       breadcrumbs={MOCK_CRUMBS}
+                      heatmapGrid={MOCK_HEATMAP_GRID}
+                      streakDays={4}
+                      totalSessions={23}
                     />
                   </Box>
                 )}

@@ -37,8 +37,16 @@ import { Box, Text, useInput } from 'ink';
 import type { Project } from '../types.js';
 import { statusIcon } from '../constants.js';
 import { useTheme } from '../lib/ThemeContext.js';
+import { HeatmapComponent } from './shared/HeatmapComponent.js';
+import { formatHeatmapGrid } from '../../../adapters/presenters/StatsPresenter.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+interface HeatmapCell {
+  date: string;
+  value: number;
+  level: number;
+}
 
 interface InspectorPanelProps {
   project?: Project;
@@ -49,6 +57,12 @@ interface InspectorPanelProps {
   pomodoroLength?: number;
   /** Last N breadcrumbs (displayed newest-first, max 3) */
   breadcrumbs?: string[];
+  /** Pre-computed heatmap grid (7 rows × N cols) */
+  heatmapGrid?: HeatmapCell[][];
+  /** Streak days for heatmap summary */
+  streakDays?: number;
+  /** Total sessions for heatmap summary */
+  totalSessions?: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -197,6 +211,9 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
   sessionSeconds = 0,
   pomodoroLength = 25,
   breadcrumbs = [],
+  heatmapGrid,
+  streakDays,
+  totalSessions,
 }) => {
   const theme = useTheme();
   const hasSession = sessionSeconds > 0;
@@ -294,6 +311,24 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           pomodoroLength={pomodoroLength}
           hasSession={hasSession}
         />
+
+        {/* Activity heatmap (full 7-day mode) */}
+        {heatmapGrid && heatmapGrid.length > 0 && (
+          <Box flexDirection="column" marginTop={1}>
+            <Box>
+              <Text color={theme.text.muted} dimColor>{'─'.repeat(22)}</Text>
+            </Box>
+            <Box marginTop={1}>
+              <HeatmapComponent
+                grid={heatmapGrid}
+                weeks={heatmapGrid[0]?.length ?? 13}
+                compact={false}
+                streakDays={streakDays}
+                totalSessions={totalSessions}
+              />
+            </Box>
+          </Box>
+        )}
 
         {/* Recent breadcrumbs */}
         {recentCrumbs.length > 0 && (

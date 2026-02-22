@@ -2,12 +2,26 @@ import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { Project } from '../../types.js';
 import { useTheme } from '../../lib/ThemeContext.js';
+import { HeatmapComponent } from '../shared/HeatmapComponent.js';
+import { formatHeatmapGrid } from '../../../../adapters/presenters/StatsPresenter.js';
+
+interface HeatmapCell {
+  date: string;
+  value: number;
+  level: number;
+}
 
 interface EcosystemViewProps {
   onBack: () => void;
   onQuit: () => void;
   onSelectProject?: (project: Project) => void;
   onFocus?: () => void;
+  /** Pre-computed heatmap grid for global activity */
+  heatmapGrid?: HeatmapCell[][];
+  /** Streak days for heatmap summary */
+  streakDays?: number;
+  /** Total sessions for heatmap summary */
+  totalSessions?: number;
 }
 
 /**
@@ -28,7 +42,7 @@ interface EcosystemViewProps {
  * - Esc/e: Back to main view
  * - q: Quit
  */
-export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, onSelectProject, onFocus }) => {
+export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, onSelectProject, onFocus, heatmapGrid, streakDays, totalSessions }) => {
   const theme = useTheme();
   // Mock ecosystem projects for POC
   const [projects] = useState<Project[]>([
@@ -174,6 +188,19 @@ export const EcosystemView: React.FC<EcosystemViewProps> = ({ onBack, onQuit, on
         <Text color={theme.focus.paused}>{avgProgress}%</Text>
         <Text> Avg Progress</Text>
       </Box>
+
+      {/* Global activity heatmap (compact 4-day mode) */}
+      {heatmapGrid && heatmapGrid.length > 0 && (
+        <Box paddingX={1} marginTop={1}>
+          <HeatmapComponent
+            grid={heatmapGrid}
+            weeks={heatmapGrid[0]?.length ?? 13}
+            compact={true}
+            streakDays={streakDays}
+            totalSessions={totalSessions}
+          />
+        </Box>
+      )}
 
       {/* Project list */}
       <Box flexDirection="column" flexGrow={1} paddingX={1} paddingTop={1}>
