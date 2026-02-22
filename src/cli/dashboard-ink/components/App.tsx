@@ -45,6 +45,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'v0.9.1 Multi-Panel Dashboard',
     path: '/Users/dt/projects/dev-tools/atlas',
     next: 'Wire panels into App.tsx, Run integration tests',
+    recentActivity: [20, 35, 60, 80, 90],
+    focusScore: 75,
+    focusTier: { symbol: '◕', color: 'green', label: 'strong' },
   },
   {
     id: '2',
@@ -54,6 +57,9 @@ const MOCK_PROJECTS: Project[] = [
     progress: 95,
     focus: 'Maintenance mode',
     path: '/Users/dt/projects/dev-tools/flow-cli',
+    recentActivity: [60, 40, 25, 15, 10],
+    focusScore: 40,
+    focusTier: { symbol: '◑', color: 'cyan', label: 'steady' },
   },
   {
     id: '3',
@@ -64,6 +70,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'Add Zotero integration',
     path: '/Users/dt/projects/dev-tools/mcp-servers/statistical-research',
     next: 'Implement citation endpoint',
+    recentActivity: [40, 40, 50, 60, 55],
+    focusScore: 90,
+    focusTier: { symbol: '●', color: 'greenBright', label: 'deep' },
   },
   {
     id: '4',
@@ -74,6 +83,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'CRAN submission prep',
     path: '/Users/dt/projects/r-packages/rmediation',
     next: 'Complete documentation, Add vignette',
+    recentActivity: [10, 5, 0, 15, 30],
+    focusScore: 25,
+    focusTier: { symbol: '◔', color: 'yellow', label: 'warming' },
   },
   {
     id: '5',
@@ -84,6 +96,9 @@ const MOCK_PROJECTS: Project[] = [
     focus: 'Week 3 lecture materials',
     path: '/Users/dt/projects/teaching/causal-inference',
     next: 'Record lecture video',
+    recentActivity: [25, 0, 0, 0, 0],
+    focusScore: 10,
+    focusTier: { symbol: '○', color: 'gray', label: 'drift' },
   },
 ];
 

@@ -27,6 +27,7 @@ import { Box, Text, useInput } from 'ink';
 import type { Project } from '../types.js';
 import { statusIcon } from '../constants.js';
 import { useTheme } from '../lib/ThemeContext.js';
+import type { Theme } from '../lib/ThemeContext.js';
 
 interface SidebarPanelProps {
   projects: Project[];
@@ -55,6 +56,40 @@ function truncate(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
+// ─── Sparkline ───────────────────────────────────────────────────────────────
+
+const SPARK_CHARS = '▁▂▃▄▅▆▇█';
+
+/** Render a 5-char sparkline from an array of numbers */
+function renderSparkline(data: number[]): string {
+  const max = Math.max(...data);
+  if (max === 0) return '·····';
+  return data
+    .map(v => v === 0 ? '·' : SPARK_CHARS[Math.min(Math.floor((v / max) * 7), 7)])
+    .join('');
+}
+
+/** Determine trend color: rising=sparklineUp, falling=sparklineDown, flat=primary */
+function sparklineTrendColor(data: number[], theme: Theme): string {
+  if (data.length < 4) return theme.chart.sparkline;
+  const first2 = (data[0] + data[1]) / 2;
+  const last2 = (data[data.length - 2] + data[data.length - 1]) / 2;
+  if (last2 > first2) return theme.chart.sparklineUp;
+  if (last2 < first2) return theme.chart.sparklineDown;
+  return theme.text.primary;
+}
+
+interface InlineSparklineProps {
+  data: number[];
+}
+
+const InlineSparkline: React.FC<InlineSparklineProps> = ({ data }) => {
+  const theme = useTheme();
+  const chars = renderSparkline(data);
+  const color = sparklineTrendColor(data, theme);
+  return <Text color={color}>{chars}</Text>;
+};
+
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
 interface RowProps {
@@ -65,8 +100,13 @@ interface RowProps {
 
 const Row: React.FC<RowProps> = ({ project, isHighlighted, isActiveSession }) => {
   const theme  = useTheme();
-  const icon   = statusIcon(project.status);
-  const color  = theme.status[project.status] ?? theme.text.secondary;
+
+  // Focus tier icon replaces status icon when focusTier is available
+  const icon = project.focusTier?.symbol ?? statusIcon(project.status);
+  const iconColor = project.focusTier
+    ? (isHighlighted ? 'blueBright' : project.focusTier.color)
+    : (isHighlighted ? 'blueBright' : (theme.status[project.status] ?? theme.text.secondary));
+
   const name   = truncate(project.name, 14);
   const pct    = fmtProgress(project.progress);
 
@@ -77,9 +117,11 @@ const Row: React.FC<RowProps> = ({ project, isHighlighted, isActiveSession }) =>
       ? theme.focus.timer
       : theme.text.primary;
 
+  const hasSparkline = project.recentActivity && project.recentActivity.length > 0;
+
   return (
     <Box paddingX={1}>
-      <Text color={isHighlighted ? 'blueBright' : color}>
+      <Text color={iconColor}>
         {icon}
       </Text>
       <Text> </Text>
@@ -93,6 +135,14 @@ const Row: React.FC<RowProps> = ({ project, isHighlighted, isActiveSession }) =>
       <Text color={isHighlighted ? theme.text.accent : theme.text.secondary}>
         {pct}
       </Text>
+
+      {/* Sparkline when data is available */}
+      {hasSparkline && (
+        <>
+          <Text> </Text>
+          <InlineSparkline data={project.recentActivity!} />
+        </>
+      )}
 
       {isActiveSession && (
         <Text color={theme.focus.timer}> ⏱</Text>

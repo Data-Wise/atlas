@@ -72,6 +72,36 @@ function trunc(s: string, max = 22): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
+// ─── Focus Score Breakdown ────────────────────────────────────────────────────
+
+interface FocusScoreBreakdownProps {
+  focusScore?: number;
+  focusTier?: { symbol: string; color: string; label: string };
+}
+
+/** Mini bar for a focus component (0-100 scale, 8 chars wide) */
+function componentBar(value: number): string {
+  const W = 8;
+  const n = Math.round(Math.max(0, Math.min(100, value)) / 100 * W);
+  return '█'.repeat(n) + '░'.repeat(W - n);
+}
+
+const FocusScoreBreakdown: React.FC<FocusScoreBreakdownProps> = ({ focusScore, focusTier }) => {
+  const theme = useTheme();
+
+  if (focusScore == null || focusTier == null) return null;
+
+  return (
+    <Box flexDirection="column" marginTop={1}>
+      {/* Score headline */}
+      <Box>
+        <Text bold color={theme.text.secondary}>Focus  </Text>
+        <Text bold color={focusTier.color}>{focusTier.symbol} {focusScore} {focusTier.label}</Text>
+      </Box>
+    </Box>
+  );
+};
+
 // ─── Pomodoro mini-block ──────────────────────────────────────────────────────
 
 interface PomodoroBlockProps {
@@ -223,6 +253,9 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
           <Text color={theme.chart.progressFilled}>{bar.filled}</Text>
           <Text color={theme.chart.progressEmpty}>{bar.empty}</Text>
         </Box>
+
+        {/* Focus score breakdown */}
+        <FocusScoreBreakdown focusScore={project.focusScore} focusTier={project.focusTier} />
 
         {/* Separator */}
         <Box marginTop={1}>

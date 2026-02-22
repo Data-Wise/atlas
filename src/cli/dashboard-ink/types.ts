@@ -16,6 +16,8 @@ export interface Project {
   next?: string;
   /** Project priority level (used by EcosystemView) */
   priority?: number;
+  /** Recent activity sparkline data (5-day session minutes, newest last) */
+  recentActivity?: number[];
   /** Focus score 0-100 (from GetSessionStatsUseCase) */
   focusScore?: number;
   /** Focus tier classification */

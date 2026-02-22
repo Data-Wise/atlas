@@ -326,6 +326,38 @@ export function formatEstimationDisplay(estimation) {
   return { display: 'Balanced', color: 'white' }
 }
 
+/**
+ * Extract per-project sparkline data from session list
+ *
+ * Returns an array of `days` numbers, each = total session minutes for that day.
+ * Newest day is last (index days-1).
+ *
+ * @param {Array} sessions - Raw session objects with startTime and getDuration()
+ * @param {string} projectName - Filter to this project name
+ * @param {number} [days=5] - Number of days to bucket
+ * @returns {number[]} Array of length `days`
+ */
+export function projectSparklineData(sessions, projectName, days = 5) {
+  const buckets = new Array(days).fill(0)
+  const now = Date.now()
+
+  for (const session of sessions) {
+    if (!session.startTime) continue
+    if (session.project !== projectName) continue
+
+    const startMs = new Date(session.startTime).getTime()
+    const daysAgo = Math.floor((now - startMs) / (24 * 60 * 60 * 1000))
+
+    if (daysAgo >= 0 && daysAgo < days) {
+      // Index: 0 = oldest, days-1 = today
+      const idx = days - 1 - daysAgo
+      buckets[idx] += session.getDuration?.() || 0
+    }
+  }
+
+  return buckets
+}
+
 export default {
   formatStatsTable,
   formatStatsJson,
@@ -336,5 +368,6 @@ export default {
   formatStreakDisplay,
   formatFlowDisplay,
   formatEstimationDisplay,
-  getPeriodLabel
+  getPeriodLabel,
+  projectSparklineData,
 }
