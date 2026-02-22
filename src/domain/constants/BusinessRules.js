@@ -29,7 +29,24 @@ export const BusinessRules = {
   BREADCRUMB_TYPES: ['thought', 'stuck', 'next', 'decision', 'note'],
 
   // Task priority levels
-  TASK_PRIORITIES: ['low', 'medium', 'high', 'urgent']
+  TASK_PRIORITIES: ['low', 'medium', 'high', 'urgent'],
+
+  // Focus score weights (must sum to 1.0)
+  FOCUS_SCORE_WEIGHT_DURATION: 0.30,
+  FOCUS_SCORE_WEIGHT_FLOW: 0.30,
+  FOCUS_SCORE_WEIGHT_COMPLETION: 0.25,
+  FOCUS_SCORE_WEIGHT_CONSISTENCY: 0.15,
+
+  // Duration scoring thresholds (minutes → points out of 100)
+  FOCUS_SCORE_DURATION_EXCELLENT: 45,
+  FOCUS_SCORE_DURATION_GOOD: 25,
+  FOCUS_SCORE_DURATION_FAIR: 15,
+
+  // Focus tier thresholds
+  FOCUS_TIER_DEEP: 80,
+  FOCUS_TIER_STRONG: 60,
+  FOCUS_TIER_STEADY: 40,
+  FOCUS_TIER_WARMING: 20,
 }
 
 // Freeze to prevent modification

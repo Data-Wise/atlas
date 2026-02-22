@@ -311,6 +311,7 @@ atlas stats month --export monthly-review.md
 - Completion rate
 - Current and longest streak
 - Best day highlight
+- Focus score with tier classification (v0.9.1)
 - Per-project breakdown (when not filtering)
 
 **Table Output Example:**
@@ -324,6 +325,7 @@ Session Analytics (Last 7 Days)
   Flow Sessions:     8 (67%)
   Completion Rate:   75%
 
+  Focus Score:       ◕ 72 strong
   Streak:            🔥 3 days (longest: 15)
   Best Day:          Tuesday (2h 30m)
 
@@ -335,6 +337,17 @@ Session Analytics (Last 7 Days)
   │ flow-cli     │ 4        │ 2h 45m  │ 75%      │
   └──────────────┴──────────┴─────────┴──────────┘
 ```
+
+**Focus Score** (v0.9.1) is a weighted quality metric:
+
+| Component | Weight | What it measures |
+|-----------|--------|------------------|
+| Duration | 30% | Average session length (45m = excellent) |
+| Flow | 30% | Percentage of flow sessions (≥15 min) |
+| Completion | 25% | Session completion rate |
+| Consistency | 15% | Streak-based regularity |
+
+Tiers: ● deep (80+), ◕ strong (60-79), ◑ steady (40-59), ◔ warming (20-39), ○ drift (0-19)
 
 ---
 
@@ -779,19 +792,20 @@ The sidebar shows a compact project list at 25–28% width:
 ┌────────────────────────┬ ...
 │ Projects 5  📥2 │     <- header: count + inbox badge
 ├────────────────────────┤
-│ ● atlas       75% │     <- ● icon + name + progress %
-│ ◐ flow-cli    95% │     <- ◐ paused icon = yellow
-│ ● mcp-server  80% ⏱│     <- ⏱ = has active session
-│ ◐ rmediation  60% │
+│ ● atlas       75% ▂▃▅█│  <- focus tier + name + progress + sparkline
+│ ◔ flow-cli    95% █▅▃▂│  <- ◔ warming tier (yellow)
+│ ● mcp-server  80% ▃▃▅▆⏱│ <- ⏱ = has active session
+│ ◑ rmediation  60% ▂▁░░│  <- ◑ steady tier (cyan)
 ├────────────────────────┤
-│ j/k: nav Enter: open  │     <- focus hint (changes when inactive)
+│ j/k: nav Enter: open  │  <- focus hint (changes when inactive)
 └────────────────────────┘
 ```
 
 | Feature       | Detail                                                                      |
 | ------------- | --------------------------------------------------------------------------- |
-| Row format    | `icon name   xx%` (14-char name, 4-char progress)                           |
-| Status icons  | `●` active, `◐` paused, `◆` stable, `✓` complete, `○` planning, `✗` blocked |
+| Row format    | `tier name   xx% sparkline` (14-char name, 4-char progress, 5-char spark)  |
+| Focus tiers   | `●` deep, `◕` strong, `◑` steady, `◔` warming, `○` drift (v0.9.1)        |
+| Sparklines    | 5-day activity chart using ▁▂▃▄▅▆▇█ with trend coloring (v0.9.1)          |
 | Session badge | `⏱` appended to row with a running timer                                    |
 | Inbox badge   | `📥N` in header when N captures are unprocessed                              |
 | Windowing     | 12 visible rows with scroll indicator `1-12/25`                             |
@@ -800,7 +814,7 @@ The sidebar shows a compact project list at 25–28% width:
 
 **Inspector Panel (Triple mode only — right column):**
 
-Shows the selected project's detail + a live Pomodoro mini-timer:
+Shows the selected project's detail, focus score, Pomodoro timer, and activity heatmap:
 
 ```
 ┌────────────────────────┐
@@ -809,15 +823,24 @@ Shows the selected project's detail + a live Pomodoro mini-timer:
 │ 🎯 atlas               │  name (18-char trunc)
 │ node-package           │  type
 │ ● active  75% ██████░░ │  status + 8-char bar
+│ Focus  ◕ 72 strong     │  focus score + tier (v0.9.1)
 │ ────────────────────── │
 │ Focus                  │
 │ Implementing auth…     │  22-char trunc
 │ Next                   │
-│ · Add OAuth provider   │  up to 3 items (comma/newline split)
+│ · Add OAuth provider   │  up to 3 items
 │ ────────────────────── │
 │ ⏱ SESSION              │
-│ 24:10  ██████░░        │  live countdown (useEffect tick)
+│ 24:10  ██████░░        │  live countdown
 │ ● FOCUSING             │  → ◑ PAUSED → ☕ BREAK TIME
+│ ────────────────────── │
+│ Activity (13w)         │  heatmap header (v0.9.1)
+│ Mon ·░▒▓█·░▒▓█·░▒     │  7-day × 13-week grid
+│ Tue ·····░░▒▒▓▓█       │  using ·░▒▓█ chars
+│ ...                    │
+│ Sun ░░·····░░▒▓█       │
+│     less ·░▒▓█ more    │  legend
+│ 🔥 4d streak  23 sess  │  summary line
 │ ────────────────────── │
 │ Recent                 │
 │ · stuck on OAuth…      │  last 3 breadcrumbs
@@ -825,15 +848,17 @@ Shows the selected project's detail + a live Pomodoro mini-timer:
 │ Space: pause r: reset  │  only when inspector focused
 ```
 
-| Feature      | Detail                                                               |
-| ------------ | -------------------------------------------------------------------- |
-| Progress bar | 8-char `████░░░░` (clamped 0-100)                                    |
-| Timer        | MM:SS countdown from `pomodoroLength` (default 25 min)               |
-| States       | `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow) |
-| `Space`      | Pause/resume (only when inspector is focused via Shift+Tab)          |
-| `r`          | Reset timer (only when paused + inspector focused)                   |
-| Empty state  | Shows "Select a project" when no project is selected                 |
-| Breadcrumbs  | Newest-first, max 3 displayed                                        |
+| Feature       | Detail                                                               |
+| ------------- | -------------------------------------------------------------------- |
+| Progress bar  | 8-char `████░░░░` (clamped 0-100)                                    |
+| Focus score   | `◕ 72 strong` — weighted metric with tier symbol (v0.9.1)           |
+| Timer         | MM:SS countdown from `pomodoroLength` (default 25 min)               |
+| States        | `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow) |
+| Heatmap       | 7-row × 13-col activity grid with 5-level Unicode chars (v0.9.1)    |
+| `Space`       | Pause/resume (only when inspector is focused via Shift+Tab)          |
+| `r`           | Reset timer (only when paused + inspector focused)                   |
+| Empty state   | Shows "Select a project" when no project is selected                 |
+| Breadcrumbs   | Newest-first, max 3 displayed                                        |
 | Next actions | Parsed from `project.next` via comma or newline, max 3 shown         |
 
 ---
