@@ -187,7 +187,10 @@ const session = program.command('session').description('Session management');
 session
   .command('start [project]')
   .description('Start a work session')
-  .action(async (project) => {
+  .option('-t, --task <task>', 'Task description')
+  .option('-e, --estimate <minutes>', 'Estimated duration in minutes', parseInt)
+  .option('--energy <level>', 'Energy level: high, medium, low')
+  .action(async (project, options) => {
     const atlasInstance = getAtlas();
 
     // Get context restoration before starting
@@ -204,8 +207,21 @@ session
     } catch (e) { /* ignore context errors */ }
 
     try {
-      const result = await atlasInstance.sessions.start(project);
+      const result = await atlasInstance.sessions.start(project, {
+        task: options.task,
+        estimatedMinutes: options.estimate,
+        energyLevel: options.energy
+      });
       console.log(`🎯 Session started: ${result.project}`);
+      if (result.task && result.task !== 'Work session') {
+        console.log(`   Task: ${result.task}`);
+      }
+      if (result.estimatedMinutes) {
+        console.log(`   Estimate: ${result.estimatedMinutes} min`);
+      }
+      if (result.energyLevel) {
+        console.log(`   Energy: ${result.energyLevel}`);
+      }
       if (result.focus) console.log(`   Focus: ${result.focus}`);
     } catch (error) {
       if (error.message.includes('Active session exists')) {
@@ -371,6 +387,31 @@ program
       fs.writeFileSync(filename, output);
       console.log(`✓ Exported to ${filename}`);
     } else {
+      console.log(output);
+    }
+  });
+
+// ============================================================================
+// PLANNING COMMAND
+// ============================================================================
+
+program
+  .command('plan')
+  .description('Morning planning ritual - review yesterday, plan today')
+  .option('--ecosystem <path>', 'Scan .STATUS files in directory')
+  .option('--json', 'Output as JSON')
+  .action(async (options) => {
+    const atlasInstance = getAtlas();
+
+    if (options.json) {
+      const plan = await atlasInstance.sessions.plan({
+        ecosystemPath: options.ecosystem
+      });
+      console.log(JSON.stringify(plan, null, 2));
+    } else {
+      const output = await atlasInstance.formatPlan({
+        ecosystemPath: options.ecosystem
+      });
       console.log(output);
     }
   });
@@ -608,9 +649,9 @@ program
 program
   .command('dashboard')
   .alias('dash')
-  .description('Launch interactive dashboard TUI')
+  .description('Launch interactive dashboard TUI (Ink-powered)')
   .action(async () => {
-    const { runDashboard } = await import('../src/cli/dashboard.js');
+    const { runDashboard } = await import('../src/cli/dashboard-ink-launcher.js');
     await runDashboard(getAtlas());
   });
 
@@ -852,7 +893,87 @@ program
   .option('-w, --watch', 'Watch for changes')
   .option('-p, --paths <paths>', 'Comma-separated root paths to scan')
   .option('--remove-orphans', 'Remove projects no longer on disk')
+  .option('--from-status', 'Scan for .STATUS files in dev-tools ecosystem')
+  .option('--report', 'Show ecosystem summary without syncing')
   .action(async (options) => {
+    // New --from-status mode uses SyncFromStatusUseCase
+    if (options.fromStatus || options.report) {
+      const { homedir } = await import('os');
+      const { join } = await import('path');
+      const atlas = getAtlas();
+      const syncUseCase = atlas.container.resolve('SyncFromStatusUseCase');
+
+      // Default to ~/projects/dev-tools if no paths specified
+      const rootPath = options.paths
+        ? options.paths.split(',')[0].trim().replace(/^~/, homedir())
+        : join(homedir(), 'projects', 'dev-tools');
+
+      console.log(`🔍 Scanning ${rootPath} for .STATUS files...`);
+
+      const result = await syncUseCase.execute({
+        rootPath,
+        dryRun: options.dryRun,
+        reportOnly: options.report,
+        onProgress: ({ path, parsed }) => {
+          if (!options.report) {
+            process.stdout.write(`   ${parsed.name}\r`);
+          }
+        }
+      });
+
+      console.log(`\n✅ Found ${result.scanned} projects with .STATUS files\n`);
+
+      // Show summary
+      if (result.summary) {
+        const { byStatus, byProgress } = result.summary;
+
+        // Status breakdown
+        console.log('📊 By Status:');
+        for (const [status, projects] of Object.entries(byStatus)) {
+          console.log(`   ${status}: ${projects.length}`);
+        }
+
+        // Progress breakdown
+        console.log('\n📈 By Progress:');
+        console.log(`   Complete (100%): ${byProgress.complete.length}`);
+        console.log(`   In Progress: ${byProgress.inProgress.length}`);
+        console.log(`   Not Started: ${byProgress.notStarted.length}`);
+
+        // Show high-priority active projects
+        const activeP1 = (byStatus.active || []).filter(p => p.priority === 1);
+        if (activeP1.length > 0) {
+          console.log('\n🔥 Active P1 Projects:');
+          activeP1.forEach(p => {
+            const progress = p.progress ? `${p.progress}%` : '-';
+            console.log(`   ${p.name}: ${progress} ${p.next ? `→ ${p.next}` : ''}`);
+          });
+        }
+      }
+
+      // Show sync results if not report-only
+      if (!options.report) {
+        if (result.created.length > 0) {
+          console.log(`\n✨ Created: ${result.created.length} projects`);
+          result.created.forEach(p => console.log(`   + ${p.name}`));
+        }
+        if (result.updated.length > 0) {
+          console.log(`\n📝 Updated: ${result.updated.length} projects`);
+          result.updated.forEach(p => console.log(`   ~ ${p.name}: ${p.changes.join(', ')}`));
+        }
+        if (result.skipped.length > 0 && options.dryRun) {
+          console.log(`\n⏭️  Unchanged: ${result.skipped.length} projects`);
+        }
+      }
+
+      if (result.errors.length > 0) {
+        console.log('\n⚠️  Errors:');
+        result.errors.forEach(e => console.log(`   ${e.path}: ${e.error}`));
+      }
+
+      return;
+    }
+
+    // Original sync behavior
     const syncOptions = {
       dryRun: options.dryRun,
       removeOrphans: options.removeOrphans,

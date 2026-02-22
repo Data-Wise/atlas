@@ -2,61 +2,60 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2025-12-29
+**Last Updated:** 2026-01-07
 
 ---
 
-## Current Version: v0.6.3
+## Current Version: v0.8.0
 
-Stats export feature complete. Ready for v0.7.0 feature development.
-
----
-
-## v0.7.0 - Enhanced Focus & Calendar (Next)
-
-**Theme:** Task-based focus, calendar integration, improved workflows
-
-See [V0.7.0-ROADMAP.md](./planning/V0.7.0-ROADMAP.md) for detailed planning.
-
-### Tier 1: Core Features
-- [ ] **Task-Based Focus** - Set specific task before starting Pomodoro
-- [ ] **Session Export** - Export sessions to iCal/ics format
-- [ ] **Time Block View** - Dashboard timeline view of today's sessions
-
-### Tier 2: Nice to Have
-- [ ] Calendar Import - Import time blocks from iCal
-- [ ] Desktop Notifications - Break reminders, streak alerts
-- [ ] Multi-Pomodoro Tracking - Track completed pomodoros per session
-
-### Future Considerations
-- [ ] Google Calendar Sync (two-way)
-- [ ] Web Dashboard (REST API + browser)
-- [ ] Apple Notes Sync (daily summary)
-- [ ] GitHub Activity Correlation
+Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 ---
 
-## v0.8.0 - Dashboard Evolution
+## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 50%)
 
-### Plan D: Multi-Panel Layout
-- [ ] Split layout option (sidebar + main panel)
-- [ ] Triple layout for power users
-- [ ] Panel resize with keyboard
-- [ ] Persistent layout preference
+**Theme:** Technical debt reduction, then visual enhancements
 
-### Features
-- [ ] Keyboard macro system
-- [ ] Custom dashboard keybindings
-- [ ] Project grouping/folders
+### Sprint 1: TUI Modernization 🔧 ✅ COMPLETE (6/6)
+- [x] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed) ✅
+- [x] Build Ink POC with MainView and Card components ✅
+- [x] Migrate all 7 views to Ink (Detail, Focus, Zen, Timeline, Ecosystem, Plan) ✅
+- [x] Implement state management with React integration ✅
+- [x] Add integration tests (25 tests, all passing) ✅
+- [x] Remove blessed dependency and switch to Ink as default ✅
+
+**Progress:** Sprint 1 COMPLETE! Ink is now default, 73% code reduction achieved.
+
+### Sprint 2: Visual Evolution 🎨 (In Progress)
+- [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅ D1 done
+- [x] **SidebarPanel** — compact project list column (25-28%) ✅ D2 done
+- [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅ D3 done
+- [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅ D4 done
+- [ ] GitHub-style heatmap view (`h` key)
+- [ ] Sparkline history per project card
+- [ ] Focus score calculator
+- [ ] Enhanced theme system (dracula, nord, gruvbox)
+
+**Branch:** `feature/multi-panel-dashboard`  
+**Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
 
 ---
 
-## v0.9.0 - Integrations
+## v0.10.0 - Temporal Intelligence
+
+### Analytics
+- [ ] Pattern detection ("most productive Tuesday mornings")
+- [ ] Velocity analytics (sessions/week, trends)
+- [ ] Prediction engine ("this will take ~2.5 hours")
+
+---
+
+## v0.11.0 - Platform Expansion
 
 ### Remote Sync
 - [ ] GitHub Issues sync (read project issues)
 - [ ] GitLab integration
-- [ ] Linear.app integration
+- [ ] Google Calendar Sync (two-way)
 
 ### IDE Extensions
 - [ ] VS Code extension for .STATUS editing
@@ -89,6 +88,24 @@ See [V0.7.0-ROADMAP.md](./planning/V0.7.0-ROADMAP.md) for detailed planning.
 ---
 
 ## Completed Milestones
+
+### v0.9.x Series
+- [x] v0.9.0 Sprint 1: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
+- [x] v0.9.1 D1: LayoutManager — SINGLE/SPLIT/TRIPLE engine, Tab key cycle
+- [x] v0.9.1 D2: SidebarPanel — compact list, j/k, windowing, inbox badge
+- [x] v0.9.1 D3: InspectorPanel — detail + live Pomodoro timer, breadcrumbs
+- [ ] v0.9.1 D4: Wire into App.tsx (in progress)
+
+### v0.8.x Series
+- [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
+  - `atlas plan` - Guided daily planning with energy tracking
+  - `atlas sync --from-status` - Import from .STATUS files
+  - EcosystemView (`e` key) - Cross-project dashboard
+  - PlanView (`p` key) - Morning ritual in dashboard
+  - Homebrew auto-update workflow
+
+### v0.7.x Series
+- [x] v0.7.0: Task-Based Focus, Session Export (iCal), Timeline View
 
 ### v0.6.x Series
 - [x] v0.6.3: Stats export (`--export`, `--format md`)

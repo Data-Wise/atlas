@@ -183,7 +183,7 @@ describe('EndSessionUseCase', () => {
       sessionRepo.sessions.push(session)
 
       await expect(useCase.execute({ sessionId: 'session-1' })).rejects.toThrow(
-        'Session is already ended'
+        "Cannot end session: invalid transition from 'ended' to 'ended'"
       )
     })
 

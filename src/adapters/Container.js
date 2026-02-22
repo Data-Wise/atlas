@@ -10,8 +10,8 @@
  * For production, could use a library like awilix or bottlejs.
  */
 
-import { join } from 'path'
-import { homedir } from 'os'
+import { join } from 'node:path'
+import { homedir } from 'node:os'
 
 // FileSystem repositories
 import { FileSystemSessionRepository } from './repositories/FileSystemSessionRepository.js'
@@ -37,12 +37,15 @@ import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
 import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
+import { SyncFromStatusUseCase } from '../use-cases/registry/SyncFromStatusUseCase.js'
 import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
 import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
 import { GetSessionStatsUseCase } from '../use-cases/session/GetSessionStatsUseCase.js'
 import { ExportSessionsUseCase } from '../use-cases/session/ExportSessionsUseCase.js'
+import { PlanDayUseCase } from '../use-cases/session/PlanDayUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
+import { StatusFileParser } from './gateways/StatusFileParser.js'
 
 export class Container {
   /**
@@ -186,6 +189,17 @@ export class Container {
     })
   }
 
+  getPlanDayUseCase() {
+    return this._resolve('planDayUseCase', () => {
+      return new PlanDayUseCase({
+        sessionRepository: this.getSessionRepository(),
+        captureRepository: this.getCaptureRepository(),
+        projectRepository: this.getProjectRepository(),
+        statusFileParser: this.getStatusFileParser()
+      })
+    })
+  }
+
   // ============================================================================
   // USE CASES - Project
   // ============================================================================
@@ -294,6 +308,15 @@ export class Container {
     })
   }
 
+  getSyncFromStatusUseCase() {
+    return this._resolve('syncFromStatusUseCase', () => {
+      return new SyncFromStatusUseCase({
+        projectRepository: this.getProjectRepository(),
+        statusFileParser: this.getStatusFileParser()
+      })
+    })
+  }
+
   // ============================================================================
   // USE CASES - Status
   // ============================================================================
@@ -314,6 +337,12 @@ export class Container {
   getStatusFileGateway() {
     return this._resolve('statusFileGateway', () => {
       return new StatusFileGateway()
+    })
+  }
+
+  getStatusFileParser() {
+    return this._resolve('statusFileParser', () => {
+      return new StatusFileParser()
     })
   }
 
@@ -363,6 +392,7 @@ export class Container {
       'EndSessionUseCase': () => this.getEndSessionUseCase(),
       'GetSessionStatsUseCase': () => this.getGetSessionStatsUseCase(),
       'ExportSessionsUseCase': () => this.getExportSessionsUseCase(),
+      'PlanDayUseCase': () => this.getPlanDayUseCase(),
       
       // Capture use cases
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
@@ -376,6 +406,7 @@ export class Container {
 
       // Registry use cases
       'SyncRegistryUseCase': () => this.getSyncRegistryUseCase(),
+      'SyncFromStatusUseCase': () => this.getSyncFromStatusUseCase(),
       'RegisterProjectUseCase': () => this.getRegisterProjectUseCase(),
 
       // Status use cases
@@ -383,6 +414,7 @@ export class Container {
 
       // Gateways
       'StatusFileGateway': () => this.getStatusFileGateway(),
+      'StatusFileParser': () => this.getStatusFileParser(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
@@ -410,6 +442,7 @@ export class Container {
       endSession: this.getEndSessionUseCase(),
       getSessionStats: this.getGetSessionStatsUseCase(),
       exportSessions: this.getExportSessionsUseCase(),
+      planDay: this.getPlanDayUseCase(),
 
       // Project
       scanProjects: this.getScanProjectsUseCase(),
@@ -428,6 +461,7 @@ export class Container {
 
       // Registry
       syncRegistry: this.getSyncRegistryUseCase(),
+      syncFromStatus: this.getSyncFromStatusUseCase(),
       registerProject: this.getRegisterProjectUseCase(),
 
       // Status

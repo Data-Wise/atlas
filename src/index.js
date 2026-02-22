@@ -285,6 +285,121 @@ export class Atlas {
         return formatStatsTable(stats);
     }
   }
+
+  async formatPlan(options = {}) {
+    const plan = await this.sessions.plan(options);
+    return this._renderPlan(plan);
+  }
+
+  _renderPlan(plan) {
+    const lines = [];
+
+    // Greeting and streak
+    lines.push(`\n${plan.greeting}`);
+    if (plan.streak?.current > 0) {
+      lines.push(`${plan.streak.display}  ${plan.streak.message}`);
+    }
+    lines.push('');
+
+    // Yesterday summary
+    lines.push('─'.repeat(50));
+    lines.push('📅 YESTERDAY');
+    lines.push('─'.repeat(50));
+    if (plan.yesterday?.hasSessions) {
+      const y = plan.yesterday;
+      lines.push(`   ${y.sessionCount} session${y.sessionCount > 1 ? 's' : ''} • ${y.hours}h ${y.minutes}m • ${y.completionRate}% completed`);
+      if (y.projects.length > 0) {
+        lines.push(`   Projects: ${y.projects.join(', ')}`);
+      }
+      if (y.lastTask) {
+        lines.push(`   Last: ${y.lastTask}`);
+      }
+    } else {
+      lines.push('   No sessions yesterday');
+    }
+    lines.push('');
+
+    // Parked contexts
+    if (plan.parkedContexts.length > 0) {
+      lines.push('─'.repeat(50));
+      lines.push('🅿️  PARKED CONTEXTS');
+      lines.push('─'.repeat(50));
+      for (const ctx of plan.parkedContexts) {
+        lines.push(`   • ${ctx.project || 'No project'}: ${ctx.text?.substring(0, 50) || 'Context saved'}`);
+      }
+      lines.push('');
+    }
+
+    // Inbox
+    if (plan.inbox.length > 0) {
+      lines.push('─'.repeat(50));
+      lines.push(`📥 INBOX (${plan.inbox.length} items)`);
+      lines.push('─'.repeat(50));
+      for (const item of plan.inbox.slice(0, 5)) {
+        const icon = { idea: '💡', task: '✓', bug: '🐛', note: '📝' }[item.type] || '•';
+        lines.push(`   ${icon} ${item.text?.substring(0, 50)}${item.text?.length > 50 ? '...' : ''}`);
+      }
+      if (plan.inbox.length > 5) {
+        lines.push(`   ... and ${plan.inbox.length - 5} more`);
+      }
+      lines.push('');
+    }
+
+    // Active projects
+    if (plan.activeProjects.length > 0) {
+      lines.push('─'.repeat(50));
+      lines.push('🎯 ACTIVE PROJECTS');
+      lines.push('─'.repeat(50));
+      for (const proj of plan.activeProjects.slice(0, 5)) {
+        const priority = proj.priority === 1 ? '🔴' : proj.priority === 2 ? '🟡' : '⚪';
+        const progress = proj.progress ? ` (${proj.progress}%)` : '';
+        lines.push(`   ${priority} ${proj.name}${progress}`);
+        if (proj.focus) {
+          lines.push(`      └─ ${proj.focus.substring(0, 45)}${proj.focus.length > 45 ? '...' : ''}`);
+        }
+      }
+      lines.push('');
+    }
+
+    // Ecosystem (if scanned)
+    if (plan.ecosystem) {
+      lines.push('─'.repeat(50));
+      lines.push(`🌐 ECOSYSTEM (${plan.ecosystem.total} projects scanned)`);
+      lines.push('─'.repeat(50));
+
+      if (plan.ecosystem.highPriority?.length > 0) {
+        lines.push('   P1 Focus:');
+        for (const p of plan.ecosystem.highPriority.slice(0, 3)) {
+          const progress = p.progress ? ` (${p.progress}%)` : '';
+          lines.push(`   🔴 ${p.name}${progress}`);
+        }
+      }
+
+      if (plan.ecosystem.inProgress?.length > 0) {
+        lines.push('   In Progress:');
+        for (const p of plan.ecosystem.inProgress.slice(0, 3)) {
+          lines.push(`   🔄 ${p.name} (${p.progress}%)`);
+        }
+      }
+      lines.push('');
+    }
+
+    // Suggestions
+    if (plan.suggestions.length > 0) {
+      lines.push('─'.repeat(50));
+      lines.push('💡 SUGGESTIONS');
+      lines.push('─'.repeat(50));
+      for (const sug of plan.suggestions.slice(0, 3)) {
+        lines.push(`   → ${sug.message}`);
+        if (sug.action) {
+          lines.push(`     ${sug.action}`);
+        }
+      }
+      lines.push('');
+    }
+
+    return lines.join('\n');
+  }
 }
 
 /**
@@ -404,13 +519,21 @@ class SessionsAPI {
     this.container = container;
   }
 
-  async start(project) {
+  async start(project, options = {}) {
     const createSession = this.container.resolve('CreateSessionUseCase');
-    const session = await createSession.execute({ project: project || 'default' });
+    const session = await createSession.execute({
+      project: project || 'default',
+      task: options.task,
+      energyLevel: options.energyLevel,
+      estimatedMinutes: options.estimatedMinutes
+    });
     return {
       project: session.project,
+      task: session.task,
       focus: session.focus,
-      startTime: session.startTime
+      startTime: session.startTime,
+      energyLevel: session.energyLevel,
+      estimatedMinutes: session.estimatedMinutes
     };
   }
 
@@ -431,6 +554,11 @@ class SessionsAPI {
   async stats(options = {}) {
     const statsUseCase = this.container.resolve('GetSessionStatsUseCase');
     return await statsUseCase.execute(options);
+  }
+
+  async plan(options = {}) {
+    const planUseCase = this.container.resolve('PlanDayUseCase');
+    return await planUseCase.execute(options);
   }
 }
 

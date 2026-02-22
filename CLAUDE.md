@@ -17,9 +17,13 @@ atlas session export             # Export to iCal (v0.7.0)
 atlas park "switching to urgent" # Save context
 atlas unpark                     # Restore context
 
+# Morning ritual (v0.8.0)
+atlas plan                       # Guided daily planning
+atlas sync --from-status         # Import from .STATUS files
+
 # Dashboard
 atlas dash                       # Launch TUI
-# Dashboard keys: f=Focus, T=Timeline, z=Zen, ?=Help
+# Dashboard keys: f=Focus, T=Timeline, z=Zen, e=Ecosystem, p=Plan, ?=Help
 ```
 
 ## Project Overview
@@ -27,10 +31,11 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.7.0 (dev) |
+| **Version** | 0.8.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,192 (Jest) |
+| **Tests** | 1,275 (Jest) |
+| **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
 ## Architecture
@@ -53,12 +58,14 @@ src/
 │   ├── repositories/ # FileSystem*, SQLite* implementations
 │   └── gateways/     # GitGateway, StatusFileGateway
 ├── utils/            # ADHD helpers, config, charts
+├── mcp/              # MCP server for Claude integration
+│   └── index.js      # Tools: get_context, start_session, capture, etc.
 ├── cli/              # Dashboard TUI (blessed)
 │   └── dashboard/    # Modular dashboard components
 │       ├── constants.js   # Configuration values
 │       ├── helpers.js     # Re-exports from presenters
-│       ├── views/         # MainView, DetailView, FocusView, ZenView, TimelineView
-│       ├── stateMachine.js # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE
+│       ├── views/         # MainView, DetailView, FocusView, ZenView, TimelineView, EcosystemView, PlanView
+│       ├── stateMachine.js # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE, ECOSYSTEM, PLAN
 │       └── timerManager.js
 └── index.js          # Commander.js CLI entry
 ```
@@ -149,7 +156,7 @@ atlas
 ## Testing
 
 ```bash
-npm test                  # All 1,156 tests
+npm test                  # All 1,428 tests
 npm run test:unit         # Unit tests only
 npm run test:e2e          # E2E tests
 npm run test:integration  # Integration tests
@@ -225,6 +232,7 @@ DEBUG=atlas:* atlas status
 | `test.yml` | Push/PR | Run tests on Node 18/20 |
 | `docs.yml` | Push to main | Deploy MkDocs to GitHub Pages |
 | `demos.yml` | Changes to `docs/demos/*.tape` | Generate terminal demo GIFs |
+| `homebrew-release.yml` | Release published | Auto-update Homebrew formula |
 
 ### Demo GIF Workflow
 
@@ -269,10 +277,17 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 | [TUTORIAL.md](docs/TUTORIAL.md) | Getting started |
 | [DIAGRAMS.md](docs/DIAGRAMS.md) | Visual diagrams |
 | [DEMOS.md](docs/DEMOS.md) | Terminal demos |
+| [MCP-SERVER.md](docs/MCP-SERVER.md) | MCP integration |
 
 ## Version History
 
-- **v0.7.0** - Session export to iCal, Task-Based Focus, Time Block View
+- **v0.8.0** - Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
+  - `atlas plan` - Guided daily planning with energy tracking
+  - `atlas sync --from-status` - Import from .STATUS files
+  - EcosystemView (`e` key) - Cross-project dashboard
+  - PlanView (`p` key) - Morning ritual in dashboard
+  - Homebrew auto-update workflow
+- **v0.7.0** - Session export, Task-Based Focus, Timeline View
 - **v0.6.3** - Stats export (`--export`, `--format md`)
 - **v0.6.2** - Demo GIF CI workflow, GitGateway detached HEAD fix
 - **v0.6.1** - Friendly error messages for session commands
@@ -281,3 +296,21 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 - **v0.5.x** - Park/unpark, templates, configuration wizard
 - **v0.4.x** - ADHD utilities, dashboard redesign
 - **v0.3.x** - Dashboard themes, Pomodoro
+
+## v0.9.0 Roadmap
+
+**Direction:** TUI Modernization (D) → Visual Evolution (B)
+
+### Sprint 1: TUI Modernization 🔧
+- Evaluate blessed alternatives (ink, terminal-kit, neo-blessed)
+- Extract ViewRenderer.js, dialog components
+- Reduce dashboard.js from 2,303 to <1,000 lines
+- Add view transition integration tests
+
+### Sprint 2: Visual Evolution 🎨
+- GitHub-style heatmap view ('h' key)
+- Sparkline history per project card
+- Focus score calculator
+- Enhanced theme system
+
+**Detailed plan:** [docs/prompts/V0.9.0-ROADMAP.md](docs/prompts/V0.9.0-ROADMAP.md)

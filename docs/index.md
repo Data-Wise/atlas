@@ -131,30 +131,46 @@ atlas dash
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
 
-## :sparkles: What's New in v0.7.0
+## :sparkles: What's New in v0.8.0
 
-!!! success "Task-Based Focus"
-    Enhanced Pomodoro with task tracking:
+!!! success "Ecosystem Hub"
+    See all your dev-tools projects in one view:
 
-    - Dashboard prompts "What will you focus on?" before timer
-    - Task displayed during focus session
-    - After timer: `c` (completed), `p` (partial), `n` (pivoted)
+    - Press `e` in dashboard for EcosystemView
+    - Scans `~/projects/dev-tools` for `.STATUS` files
+    - Shows status, progress, and focus for each project
+    - Cross-project metrics and progress bars
 
-!!! tip "Calendar Export"
-    Export sessions to iCal for any calendar app:
+!!! tip "Morning Ritual"
+    Start your day with guided planning:
 
     ```bash
-    atlas session export sessions.ics    # Export to iCal
-    atlas session export --days 60       # Last 60 days
-    atlas session export --format json   # JSON format
+    atlas plan              # Guided daily planning
+    atlas sync --from-status # Import from .STATUS files
     ```
 
-!!! info "Timeline View"
-    Press `T` in dashboard to see today's sessions on a timeline. Visualize your work patterns with color-coded time blocks.
+    - Press `p` in dashboard for PlanView
+    - Shows yesterday's sessions, inbox, streak
+    - Set energy level (high/medium/low)
+    - Choose your #1 focus for the day
 
-??? note "Previous: v0.6.x"
-    - **v0.6.3**: Stats export (`--export`, `--format md`)
-    - **v0.6.0**: Session analytics with `atlas stats`
+!!! info "MCP Server Integration"
+    Atlas now works with Claude via MCP:
+
+    - Tools: `get_projects`, `get_context`, `capture`
+    - Register in `~/.claude/settings.json`
+    - See [MCP-SERVER.md](MCP-SERVER.md) for setup
+
+!!! note "Time Estimation"
+    Track estimated vs actual session time:
+
+    - Add estimates when starting sessions
+    - Stats show estimation accuracy
+    - "You typically underestimate by X%"
+
+??? note "Previous: v0.7.x"
+    - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
+    - **v0.6.x**: Session analytics, stats export
 
 ## :heart: ADHD-Friendly Design
 

@@ -13,8 +13,8 @@
  * The domain layer knows nothing about this implementation.
  */
 
-import { promises as fs } from 'fs'
-import { join, dirname } from 'path'
+import { promises as fs } from 'node:fs'
+import { join, dirname } from 'node:path'
 import { Session } from '../../domain/entities/Session.js'
 import { SessionState } from '../../domain/value-objects/SessionState.js'
 import { ISessionRepository } from '../../domain/repositories/ISessionRepository.js'

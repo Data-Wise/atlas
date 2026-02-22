@@ -155,11 +155,11 @@ export async function runDashboard(atlas, options = {}) {
 
   // Apply current theme to widgets
   function applyTheme() {
-    statusBar.style.bg = currentTheme.primary
+    // Apply to actual widgets that exist
+    titleBar.style.bg = currentTheme.primary
     filterBar.style.bg = 'black'
-    projectsTable.options.border.fg = currentTheme.primary
-    sidebar.options.border.fg = currentTheme.primary
     commandBar.style.bg = currentTheme.primary
+    // Note: projectsTable and sidebar are legacy shims - skip them
     screen.render()
   }
 
@@ -286,17 +286,18 @@ export async function runDashboard(atlas, options = {}) {
     style: { fg: 'gray', bg: 'black' }
   })
 
-  // Legacy compatibility aliases
-  const statusBar = titleBar
-  const projectsTable = {
+  // Compatibility shims for old code paths
+  // TODO: Refactor callers to use new widget names directly, then remove these
+  const statusBar = titleBar // Used for status messages throughout
+  const projectsTable = { // Shim for focus management
     rows: { selected: 0, emit: () => {} },
     setData: () => {},
     focus: () => cardContainer.focus()
   }
-  const sidebar = blessed.box({ hidden: true })
-  const activitySpark = { setData: () => {} }
-  const statsBox = blessed.box({ setContent: () => {} })
-  const capturesBox = blessed.box({ setContent: () => {} })
+  const sidebar = blessed.box({ hidden: true }) // Unused but referenced
+  const activitySpark = { setData: () => {} } // Unused stub
+  const statsBox = blessed.box({ setContent: () => {} }) // Unused stub
+  const capturesBox = blessed.box({ setContent: () => {} }) // Unused stub
 
   screen.append(mainView)
 
@@ -733,6 +734,171 @@ export async function runDashboard(atlas, options = {}) {
   })
 
   screen.append(timelineView)
+
+  // ============================================================================
+  // ECOSYSTEM VIEW - Multi-project overview
+  // ============================================================================
+
+  const ecosystemView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Ecosystem header
+  const ecosystemHeader = blessed.box({
+    parent: ecosystemView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' },
+    content: ' {bold}ECOSYSTEM{/}  {gray-fg}────────────────────────────────────────────────{/}'
+  })
+
+  // Stats summary
+  const ecosystemStats = blessed.box({
+    parent: ecosystemView,
+    top: 1,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' },
+    content: ''
+  })
+
+  // Project list
+  const ecosystemList = blessed.box({
+    parent: ecosystemView,
+    top: 3,
+    left: 1,
+    width: '100%-2',
+    height: '100%-5',
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: { ch: '│', style: { fg: 'gray' } },
+    tags: true,
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Ecosystem command bar
+  const ecosystemCommandBar = blessed.box({
+    parent: ecosystemView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}↑↓{/} Navigate  {cyan-fg}Enter{/} View  {cyan-fg}f{/} Focus  {cyan-fg}Esc{/} Back  {cyan-fg}q{/} Quit'
+  })
+
+  screen.append(ecosystemView)
+
+  // Ecosystem state
+  let ecosystemProjects = []
+  let ecosystemSelectedIndex = 0
+
+  // ============================================================================
+  // PLAN VIEW (Morning Ritual)
+  // ============================================================================
+
+  const planView = blessed.box({
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    hidden: true,
+    style: { bg: 'black' }
+  })
+
+  // Plan title bar
+  const planTitle = blessed.box({
+    parent: planView,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Yesterday summary
+  const planYesterday = blessed.box({
+    parent: planView,
+    top: 2,
+    left: 1,
+    width: '48%',
+    height: 6,
+    tags: true,
+    border: { type: 'line', fg: 'gray' },
+    label: ' 📅 Yesterday ',
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Streak display
+  const planStreak = blessed.box({
+    parent: planView,
+    top: 2,
+    right: 1,
+    width: '48%',
+    height: 6,
+    tags: true,
+    border: { type: 'line', fg: 'gray' },
+    label: ' 🔥 Streak ',
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Suggestions list
+  const planSuggestions = blessed.box({
+    parent: planView,
+    top: 9,
+    left: 1,
+    width: '100%-2',
+    height: '50%-3',
+    tags: true,
+    border: { type: 'line', fg: 'cyan' },
+    label: ' 💡 Suggestions ',
+    scrollable: true,
+    alwaysScroll: true,
+    scrollbar: { ch: '│', style: { fg: 'gray' } },
+    style: { fg: 'white', bg: 'black' }
+  })
+
+  // Stats footer
+  const planStats = blessed.box({
+    parent: planView,
+    bottom: 2,
+    left: 1,
+    width: '100%-2',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' }
+  })
+
+  // Command bar
+  const planCommandBar = blessed.box({
+    parent: planView,
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: 1,
+    tags: true,
+    style: { fg: 'gray', bg: 'black' },
+    content: ' {cyan-fg}↑↓{/} Navigate  {cyan-fg}Enter{/} Execute  {cyan-fg}e{/} Energy  {cyan-fg}s{/} Start Session  {cyan-fg}Esc{/} Back'
+  })
+
+  screen.append(planView)
+
+  // Plan state
+  let planData = null
+  let planSelectedIndex = 0
+  let planEnergyLevel = null
 
   // ============================================================================
   // HELPER FUNCTIONS
@@ -1647,6 +1813,278 @@ export async function runDashboard(atlas, options = {}) {
   }
 
   // ============================================================================
+  // ECOSYSTEM VIEW
+  // ============================================================================
+
+  async function showEcosystemView() {
+    stateMachine.transition(STATES.ECOSYSTEM)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.hide()
+    timelineView.hide()
+    ecosystemView.show()
+
+    await updateEcosystemDisplay()
+    screen.render()
+  }
+
+  function exitEcosystemView() {
+    stateMachine.transition(STATES.BROWSE)
+    ecosystemView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  async function updateEcosystemDisplay() {
+    // Use StatusFileParser to scan for .STATUS files in dev-tools ecosystem
+    const statusFileParser = atlas.container.resolve('StatusFileParser')
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
+
+    // Scan ~/projects/dev-tools for .STATUS files
+    const rootPath = join(homedir(), 'projects', 'dev-tools')
+    let scanResults = []
+
+    try {
+      scanResults = await statusFileParser.scanDirectory(rootPath, { maxDepth: 2 })
+    } catch (error) {
+      // Fall back to registered projects if scan fails
+      scanResults = []
+    }
+
+    // Convert scan results to project format
+    const projectsWithStatus = scanResults.map(({ path, parsed }) => ({
+      name: parsed.name || 'Unknown',
+      path: path,
+      type: parsed.type || 'unknown',
+      status: parsed.status || 'unknown',
+      progress: parsed.progress || 0,
+      priority: parsed.priority || 3,
+      phase: parsed.phase || '',
+      focus: parsed.focus || '',
+      next: parsed.next || ''
+    }))
+
+    // Sort: active first, then by priority, then by name
+    projectsWithStatus.sort((a, b) => {
+      if (a.status === 'active' && b.status !== 'active') return -1
+      if (a.status !== 'active' && b.status === 'active') return 1
+      if (a.priority !== b.priority) return a.priority - b.priority
+      return a.name.localeCompare(b.name)
+    })
+
+    // Update stats bar
+    const activeCount = projectsWithStatus.filter(p => p.status === 'active').length
+    const totalProgress = projectsWithStatus.reduce((sum, p) => sum + (p.progress || 0), 0)
+    const avgProgress = projectsWithStatus.length > 0 ? Math.round(totalProgress / projectsWithStatus.length) : 0
+
+    ecosystemStats.setContent(
+      ` {green-fg}${activeCount}{/} Active  │  ` +
+      `{cyan-fg}${projectsWithStatus.length}{/} Total  │  ` +
+      `{yellow-fg}${avgProgress}%{/} Avg Progress`
+    )
+
+    // Build project list content
+    const lines = []
+    const STATUS_ICONS = {
+      active: '🟢',
+      stable: '✅',
+      released: '🚀',
+      paused: '⏸️',
+      draft: '📝',
+      archived: '📦',
+      unknown: '❓'
+    }
+
+    const PRIORITY_COLORS = { 1: 'red', 2: 'yellow', 3: 'cyan' }
+
+    // Group by status
+    const grouped = {
+      active: projectsWithStatus.filter(p => p.status === 'active'),
+      stable: projectsWithStatus.filter(p => ['stable', 'released'].includes(p.status)),
+      paused: projectsWithStatus.filter(p => p.status === 'paused'),
+      draft: projectsWithStatus.filter(p => p.status === 'draft'),
+      other: projectsWithStatus.filter(p => !['active', 'stable', 'released', 'paused', 'draft'].includes(p.status))
+    }
+
+    let globalIndex = 0
+    const addGroup = (title, groupProjects) => {
+      if (groupProjects.length === 0) return
+
+      lines.push(`{bold}{white-fg}${title}{/} (${groupProjects.length})`)
+      lines.push('')
+
+      for (const project of groupProjects) {
+        const isSelected = globalIndex === ecosystemSelectedIndex
+        const prefix = isSelected ? '{inverse} ► {/}' : '   '
+        const statusIcon = STATUS_ICONS[project.status] || STATUS_ICONS.unknown
+        const priorityColor = PRIORITY_COLORS[project.priority] || 'white'
+
+        // Progress bar
+        const barWidth = 12
+        const filled = Math.round((project.progress / 100) * barWidth)
+        const empty = barWidth - filled
+        const color = project.progress >= 75 ? 'green' : project.progress >= 50 ? 'yellow' : 'cyan'
+        const progressBar = `{${color}-fg}${'█'.repeat(filled)}{/}{gray-fg}${'░'.repeat(empty)}{/}`
+
+        const name = project.name.padEnd(20).slice(0, 20)
+        const typeStr = (project.type || '').slice(0, 12).padEnd(12)
+
+        lines.push(
+          `${prefix}${statusIcon} {bold}${name}{/} ${progressBar} ` +
+          `{${priorityColor}-fg}P${project.priority}{/} ` +
+          `{gray-fg}${typeStr}{/}`
+        )
+
+        // Show focus/next for selected project
+        if (isSelected && (project.focus || project.next)) {
+          const detail = project.focus || project.next
+          const truncated = detail.length > 50 ? detail.slice(0, 47) + '...' : detail
+          lines.push(`     {cyan-fg}→ ${truncated}{/}`)
+        }
+
+        globalIndex++
+      }
+      lines.push('')
+    }
+
+    addGroup('🔥 Active Projects', grouped.active)
+    addGroup('✅ Stable/Released', grouped.stable)
+    addGroup('⏸️  Paused', grouped.paused)
+    addGroup('📝 Draft', grouped.draft)
+    addGroup('📦 Other', grouped.other)
+
+    ecosystemList.setContent(lines.join('\n'))
+    screen.render()
+  }
+
+  // ============================================================================
+  // PLAN VIEW (Morning Ritual)
+  // ============================================================================
+
+  async function showPlanView() {
+    stateMachine.transition(STATES.PLAN)
+    mainView.hide()
+    detailView.hide()
+    focusView.hide()
+    zenView.hide()
+    timelineView.hide()
+    ecosystemView.hide()
+    planView.show()
+
+    await updatePlanDisplay()
+    screen.render()
+  }
+
+  function exitPlanView() {
+    stateMachine.transition(STATES.BROWSE)
+    planView.hide()
+    mainView.show()
+    projectsTable.focus()
+    screen.render()
+  }
+
+  async function updatePlanDisplay() {
+    // Get plan data using PlanDayUseCase
+    const planUseCase = atlas.container.resolve('PlanDayUseCase')
+    const { homedir } = await import('node:os')
+    const { join } = await import('node:path')
+
+    try {
+      planData = await planUseCase.execute({
+        ecosystemPath: join(homedir(), 'projects', 'dev-tools')
+      })
+    } catch (error) {
+      planData = { greeting: 'Hello!', suggestions: [], inbox: [], parkedContexts: [], activeProjects: [] }
+    }
+
+    planSelectedIndex = Math.min(planSelectedIndex, Math.max(0, (planData.suggestions?.length || 1) - 1))
+
+    // Title with greeting
+    const greeting = planData.greeting || 'Hello!'
+    const energyStr = planEnergyLevel ? `{cyan-fg}Energy: ${planEnergyLevel}{/}` : '{gray-fg}Energy: not set{/}'
+    planTitle.setContent(` {bold}${greeting}{/}  ─────────────────────────  ${energyStr}`)
+
+    // Yesterday summary
+    const yesterday = planData.yesterday || {}
+    if (yesterday.hasSessions) {
+      planYesterday.setContent(
+        ` {white-fg}${yesterday.sessionCount} sessions{/}\n` +
+        ` {cyan-fg}${yesterday.hours}h ${yesterday.minutes}m{/} total\n` +
+        ` {green-fg}${yesterday.completionRate}%{/} completed\n` +
+        ` Last: {yellow-fg}${yesterday.lastProject || 'unknown'}{/}`
+      )
+    } else {
+      planYesterday.setContent(
+        ` {gray-fg}No sessions yesterday{/}\n\n` +
+        ` {yellow-fg}Fresh start today!{/}`
+      )
+    }
+
+    // Streak display
+    const streak = planData.streak || {}
+    const streakDisplay = streak.display || '🔥'
+    planStreak.setContent(
+      ` Current: {bold}{green-fg}${streak.current || 0} days{/}\n` +
+      ` Longest: {cyan-fg}${streak.longest || 0} days{/}\n` +
+      ` ${streakDisplay}\n` +
+      ` {gray-fg}${streak.message || ''}{/}`
+    )
+
+    // Suggestions
+    const suggestions = planData.suggestions || []
+    const lines = []
+    const SUGGESTION_ICONS = {
+      unpark: '⏸️',
+      triage: '📥',
+      focus: '🎯',
+      continue: '▶️',
+      streak: '🔥'
+    }
+
+    if (suggestions.length === 0) {
+      lines.push(' {gray-fg}No suggestions - start fresh!{/}')
+    } else {
+      suggestions.forEach((s, i) => {
+        const isSelected = i === planSelectedIndex
+        const prefix = isSelected ? '{inverse} ► {/}' : '   '
+        const icon = SUGGESTION_ICONS[s.type] || '💡'
+
+        lines.push(`${prefix}${icon} {white-fg}${s.message}{/}`)
+        if (s.action && isSelected) {
+          lines.push(`     {cyan-fg}→ ${s.action}{/}`)
+        }
+        lines.push('')
+      })
+    }
+
+    planSuggestions.setContent(lines.join('\n'))
+
+    // Stats footer
+    const inboxCount = planData.inbox?.length || 0
+    const parkedCount = planData.parkedContexts?.length || 0
+    const activeCount = planData.activeProjects?.length || 0
+
+    planStats.setContent(
+      ` {cyan-fg}📥 ${inboxCount} inbox{/}  │  ` +
+      `{yellow-fg}⏸️ ${parkedCount} parked{/}  │  ` +
+      `{green-fg}🟢 ${activeCount} active{/}`
+    )
+
+    screen.render()
+  }
+
+  function cyclePlanEnergyLevel() {
+    const levels = [null, 'high', 'medium', 'low']
+    const currentIndex = levels.indexOf(planEnergyLevel)
+    planEnergyLevel = levels[(currentIndex + 1) % levels.length]
+    updatePlanDisplay()
+    return planEnergyLevel
+  }
+
+  // ============================================================================
   // DECISION HELPER
   // ============================================================================
 
@@ -1813,6 +2251,10 @@ export async function runDashboard(atlas, options = {}) {
       exitFocusMode()
     } else if (stateMachine.is(STATES.TIMELINE)) {
       exitTimelineView()
+    } else if (stateMachine.is(STATES.ECOSYSTEM)) {
+      exitEcosystemView()
+    } else if (stateMachine.is(STATES.PLAN)) {
+      exitPlanView()
     } else if (stateMachine.is(STATES.DETAIL)) {
       showMainView()
     }
@@ -2030,6 +2472,24 @@ export async function runDashboard(atlas, options = {}) {
       showTimelineView()
     } else if (stateMachine.is(STATES.TIMELINE)) {
       exitTimelineView()
+    }
+  })
+
+  // Ecosystem view: e key
+  screen.key(['e'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showEcosystemView()
+    } else if (stateMachine.is(STATES.ECOSYSTEM)) {
+      exitEcosystemView()
+    }
+  })
+
+  // Plan view (morning ritual): p key
+  screen.key(['p'], () => {
+    if (stateMachine.is(STATES.BROWSE) || stateMachine.is(STATES.DETAIL)) {
+      showPlanView()
+    } else if (stateMachine.is(STATES.PLAN)) {
+      exitPlanView()
     }
   })
 

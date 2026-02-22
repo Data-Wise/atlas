@@ -33,6 +33,8 @@ export class CreateSessionUseCase {
    * @param {string} [input.task] - Optional task description
    * @param {string} [input.branch] - Optional git branch
    * @param {Object} [input.context] - Optional metadata
+   * @param {string} [input.energyLevel] - Optional energy level (high, medium, low)
+   * @param {number} [input.estimatedMinutes] - Optional time estimate in minutes
    * @returns {Promise<Session>} Created session
    */
   async execute(input) {
@@ -56,7 +58,9 @@ export class CreateSessionUseCase {
     const session = new Session(sessionId, input.project, {
       task: input.task,
       branch: input.branch,
-      context: input.context
+      context: input.context,
+      energyLevel: input.energyLevel,
+      estimatedMinutes: input.estimatedMinutes
     })
 
     // Persist the session
@@ -102,6 +106,24 @@ export class CreateSessionUseCase {
 
     if (input.context !== undefined && typeof input.context !== 'object') {
       throw new Error('CreateSessionUseCase: context must be an object')
+    }
+
+    // Validate energy level if provided
+    if (input.energyLevel !== undefined) {
+      const validLevels = ['high', 'medium', 'low']
+      if (!validLevels.includes(input.energyLevel)) {
+        throw new Error(`CreateSessionUseCase: energyLevel must be one of: ${validLevels.join(', ')}`)
+      }
+    }
+
+    // Validate estimated minutes if provided
+    if (input.estimatedMinutes !== undefined) {
+      if (typeof input.estimatedMinutes !== 'number' || input.estimatedMinutes <= 0) {
+        throw new Error('CreateSessionUseCase: estimatedMinutes must be a positive number')
+      }
+      if (input.estimatedMinutes > 480) {
+        throw new Error('CreateSessionUseCase: estimatedMinutes cannot exceed 480 (8 hours)')
+      }
     }
   }
 }

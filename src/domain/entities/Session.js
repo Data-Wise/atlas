@@ -13,6 +13,7 @@ import {
   SessionResumedEvent,
   SessionContextUpdatedEvent
 } from '../events/SessionEvent.js'
+import { BusinessRules } from '../constants/BusinessRules.js'
 
 export class Session {
   /**
@@ -27,8 +28,8 @@ export class Session {
     this.project = project
 
     // Optional properties with defaults
-    this.task = options.task || 'Work session'
-    this.branch = options.branch || 'main'
+    this.task = options.task || BusinessRules.SESSION_DEFAULT_TASK
+    this.branch = options.branch || BusinessRules.SESSION_DEFAULT_BRANCH
     this.startTime = options.startTime || new Date()
     this.endTime = null
     this.pausedAt = null
@@ -37,6 +38,13 @@ export class Session {
     this.state = new SessionState(SessionState.ACTIVE)
     this.outcome = null
     this.context = options.context || {}
+
+    // ADHD-friendly: track energy level for task matching
+    this.energyLevel = options.energyLevel || null // high, medium, low, or null
+
+    // Time estimation tracking (ADHD-friendly: helps calibrate time perception)
+    // Use explicit undefined check to properly validate 0 as invalid
+    this.estimatedMinutes = options.estimatedMinutes !== undefined ? options.estimatedMinutes : null
 
     // Domain events (not persisted)
     this._events = []
@@ -65,6 +73,22 @@ export class Session {
     if (this.task && this.task.length > 500) {
       throw new Error('Task description too long (max 500 characters)')
     }
+
+    // Validate energy level if provided
+    const validEnergyLevels = ['high', 'medium', 'low']
+    if (this.energyLevel && !validEnergyLevels.includes(this.energyLevel)) {
+      throw new Error(`Invalid energy level: ${this.energyLevel}. Must be one of: ${validEnergyLevels.join(', ')}`)
+    }
+
+    // Validate estimated minutes if provided
+    if (this.estimatedMinutes !== null) {
+      if (typeof this.estimatedMinutes !== 'number' || this.estimatedMinutes <= 0) {
+        throw new Error('Estimated minutes must be a positive number')
+      }
+      if (this.estimatedMinutes > 480) { // 8 hours max
+        throw new Error('Estimated minutes cannot exceed 480 (8 hours)')
+      }
+    }
   }
 
   /**
@@ -72,17 +96,17 @@ export class Session {
    * @param {string} outcome - Session outcome (completed, cancelled, interrupted)
    */
   end(outcome = 'completed') {
-    if (this.state.isEnded()) {
-      throw new Error('Session is already ended')
+    const newState = new SessionState(SessionState.ENDED)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot end session: invalid transition from '${this.state.value}' to 'ended'`)
     }
 
-    const validOutcomes = ['completed', 'cancelled', 'interrupted']
-    if (!validOutcomes.includes(outcome)) {
-      throw new Error(`Invalid outcome: ${outcome}. Must be one of: ${validOutcomes.join(', ')}`)
+    if (!BusinessRules.SESSION_VALID_OUTCOMES.includes(outcome)) {
+      throw new Error(`Invalid outcome: ${outcome}. Must be one of: ${BusinessRules.SESSION_VALID_OUTCOMES.join(', ')}`)
     }
 
     this.endTime = new Date()
-    this.state = new SessionState(SessionState.ENDED)
+    this.state = newState
     this.outcome = outcome
 
     this._events.push(new SessionEndedEvent(this.id, outcome, this.getDuration()))
@@ -92,12 +116,13 @@ export class Session {
    * Business Rule: Pause active session
    */
   pause() {
-    if (!this.state.isActive()) {
-      throw new Error('Can only pause active sessions')
+    const newState = new SessionState(SessionState.PAUSED)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot pause session: invalid transition from '${this.state.value}' to 'paused'`)
     }
 
     this.pausedAt = new Date()
-    this.state = new SessionState(SessionState.PAUSED)
+    this.state = newState
 
     this._events.push(new SessionPausedEvent(this.id))
   }
@@ -106,8 +131,9 @@ export class Session {
    * Business Rule: Resume paused session
    */
   resume() {
-    if (!this.state.isPaused()) {
-      throw new Error('Can only resume paused sessions')
+    const newState = new SessionState(SessionState.ACTIVE)
+    if (!this.state.canTransitionTo(newState)) {
+      throw new Error(`Cannot resume session: invalid transition from '${this.state.value}' to 'active'`)
     }
 
     if (this.pausedAt) {
@@ -117,7 +143,7 @@ export class Session {
 
     this.resumedAt = new Date()
     this.pausedAt = null
-    this.state = new SessionState(SessionState.ACTIVE)
+    this.state = newState
 
     this._events.push(new SessionResumedEvent(this.id))
   }
@@ -154,7 +180,7 @@ export class Session {
    * @returns {boolean}
    */
   isInFlowState() {
-    return this.state.isActive() && this.getDuration() >= 15
+    return this.state.isActive() && this.getDuration() >= BusinessRules.SESSION_FLOW_STATE_MINUTES
   }
 
   /**
@@ -193,7 +219,70 @@ export class Session {
       duration: this.getDuration(),
       state: this.state.value,
       outcome: this.outcome,
-      isFlowState: this.isInFlowState()
+      isFlowState: this.isInFlowState(),
+      energyLevel: this.energyLevel,
+      estimatedMinutes: this.estimatedMinutes,
+      estimationAccuracy: this.getEstimationAccuracy()
     }
+  }
+
+  /**
+   * Set energy level for the session
+   * @param {string} level - Energy level (high, medium, low)
+   */
+  setEnergyLevel(level) {
+    const validEnergyLevels = ['high', 'medium', 'low']
+    if (!validEnergyLevels.includes(level)) {
+      throw new Error(`Invalid energy level: ${level}. Must be one of: ${validEnergyLevels.join(', ')}`)
+    }
+    this.energyLevel = level
+  }
+
+  /**
+   * Set estimated minutes for the session
+   * @param {number} minutes - Estimated duration in minutes
+   */
+  setEstimatedMinutes(minutes) {
+    if (typeof minutes !== 'number' || minutes <= 0) {
+      throw new Error('Estimated minutes must be a positive number')
+    }
+    if (minutes > 480) {
+      throw new Error('Estimated minutes cannot exceed 480 (8 hours)')
+    }
+    this.estimatedMinutes = minutes
+  }
+
+  /**
+   * Get estimation accuracy (how well the estimate matched actual duration)
+   * Only meaningful for ended sessions with estimates
+   * @returns {Object|null} Accuracy info or null if not applicable
+   */
+  getEstimationAccuracy() {
+    if (!this.estimatedMinutes || !this.state.isEnded()) {
+      return null
+    }
+
+    const actual = this.getDuration()
+    const estimated = this.estimatedMinutes
+    const difference = actual - estimated
+    const percentageOff = estimated > 0 ? Math.round((difference / estimated) * 100) : 0
+
+    return {
+      estimated,
+      actual,
+      difference, // positive = took longer (underestimated), negative = took less (overestimated)
+      percentageOff, // positive = underestimated, negative = overestimated
+      wasUnderestimate: difference > 0,
+      wasOverestimate: difference < 0,
+      wasAccurate: Math.abs(percentageOff) <= 10 // within 10% is considered accurate
+    }
+  }
+
+  /**
+   * Check if session has an estimate
+   * @returns {boolean}
+   */
+  hasEstimate() {
+    return this.estimatedMinutes !== null && this.estimatedMinutes > 0
   }
 }

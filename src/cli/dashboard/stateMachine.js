@@ -7,20 +7,24 @@
 
 // Valid dashboard states
 export const STATES = {
-  BROWSE: 'browse',      // Main project list view
-  DETAIL: 'detail',      // Single project detail view
-  FOCUS: 'focus',        // Focus mode with timer
-  ZEN: 'zen',            // Minimal zen mode
-  TIMELINE: 'timeline'   // Time block view
+  BROWSE: 'browse',        // Main project list view
+  DETAIL: 'detail',        // Single project detail view
+  FOCUS: 'focus',          // Focus mode with timer
+  ZEN: 'zen',              // Minimal zen mode
+  TIMELINE: 'timeline',    // Time block view
+  ECOSYSTEM: 'ecosystem',  // Multi-project ecosystem overview
+  PLAN: 'plan'             // Morning ritual / daily planning
 }
 
 // Valid transitions between states
 const TRANSITIONS = {
-  [STATES.BROWSE]: [STATES.DETAIL, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE],
-  [STATES.DETAIL]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE],
-  [STATES.FOCUS]: [STATES.BROWSE, STATES.ZEN, STATES.TIMELINE],
-  [STATES.ZEN]: [STATES.BROWSE, STATES.FOCUS, STATES.TIMELINE],
-  [STATES.TIMELINE]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN]
+  [STATES.BROWSE]: [STATES.DETAIL, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN],
+  [STATES.DETAIL]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN],
+  [STATES.FOCUS]: [STATES.BROWSE, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN],
+  [STATES.ZEN]: [STATES.BROWSE, STATES.FOCUS, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN],
+  [STATES.TIMELINE]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.ECOSYSTEM, STATES.PLAN],
+  [STATES.ECOSYSTEM]: [STATES.BROWSE, STATES.DETAIL, STATES.FOCUS, STATES.PLAN],
+  [STATES.PLAN]: [STATES.BROWSE, STATES.FOCUS, STATES.DETAIL]
 }
 
 /**

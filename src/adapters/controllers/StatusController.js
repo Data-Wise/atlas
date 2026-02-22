@@ -14,10 +14,10 @@
  * - Box drawing characters for visual structure
  */
 
-import { homedir } from 'os'
-import { join } from 'path'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { readFile } from 'fs/promises'
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
 import chalk from 'chalk'
 import { WebDashboard } from '../../web/WebDashboard.js'
 import open from 'open'
