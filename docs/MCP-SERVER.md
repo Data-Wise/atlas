@@ -119,6 +119,63 @@ Get session statistics.
 }
 ```
 
+### atlas_get_trail
+
+Get breadcrumb trail for context reconstruction.
+
+```javascript
+// Parameters
+{
+  project?: string,  // Optional: filter to specific project
+  days?: number      // Days to look back (default: 7)
+}
+
+// Returns
+[
+  { text, type, project, timestamp },
+  ...
+]
+```
+
+### atlas_get_inbox
+
+Get quick capture inbox items awaiting triage.
+
+```javascript
+// Parameters
+{
+  type?: 'idea' | 'task' | 'bug' | 'note',  // Filter by type
+  project?: string,                           // Filter by project
+  limit?: number                              // Max items (default: 20)
+}
+
+// Returns
+[
+  { text, type, project, tags, createdAt },
+  ...
+]
+```
+
+### atlas_plan
+
+Get morning planning summary with suggestions.
+
+```javascript
+// Parameters
+{
+  scanEcosystem?: boolean  // Include .STATUS scan (default: false)
+}
+
+// Returns
+{
+  streak: { current, longest },
+  yesterday: { sessions, totalMinutes },
+  parked: [...],
+  inbox: { count, items },
+  suggestions: [...]
+}
+```
+
 ### atlas_start_session
 
 Start a new work session.
@@ -144,7 +201,7 @@ End current session.
 // Parameters
 {
   note?: string,
-  outcome?: 'completed' | 'interrupted' | 'blocked'
+  outcome?: 'completed' | 'cancelled' | 'interrupted'
 }
 
 // Returns

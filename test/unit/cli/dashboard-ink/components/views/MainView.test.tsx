@@ -65,7 +65,7 @@ describe('MainView Component', () => {
       );
 
       const frame = lastFrame();
-      expect(frame).toContain('j/k: Navigate');
+      expect(frame).toContain('j/k: Nav');
       expect(frame).toContain('Enter: Select');
       expect(frame).toContain('q: Quit');
     });

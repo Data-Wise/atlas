@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Card } from '../shared/Card.js';
-
-interface Project {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  focus?: string;
-  path?: string;
-  next?: string;
-}
+import type { Project } from '../../types.js';
 
 interface MainViewProps {
   projects: Project[];

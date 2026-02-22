@@ -58,6 +58,16 @@ Export sessions to iCal/ICS format. Import your work history into any calendar a
 Streak tracking, time blindness helpers, celebrations, and anti-perfectionism features.
 </div>
 
+<div class="feature-card" markdown>
+### :desktop_computer: Multi-Panel Dashboard
+Ink-powered TUI with SINGLE/SPLIT/TRIPLE layouts. Sidebar, inspector, and Pomodoro timer.
+</div>
+
+<div class="feature-card" markdown>
+### :robot: MCP Server
+Expose Atlas to Claude via Model Context Protocol. 10 tools for sessions, captures, and context.
+</div>
+
 </div>
 
 ## :zap: Quick Start
@@ -130,45 +140,43 @@ atlas dash
 | [Configuration](CONFIGURATION.md) | All settings and preferences |
 | [Architecture](ARCHITECTURE.md) | System design and patterns |
 | [API Guide](API-GUIDE.md) | Using Atlas as a library |
+| [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
+| [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.8.0
+## :sparkles: What's New in v0.9.0
 
-!!! success "Ecosystem Hub"
-    See all your dev-tools projects in one view:
+!!! success "Ink TUI Modernization"
+    Modern React Ink dashboard replacing blessed:
 
-    - Press `e` in dashboard for EcosystemView
-    - Scans `~/projects/dev-tools` for `.STATUS` files
-    - Shows status, progress, and focus for each project
-    - Cross-project metrics and progress bars
+    - **73% code reduction** — 7 views migrated to React Ink
+    - **LayoutManager**: `Tab` cycles SINGLE / SPLIT / TRIPLE layouts
+    - **SidebarPanel**: Compact project list with inbox badge
+    - **InspectorPanel**: Project detail + live Pomodoro timer
 
-!!! tip "Morning Ritual"
-    Start your day with guided planning:
+!!! tip "Multi-Panel Dashboard"
+    Three layout modes for different workflows:
 
-    ```bash
-    atlas plan              # Guided daily planning
-    atlas sync --from-status # Import from .STATUS files
-    ```
+    - `Tab` (1x) **Single**: Full-screen (default)
+    - `Tab` (2x) **Split**: Sidebar 28% + Main 72%
+    - `Tab` (3x) **Triple**: Sidebar 25% + Main 47% + Inspector 28%
+    - `Shift+Tab` to cycle panel focus
 
-    - Press `p` in dashboard for PlanView
-    - Shows yesterday's sessions, inbox, streak
-    - Set energy level (high/medium/low)
-    - Choose your #1 focus for the day
+!!! info "MCP Server (10 Tools)"
+    Atlas works with Claude via MCP:
 
-!!! info "MCP Server Integration"
-    Atlas now works with Claude via MCP:
-
-    - Tools: `get_projects`, `get_context`, `capture`
-    - Register in `~/.claude/settings.json`
+    - Read: `get_context`, `get_projects`, `get_sessions`, `get_trail`, `get_inbox`
+    - Write: `start_session`, `end_session`, `capture`, `breadcrumb`, `plan`
     - See [MCP-SERVER.md](MCP-SERVER.md) for setup
 
-!!! note "Time Estimation"
-    Track estimated vs actual session time:
+!!! note "Ecosystem Hub & Morning Ritual"
+    Cross-project dashboard and guided planning:
 
-    - Add estimates when starting sessions
-    - Stats show estimation accuracy
-    - "You typically underestimate by X%"
+    - Press `e` for EcosystemView — scans `.STATUS` files
+    - Press `p` for PlanView — yesterday's work, inbox, streak
+    - `atlas plan` for guided daily planning
 
-??? note "Previous: v0.7.x"
+??? note "Previous Releases"
+    - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
     - **v0.6.x**: Session analytics, stats export
 

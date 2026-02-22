@@ -2,17 +2,17 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-01-07
+**Last Updated:** 2026-02-21
 
 ---
 
-## Current Version: v0.8.0
+## Current Version: v0.9.0
 
-Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
+TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, MCP Server.
 
 ---
 
-## v0.9.0 - TUI Modernization + Visual Evolution (In Progress - 50%)
+## v0.9.x - Visual Evolution (Remaining Items)
 
 **Theme:** Technical debt reduction, then visual enhancements
 
@@ -26,12 +26,17 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 
 **Progress:** Sprint 1 COMPLETE! Ink is now default, 73% code reduction achieved.
 
-### Sprint 2: Visual Evolution 🎨
+### Sprint 2: Visual Evolution 🎨 (In Progress)
+- [x] **LayoutManager** — SINGLE/SPLIT/TRIPLE layout engine (`Tab` key) ✅ D1 done
+- [x] **SidebarPanel** — compact project list column (25-28%) ✅ D2 done
+- [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅ D3 done
+- [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅ D4 done
 - [ ] GitHub-style heatmap view (`h` key)
 - [ ] Sparkline history per project card
 - [ ] Focus score calculator
 - [ ] Enhanced theme system (dracula, nord, gruvbox)
 
+**Branch:** `feature/multi-panel-dashboard`  
 **Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
 
 ---
@@ -83,6 +88,13 @@ Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation.
 ---
 
 ## Completed Milestones
+
+### v0.9.x Series
+- [x] v0.9.0 Sprint 1: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
+- [x] v0.9.1 D1: LayoutManager — SINGLE/SPLIT/TRIPLE engine, Tab key cycle
+- [x] v0.9.1 D2: SidebarPanel — compact list, j/k, windowing, inbox badge
+- [x] v0.9.1 D3: InspectorPanel — detail + live Pomodoro timer, breadcrumbs
+- [x] v0.9.1 D4: Wire into App.tsx \u2705
 
 ### v0.8.x Series
 - [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation

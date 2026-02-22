@@ -9,6 +9,7 @@ interface Suggestion {
 
 interface PlanViewProps {
   onBack: () => void;
+  onQuit: () => void;
   onStartSession?: () => void;
 }
 
@@ -31,7 +32,7 @@ interface PlanViewProps {
  * - Esc/p: Back to main view
  * - q: Quit
  */
-export const PlanView: React.FC<PlanViewProps> = ({ onBack, onStartSession }) => {
+export const PlanView: React.FC<PlanViewProps> = ({ onBack, onQuit, onStartSession }) => {
   // Mock plan data for POC
   const [suggestions] = useState<Suggestion[]>([
     {
@@ -98,7 +99,7 @@ export const PlanView: React.FC<PlanViewProps> = ({ onBack, onStartSession }) =>
     } else if (input === 's' && onStartSession) {
       onStartSession();
     } else if (input === 'q') {
-      process.exit(0);
+      onQuit();
     }
   });
 

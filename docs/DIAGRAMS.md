@@ -10,8 +10,9 @@ This document contains comprehensive Mermaid diagrams visualizing the Atlas CLI 
 graph TB
     subgraph "CLI / Presentation Layer"
         CLI["CLI Entry Point<br/>bin/atlas.js<br/>(Commander.js)"]
-        Dashboard["TUI Dashboard<br/>src/cli/dashboard.js"]
+        Dashboard["TUI Dashboard<br/>src/cli/dashboard-ink/"]
         API["Programmatic API<br/>src/index.js"]
+        MCP["MCP Server<br/>src/mcp/index.js"]
     end
 
     subgraph "Controller / Adapter Layer"
@@ -37,6 +38,7 @@ graph TB
         Breadcrumb["Breadcrumb<br/>Core Entity"]
         Task["Task<br/>Core Entity"]
         RepoIface["Repository<br/>Interfaces<br/>IProject, ISession,<br/>ICapture, IBreadcrumb"]
+        BizRules["BusinessRules<br/>Constants"]
         ValueObj["Value Objects<br/>ProjectType,<br/>SessionState"]
         Validators["Domain Validators<br/>StatusFileValidator"]
     end
@@ -56,6 +58,10 @@ graph TB
     Dashboard --> SessionUC
     API --> ProjectUC
     API --> SessionUC
+    MCP --> ProjectUC
+    MCP --> SessionUC
+    MCP --> CaptureUC
+    MCP --> ContextUC
 
     ProjectUC --> Project
     SessionUC --> Session
@@ -80,12 +86,14 @@ graph TB
 
     style CLI fill:#e1f5ff
     style Dashboard fill:#e1f5ff
+    style MCP fill:#e1f5ff
     style API fill:#e1f5ff
     style ProjectUC fill:#f3e5f5
     style SessionUC fill:#f3e5f5
     style CaptureUC fill:#f3e5f5
     style ContextUC fill:#f3e5f5
     style Project fill:#e8f5e9
+    style BizRules fill:#e8f5e9
     style Session fill:#e8f5e9
     style Capture fill:#e8f5e9
     style FSRepo fill:#fff3e0
@@ -381,6 +389,12 @@ graph TD
     Atlas -->|sync| Sync["sync [PATHS...]<br/>Sync project registry"]
     Atlas -->|register| Register["register PROJECT PATH<br/>Register project"]
 
+    %% Plan Command
+    Atlas -->|plan| Plan["plan<br/>Morning ritual"]
+
+    %% Stats Command
+    Atlas -->|stats| Stats["stats<br/>Session analytics"]
+
     %% Info Commands
     Atlas -->|status| Info["status<br/>System status"]
     Atlas -->|dashboard| Dashboard["dashboard<br/>TUI Dashboard"]
@@ -399,6 +413,8 @@ graph TD
     style CInbox fill:#e8f5e9,stroke:#1b5e20
     style CLog fill:#e8f5e9,stroke:#1b5e20
     style CTrail fill:#e8f5e9,stroke:#1b5e20
+    style Plan fill:#e8f5e9,stroke:#1b5e20
+    style Stats fill:#e8f5e9,stroke:#1b5e20
     style Sync fill:#fff3e0,stroke:#e65100
     style Register fill:#fff3e0,stroke:#e65100
 ```
@@ -730,7 +746,7 @@ graph TD
 ```mermaid
 graph TB
     subgraph "Dashboard TUI"
-        Dashboard["dashboard.js"]
+        Dashboard["dashboard-blessed.js<br/>(legacy)"]
         Helpers["helpers.js<br/>(re-exports)"]
         Constants["constants.js<br/>(config values)"]
     end
@@ -769,6 +785,71 @@ graph TB
 
 ---
 
+
+---
+
+## 12. Dashboard State Machine (Ink v0.9.x)
+
+```mermaid
+stateDiagram-v2
+    [*] --> BROWSE
+    BROWSE --> DETAIL: Enter on project
+    BROWSE --> FOCUS: f key
+    BROWSE --> ZEN: z key
+    BROWSE --> TIMELINE: T key
+    BROWSE --> ECOSYSTEM: e key
+    BROWSE --> PLAN: p key
+
+    DETAIL --> BROWSE: Escape
+    DETAIL --> FOCUS: f key
+
+    FOCUS --> BROWSE: Escape
+    FOCUS --> ZEN: z key
+
+    ZEN --> BROWSE: Escape
+    ZEN --> FOCUS: f key
+
+    TIMELINE --> BROWSE: Escape
+    ECOSYSTEM --> BROWSE: Escape
+    ECOSYSTEM --> DETAIL: Enter
+    PLAN --> BROWSE: Escape
+    PLAN --> FOCUS: Start session
+```
+
+**States:** BROWSE (card list), DETAIL (project), FOCUS (Pomodoro), ZEN (minimal), TIMELINE (time blocks), ECOSYSTEM (multi-project), PLAN (morning ritual)
+
+**Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts`
+
+---
+
+## 13. Ink Dashboard Component Tree (v0.9.1)
+
+```mermaid
+graph TB
+    App["App.tsx<br/>(state + data)"]
+    LM["LayoutManager.tsx<br/>(SINGLE / SPLIT / TRIPLE)"]
+    SP["SidebarPanel.tsx<br/>(25-28%)"]
+    IP["InspectorPanel.tsx<br/>(28%)"]
+    Views["View Layer<br/>(Main, Detail, Focus,<br/>Zen, Timeline,<br/>Ecosystem, Plan)"]
+
+    App --> LM
+    LM --> SP
+    LM --> Views
+    LM --> IP
+    SP -->|onSelectProject| App
+    Views -->|onTransition| App
+
+    style App fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style LM fill:#f3e5f5,stroke:#4a148c
+    style SP fill:#e8f5e9
+    style IP fill:#e8f5e9
+```
+
+**Layout Modes (Tab cycles):**
+- **SINGLE:** Main view only (100%)
+- **SPLIT:** Sidebar (28%) + Main (72%)
+- **TRIPLE:** Sidebar (25%) + Main (47%) + Inspector (28%)
+
 ## Diagram Reference Guide
 
 | # | Diagram | Purpose | Key Use Case |
@@ -784,6 +865,8 @@ graph TB
 | 9 | Template System | Project template processing | Creating new projects |
 | 10 | Scanning & Registry | Project discovery | Project synchronization |
 | 11 | Presenter Layer | UI formatting separation | Dashboard TUI formatting |
+| 12 | Dashboard State Machine | Ink view state transitions | Dashboard navigation |
+| 13 | Ink Component Tree | React Ink component hierarchy | TUI architecture |
 
 ---
 

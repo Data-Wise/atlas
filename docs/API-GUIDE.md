@@ -804,6 +804,98 @@ capture.getAge();                // "2 hours ago"
 
 ---
 
+## TUI Component APIs (v0.9.1)
+
+The v0.9.1 Ink dashboard exposes typed React components and hooks for building custom layouts.
+
+### useLayout() hook
+
+```typescript
+import { useLayout, LAYOUT, PANEL_CONFIG } from '../lib/LayoutManager';
+
+function MyDashboard() {
+  const { layout, focusedPanel, cycleLayout, cycleFocus } = useLayout();
+
+  // layout: 'single' | 'split' | 'triple'
+  // focusedPanel: 'main' | 'sidebar' | 'inspector'
+  // Tab → cycleLayout()  |  Shift+Tab → cycleFocus()
+
+  const config = PANEL_CONFIG[layout];
+  // { sidebar: { width: 28 } | null, main: { width: 72 }, inspector: { width: 28 } | null }
+}
+```
+
+**`LAYOUT` constants:**
+```typescript
+LAYOUT.SINGLE  // 'single' — full-screen, no panels
+LAYOUT.SPLIT   // 'split'  — sidebar 28% + main 72%
+LAYOUT.TRIPLE  // 'triple' — sidebar 25% + main 47% + inspector 28%
+```
+
+### SidebarPanel props
+
+```typescript
+import { SidebarPanel, SidebarProject } from '../components/SidebarPanel';
+
+interface SidebarProject {
+  id: string;
+  name: string;       // truncated to 14 chars in display
+  type: string;
+  status: string;     // 'active'|'paused'|'stable'|'complete'|'planning'|'blocked'
+  progress: number;   // 0-100, displayed as right-padded 4-char " 75%"
+  focus?: string;
+  path?: string;
+  next?: string;
+}
+
+<SidebarPanel
+  projects={projects}        // required
+  selectedIndex={idx}        // controlled
+  onSelect={setIdx}          // called on j/k navigation
+  onSelectProject={openFn}   // called on Enter
+  isActive={isActive}        // j/k/Enter no-ops when false
+  pendingCaptures={5}        // 📥 badge in header, optional
+  activeProjectId="abc"      // ⏱ on matching row, optional
+/>
+```
+
+**Display contract:**
+- Row: `● atlas   75%` — icon(1) + space + name(14) + progress(4)
+- 12-row window, scroll indicator `1-12/N` when N > 12
+- Header border: `cyan` when `isActive`, `gray` when not
+
+### InspectorPanel props
+
+```typescript
+import { InspectorPanel, InspectorProject } from '../components/InspectorPanel';
+
+interface InspectorProject {
+  id: string;
+  name: string;       // truncated to 18 chars
+  type: string;
+  status: string;
+  progress: number;   // drives 8-char ████░░░░ bar
+  focus?: string;     // truncated to 22 chars
+  next?: string;      // comma/newline split, max 3 items, each truncated to 20
+}
+
+<InspectorPanel
+  project={selectedProject}  // undefined → empty state
+  isActive={active}          // Space/r keys guarded by this
+  sessionSeconds={300}       // > 0 shows live Pomodoro timer
+  pomodoroLength={25}        // block length in minutes, default 25
+  breadcrumbs={crumbs}       // string[], newest-first, max 3 shown
+/>
+```
+
+**Pomodoro mini-timer:**
+- Live tick via `useEffect` + `setInterval(1000)`
+- States: `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow)
+- `Space` toggles pause, `r` resets (both guarded by `isActive`)
+- Timer resets automatically when `sessionSeconds` prop changes
+
+---
+
 ## Error Handling
 
 ```javascript
@@ -935,6 +1027,22 @@ getStatusIcon('blocked'); // "{red-fg}✖{/}"
 // Available themes
 console.log(themes.default.primary); // "blue"
 console.log(themes.dark.primary);    // "magenta"
+```
+
+### Ink Component Status Icons (v0.9.1)
+
+All three panel components share a common status icon / colour contract:
+
+```typescript
+// Same mapping in SidebarPanel.tsx, InspectorPanel.tsx, and DetailView.tsx
+const STATUS_ICON = {
+  active:   '●',   // green
+  paused:   '◐',   // yellow
+  stable:   '◆',   // cyan
+  complete: '✓',   // gray
+  planning: '○',   // blue
+  blocked:  '✗',   // red
+};
 ```
 
 ---

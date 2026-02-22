@@ -140,11 +140,15 @@ atlas project remove old-project
 Start a new work session.
 
 ```bash
-atlas session start [project] [task]
+atlas session start [project] [options]
 
 Arguments:
   project    Project name (optional if in project directory)
-  task       Task description (optional)
+
+Options:
+  -t, --task <task>           Task description
+  -e, --estimate <minutes>    Estimated duration in minutes
+  --energy <level>            Energy level: high, medium, low
 ```
 
 **Examples:**
@@ -156,7 +160,10 @@ atlas session start
 atlas session start myproject
 
 # Start with task description
-atlas session start myproject "Implement user authentication"
+atlas session start myproject -t "Implement user authentication"
+
+# Start with estimate and energy level
+atlas session start myproject -t "Fix bug" -e 30 --energy high
 ```
 
 **Output includes:**
@@ -541,7 +548,8 @@ Start the morning ritual - a guided daily planning flow.
 atlas plan [options]
 
 Options:
-  -e, --ecosystem <path>    Scan ecosystem path for project statuses
+  --ecosystem <path>    Scan ecosystem path for project statuses
+  --json                Output as JSON
 ```
 
 **Examples:**
@@ -551,6 +559,9 @@ atlas plan
 
 # Include ecosystem scan
 atlas plan --ecosystem ~/projects/dev-tools
+
+# Output plan as JSON
+atlas plan --json
 ```
 
 **The planning ritual includes:**
@@ -674,40 +685,37 @@ atlas dash
 
 **Keyboard Shortcuts:**
 
-| Key | Action |
-|-----|--------|
-| `↑↓` | Navigate projects |
-| `Enter` | Open project detail |
-| `Esc` | Back / Exit focus mode |
-| `/` | Search/filter projects |
-| `a` | Filter: active only |
-| `p` | Filter: paused only |
-| `*` | Clear filter (show all) |
-| `s` | Start session |
-| `e` | End session |
-| `c` | Quick capture |
-| `r` | Refresh data |
-| `o` | Open project folder |
-| `f` | Enter focus mode |
-| `d` | Decision helper |
-| `t` | Cycle themes |
-| `T` | Timeline view (time blocks) |
-| `e` | Ecosystem view (v0.8.0) |
-| `p` | Plan view - morning ritual (v0.8.0) |
-| `z` | Zen mode |
-| `q` | Quit |
-| `?` | Show help |
+| Key         | Action                                    |
+| ----------- | ----------------------------------------- |
+| `↑↓` / `j`/`k` | Navigate projects                     |
+| `Enter`     | Open project detail                       |
+| `Esc`       | Back / Exit current view                  |
+| `f`         | Enter focus mode (Pomodoro)               |
+| `z`         | Zen mode                                  |
+| `T`         | Timeline view (time blocks)               |
+| `e`         | Ecosystem view (multi-project overview)   |
+| `p`         | Plan view (morning ritual)                |
+| `c`         | Quick capture                             |
+| `t`         | Cycle themes                              |
+| `Tab`       | Cycle layout: SINGLE → SPLIT → TRIPLE    |
+| `Shift+Tab` | Cycle panel focus in split/triple layouts |
+| `q`         | Quit                                      |
+| `?`         | Show help                                 |
+
+> **Note:** The legacy blessed dashboard (`atlas dash --blessed`) uses different
+> bindings: `e` = End session, `s` = Start session, `p` = Filter paused,
+> `a` = Filter active, `/` = Search.
 
 **Focus Mode Keys:**
 
-| Key | Action |
-|-----|--------|
+| Key     | Action             |
+| ------- | ------------------ |
 | `Space` | Pause/Resume timer |
-| `r` | Reset timer |
-| `+` | Add 5 minutes |
-| `-` | Subtract 5 minutes |
-| `c` | Quick capture |
-| `Esc` | Exit focus mode |
+| `r`     | Reset timer        |
+| `+`     | Add 5 minutes      |
+| `-`     | Subtract 5 minutes |
+| `c`     | Quick capture      |
+| `Esc`   | Exit focus mode    |
 
 **Task-Based Focus (v0.7.0):**
 
@@ -744,6 +752,89 @@ Press `p` to enter the morning planning ritual:
 - Inbox items pending triage
 - Smart suggestions based on history
 - Helps start the day with intention
+
+**Multi-Panel Layout (v0.9.1):**
+
+Press `Tab` to cycle through three layout modes:
+
+```
+▣ SINGLE (default) ▥ SPLIT             ▦ TRIPLE
+┌─────────────┐     ┌────┬───────┬─────────┬────┐
+│ Full View    │     │Side│ Main  │     │Side│ Main  │Inspector│
+│              │     │    │       │     │    │       │         │
+│ All 7 views  │     ┬────┴───────┘     ┴────┴───────┴─────────┴────┘
+└─────────────┘     28% + 72%         25% + 47% + 28%
+```
+
+- **`Tab`** → cycles `Single → Split → Triple → Single`
+- **`Shift+Tab`** → cycles keyboard focus between visible panels
+- Layout mode indicator `▣/▥/▦` shown in command bar
+- SINGLE mode is a transparent pass-through (no overhead)
+
+**Sidebar Panel (Split and Triple modes):**
+
+The sidebar shows a compact project list at 25–28% width:
+
+```
+┌────────────────────────┬ ...
+│ Projects 5  📥2 │     <- header: count + inbox badge
+├────────────────────────┤
+│ ● atlas       75% │     <- ● icon + name + progress %
+│ ◐ flow-cli    95% │     <- ◐ paused icon = yellow
+│ ● mcp-server  80% ⏱│     <- ⏱ = has active session
+│ ◐ rmediation  60% │
+├────────────────────────┤
+│ j/k: nav Enter: open  │     <- focus hint (changes when inactive)
+└────────────────────────┘
+```
+
+| Feature       | Detail                                                                      |
+| ------------- | --------------------------------------------------------------------------- |
+| Row format    | `icon name   xx%` (14-char name, 4-char progress)                           |
+| Status icons  | `●` active, `◐` paused, `◆` stable, `✓` complete, `○` planning, `✗` blocked |
+| Session badge | `⏱` appended to row with a running timer                                    |
+| Inbox badge   | `📥N` in header when N captures are unprocessed                              |
+| Windowing     | 12 visible rows with scroll indicator `1-12/25`                             |
+| Navigation    | `j`/`k` or `↑`/`↓`, only fires when sidebar has focus                       |
+| Select        | `Enter` opens project in main panel                                         |
+
+**Inspector Panel (Triple mode only — right column):**
+
+Shows the selected project's detail + a live Pomodoro mini-timer:
+
+```
+┌────────────────────────┐
+│ Inspector              │  ← cyan when focused
+├────────────────────────┤
+│ 🎯 atlas               │  name (18-char trunc)
+│ node-package           │  type
+│ ● active  75% ██████░░ │  status + 8-char bar
+│ ────────────────────── │
+│ Focus                  │
+│ Implementing auth…     │  22-char trunc
+│ Next                   │
+│ · Add OAuth provider   │  up to 3 items (comma/newline split)
+│ ────────────────────── │
+│ ⏱ SESSION              │
+│ 24:10  ██████░░        │  live countdown (useEffect tick)
+│ ● FOCUSING             │  → ◑ PAUSED → ☕ BREAK TIME
+│ ────────────────────── │
+│ Recent                 │
+│ · stuck on OAuth…      │  last 3 breadcrumbs
+└────────────────────────┘
+│ Space: pause r: reset  │  only when inspector focused
+```
+
+| Feature      | Detail                                                               |
+| ------------ | -------------------------------------------------------------------- |
+| Progress bar | 8-char `████░░░░` (clamped 0-100)                                    |
+| Timer        | MM:SS countdown from `pomodoroLength` (default 25 min)               |
+| States       | `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow) |
+| `Space`      | Pause/resume (only when inspector is focused via Shift+Tab)          |
+| `r`          | Reset timer (only when paused + inspector focused)                   |
+| Empty state  | Shows "Select a project" when no project is selected                 |
+| Breadcrumbs  | Newest-first, max 3 displayed                                        |
+| Next actions | Parsed from `project.next` via comma or newline, max 3 shown         |
 
 ---
 
@@ -868,6 +959,8 @@ Options:
   -w, --watch             Watch mode (5s interval)
   -p, --paths <paths>     Comma-separated paths to scan
   --remove-orphans        Remove projects whose paths no longer exist
+  --from-status           Scan for .STATUS files in ecosystem
+  --report                Show ecosystem summary without syncing
 ```
 
 **Examples:**
@@ -883,6 +976,12 @@ atlas sync --watch
 
 # Sync specific paths
 atlas sync --paths ~/projects,~/work
+
+# Scan ecosystem for .STATUS files
+atlas sync --from-status
+
+# Generate ecosystem status report
+atlas sync --report
 ```
 
 ---
@@ -929,22 +1028,39 @@ Interactive configuration wizard.
 atlas config setup
 ```
 
-### Preferences
+### `atlas config prefs`
 
+Manage underlying preferences for Atlas.
+
+#### `atlas config prefs show`
+Display all preferences.
 ```bash
-# Show all preferences
 atlas config prefs show
+```
 
-# Get specific preference
+#### `atlas config prefs get`
+Get a specific preference value.
+```bash
+atlas config prefs get <path>
 atlas config prefs get adhd.showStreak
+```
 
-# Set preference
+#### `atlas config prefs set`
+Set a specific preference value.
+```bash
+atlas config prefs set <path> <value>
 atlas config prefs set adhd.celebrationLevel enthusiastic
+```
 
-# Reset to defaults
+#### `atlas config prefs reset`
+Reset all preferences to default.
+```bash
 atlas config prefs reset
+```
 
-# Show default values
+#### `atlas config prefs defaults`
+Show the default preference values.
+```bash
 atlas config prefs defaults
 ```
 
@@ -1034,22 +1150,22 @@ atlas completions fish > ~/.config/fish/completions/atlas.fish
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ATLAS_CONFIG` | Config directory path | `~/.atlas` |
-| `ATLAS_STORAGE` | Storage backend | `filesystem` |
+| Variable        | Description           | Default      |
+| --------------- | --------------------- | ------------ |
+| `ATLAS_CONFIG`  | Config directory path | `~/.atlas`   |
+| `ATLAS_STORAGE` | Storage backend       | `filesystem` |
 
 ---
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | General error |
-| 2 | Invalid arguments |
-| 3 | Project not found |
-| 4 | Session error |
+| Code | Meaning           |
+| ---- | ----------------- |
+| 0    | Success           |
+| 1    | General error     |
+| 2    | Invalid arguments |
+| 3    | Project not found |
+| 4    | Session error     |
 
 ---
 

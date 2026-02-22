@@ -23,9 +23,11 @@
 |-------|-------------|
 | [Getting Started Tutorial](https://data-wise.github.io/atlas/TUTORIAL/) | Step-by-step introduction (15 min) |
 | [CLI Command Reference](https://data-wise.github.io/atlas/CLI-REFERENCE/) | Complete command documentation |
+| [Quick Reference Card](https://data-wise.github.io/atlas/REFCARD/) | Printable cheat sheet |
 | [Architecture Overview](https://data-wise.github.io/atlas/ARCHITECTURE/) | System design and patterns |
 | [Visual Diagrams](https://data-wise.github.io/atlas/DIAGRAMS/) | Mermaid architecture diagrams |
 | [Programmatic API](https://data-wise.github.io/atlas/API-GUIDE/) | Using Atlas as a library |
+| [MCP Server](https://data-wise.github.io/atlas/MCP-SERVER/) | Model Context Protocol integration |
 | [Configuration](https://data-wise.github.io/atlas/CONFIGURATION/) | All settings and preferences |
 
 ## Overview
@@ -172,21 +174,18 @@ atlas dash                     # Alias for dashboard
 
 | Key | Action |
 |-----|--------|
-| `↑↓` | Navigate projects |
+| `↑↓` / `j`/`k` | Navigate projects |
 | `Enter` | Open project detail view |
-| `Esc` | Return to main view / Exit focus mode |
-| `/` | Search/filter projects |
-| `a` | Filter: active projects only |
-| `p` | Filter: paused projects only |
-| `*` | Clear filter (show all) |
-| `s` | Start session (in detail view) |
-| `e` | End current session |
-| `c` | Quick capture |
-| `r` | Refresh data (reset timer in focus mode) |
-| `o` | Open project folder (detail view) |
+| `Esc` | Return to main view / Exit current view |
 | `f` | Enter focus mode (Pomodoro timer) |
-| `d` | Decision helper ("What to work on?") |
+| `z` | Zen mode (minimal distraction) |
+| `T` | Timeline view (time blocks) |
+| `e` | Ecosystem view (multi-project overview) |
+| `p` | Plan view (morning ritual) |
+| `c` | Quick capture |
 | `t` | Cycle themes (default/dark/minimal) |
+| `Tab` | Cycle layout: SINGLE → SPLIT → TRIPLE |
+| `Shift+Tab` | Cycle panel focus |
 | `q` | Quit dashboard |
 | `?` | Show help |
 
@@ -373,25 +372,35 @@ Atlas follows Clean Architecture principles:
 src/
 ├── domain/                  # Business entities & rules
 │   ├── entities/            # Project, Session, Capture, Breadcrumb
+│   ├── constants/           # BusinessRules (centralized constants)
 │   ├── value-objects/       # ProjectType, SessionState
+│   ├── gateways/            # IStatusFileParser (interface)
 │   └── repositories/        # Repository interfaces
 │
 ├── use-cases/               # Application business logic
 │   ├── project/             # ScanProjects, GetStatus, GetRecentProjects
-│   ├── session/             # CreateSession, EndSession
+│   ├── session/             # CreateSession, EndSession, PlanDay
 │   ├── capture/             # CaptureIdea, GetInbox, TriageInbox
 │   ├── context/             # GetContext, LogBreadcrumb, GetTrail
-│   ├── registry/            # SyncRegistry, RegisterProject
+│   ├── registry/            # SyncRegistry, SyncFromStatus
 │   └── status/              # UpdateStatus
 │
 ├── adapters/                # External interfaces
 │   ├── repositories/        # FileSystem + SQLite implementations
+│   ├── gateways/            # StatusFileGateway, StatusFileParser
+│   ├── presenters/          # ProjectPresenter, TuiPresenter
 │   ├── Container.js         # Dependency injection
-│   ├── gateways/            # StatusFileGateway
 │   └── events/              # Event publishing
 │
+├── mcp/                     # MCP server (Model Context Protocol)
+│   ├── index.js             # Server entry (10 tools, 2 resources)
+│   └── formatters.js        # Response formatters
+│
 └── cli/                     # Command-line interface
-    └── dashboard.js         # TUI dashboard (blessed-contrib)
+    ├── dashboard-blessed.js # Legacy TUI (blessed-contrib)
+    └── dashboard-ink/       # New TUI (React Ink, v0.9.x)
+        ├── components/      # App, views, panels
+        └── lib/             # LayoutManager, stateMachine
 ```
 
 ## Data Storage

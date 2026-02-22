@@ -9,8 +9,7 @@
  * 2. YAML-style: status: active, progress: 75
  */
 
-import { readFile, readdir, stat } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { readFile, readdir, stat, access, constants } from 'node:fs/promises'
 import { join, basename, dirname } from 'node:path'
 
 export class StatusFileParser {
@@ -70,7 +69,9 @@ export class StatusFileParser {
    * @returns {Promise<Object|null>} Parsed status data
    */
   async parse(filePath) {
-    if (!existsSync(filePath)) {
+    try {
+      await access(filePath, constants.F_OK)
+    } catch {
       return null
     }
 
@@ -197,10 +198,12 @@ export class StatusFileParser {
       // Skip comments and empty lines
       if (!trimmed || trimmed.startsWith('#')) continue
 
-      // Match key: value pattern (not indented, not starting with -)
-      const match = trimmed.match(/^(\w+):\s*(.+)$/)
-      if (match) {
-        const [, key, value] = match
+      // Match key: value pattern (split on first colon only)
+      const colonIndex = trimmed.indexOf(':')
+      if (colonIndex > 0 && /^\w+$/.test(trimmed.slice(0, colonIndex))) {
+        const key = trimmed.slice(0, colonIndex).trim()
+        const value = trimmed.slice(colonIndex + 1).trim()
+        if (!value) continue
         const lowerKey = key.toLowerCase()
         const cleanValue = this._cleanValue(value)
 

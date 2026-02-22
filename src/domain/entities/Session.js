@@ -13,6 +13,7 @@ import {
   SessionResumedEvent,
   SessionContextUpdatedEvent
 } from '../events/SessionEvent.js'
+import { BusinessRules } from '../constants/BusinessRules.js'
 
 export class Session {
   /**
@@ -27,8 +28,8 @@ export class Session {
     this.project = project
 
     // Optional properties with defaults
-    this.task = options.task || 'Work session'
-    this.branch = options.branch || 'main'
+    this.task = options.task || BusinessRules.SESSION_DEFAULT_TASK
+    this.branch = options.branch || BusinessRules.SESSION_DEFAULT_BRANCH
     this.startTime = options.startTime || new Date()
     this.endTime = null
     this.pausedAt = null
@@ -100,9 +101,8 @@ export class Session {
       throw new Error(`Cannot end session: invalid transition from '${this.state.value}' to 'ended'`)
     }
 
-    const validOutcomes = ['completed', 'cancelled', 'interrupted']
-    if (!validOutcomes.includes(outcome)) {
-      throw new Error(`Invalid outcome: ${outcome}. Must be one of: ${validOutcomes.join(', ')}`)
+    if (!BusinessRules.SESSION_VALID_OUTCOMES.includes(outcome)) {
+      throw new Error(`Invalid outcome: ${outcome}. Must be one of: ${BusinessRules.SESSION_VALID_OUTCOMES.join(', ')}`)
     }
 
     this.endTime = new Date()
@@ -180,7 +180,7 @@ export class Session {
    * @returns {boolean}
    */
   isInFlowState() {
-    return this.state.isActive() && this.getDuration() >= 15
+    return this.state.isActive() && this.getDuration() >= BusinessRules.SESSION_FLOW_STATE_MINUTES
   }
 
   /**

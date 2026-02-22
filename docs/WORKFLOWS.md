@@ -292,6 +292,40 @@ atlas dash
 
 ---
 
+### Multi-Panel Layout (v0.9.1)
+
+**Goal:** See your project list and content side-by-side without leaving the dashboard
+
+```bash
+atlas dash
+# Press Tab to cycle layouts
+# ▣ Single (default) → ▥ Split → ▦ Triple → ▣ Single
+```
+
+**Split workflow — project list + main content:**
+1. Press `Tab` → sidebar appears on the left
+2. `Shift+Tab` → move keyboard focus to sidebar
+3. `j`/`k` to scroll the project list
+4. `Enter` to open project in the main panel
+5. `Shift+Tab` again → back to main panel
+
+**Sidebar rows at a glance:**
+```
+│ ● atlas       75% │  <- green = active
+│ ◐ flow-cli    50% │  <- yellow = paused
+│ ● mcp-server  80% ⏱│  <- ⏱ = active session running
+│ 1–12/25            │  <- scroll indicator when > 12 projects
+```
+
+**Inbox badge:** `📥N` appears in sidebar header when N captures need triage.
+
+!!! tip "Multi-Panel ADHD Tip"
+    Use **Split** mode to keep your full project list visible while working in
+    the main panel. The inbox badge reminds you to triage without needing to
+    switch views.
+
+---
+
 ### Session Export (v0.7.0)
 
 **Goal:** Get your work sessions into your calendar
@@ -559,14 +593,14 @@ Create `.vscode/tasks.json`:
 
 ## Workflow Cheat Sheet
 
-| Situation | Workflow |
-|-----------|----------|
-| Starting work | `where` → `trail` → `session start` |
-| Got an idea | `catch "idea"` (don't stop working) |
+| Situation      | Workflow                                            |
+| -------------- | --------------------------------------------------- |
+| Starting work  | `where` → `trail` → `session start`                 |
+| Got an idea    | `catch "idea"` (don't stop working)                 |
 | Need to switch | `park` → switch → `session start` → later: `unpark` |
-| Feeling stuck | `crumb "stuck on X"` → take break |
-| End of day | `session end` → `stats` → `crumb "tomorrow: X"` |
-| Monday morning | `stats week` → `parked` → `inbox --triage` |
+| Feeling stuck  | `crumb "stuck on X"` → take break                   |
+| End of day     | `session end` → `stats` → `crumb "tomorrow: X"`     |
+| Monday morning | `stats week` → `parked` → `inbox --triage`          |
 
 ---
 
