@@ -850,6 +850,72 @@ graph TB
 - **SPLIT:** Sidebar (28%) + Main (72%)
 - **TRIPLE:** Sidebar (25%) + Main (47%) + Inspector (28%)
 
+## 14. Visual Pipeline (v0.9.1)
+
+Shows how session data flows through the visual enhancement layers:
+
+```mermaid
+flowchart TB
+    subgraph Data["Data Sources"]
+        Sessions["Session History"]
+        Streak["Streak Calculator"]
+    end
+
+    subgraph Domain["Domain Layer"]
+        FocusCalc["calculateFocusScore()<br/>GetSessionStatsUseCase"]
+    end
+
+    subgraph Presenters["Presenter Layer"]
+        FocusPres["FocusScorePresenter<br/>formatFocusScore() · focusTierIcon()"]
+        SparkPres["StatsPresenter<br/>projectSparklineData()"]
+        HeatPres["StatsPresenter<br/>formatHeatmapGrid()"]
+    end
+
+    subgraph Theme["Theme System"]
+        ThemeCtx["ThemeContext.tsx<br/>ThemeProvider · useTheme()"]
+        Themes["5 Themes<br/>default · nord · solarized<br/>mono · high-contrast"]
+    end
+
+    subgraph UI["Dashboard Components"]
+        Sidebar["SidebarPanel<br/>Focus tier icon + sparkline"]
+        Inspector["InspectorPanel<br/>Focus score + heatmap"]
+        Ecosystem["EcosystemView<br/>Compact heatmap"]
+        Stats["atlas stats CLI<br/>Focus score line"]
+    end
+
+    Sessions --> FocusCalc
+    Streak --> FocusCalc
+    Sessions --> SparkPres
+    Sessions --> HeatPres
+    FocusCalc --> FocusPres
+
+    FocusPres --> Sidebar
+    FocusPres --> Inspector
+    FocusPres --> Stats
+    SparkPres --> Sidebar
+    HeatPres --> Inspector
+    HeatPres --> Ecosystem
+
+    ThemeCtx --> Sidebar
+    ThemeCtx --> Inspector
+    ThemeCtx --> Ecosystem
+    Themes --> ThemeCtx
+
+    style Data fill:#fff3cd
+    style Domain fill:#f3e5f5
+    style Presenters fill:#e8f5e9
+    style Theme fill:#e1f5ff
+    style UI fill:#fce4ec
+```
+
+**Key design decisions:**
+- Theme is pure React Context — no prop drilling
+- Presenters are framework-agnostic (used by both CLI and TUI)
+- All visual data derived from one `GetSessionStatsUseCase` fetch
+- Never use red — ADHD-friendly design principle
+
+---
+
 ## Diagram Reference Guide
 
 | # | Diagram | Purpose | Key Use Case |
@@ -867,6 +933,7 @@ graph TB
 | 11 | Presenter Layer | UI formatting separation | Dashboard TUI formatting |
 | 12 | Dashboard State Machine | Ink view state transitions | Dashboard navigation |
 | 13 | Ink Component Tree | React Ink component hierarchy | TUI architecture |
+| 14 | Visual Pipeline | Theme + focus + sparkline + heatmap flow | v0.9.1 visual features |
 
 ---
 

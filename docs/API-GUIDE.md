@@ -1024,9 +1024,9 @@ progressBar(75, 20); // "{green-fg}███████████████
 getStatusIcon('active');  // "{green-fg}●{/}"
 getStatusIcon('blocked'); // "{red-fg}✖{/}"
 
-// Available themes
+// Available themes (v0.9.1: default, nord, solarized, mono, high-contrast)
 console.log(themes.default.primary); // "blue"
-console.log(themes.dark.primary);    // "magenta"
+console.log(themes.nord.primary);    // "blue"
 ```
 
 ### Ink Component Status Icons (v0.9.1)
@@ -1043,6 +1043,66 @@ const STATUS_ICON = {
   planning: '○',   // blue
   blocked:  '✗',   // red
 };
+```
+
+### FocusScorePresenter (v0.9.1)
+
+Format focus scores for CLI and dashboard display:
+
+```javascript
+import {
+  formatFocusScore,
+  focusTierIcon,
+  focusTierColor,
+  focusTierLabel,
+  getTierFromScore
+} from '@data-wise/atlas/presenters';
+
+// Full display string
+formatFocusScore(72);     // "◕ 72 strong"
+formatFocusScore(15);     // "○ 15 drift"
+
+// Individual components
+focusTierIcon(85);        // "●"  (deep)
+focusTierColor(85);       // "greenBright"
+focusTierLabel(85);       // "deep"
+
+// Complete tier object
+getTierFromScore(50);
+// { symbol: '◑', label: 'steady', color: 'cyan', index: 2 }
+```
+
+**Tier thresholds:**
+
+| Score | Symbol | Label | Color |
+|-------|--------|-------|-------|
+| 80-100 | `●` | deep | greenBright |
+| 60-79 | `◕` | strong | green |
+| 40-59 | `◑` | steady | cyan |
+| 20-39 | `◔` | warming | yellow |
+| 0-19 | `○` | drift | gray |
+
+### StatsPresenter Visual Helpers (v0.9.1)
+
+Generate sparkline and heatmap data for dashboards:
+
+```javascript
+import {
+  projectSparklineData,
+  formatHeatmapGrid
+} from '@data-wise/atlas/presenters';
+
+// Sparkline: array of durations per day (oldest → newest)
+const data = projectSparklineData(sessions, 'myproject', 5);
+// { values: [0, 45, 120, 30, 90], trend: 'rising' }
+
+// Heatmap: GitHub-style grid (7 rows × N weeks)
+const grid = formatHeatmapGrid(dailyBreakdown, {
+  weeks: 13,       // default: 13 weeks
+  metric: 'minutes' // or 'sessions'
+});
+// Returns { rows: string[][], maxVal: number }
+// Cells use: '·' (none), '░' (low), '▒' (med), '▓' (high), '█' (max)
 ```
 
 ---
