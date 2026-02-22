@@ -28,10 +28,20 @@ jobs:
         run: npm ci
 
       - name: Run unit tests
-        run: npm run test:unit
+        run: |
+          if [ "${{ matrix.node-version }}" = "18" ]; then
+            npm run test:unit -- --testPathIgnorePatterns=dashboard-ink
+          else
+            npm run test:unit
+          fi
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: |
+          if [ "${{ matrix.node-version }}" = "18" ]; then
+            npm run test:integration -- --testPathIgnorePatterns=dashboard-ink
+          else
+            npm run test:integration
+          fi
 
   dogfood-tests:
     name: Dogfood Tests
