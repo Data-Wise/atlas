@@ -1,12 +1,12 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.9.1 IN PROGRESS
+## Phase: v0.10.0 PLANNING
 ## Priority: 1
-## Progress: 15
+## Progress: 0
 
-## Focus: v0.9.1 visual enhancements + CI flaky test fix
-## Next: Fix flaky test (fix/flaky-unpark-test), then continue visual enhancements
+## Focus: v0.10.0 temporal intelligence — pattern detection, velocity analytics, prediction engine
+## Next: Brainstorm and spec v0.10.0
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -19,13 +19,14 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - **Quick Capture**: Ideas, tasks, bugs with triage workflow
 - **Breadcrumb Trail**: Context markers for "where was I?"
 - **MCP Server**: 10 tools for Claude integration
-- **Ink TUI Dashboard**: Multi-panel React Ink dashboard
+- **Ink TUI Dashboard**: Multi-panel React Ink dashboard with themes
+- **Visual Enhancements**: Focus score, sparklines, heatmap, 5 themes
 - **Morning Ritual**: Guided daily planning (`atlas plan`)
 - **Ecosystem Hub**: Cross-project `.STATUS` scanning
 - **Session Export**: iCal/JSON export for calendars
 
 ## Test Stats
-- Total: 1,750+ passing (Jest)
+- Total: 1,827 passing (Jest)
 - Dogfood: 183 (shell test suite)
 
 ## Links
@@ -35,24 +36,22 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - npm: `npm install -g @data-wise/atlas`
 
 ## ✅ Just Completed (2026-02-22)
-- Released v0.9.0 to GitHub, Homebrew, npm, docs site
-- Fixed homebrew-release workflow auth (PR #8 merged to main)
-- Brainstormed v0.9.1 visual enhancements (max depth, 2 agents)
-- Created spec + orchestration plan for visual enhancements
-- Theme system implemented (5 built-in themes) on feature branch
-- Diagnosed CI flaky test: UnparkContext ordering on Node 18
-- Created fix worktree with orchestration plan
+- Released v0.9.1 to GitHub, Homebrew, docs site
+- Theme system: 5 built-in themes (default, nord, solarized, mono, high-contrast)
+- Focus score: weighted quality metric with 5-tier classification
+- Sidebar sparklines: 5-day activity charts with trend coloring
+- Activity heatmap: GitHub-style 13-week grid (full + compact modes)
+- Fixed flaky UnparkContext sort test (Node 18 CI)
+- New Visual Guide + Visual Features tutorial
+- Updated Tutorial, CLI Reference, Architecture, Roadmap docs
 
 ## 🔴 Blockers
-- CI red on main: flaky UnparkContextUseCase sort test (Node 18)
+- None
 
 ## 🔧 Active Worktrees
-| Branch | Location | Status |
-|--------|----------|--------|
-| `feature/visual-enhancements` | `~/.git-worktrees/atlas/feature-visual-enhancements` | Theme system done, 3 increments remaining |
-| `fix/flaky-unpark-test` | `~/.git-worktrees/atlas/fix-flaky-unpark` | Orchestrated, needs implementation |
+None
 
 ## 🎯 Next Action
-A) `cd ~/.git-worktrees/atlas/fix-flaky-unpark && claude` → fix flaky test, PR to dev, merge to main to unblock CI
-B) `cd ~/.git-worktrees/atlas/feature-visual-enhancements && claude` → continue v0.9.1 increments
+A) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
+B) Wire real session data into Ink dashboard (currently mock data)
 C) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
