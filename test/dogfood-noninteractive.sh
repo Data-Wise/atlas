@@ -162,7 +162,7 @@ echo -e "${DIM}Test dir: $TEST_DIR${NC}"
 header "1. Version & Help"
 
 test_matches "Version format" "$ATLAS --version" "^[0-9]+\.[0-9]+\.[0-9]+$"
-test_contains "Version is 0.7.x" "$ATLAS --version" "0.7"
+test_contains "Version is 0.9.x" "$ATLAS --version" "0.9"
 test_contains "Help shows usage" "$ATLAS --help" "Usage: atlas"
 test_contains "Help shows session cmd" "$ATLAS --help" "session"
 test_contains "Help shows project cmd" "$ATLAS --help" "project"
@@ -376,21 +376,15 @@ LAYOUT_SRC="$(dirname "$0")/../src/cli/dashboard-ink/lib/LayoutManager.tsx"
 # Confirm the file exists
 test_succeeds "LayoutManager.tsx exists" "ls '$LAYOUT_SRC'"
 
-# Run all constant checks via inline node + tsx (uses --import for ESM transform)
-LAYOUT_NODE="node --import ../atlas/node_modules/tsx/dist/esm/index.cjs"
-
-# 1. LAYOUT enum values present
+# 1. LAYOUT enum values present (grep source — tsx import not portable across CI)
 test_contains "LAYOUT.SINGLE = 'single'" \
-  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
-  '"single"'
+  "grep \"SINGLE.*'single'\" '$LAYOUT_SRC'" "single"
 
 test_contains "LAYOUT.SPLIT = 'split'" \
-  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
-  '"split"'
+  "grep \"SPLIT.*'split'\" '$LAYOUT_SRC'" "split"
 
 test_contains "LAYOUT.TRIPLE = 'triple'" \
-  "$LAYOUT_NODE --input-type=module <<< \"import { LAYOUT } from '${LAYOUT_SRC}'; console.log(JSON.stringify(LAYOUT));\"" \
-  '"triple"'
+  "grep \"TRIPLE.*'triple'\" '$LAYOUT_SRC'" "triple"
 
 # 2. Key exports are present in the source file (static grep — no tsx needed)
 test_contains "Exports useLayout hook" \
@@ -477,6 +471,7 @@ echo -e "  ${DIM}LayoutManager D1 dogfood complete${NC}"
 header "17. SidebarPanel D2 - Compact Project List Column"
 
 SIDEBAR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/SidebarPanel.tsx"
+CONSTANTS_SRC="$(dirname "$0")/../src/cli/dashboard-ink/constants.ts"
 
 # File present
 test_succeeds "SidebarPanel.tsx exists" "ls '$SIDEBAR_SRC'"
@@ -485,37 +480,37 @@ test_succeeds "SidebarPanel.tsx exists" "ls '$SIDEBAR_SRC'"
 test_contains "Exports SidebarPanel component" \
   "grep -c 'export const SidebarPanel' '$SIDEBAR_SRC'" "1"
 
-test_contains "Exports SidebarProject interface" \
-  "grep -c 'export interface SidebarProject' '$SIDEBAR_SRC'" "1"
+test_contains "Imports Project type from shared types" \
+  "grep -c \"from '../types.js'\" '$SIDEBAR_SRC'" "1"
 
-# 2. Status icons — all 6 must be in source
+# 2. Status icons — all 6 must be in shared constants
 test_contains "Status icon: active ●" \
-  "grep \"'●'\" '$SIDEBAR_SRC'" "'●'"
+  "grep \"'●'\" '$CONSTANTS_SRC'" "'●'"
 
 test_contains "Status icon: paused ◐" \
-  "grep \"'◐'\" '$SIDEBAR_SRC'" "'◐'"
+  "grep \"'◐'\" '$CONSTANTS_SRC'" "'◐'"
 
 test_contains "Status icon: stable ◆" \
-  "grep \"'◆'\" '$SIDEBAR_SRC'" "'◆'"
+  "grep \"'◆'\" '$CONSTANTS_SRC'" "'◆'"
 
 test_contains "Status icon: complete ✓" \
-  "grep \"'✓'\" '$SIDEBAR_SRC'" "'✓'"
+  "grep \"'✓'\" '$CONSTANTS_SRC'" "'✓'"
 
 test_contains "Status icon: planning ○" \
-  "grep \"'○'\" '$SIDEBAR_SRC'" "'○'"
+  "grep \"'○'\" '$CONSTANTS_SRC'" "'○'"
 
 test_contains "Status icon: blocked ✗" \
-  "grep \"'✗'\" '$SIDEBAR_SRC'" "'✗'"
+  "grep \"'✗'\" '$CONSTANTS_SRC'" "'✗'"
 
-# 3. Status colours
+# 3. Status colours — in shared constants
 test_contains "Status colour: active=green" \
-  "grep \"active.*'green'\" '$SIDEBAR_SRC'" "green"
+  "grep \"active.*'green'\" '$CONSTANTS_SRC'" "green"
 
 test_contains "Status colour: paused=yellow" \
-  "grep \"paused.*'yellow'\" '$SIDEBAR_SRC'" "yellow"
+  "grep \"paused.*'yellow'\" '$CONSTANTS_SRC'" "yellow"
 
 test_contains "Status colour: blocked=red" \
-  "grep \"blocked.*'red'\" '$SIDEBAR_SRC'" "red"
+  "grep \"blocked.*'red'\" '$CONSTANTS_SRC'" "red"
 
 # 4. Progress formatter — padStart(4)
 test_contains "fmtProgress uses padStart(4)" \
@@ -598,18 +593,16 @@ test_succeeds "InspectorPanel.tsx exists" "ls '$INSPECTOR_SRC'"
 test_contains "Exports InspectorPanel component" \
   "grep -c 'export const InspectorPanel' '$INSPECTOR_SRC'" "1"
 
-test_contains "Exports InspectorProject interface" \
-  "grep -c 'export interface InspectorProject' '$INSPECTOR_SRC'" "1"
+test_contains "Imports Project type from shared types" \
+  "grep -c \"from '../types.js'\" '$INSPECTOR_SRC'" "1"
 
-# 2. Status icons — 6 required (same contract as SidebarPanel)
-for icon in '●' '◐' '◆' '✓' '○' '✗'; do
-  test_contains "Status icon $icon present" \
-    "grep \"'$icon'\" '$INSPECTOR_SRC'" "'$icon'"
-done
+# 2. Status icons — in shared constants (not InspectorPanel directly)
+test_contains "Constants file has status icons" \
+  "grep -c \"'●'\" '$CONSTANTS_SRC'" "1"
 
 # 3. progressBar helper — 8-char bar
-test_contains "progressBar uses BAR_WIDTH = 8" \
-  "grep 'BAR_WIDTH = 8' '$INSPECTOR_SRC'" "8"
+test_contains "progressBar uses W = 8" \
+  "grep 'const W = 8' '$INSPECTOR_SRC'" "8"
 
 test_contains "Filled char is █" \
   "grep \"'█'\" '$INSPECTOR_SRC'" "█"
