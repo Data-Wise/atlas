@@ -2,7 +2,7 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-02-21
+**Last Updated:** 2026-02-22
 
 ---
 
@@ -31,13 +31,13 @@ TUI Modernization (Ink), Multi-Panel Dashboard, Ecosystem Hub, Morning Ritual, M
 - [x] **SidebarPanel** — compact project list column (25-28%) ✅ D2 done
 - [x] **InspectorPanel** — detail + Pomodoro right panel (28%) ✅ D3 done
 - [x] **Wire App.tsx** — useLayout + LayoutManager + panels + LayoutStatusBar ✅ D4 done
+- [x] **Theme system** — 5 built-in themes (default, dracula, nord, solarized, monokai) ✅
 - [ ] GitHub-style heatmap view (`h` key)
 - [ ] Sparkline history per project card
 - [ ] Focus score calculator
-- [ ] Enhanced theme system (dracula, nord, gruvbox)
 
-**Branch:** `feature/multi-panel-dashboard`  
-**Detailed plan:** [prompts/V0.9.0-ROADMAP.md](prompts/V0.9.0-ROADMAP.md)
+**Branch:** `feature/visual-enhancements`
+**Spec:** [specs/SPEC-visual-enhancements-2026-02-22.md](specs/SPEC-visual-enhancements-2026-02-22.md)
 
 ---
 
