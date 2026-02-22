@@ -219,10 +219,10 @@ describe('UnparkContextUseCase', () => {
             task: null,
             note: null,
             sessionDuration: 15,
-            parkedAt: new Date().toISOString(),
+            parkedAt: new Date(Date.now() - 1000).toISOString(),
             breadcrumbs: []
           },
-          createdAt: new Date().toISOString()
+          createdAt: new Date(Date.now() - 1000).toISOString()
         }
       ];
 
