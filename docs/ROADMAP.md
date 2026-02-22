@@ -2,7 +2,7 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-02-21
+**Last Updated:** 2026-02-22
 
 ---
 
