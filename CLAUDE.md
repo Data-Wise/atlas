@@ -34,7 +34,7 @@ atlas dash                       # Launch TUI
 | **Version** | 0.8.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,275 (Jest) |
+| **Tests** | 1,410 (Jest) |
 | **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
@@ -44,29 +44,34 @@ atlas dash                       # Launch TUI
 src/
 ├── domain/           # Pure business logic (no dependencies)
 │   ├── entities/     # Project, Session, Capture, Breadcrumb, Task
+│   ├── constants/    # BusinessRules (centralized thresholds)
+│   ├── gateways/     # IStatusFileParser (interface)
 │   ├── repositories/ # Interfaces (IProjectRepository, etc.)
 │   └── value-objects/# ProjectType, SessionState, TaskPriority
 ├── use-cases/        # Application logic
-│   ├── session/      # CreateSession, EndSession, GetSessionStats
+│   ├── session/      # CreateSession, EndSession, GetSessionStats, PlanDay
 │   ├── capture/      # CaptureIdea, TriageInbox
 │   ├── context/      # GetContext, Park/Unpark
 │   ├── project/      # GetStatus, GetRecentProjects
-│   └── registry/     # RegisterProject, SyncRegistry
+│   └── registry/     # RegisterProject, SyncRegistry, SyncFromStatus
 ├── adapters/         # External interfaces
 │   ├── controllers/  # StatusController
 │   ├── presenters/   # ProjectPresenter, TuiPresenter, StatsPresenter
 │   ├── repositories/ # FileSystem*, SQLite* implementations
-│   └── gateways/     # GitGateway, StatusFileGateway
+│   └── gateways/     # GitGateway, StatusFileGateway, StatusFileParser
 ├── utils/            # ADHD helpers, config, charts
 ├── mcp/              # MCP server for Claude integration
 │   └── index.js      # Tools: get_context, start_session, capture, etc.
-├── cli/              # Dashboard TUI (blessed)
-│   └── dashboard/    # Modular dashboard components
-│       ├── constants.js   # Configuration values
-│       ├── helpers.js     # Re-exports from presenters
-│       ├── views/         # MainView, DetailView, FocusView, ZenView, TimelineView, EcosystemView, PlanView
-│       ├── stateMachine.js # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE, ECOSYSTEM, PLAN
-│       └── timerManager.js
+├── cli/              # Dashboard TUI
+│   ├── dashboard-blessed.js # Legacy blessed dashboard
+│   ├── dashboard-ink/       # New Ink dashboard (default, v0.9.x)
+│   │   ├── components/      # App.tsx, views/, SidebarPanel, InspectorPanel
+│   │   ├── lib/             # LayoutManager.tsx, stateMachine.ts
+│   │   ├── types.ts         # Shared Project interface
+│   │   └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
+│   └── dashboard/           # Blessed dashboard components
+│       ├── views/           # MainView, DetailView, FocusView, etc.
+│       └── stateMachine.js  # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE
 └── index.js          # Commander.js CLI entry
 ```
 
@@ -141,14 +146,16 @@ atlas
 │   └── archive/unarchive
 ├── session
 │   ├── start/end/pause/resume
-│   └── status/history/current
+│   ├── status/history/current
+│   └── export            # iCal/JSON export (v0.7.0)
 ├── stats                 # Session analytics
+├── plan                  # Morning ritual (v0.8.0)
 ├── catch/inbox/triage    # Quick capture
 ├── where/trail/crumb     # Context
 ├── park/unpark/parked    # Context switching
 ├── template              # Template management
 ├── config                # Configuration
-├── sync                  # Registry sync
+├── sync [--from-status]  # Registry sync
 ├── dash                  # Dashboard TUI
 └── status                # Quick status
 ```
@@ -156,7 +163,7 @@ atlas
 ## Testing
 
 ```bash
-npm test                  # All 1,428 tests
+npm test                  # All 1,410 tests
 npm run test:unit         # Unit tests only
 npm run test:e2e          # E2E tests
 npm run test:integration  # Integration tests
@@ -297,20 +304,14 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 - **v0.4.x** - ADHD utilities, dashboard redesign
 - **v0.3.x** - Dashboard themes, Pomodoro
 
-## v0.9.0 Roadmap
+## v0.9.x Status
 
-**Direction:** TUI Modernization (D) → Visual Evolution (B)
-
-### Sprint 1: TUI Modernization 🔧
-- Evaluate blessed alternatives (ink, terminal-kit, neo-blessed)
-- Extract ViewRenderer.js, dialog components
-- Reduce dashboard.js from 2,303 to <1,000 lines
-- Add view transition integration tests
-
-### Sprint 2: Visual Evolution 🎨
-- GitHub-style heatmap view ('h' key)
-- Sparkline history per project card
-- Focus score calculator
-- Enhanced theme system
+**v0.9.0-v0.9.1** — TUI Modernization (complete):
+- React Ink dashboard with TypeScript (replacing blessed)
+- LayoutManager: SINGLE/SPLIT/TRIPLE layouts (Tab to cycle)
+- SidebarPanel: Compact project list with windowing
+- InspectorPanel: Detail + embedded Pomodoro
+- Shared types (`types.ts`) and constants (`constants.ts`)
+- State machine with 7 view states
 
 **Detailed plan:** [docs/prompts/V0.9.0-ROADMAP.md](docs/prompts/V0.9.0-ROADMAP.md)

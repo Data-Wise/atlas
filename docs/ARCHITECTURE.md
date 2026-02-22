@@ -100,6 +100,11 @@ src/
 │   │   ├── ISessionRepository.js
 │   │   ├── ICaptureRepository.js
 │   │   └── IBreadcrumbRepository.js
+│   ├── constants/              # Centralized domain constants
+│   │   ├── BusinessRules.js   # Session thresholds, valid outcomes, defaults
+│   │   └── index.js           # Re-exports
+│   ├── gateways/              # Gateway interfaces (dependency inversion)
+│   │   └── IStatusFileParser.js  # .STATUS file parser interface
 │   ├── validators/             # Domain validation
 │   │   └── StatusFileValidator.js
 │   └── events/                 # Domain events
@@ -128,6 +133,7 @@ src/
 │   │   └── UnparkContextUseCase.js
 │   ├── registry/               # Project registry
 │   │   ├── SyncRegistryUseCase.js
+│   │   ├── SyncFromStatusUseCase.js  # v0.8.0: sync --from-status
 │   │   └── RegisterProjectUseCase.js
 │   └── status/                 # Status updates
 │       ├── UpdateStatusUseCase.js
@@ -149,6 +155,7 @@ src/
 │   ├── presenters/             # Formatting and presentation logic
 │   │   ├── ProjectPresenter.js # UI-agnostic formatters
 │   │   ├── TuiPresenter.js     # blessed-specific formatters
+│   │   ├── StatsPresenter.js   # Analytics formatters
 │   │   └── index.js            # Re-exports
 │   ├── controllers/            # Presentation controllers
 │   │   └── StatusController.js
@@ -392,6 +399,42 @@ classDiagram
         parked
     }
 ```
+
+## Domain Constants (v0.8.0)
+
+Centralized business rules ensure consistency across entities and use cases:
+
+```javascript
+// src/domain/constants/BusinessRules.js
+export const BusinessRules = Object.freeze({
+  SESSION_DEFAULT_TASK: 'Work session',
+  SESSION_DEFAULT_BRANCH: 'main',
+  SESSION_VALID_OUTCOMES: ['completed', 'cancelled', 'interrupted'],
+  SESSION_FLOW_STATE_MINUTES: 15,
+  CAPTURE_TEXT_MAX_LENGTH: 500,
+  BREADCRUMB_TEXT_MAX_LENGTH: 200,
+  // ... additional thresholds
+})
+```
+
+**Used by:** `Session.js`, `GetSessionStatsUseCase.js`, `src/mcp/index.js`
+
+## Gateway Interfaces
+
+### IStatusFileParser
+
+Domain interface for .STATUS file parsing (dependency inversion):
+
+```javascript
+// src/domain/gateways/IStatusFileParser.js
+export class IStatusFileParser {
+  async parse(filePath) { throw new Error('Not implemented') }
+  async scanDirectory(dirPath) { throw new Error('Not implemented') }
+  summarize(parsed) { throw new Error('Not implemented') }
+}
+```
+
+**Implementation:** `src/adapters/gateways/StatusFileParser.js`
 
 ## Repository Pattern
 
