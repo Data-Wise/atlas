@@ -698,6 +698,110 @@ echo ""
 echo -e "  ${DIM}InspectorPanel D3 dogfood complete${NC}"
 
 # ============================================================================
+# 19. APP.TSX D4 - Multi-Panel Wiring
+# ============================================================================
+
+header "19. App.tsx D4 - Multi-Panel Layout Wiring"
+
+APP_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/App.tsx"
+
+# File present
+test_succeeds "App.tsx exists" "ls '$APP_SRC'"
+
+# 1. LayoutManager imports
+test_contains "Imports useLayout" \
+  "grep 'useLayout' '$APP_SRC'" "useLayout"
+
+test_contains "Imports LayoutManager" \
+  "grep 'LayoutManager' '$APP_SRC'" "LayoutManager"
+
+test_contains "Imports LayoutStatusBar" \
+  "grep 'LayoutStatusBar' '$APP_SRC'" "LayoutStatusBar"
+
+test_contains "Imports LAYOUT constant" \
+  "grep 'LAYOUT' '$APP_SRC'" "LAYOUT"
+
+# 2. Panel component imports
+test_contains "Imports SidebarPanel" \
+  "grep 'SidebarPanel' '$APP_SRC'" "SidebarPanel"
+
+test_contains "Imports InspectorPanel" \
+  "grep 'InspectorPanel' '$APP_SRC'" "InspectorPanel"
+
+# 3. useLayout call
+test_contains "Calls useLayout with LAYOUT.SINGLE" \
+  "grep 'useLayout' '$APP_SRC'" "useLayout"
+
+test_contains "Uses LAYOUT.SINGLE as initial" \
+  "grep 'LAYOUT.SINGLE' '$APP_SRC'" "LAYOUT.SINGLE"
+
+# 4. LayoutManager render-prop usage
+test_contains "<LayoutManager> present" \
+  "grep '<LayoutManager' '$APP_SRC'" "<LayoutManager"
+
+test_contains "sidebar && conditional guard" \
+  "grep 'sidebar &&' '$APP_SRC'" "sidebar &&"
+
+test_contains "inspector && conditional guard" \
+  "grep 'inspector &&' '$APP_SRC'" "inspector &&"
+
+# 5. Width forwarding
+test_contains "sidebar.widthPct forwarded to Box" \
+  "grep 'sidebar.widthPct' '$APP_SRC'" "widthPct"
+
+test_contains "main.widthPct forwarded to Box" \
+  "grep 'main.widthPct' '$APP_SRC'" "widthPct"
+
+test_contains "inspector.widthPct forwarded to Box" \
+  "grep 'inspector.widthPct' '$APP_SRC'" "widthPct"
+
+# 6. isActive prop forwarding
+test_contains "sidebar.isActive forwarded" \
+  "grep 'sidebar.isActive' '$APP_SRC'" "isActive"
+
+test_contains "inspector.isActive forwarded" \
+  "grep 'inspector.isActive' '$APP_SRC'" "isActive"
+
+# 7. Sidebar ↔ inspector sync
+test_contains "handleSidebarIndexChange updates inspector" \
+  "grep 'handleSidebarIndexChange' '$APP_SRC'" "handleSidebarIndexChange"
+
+test_contains "handleSidebarSelect guards on BROWSE" \
+  "grep 'STATES.BROWSE' '$APP_SRC'" "BROWSE"
+
+# 8. LayoutStatusBar in command bar
+test_contains "LayoutStatusBar rendered" \
+  "grep '<LayoutStatusBar' '$APP_SRC'" "<LayoutStatusBar"
+
+test_contains "LayoutStatusBar receives layout prop" \
+  "grep 'layout={layout}' '$APP_SRC'" "layout={layout}"
+
+# 9. All 7 views still present
+for view in MainView DetailView FocusView ZenView TimelineView EcosystemView PlanView; do
+  test_contains "$view still rendered" \
+    "grep '$view' '$APP_SRC'" "$view"
+done
+
+# 10. MOCK_PROJECTS and breadcrumbs
+test_contains "MOCK_PROJECTS data present" \
+  "grep 'MOCK_PROJECTS' '$APP_SRC'" "MOCK_PROJECTS"
+
+test_contains "MOCK_CRUMBS for breadcrumbs" \
+  "grep 'MOCK_CRUMBS' '$APP_SRC'" "MOCK_CRUMBS"
+
+test_contains "pendingCaptures prop set" \
+  "grep 'pendingCaptures' '$APP_SRC'" "pendingCaptures"
+
+test_contains "activeProjectId prop set" \
+  "grep 'activeProjectId' '$APP_SRC'" "activeProjectId"
+
+test_contains "sessionSeconds prop set" \
+  "grep 'sessionSeconds' '$APP_SRC'" "sessionSeconds"
+
+echo ""
+echo -e "  ${DIM}App.tsx D4 dogfood complete${NC}"
+
+# ============================================================================
 # CLEANUP
 # ============================================================================
 

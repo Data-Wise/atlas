@@ -14,6 +14,15 @@
  *   test/e2e/dashboard-ink/sidebarPanel.e2e.test.js (future)
  */
 
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 // ─── Mirror pure-logic helpers from SidebarPanel.tsx ─────────────────────────
 // These are extracted here as the CONTRACT the implementation must satisfy.
 // Any change to the source that breaks these tests is a regression.
