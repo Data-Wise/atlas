@@ -31,6 +31,7 @@ import { useLayout, LayoutManager, LayoutStatusBar, LAYOUT } from '../lib/Layout
 import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
+import { ThemeProvider } from '../lib/ThemeContext.js';
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -219,55 +220,57 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <Box flexDirection="column" width="100%" height="100%">
+    <ThemeProvider>
+      <Box flexDirection="column" width="100%" height="100%">
 
-      {/* Main content area — LayoutManager handles SINGLE / SPLIT / TRIPLE */}
-      <Box flexGrow={1}>
-        <LayoutManager layout={layout} focusPanel={focusPanel}>
-          {({ sidebar, main, inspector }) => (
-            <>
-              {/* Left panel: project list (SPLIT + TRIPLE only) */}
-              {sidebar && (
-                <Box width={`${sidebar.widthPct}%`} height="100%">
-                  <SidebarPanel
-                    projects={MOCK_PROJECTS}
-                    selectedIndex={sidebarIndex}
-                    onSelect={handleSidebarIndexChange}
-                    onSelectProject={handleSidebarSelect}
-                    isActive={sidebar.isActive}
-                    pendingCaptures={2}                    // mock: 2 inbox items
-                    activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
-                  />
+        {/* Main content area — LayoutManager handles SINGLE / SPLIT / TRIPLE */}
+        <Box flexGrow={1}>
+          <LayoutManager layout={layout} focusPanel={focusPanel}>
+            {({ sidebar, main, inspector }) => (
+              <>
+                {/* Left panel: project list (SPLIT + TRIPLE only) */}
+                {sidebar && (
+                  <Box width={`${sidebar.widthPct}%`} height="100%">
+                    <SidebarPanel
+                      projects={MOCK_PROJECTS}
+                      selectedIndex={sidebarIndex}
+                      onSelect={handleSidebarIndexChange}
+                      onSelectProject={handleSidebarSelect}
+                      isActive={sidebar.isActive}
+                      pendingCaptures={2}                    // mock: 2 inbox items
+                      activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
+                    />
+                  </Box>
+                )}
+
+                {/* Center panel: current view */}
+                <Box width={`${main.widthPct}%`} height="100%">
+                  {renderCurrentView()}
                 </Box>
-              )}
 
-              {/* Center panel: current view */}
-              <Box width={`${main.widthPct}%`} height="100%">
-                {renderCurrentView()}
-              </Box>
+                {/* Right panel: inspector + Pomodoro (TRIPLE only) */}
+                {inspector && (
+                  <Box width={`${inspector.widthPct}%`} height="100%">
+                    <InspectorPanel
+                      project={selectedProject ?? undefined}
+                      isActive={inspector.isActive}
+                      sessionSeconds={300}        // mock: 5 min into session
+                      pomodoroLength={25}
+                      breadcrumbs={MOCK_CRUMBS}
+                    />
+                  </Box>
+                )}
+              </>
+            )}
+          </LayoutManager>
+        </Box>
 
-              {/* Right panel: inspector + Pomodoro (TRIPLE only) */}
-              {inspector && (
-                <Box width={`${inspector.widthPct}%`} height="100%">
-                  <InspectorPanel
-                    project={selectedProject ?? undefined}
-                    isActive={inspector.isActive}
-                    sessionSeconds={300}        // mock: 5 min into session
-                    pomodoroLength={25}
-                    breadcrumbs={MOCK_CRUMBS}
-                  />
-                </Box>
-              )}
-            </>
-          )}
-        </LayoutManager>
+        {/* Command bar — LayoutStatusBar at the right end */}
+        <Box paddingX={1} justifyContent="flex-end">
+          <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
+        </Box>
+
       </Box>
-
-      {/* Command bar — LayoutStatusBar at the right end */}
-      <Box paddingX={1} justifyContent="flex-end">
-        <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
-      </Box>
-
-    </Box>
+    </ThemeProvider>
   );
 };

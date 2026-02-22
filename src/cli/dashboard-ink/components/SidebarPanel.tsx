@@ -25,7 +25,8 @@
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { Project } from '../types.js';
-import { statusIcon, statusColor } from '../constants.js';
+import { statusIcon } from '../constants.js';
+import { useTheme } from '../lib/ThemeContext.js';
 
 interface SidebarPanelProps {
   projects: Project[];
@@ -63,49 +64,38 @@ interface RowProps {
 }
 
 const Row: React.FC<RowProps> = ({ project, isHighlighted, isActiveSession }) => {
+  const theme  = useTheme();
   const icon   = statusIcon(project.status);
-  const color  = statusColor(project.status);
-  // Name column: narrow — 14 chars leaves room for icon + progress
+  const color  = theme.status[project.status] ?? theme.text.secondary;
   const name   = truncate(project.name, 14);
   const pct    = fmtProgress(project.progress);
 
-  // Highlight logic:
-  //   isHighlighted → blue reverse-video selection bar
-  //   isActiveSession (running timer) → green name even when not selected
   const nameBold  = isHighlighted || isActiveSession;
   const nameColor = isHighlighted
     ? 'blueBright'
     : isActiveSession
-      ? 'greenBright'
-      : 'white';
+      ? theme.focus.timer
+      : theme.text.primary;
 
   return (
-    <Box
-      paddingX={1}
-      // Ink doesn't support true background fills; simulate selection with bold + color
-    >
-      {/* Status icon */}
+    <Box paddingX={1}>
       <Text color={isHighlighted ? 'blueBright' : color}>
         {icon}
       </Text>
       <Text> </Text>
 
-      {/* Project name */}
       <Text bold={nameBold} color={nameColor}>
         {name}
       </Text>
 
-      {/* Spacer */}
-      <Text color="gray"> </Text>
+      <Text color={theme.text.muted}> </Text>
 
-      {/* Progress — right-aligned visually by padding name to fixed width */}
-      <Text color={isHighlighted ? 'cyan' : 'gray'}>
+      <Text color={isHighlighted ? theme.text.accent : theme.text.secondary}>
         {pct}
       </Text>
 
-      {/* Active session dot */}
       {isActiveSession && (
-        <Text color="green"> ⏱</Text>
+        <Text color={theme.focus.timer}> ⏱</Text>
       )}
     </Box>
   );
@@ -145,21 +135,23 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
   const visible = projects.slice(windowStart, windowStart + WINDOW);
 
   // ─── Render ────────────────────────────────────────────────────────────────
+  const theme = useTheme();
+
   return (
     <Box flexDirection="column" width="100%" height="100%">
 
       {/* Header */}
-      <Box paddingX={1} borderStyle="single" borderColor={isActive ? 'cyan' : 'gray'}>
-        <Text bold color={isActive ? 'cyan' : 'gray'}>
+      <Box paddingX={1} borderStyle="single" borderColor={isActive ? theme.panel.borderActive : theme.panel.borderInactive}>
+        <Text bold color={isActive ? theme.panel.headerActive : theme.panel.headerInactive}>
           Projects
         </Text>
-        <Text color="gray"> {projects.length}</Text>
+        <Text color={theme.text.secondary}> {projects.length}</Text>
 
         {/* Inbox badge */}
         {pendingCaptures > 0 && (
           <>
-            <Text color="gray">  </Text>
-            <Text color="yellow" bold>
+            <Text color={theme.text.secondary}>  </Text>
+            <Text color={theme.focus.paused} bold>
               📥{pendingCaptures}
             </Text>
           </>
@@ -184,18 +176,18 @@ export const SidebarPanel: React.FC<SidebarPanelProps> = ({
       {/* Scroll indicator when list overflows */}
       {projects.length > WINDOW && (
         <Box paddingX={1}>
-          <Text color="gray" dimColor>
+          <Text color={theme.text.muted} dimColor>
             {windowStart + 1}–{Math.min(windowStart + WINDOW, projects.length)}/{projects.length}
           </Text>
         </Box>
       )}
 
       {/* Focus hint */}
-      <Box paddingX={1} borderStyle="single" borderColor="gray">
+      <Box paddingX={1} borderStyle="single" borderColor={theme.panel.borderInactive}>
         {isActive ? (
-          <Text color="gray" dimColor>j/k: nav  Enter: open  Shift+Tab: switch</Text>
+          <Text color={theme.text.muted} dimColor>j/k: nav  Enter: open  Shift+Tab: switch</Text>
         ) : (
-          <Text color="gray" dimColor>Shift+Tab: focus sidebar</Text>
+          <Text color={theme.text.muted} dimColor>Shift+Tab: focus sidebar</Text>
         )}
       </Box>
     </Box>

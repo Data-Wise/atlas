@@ -35,7 +35,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
 import type { Project } from '../types.js';
-import { statusIcon, statusColor } from '../constants.js';
+import { statusIcon } from '../constants.js';
+import { useTheme } from '../lib/ThemeContext.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ const PomodoroBlock: React.FC<PomodoroBlockProps> = ({
   pomodoroLength,
   hasSession,
 }) => {
+  const theme = useTheme();
   const [elapsed, setElapsed] = useState(0);
   const [paused, setPaused]   = useState(false);
 
@@ -91,7 +93,6 @@ const PomodoroBlock: React.FC<PomodoroBlockProps> = ({
   const remaining = Math.max(0, totalSecs - elapsed);
   const isBreak   = remaining === 0;
 
-  // Timer tick — only runs when inspector is in a session and not paused
   useEffect(() => {
     if (!hasSession || paused || isBreak) return;
     const id = setInterval(() => {
@@ -100,13 +101,11 @@ const PomodoroBlock: React.FC<PomodoroBlockProps> = ({
     return () => clearInterval(id);
   }, [hasSession, paused, isBreak, totalSecs]);
 
-  // Reset when session changes
   useEffect(() => {
     setElapsed(0);
     setPaused(false);
   }, [hasSession]);
 
-  // Keyboard – only responds when inspector panel is focused
   useInput((input, key) => {
     if (!isActive) return;
     if (input === ' ') setPaused(p => !p);
@@ -116,48 +115,44 @@ const PomodoroBlock: React.FC<PomodoroBlockProps> = ({
   if (!hasSession) {
     return (
       <Box flexDirection="column" marginTop={1}>
-        <Text bold color="gray">⏱ SESSION</Text>
-        <Text color="gray" dimColor> No active session</Text>
-        <Text color="gray" dimColor> Press s in main panel</Text>
+        <Text bold color={theme.text.secondary}>⏱ SESSION</Text>
+        <Text color={theme.text.muted} dimColor> No active session</Text>
+        <Text color={theme.text.muted} dimColor> Press s in main panel</Text>
       </Box>
     );
   }
 
   const bar = progressBar((elapsed / totalSecs) * 100);
   const statusLabel = isBreak ? '☕ BREAK TIME' : paused ? '◑ PAUSED' : '● FOCUSING';
-  const timerColor  = isBreak ? 'yellow' : paused ? 'yellow' : 'green';
+  const timerColor  = isBreak ? theme.focus.break : paused ? theme.focus.paused : theme.focus.timer;
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text bold color={isActive ? 'cyan' : 'gray'}>⏱ SESSION</Text>
+      <Text bold color={isActive ? theme.panel.headerActive : theme.text.secondary}>⏱ SESSION</Text>
 
-      {/* Timer */}
       <Box marginTop={1}>
         <Text bold color={timerColor}>{fmtTime(remaining)}</Text>
-        <Text color="gray">  </Text>
-        <Text color={bar.filled ? 'green' : 'gray'}>{bar.filled}</Text>
-        <Text color="gray">{bar.empty}</Text>
+        <Text color={theme.text.secondary}>  </Text>
+        <Text color={bar.filled ? theme.chart.progressFilled : theme.text.secondary}>{bar.filled}</Text>
+        <Text color={theme.chart.progressEmpty}>{bar.empty}</Text>
       </Box>
 
-      {/* Status */}
       <Box>
         <Text bold color={timerColor}>{statusLabel}</Text>
       </Box>
 
-      {/* Pomodoro count */}
       <Box>
-        <Text color="gray" dimColor>
+        <Text color={theme.text.muted} dimColor>
           {pomodoroLength}m block
         </Text>
       </Box>
 
-      {/* Hint — only when focused */}
       {isActive && (
         <Box marginTop={1}>
-          <Text color="cyan">Space</Text>
-          <Text color="gray"> {paused ? 'resume' : 'pause'} </Text>
-          <Text color="cyan">r</Text>
-          <Text color="gray"> reset</Text>
+          <Text color={theme.text.accent}>Space</Text>
+          <Text color={theme.text.secondary}> {paused ? 'resume' : 'pause'} </Text>
+          <Text color={theme.text.accent}>r</Text>
+          <Text color={theme.text.secondary}> reset</Text>
         </Box>
       )}
     </Box>
@@ -173,32 +168,31 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
   pomodoroLength = 25,
   breadcrumbs = [],
 }) => {
+  const theme = useTheme();
   const hasSession = sessionSeconds > 0;
 
   // ── Empty state ────────────────────────────────────────────────────────────
   if (!project) {
     return (
       <Box flexDirection="column" width="100%" height="100%">
-        <Box paddingX={1} borderStyle="single" borderColor={isActive ? 'cyan' : 'gray'}>
-          <Text bold color={isActive ? 'cyan' : 'gray'}>Inspector</Text>
+        <Box paddingX={1} borderStyle="single" borderColor={isActive ? theme.panel.borderActive : theme.panel.borderInactive}>
+          <Text bold color={isActive ? theme.panel.headerActive : theme.panel.headerInactive}>Inspector</Text>
         </Box>
         <Box flexGrow={1} paddingX={1} paddingTop={2} justifyContent="center">
-          <Text color="gray" dimColor>Select a project</Text>
+          <Text color={theme.text.muted} dimColor>Select a project</Text>
         </Box>
       </Box>
     );
   }
 
   const bar  = progressBar(project.progress);
-  const sCol = statusColor(project.status);
+  const sCol = theme.status[project.status] ?? theme.text.secondary;
   const sIco = statusIcon(project.status);
 
-  // Parse next actions (comma-separated or newline-separated, up to 3)
   const nextItems: string[] = project.next
     ? project.next.split(/[,\n]/).map(s => s.trim()).filter(Boolean).slice(0, 3)
     : [];
 
-  // Breadcrumbs — newest first, up to 3
   const recentCrumbs = breadcrumbs.slice(0, 3);
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -206,51 +200,51 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
     <Box flexDirection="column" width="100%" height="100%">
 
       {/* Header */}
-      <Box paddingX={1} borderStyle="single" borderColor={isActive ? 'cyan' : 'gray'}>
-        <Text bold color={isActive ? 'cyan' : 'gray'}>Inspector</Text>
+      <Box paddingX={1} borderStyle="single" borderColor={isActive ? theme.panel.borderActive : theme.panel.borderInactive}>
+        <Text bold color={isActive ? theme.panel.headerActive : theme.panel.headerInactive}>Inspector</Text>
       </Box>
 
       <Box flexDirection="column" paddingX={1} flexGrow={1}>
 
         {/* Project name + type */}
         <Box marginTop={1}>
-          <Text bold color="white">🎯 </Text>
-          <Text bold color="white">{trunc(project.name, 18)}</Text>
+          <Text bold color={theme.text.primary}>🎯 </Text>
+          <Text bold color={theme.text.primary}>{trunc(project.name, 18)}</Text>
         </Box>
         <Box>
-          <Text color="gray" dimColor>{project.type}</Text>
+          <Text color={theme.text.muted} dimColor>{project.type}</Text>
         </Box>
 
         {/* Status + progress */}
         <Box marginTop={1}>
           <Text color={sCol}>{sIco} </Text>
           <Text color={sCol}>{project.status}</Text>
-          <Text color="gray">  {project.progress}%  </Text>
-          <Text color="green">{bar.filled}</Text>
-          <Text color="gray">{bar.empty}</Text>
+          <Text color={theme.text.secondary}>  {project.progress}%  </Text>
+          <Text color={theme.chart.progressFilled}>{bar.filled}</Text>
+          <Text color={theme.chart.progressEmpty}>{bar.empty}</Text>
         </Box>
 
         {/* Separator */}
         <Box marginTop={1}>
-          <Text color="gray" dimColor>{'─'.repeat(22)}</Text>
+          <Text color={theme.text.muted} dimColor>{'─'.repeat(22)}</Text>
         </Box>
 
         {/* Focus */}
         {project.focus && (
           <Box flexDirection="column" marginTop={1}>
-            <Text bold color="gray">Focus</Text>
-            <Text color="cyan">{trunc(project.focus, 22)}</Text>
+            <Text bold color={theme.text.secondary}>Focus</Text>
+            <Text color={theme.text.accent}>{trunc(project.focus, 22)}</Text>
           </Box>
         )}
 
         {/* Next actions */}
         {nextItems.length > 0 && (
           <Box flexDirection="column" marginTop={1}>
-            <Text bold color="gray">Next</Text>
+            <Text bold color={theme.text.secondary}>Next</Text>
             {nextItems.map((item, i) => (
               <Box key={i}>
-                <Text color="gray">· </Text>
-                <Text color="white">{trunc(item, 20)}</Text>
+                <Text color={theme.text.secondary}>· </Text>
+                <Text color={theme.text.primary}>{trunc(item, 20)}</Text>
               </Box>
             ))}
           </Box>
@@ -258,7 +252,7 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
         {/* Separator */}
         <Box marginTop={1}>
-          <Text color="gray" dimColor>{'─'.repeat(22)}</Text>
+          <Text color={theme.text.muted} dimColor>{'─'.repeat(22)}</Text>
         </Box>
 
         {/* Pomodoro block */}
@@ -272,13 +266,13 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
         {recentCrumbs.length > 0 && (
           <Box flexDirection="column" marginTop={1}>
             <Box marginTop={1}>
-              <Text color="gray" dimColor>{'─'.repeat(22)}</Text>
+              <Text color={theme.text.muted} dimColor>{'─'.repeat(22)}</Text>
             </Box>
-            <Text bold color="gray">Recent</Text>
+            <Text bold color={theme.text.secondary}>Recent</Text>
             {recentCrumbs.map((crumb, i) => (
               <Box key={i}>
-                <Text color="gray">· </Text>
-                <Text color="gray" dimColor>{trunc(crumb, 20)}</Text>
+                <Text color={theme.text.secondary}>· </Text>
+                <Text color={theme.text.muted} dimColor>{trunc(crumb, 20)}</Text>
               </Box>
             ))}
           </Box>
@@ -287,11 +281,11 @@ export const InspectorPanel: React.FC<InspectorPanelProps> = ({
       </Box>
 
       {/* Focus hint footer */}
-      <Box paddingX={1} borderStyle="single" borderColor="gray">
+      <Box paddingX={1} borderStyle="single" borderColor={theme.panel.borderInactive}>
         {isActive ? (
-          <Text color="gray" dimColor>Space: pause  r: reset  Shift+Tab: switch</Text>
+          <Text color={theme.text.muted} dimColor>Space: pause  r: reset  Shift+Tab: switch</Text>
         ) : (
-          <Text color="gray" dimColor>Shift+Tab: focus inspector</Text>
+          <Text color={theme.text.muted} dimColor>Shift+Tab: focus inspector</Text>
         )}
       </Box>
     </Box>

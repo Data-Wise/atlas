@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Card } from '../shared/Card.js';
 import type { Project } from '../../types.js';
+import { useTheme } from '../../lib/ThemeContext.js';
 
 interface MainViewProps {
   projects: Project[];
@@ -26,6 +27,7 @@ interface MainViewProps {
  * - q: Quit
  */
 export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectProject, onFocus, onZen, onTimeline, onEcosystem, onPlan }) => {
+  const theme = useTheme();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Keyboard navigation
@@ -71,14 +73,14 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
       {/* Header */}
       <Box
         borderStyle="single"
-        borderColor="cyan"
+        borderColor={theme.panel.borderActive}
         paddingX={1}
         marginBottom={1}
       >
-        <Text bold color="cyan">
+        <Text bold color={theme.panel.headerActive}>
           Atlas Dashboard (Ink POC)
         </Text>
-        <Text color="gray"> - {projects.length} projects</Text>
+        <Text color={theme.text.secondary}> - {projects.length} projects</Text>
       </Box>
 
       {/* Card Stack */}
@@ -99,14 +101,14 @@ export const MainView: React.FC<MainViewProps> = ({ projects, onQuit, onSelectPr
       {/* Command Bar */}
       <Box
         borderStyle="single"
-        borderColor="gray"
+        borderColor={theme.panel.borderInactive}
         paddingX={1}
         marginTop={1}
       >
-        <Text color="gray">
+        <Text color={theme.text.muted}>
           j/k: Nav • Enter: Select • f: Focus • z: Zen • T: Timeline • e: Eco • p: Plan • q: Quit
         </Text>
-        <Text color="cyan"> [{selectedIndex + 1}/{projects.length}]</Text>
+        <Text color={theme.text.accent}> [{selectedIndex + 1}/{projects.length}]</Text>
       </Box>
     </Box>
   );
