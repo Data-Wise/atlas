@@ -14,6 +14,7 @@
  */
 
 import { StreakCalculator } from '../../utils/StreakCalculator.js'
+import { BusinessRules } from '../../domain/constants/BusinessRules.js'
 
 export class GetSessionStatsUseCase {
   /**
@@ -100,8 +101,8 @@ export class GetSessionStatsUseCase {
     const totalSessions = sessions.length
     const totalMinutes = sessions.reduce((sum, s) => sum + (s.getDuration?.() || 0), 0)
 
-    // Flow state (sessions >= 15 minutes)
-    const flowSessions = sessions.filter(s => (s.getDuration?.() || 0) >= 15)
+    // Flow state (sessions >= configured threshold)
+    const flowSessions = sessions.filter(s => (s.getDuration?.() || 0) >= BusinessRules.SESSION_FLOW_STATE_MINUTES)
     const flowPercentage = totalSessions > 0
       ? Math.round((flowSessions.length / totalSessions) * 100)
       : 0
@@ -258,7 +259,7 @@ export class GetSessionStatsUseCase {
       const duration = session.getDuration?.() || 0
       byProject[projectName].sessions++
       byProject[projectName].totalMinutes += duration
-      if (duration >= 15) {
+      if (duration >= BusinessRules.SESSION_FLOW_STATE_MINUTES) {
         byProject[projectName].flowSessions++
       }
     }

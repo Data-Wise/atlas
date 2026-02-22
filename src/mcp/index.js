@@ -23,7 +23,12 @@ import {
   ReadResourceRequestSchema
 } from '@modelcontextprotocol/sdk/types.js'
 
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
+const pkg = require('../../package.json')
+
 import Atlas from '../index.js'
+import { BusinessRules } from '../domain/constants/BusinessRules.js'
 import {
   formatContext,
   formatProjects,
@@ -39,7 +44,10 @@ import {
 } from './formatters.js'
 
 // Initialize Atlas instance
-const atlas = new Atlas()
+const atlas = new Atlas({
+  dataDir: process.env.ATLAS_DATA_DIR,
+  storage: process.env.ATLAS_STORAGE || 'filesystem'
+})
 
 // Tool definitions
 const TOOLS = [
@@ -185,7 +193,7 @@ const TOOLS = [
         },
         outcome: {
           type: 'string',
-          enum: ['completed', 'interrupted', 'blocked'],
+          enum: ['completed', 'cancelled', 'interrupted'],
           description: 'Session outcome (default: completed)',
           default: 'completed'
         }
@@ -265,7 +273,7 @@ const TOOLS = [
 const server = new Server(
   {
     name: 'atlas',
-    version: '0.7.0'
+    version: pkg.version
   },
   {
     capabilities: {
@@ -444,6 +452,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!args?.text) {
           throw new Error('Capture text is required')
         }
+        if (args.text.length > BusinessRules.CAPTURE_TEXT_MAX_LENGTH) {
+          throw new Error(`Capture text exceeds maximum length of ${BusinessRules.CAPTURE_TEXT_MAX_LENGTH} characters`)
+        }
         await atlas.capture.add(args.text, {
           type: args.type || 'idea',
           project: args.project,
@@ -460,6 +471,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'atlas_breadcrumb': {
         if (!args?.text) {
           throw new Error('Breadcrumb text is required')
+        }
+        if (args.text.length > BusinessRules.BREADCRUMB_TEXT_MAX_LENGTH) {
+          throw new Error(`Breadcrumb text exceeds maximum length of ${BusinessRules.BREADCRUMB_TEXT_MAX_LENGTH} characters`)
         }
         await atlas.context.breadcrumb(args.text, args.project)
         return {
@@ -509,7 +523,7 @@ process.on('SIGTERM', () => {
 async function main() {
   const transport = new StdioServerTransport()
   await server.connect(transport)
-  console.error('Atlas MCP Server v0.7.0 running on stdio')
+  console.error(`Atlas MCP Server v${pkg.version} running on stdio`)
   console.error('Tools: atlas_get_context, atlas_get_projects, atlas_get_sessions, atlas_get_trail, atlas_get_inbox, atlas_start_session, atlas_end_session, atlas_capture, atlas_breadcrumb, atlas_plan')
 }
 

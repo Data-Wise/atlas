@@ -132,7 +132,7 @@ describe('Atlas MCP Server', () => {
       )
 
       expect(content).toContain("name: 'atlas'")
-      expect(content).toContain("version: '0.7.0'")
+      expect(content).toContain("version: pkg.version")
     })
 
     it('should enable tools and resources capabilities', async () => {
