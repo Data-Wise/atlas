@@ -34,22 +34,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
+import type { Project } from '../types.js';
+import { statusIcon, statusColor } from '../constants.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface InspectorProject {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  focus?: string;
-  path?: string;
-  next?: string;
-}
-
 interface InspectorPanelProps {
-  project?: InspectorProject;
+  project?: Project;
   isActive: boolean;
   /** Seconds elapsed in the current work session (0 = no active session) */
   sessionSeconds?: number;
@@ -60,27 +51,6 @@ interface InspectorPanelProps {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STATUS_COLOR: Record<string, string> = {
-  active:   'green',
-  paused:   'yellow',
-  stable:   'cyan',
-  complete: 'gray',
-  planning: 'blue',
-  blocked:  'red',
-};
-
-const STATUS_ICON: Record<string, string> = {
-  active:   '●',
-  paused:   '◐',
-  stable:   '◆',
-  complete: '✓',
-  planning: '○',
-  blocked:  '✗',
-};
-
-function statusColor(s: string): string { return STATUS_COLOR[s] ?? 'white'; }
-function statusIcon(s: string): string  { return STATUS_ICON[s]  ?? '○'; }
 
 /** 8-char progress bar */
 function progressBar(pct: number): { filled: string; empty: string } {

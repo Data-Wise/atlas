@@ -22,28 +22,17 @@
  *   activeProjectId  - id of project with running session (highlights row)
  */
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Box, Text, useInput } from 'ink';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface SidebarProject {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  focus?: string;
-  path?: string;
-  next?: string;
-}
+import type { Project } from '../types.js';
+import { statusIcon, statusColor } from '../constants.js';
 
 interface SidebarPanelProps {
-  projects: SidebarProject[];
+  projects: Project[];
   /** Controlled selection index */
   selectedIndex: number;
   onSelect: (index: number) => void;
-  onSelectProject: (project: SidebarProject) => void;
+  onSelectProject: (project: Project) => void;
   /** Whether this panel currently holds keyboard focus */
   isActive: boolean;
   /** Inbox badge count */
@@ -53,32 +42,6 @@ interface SidebarPanelProps {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STATUS_ICON: Record<string, string> = {
-  active:   '●',
-  paused:   '◐',
-  stable:   '◆',
-  complete: '✓',
-  planning: '○',
-  blocked:  '✗',
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  active:   'green',
-  paused:   'yellow',
-  stable:   'cyan',
-  complete: 'gray',
-  planning: 'blue',
-  blocked:  'red',
-};
-
-function statusIcon(status: string): string {
-  return STATUS_ICON[status] ?? '○';
-}
-
-function statusColor(status: string): string {
-  return STATUS_COLOR[status] ?? 'white';
-}
 
 /** Abbreviate progress to a 3-char string e.g. "75%" " 5%" */
 function fmtProgress(p: number): string {
@@ -94,7 +57,7 @@ function truncate(s: string, max: number): string {
 // ─── Row ──────────────────────────────────────────────────────────────────────
 
 interface RowProps {
-  project: SidebarProject;
+  project: Project;
   isHighlighted: boolean;
   isActiveSession: boolean;
 }

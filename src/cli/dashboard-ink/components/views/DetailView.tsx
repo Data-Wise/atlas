@@ -1,16 +1,6 @@
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
-
-interface Project {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  progress: number;
-  focus?: string;
-  path?: string;
-  next?: string;
-}
+import type { Project } from '../../types.js';
 
 interface DetailViewProps {
   project: Project;
