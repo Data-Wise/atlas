@@ -33,6 +33,7 @@ import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
 import { ThemeProvider } from '../lib/ThemeContext.js';
 import { useProjects } from '../hooks/useProjects.js';
+import { useActiveSession } from '../hooks/useActiveSession.js';
 
 // Mock breadcrumbs for the inspector (would come from atlas.context.trail() in production)
 const MOCK_CRUMBS = [
@@ -63,6 +64,12 @@ const MOCK_HEATMAP_GRID = generateMockHeatmapGrid();
 export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   // ── Real data hooks ─────────────────────────────────────────────────────────
   const { projects, loading, error } = useProjects();
+  const { projectName: activeProjectName, elapsed: sessionSeconds, isActive: hasActiveSession } = useActiveSession();
+
+  // Derive activeProjectId from the active session's project name
+  const activeProjectId = hasActiveSession
+    ? projects.find(p => p.name === activeProjectName)?.id ?? null
+    : null;
 
   // ── State machine ──────────────────────────────────────────────────────────
   const [stateMachine] = useState(() => createStateMachine({ initial: STATES.BROWSE }));
@@ -207,8 +214,8 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                       onSelect={handleSidebarIndexChange}
                       onSelectProject={handleSidebarSelect}
                       isActive={sidebar.isActive}
-                      pendingCaptures={2}                    // mock: 2 inbox items
-                      activeProjectId={projects[0].id} // mock: atlas has active session
+                      pendingCaptures={2}                    // mock: 2 inbox items (Increment 4)
+                      activeProjectId={activeProjectId}
                     />
                   </Box>
                 )}
@@ -224,7 +231,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                     <InspectorPanel
                       project={selectedProject ?? undefined}
                       isActive={inspector.isActive}
-                      sessionSeconds={300}        // mock: 5 min into session
+                      sessionSeconds={sessionSeconds}
                       pomodoroLength={25}
                       breadcrumbs={MOCK_CRUMBS}
                       heatmapGrid={MOCK_HEATMAP_GRID}
