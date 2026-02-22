@@ -157,21 +157,32 @@ src/
 │   └── Container.js            # Dependency injection container
 │
 ├── cli/                         # Command-line interface
-│   ├── dashboard.js            # TUI dashboard entry
-│   └── dashboard/              # Dashboard components
-│       ├── constants.js        # Centralized configuration values
-│       ├── helpers.js          # Re-exports from presenters
-│       ├── stateMachine.js     # View state management
-│       ├── timerManager.js     # Pomodoro timer
-│       ├── dialogs.js          # Modal dialogs
-│       └── views/              # View components
-│           ├── MainView.js     # Card-based project list
-│           ├── DetailView.js   # Project details panel
-│           ├── FocusView.js    # Pomodoro timer view
-│           ├── ZenView.js      # Minimal focus mode
-│           ├── TimelineView.js # Time block visualization (v0.7.0)
-│           ├── EcosystemView.js # Multi-project ecosystem view (v0.8.0)
-│           └── PlanView.js     # Morning ritual planning view (v0.8.0)
+│   ├── dashboard.js            # TUI dashboard entry (legacy blessed)
+│   ├── dashboard-ink/          # ✨ v0.9.x Ink TUI (default)
+│   │   ├── components/         # Leaf components
+│   │   │   ├── App.tsx         # Root component, state machine driver
+│   │   │   ├── SidebarPanel.tsx  # Compact project list (D2, v0.9.1)
+│   │   │   ├── InspectorPanel.tsx # Detail + Pomodoro right panel (D3, v0.9.1)
+│   │   │   ├── shared/
+│   │   │   │   └── Card.tsx    # Project card component
+│   │   │   └── views/
+│   │   │       ├── MainView.tsx    # Card stack (BROWSE)
+│   │   │       ├── DetailView.tsx  # Project details (DETAIL)
+│   │   │       ├── FocusView.tsx   # Pomodoro timer (FOCUS)
+│   │   │       ├── ZenView.tsx     # Minimal mode (ZEN)
+│   │   │       ├── TimelineView.tsx # Time blocks (TIMELINE)
+│   │   │       ├── EcosystemView.tsx # Multi-project (ECOSYSTEM)
+│   │   │       └── PlanView.tsx    # Morning ritual (PLAN)
+│   │   └── lib/
+│   │       ├── LayoutManager.tsx   # ✨ Layout engine: SINGLE/SPLIT/TRIPLE (D1, v0.9.1)
+│   │       └── stateMachine.ts     # View state machine
+│   └── dashboard/              # Legacy blessed components
+│       ├── constants.js
+│       ├── helpers.js
+│       ├── stateMachine.js
+│       ├── timerManager.js
+│       ├── dialogs.js
+│       └── views/              # Blessed view components
 │
 ├── mcp/                         # Model Context Protocol server (v0.7.0)
 │   ├── index.js                # MCP server entry point
@@ -595,17 +606,105 @@ stateDiagram-v2
 ```
 
 **States:**
-| State | View | Purpose |
-|-------|------|---------|
-| `BROWSE` | MainView | Default card-based project list |
-| `DETAIL` | DetailView | Single project details panel |
-| `FOCUS` | FocusView | Pomodoro timer with task |
-| `ZEN` | ZenView | Minimal distraction mode |
-| `TIMELINE` | TimelineView | Time block visualization |
+| State       | View          | Purpose                          |
+| ----------- | ------------- | -------------------------------- |
+| `BROWSE`    | MainView      | Default card-based project list  |
+| `DETAIL`    | DetailView    | Single project details panel     |
+| `FOCUS`     | FocusView     | Pomodoro timer with task         |
+| `ZEN`       | ZenView       | Minimal distraction mode         |
+| `TIMELINE`  | TimelineView  | Time block visualization         |
 | `ECOSYSTEM` | EcosystemView | Multi-project ecosystem overview |
-| `PLAN` | PlanView | Morning ritual daily planning |
+| `PLAN`      | PlanView      | Morning ritual daily planning    |
 
-**Implementation:** `src/cli/dashboard/stateMachine.js`
+**Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts`
+
+## TUI Component Architecture (v0.9.1)
+
+The v0.9.1 Ink TUI uses a three-layer component model:
+
+```
+┌────────────────────────────────────────────────────────┐
+│  App.tsx  (state machine driver, data provider)        │
+├────────────────────────────────────────────────────────┤
+│  LayoutManager.tsx  (layout engine — SINGLE/SPLIT/TRIPLE)│
+│  useLayout() hook → Tab cycles modes, Shift+Tab focus  │
+├──────────────┬──────────────────┬──────────────────────┤
+│ SidebarPanel │   View Layer     │  InspectorPanel      │
+│ (25-28%)     │ (MainView,       │  (28%)               │
+│              │  DetailView,     │                      │
+│ compact list │  FocusView…)     │  detail + Pomodoro   │
+└──────────────┴──────────────────┴──────────────────────┘
+```
+
+### LayoutManager (D1)
+
+```typescript
+// useLayout() returns:
+{
+  layout: 'single' | 'split' | 'triple',
+  focusedPanel: 'main' | 'sidebar' | 'inspector',
+  panelConfig: {
+    sidebar: { width: 28 } | null,
+    main:    { width: 72 } | { width: 47 } | { width: 100 },
+    inspector: { width: 28 } | null,
+  }
+}
+// Tab → cycles SINGLE → SPLIT → TRIPLE → SINGLE
+// Shift+Tab → cycles panel focus
+```
+
+**Key exports:** `LAYOUT`, `PANEL_CONFIG`, `useLayout`, `LayoutManager`, `LayoutStatusBar`, `PanelBox`
+
+### SidebarPanel (D2)
+
+Compact project list column for SPLIT and TRIPLE modes.
+
+```typescript
+interface SidebarPanelProps {
+  projects: SidebarProject[];   // project list
+  selectedIndex: number;        // controlled selection
+  onSelect: (idx: number) => void;
+  onSelectProject: (p: SidebarProject) => void; // fires on Enter
+  isActive: boolean;            // guards keyboard input
+  pendingCaptures?: number;     // inbox badge count
+  activeProjectId?: string;     // ⏱ session indicator
+}
+```
+
+- **Windowing:** 12 visible rows, scroll indicator when > 12 projects
+- **Row format:** `● name   75%` (icon + 14-char name + 4-char %-padded)
+- **isActive guard:** `j/k/Enter` are no-ops when sidebar is not focused
+
+### InspectorPanel (D3)
+
+Right-hand detail + embedded Pomodoro mini-timer for TRIPLE mode.
+
+```typescript
+interface InspectorPanelProps {
+  project?: InspectorProject;   // undefined → empty state
+  isActive: boolean;            // guards Space/r keys
+  sessionSeconds?: number;      // > 0 → shows live timer
+  pomodoroLength?: number;      // default: 25 min
+  breadcrumbs?: string[];       // newest-first, max 3 shown
+}
+```
+
+- **Sections:** Name/type → Status bar → Focus → Next actions → Pomodoro → Breadcrumbs
+- **Pomodoro states:** `● FOCUSING` → `◑ PAUSED` → `☕ BREAK TIME`
+- **Timer resets** when `sessionSeconds` changes (new session)
+- **next actions** parsed from `project.next` via comma/newline split, sliced to 3
+
+### Component Communication
+
+```mermaid
+graph TB
+  App["App.tsx\n(state + data)"] -->|layout prop| LM["LayoutManager"]
+  LM -->|isActive, onSelect| SP["SidebarPanel"]
+  LM -->|currentView| VL["View Layer\n(MainView etc)"]
+  LM -->|isActive, project| IP["InspectorPanel"]
+  SP -->|onSelectProject| App
+  VL -->|onTransition| App
+```
 
 ## Template System
 
@@ -701,10 +800,19 @@ test/
 
 **Test Commands:**
 ```bash
-npm test                  # All 1,486 tests
+npm test                  # All 1,486+ tests
 npm run test:debug        # With --detectOpenHandles
 npm run test:unit         # Unit tests only
 npm run test:coverage     # With coverage report
+```
+
+**v0.9.1 dashboard-ink integration tests:**
+```
+test/integration/dashboard-ink/
+├── layoutManager.test.js   # 30 tests — LayoutManager D1
+├── sidebarPanel.test.js    # 35 tests — SidebarPanel D2
+├── inspectorPanel.test.js  # 40 tests — InspectorPanel D3
+└── view-transitions.test.js # State machine transitions
 ```
 
 ## Performance Considerations

@@ -3,10 +3,10 @@
 ## Status: active
 ## Phase: 🚧 feature/multi-panel-dashboard - In Progress
 ## Priority: 1
-## Progress: 70
+## Progress: 80
 
-## Focus: Multi-panel dashboard — D1+D2+D5 complete, building InspectorPanel next
-## Next: D3 - InspectorPanel.tsx (detail + Pomodoro right panel)
+## Focus: Multi-panel dashboard — D1+D2+D3+D5 complete, wiring App.tsx next
+## Next: D4 - Wire LayoutManager + panels into App.tsx
 ## Sprint0 Completed: 2025-12-30 (architecture quick wins, +83 tests)
 
 ## Quick Context
@@ -139,10 +139,17 @@ atlas dashboard           # Interactive TUI
 - [x] Focus hint in footer (changes when isActive toggles)
 - File: `src/cli/dashboard-ink/components/SidebarPanel.tsx`
 
-### D3: InspectorPanel.tsx 🔜
-- [ ] Shows selected project detail (focus, next, path)
-- [ ] Active session / Pomodoro timer block (reuse FocusView timer logic)
-- [ ] Recent breadcrumbs (last 3)
+### D3: InspectorPanel.tsx ✅ COMPLETE
+- [x] Project detail: name, type, status icon + colour, 8-char progress bar
+- [x] Focus text (truncated to 22 chars for narrow column)
+- [x] Next actions (up to 3, comma/newline parsed from `project.next`)
+- [x] Embedded Pomodoro mini-timer (reuses FocusView tick logic via useEffect)
+  - `Space` pause/resume, `r` reset — only fires when `isActive=true`
+  - Timer resets on session change (hasSession toggle)
+  - `☕ BREAK TIME` / `◑ PAUSED` / `● FOCUSING` state labels
+- [x] Last 3 breadcrumbs in footer
+- [x] Empty state when no project selected
+- [x] Focus hint footer swaps on isActive toggle
 - File: `src/cli/dashboard-ink/components/InspectorPanel.tsx`
 
 ### D4: Wire into App.tsx 🔜
@@ -155,14 +162,15 @@ atlas dashboard           # Interactive TUI
 ### D5: Tests ✅ COMPLETE
 - [x] `test/integration/dashboard-ink/layoutManager.test.js` (30 tests — D1)
 - [x] `test/integration/dashboard-ink/sidebarPanel.test.js` (35 tests — D2)
-  - STATUS_ICON/COLOR: all 6 statuses, parity check
-  - fmtProgress: 0/5/75/100, clamp ±, always 4 chars
-  - truncate: exact/over/under, Unicode ellipsis, edge cases
-  - Windowing: short list, long list, selection always visible, caps at total-WINDOW
-  - isActive guard: source-verified (3 checks)
+- [x] `test/integration/dashboard-ink/inspectorPanel.test.js` (40 tests — D3)
+  - STATUS maps, progressBar (BAR_WIDTH=8), fmtTime (MM:SS, always 5 chars)
+  - trunc (22-char default), parseNextItems (comma/newline/trim/slice-3)
+  - Breadcrumbs slice, hasSession, pomodoroRemaining, state labels
+  - Source contract: empty state, useEffect tick, reset on session change
 - [x] `test/dogfood-noninteractive.sh`
   - §16: LayoutManager D1 — 18 checks
-  - §17: SidebarPanel D2 — 26 checks (exports, icons, colours, fmtProgress, truncate, windowing, guard, nav, badge)
+  - §17: SidebarPanel D2 — 26 checks
+  - §18: InspectorPanel D3 — 30 checks (exports, icons, progressBar, fmtTime, trunc, nextItems, Pomodoro, guard, breadcrumbs)
 
 ## Current Tasks (legacy — pre-branch)
 - [x] Update Homebrew formula to 0.5.3

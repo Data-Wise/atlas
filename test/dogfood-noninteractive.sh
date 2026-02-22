@@ -584,6 +584,120 @@ echo ""
 echo -e "  ${DIM}SidebarPanel D2 dogfood complete${NC}"
 
 # ============================================================================
+# 18. INSPECTOR PANEL - D3 (feature/multi-panel-dashboard)
+# ============================================================================
+
+header "18. InspectorPanel D3 - Detail + Pomodoro Right Panel"
+
+INSPECTOR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/InspectorPanel.tsx"
+
+# File present
+test_succeeds "InspectorPanel.tsx exists" "ls '$INSPECTOR_SRC'"
+
+# 1. Exports
+test_contains "Exports InspectorPanel component" \
+  "grep -c 'export const InspectorPanel' '$INSPECTOR_SRC'" "1"
+
+test_contains "Exports InspectorProject interface" \
+  "grep -c 'export interface InspectorProject' '$INSPECTOR_SRC'" "1"
+
+# 2. Status icons — 6 required (same contract as SidebarPanel)
+for icon in '●' '◐' '◆' '✓' '○' '✗'; do
+  test_contains "Status icon $icon present" \
+    "grep \"'$icon'\" '$INSPECTOR_SRC'" "'$icon'"
+done
+
+# 3. progressBar helper — 8-char bar
+test_contains "progressBar uses BAR_WIDTH = 8" \
+  "grep 'BAR_WIDTH = 8' '$INSPECTOR_SRC'" "8"
+
+test_contains "Filled char is █" \
+  "grep \"'█'\" '$INSPECTOR_SRC'" "█"
+
+test_contains "Empty char is ░" \
+  "grep \"'░'\" '$INSPECTOR_SRC'" "░"
+
+# 4. fmtTime — MM:SS format with padStart
+test_contains "fmtTime uses padStart(2" \
+  "grep 'padStart(2' '$INSPECTOR_SRC'" "padStart(2"
+
+# 5. trunc — 22-char default
+test_contains "trunc default max = 22" \
+  "grep 'max = 22' '$INSPECTOR_SRC'" "22"
+
+test_contains "trunc uses Unicode ellipsis (…)" \
+  "grep '…' '$INSPECTOR_SRC'" "…"
+
+# 6. next actions parsing — comma + newline split, max 3
+test_contains "next actions split regex [,\\n]" \
+  "grep 'split(/\[,\\\\n\]/)' '$INSPECTOR_SRC'" "split"
+
+test_contains "next actions sliced to 3" \
+  "grep 'slice(0, 3)' '$INSPECTOR_SRC'" "slice(0, 3)"
+
+# 7. Pomodoro mini-timer — reuses FocusView pattern
+test_contains "useEffect for timer tick" \
+  "grep 'useEffect' '$INSPECTOR_SRC'" "useEffect"
+
+test_contains "setInterval for 1-second tick" \
+  "grep 'setInterval' '$INSPECTOR_SRC'" "setInterval"
+
+test_contains "clearInterval cleanup" \
+  "grep 'clearInterval' '$INSPECTOR_SRC'" "clearInterval"
+
+# 8. isActive guard in PomodoroBlock
+test_contains "isActive guard in useInput" \
+  "grep 'if (!isActive) return' '$INSPECTOR_SRC'" "if (!isActive) return"
+
+# 9. Pomodoro state labels
+test_contains "BREAK TIME label (☕)" \
+  "grep '☕ BREAK TIME' '$INSPECTOR_SRC'" "☕ BREAK TIME"
+
+test_contains "PAUSED label (◑)" \
+  "grep '◑ PAUSED' '$INSPECTOR_SRC'" "◑ PAUSED"
+
+test_contains "FOCUSING label (●)" \
+  "grep '● FOCUSING' '$INSPECTOR_SRC'" "● FOCUSING"
+
+# 10. Timer reset on session change
+test_contains "Timer resets elapsed on session change" \
+  "grep 'setElapsed(0)' '$INSPECTOR_SRC'" "setElapsed(0)"
+
+test_contains "Paused resets on session change" \
+  "grep 'setPaused(false)' '$INSPECTOR_SRC'" "setPaused(false)"
+
+# 11. Empty state
+test_contains "Empty state message when no project" \
+  "grep 'Select a project' '$INSPECTOR_SRC'" "Select a project"
+
+# 12. Breadcrumbs sliced to 3
+test_contains "Breadcrumbs sliced to max 3" \
+  "grep 'slice(0, 3)' '$INSPECTOR_SRC'" "slice(0, 3)"
+
+# 13. Keyboard — Space + r (when active)
+test_contains "Space key toggles pause" \
+  "grep \"input === ' '\" '$INSPECTOR_SRC'" "input === ' '"
+
+test_contains "r key resets timer" \
+  "grep \"input === 'r'\" '$INSPECTOR_SRC'" "input === 'r'"
+
+# 14. Ink imports
+test_contains "Imports Box, Text from ink" \
+  "grep \"from 'ink'\" '$INSPECTOR_SRC'" "Box"
+
+test_contains "Imports useInput from ink" \
+  "grep \"from 'ink'\" '$INSPECTOR_SRC'" "useInput"
+
+test_contains "Imports useState from react" \
+  "grep 'useState' '$INSPECTOR_SRC'" "useState"
+
+test_contains "Imports useEffect from react" \
+  "grep 'useEffect' '$INSPECTOR_SRC'" "useEffect"
+
+echo ""
+echo -e "  ${DIM}InspectorPanel D3 dogfood complete${NC}"
+
+# ============================================================================
 # CLEANUP
 # ============================================================================
 

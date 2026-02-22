@@ -114,22 +114,30 @@ flowchart LR
 
 Start dashboard: `atlas dash`
 
-| Key         | Action                           |
-| ----------- | -------------------------------- |
-| `j` / `k`   | Navigate up/down                 |
-| `Enter`     | Select project                   |
-| `s`         | Start session                    |
-| `c`         | Quick capture                    |
-| `f`         | Toggle focus mode                |
-| `z`         | Toggle zen mode                  |
-| `t`         | Cycle theme                      |
-| `T`         | Timeline view                    |
-| `e`         | Ecosystem view (v0.8.0)          |
-| `p`         | Plan view (v0.8.0)               |
-| `Tab`       | **Cycle layout mode** (v0.9.1)   |
-| `Shift+Tab` | Cycle panel focus (split/triple) |
-| `?`         | Show help                        |
-| `q`         | Quit                             |
+| Key         | Action                                           |
+| ----------- | ------------------------------------------------ |
+| `j` / `k`   | Navigate up/down                                 |
+| `Enter`     | Select project                                   |
+| `s`         | Start session                                    |
+| `c`         | Quick capture                                    |
+| Key         | Action                                           |
+| ----------- | -----------------------------------------        |
+| `j` / `k`   | Navigate up/down                                 |
+| `Enter`     | Select project                                   |
+| `s`         | Start session                                    |
+| `c`         | Quick capture                                    |
+| `f`         | Toggle focus mode                                |
+| `z`         | Toggle zen mode                                  |
+| `t`         | Cycle theme                                      |
+| `T`         | Timeline view                                    |
+| `e`         | Ecosystem view (v0.8.0)                          |
+| `p`         | Plan view (v0.8.0)                               |
+| `Tab`       | **Cycle layout mode** (v0.9.1)                   |
+| `Shift+Tab` | Cycle panel focus (split/triple)                 |
+| `Space`     | Pause/resume Pomodoro (inspector focused)        |
+| `r`         | Reset Pomodoro timer (inspector focused, paused) |
+| `?`         | Show help                                        |
+| `q`         | Quit                                             |
 
 **v0.9.1 Multi-Panel Layout Modes:**
 
@@ -145,6 +153,13 @@ Start dashboard: `atlas dash`
 - `📥N` inbox count in header when captures pending
 - `j/k` navigate when focused • `Enter` opens project detail
 - `Shift+Tab` to move keyboard focus between panels
+
+**Inspector panel (Triple only):**
+- Name + type + status bar + 8-char progress bar
+- Focus text + up to 3 Next actions
+- Live Pomodoro mini-timer: `● FOCUSING` → `◑ PAUSED` → `☕ BREAK`
+- `Space` pause/resume • `r` reset (when inspector focused)
+- Last 3 breadcrumbs
 
 **v0.8.0 Views:**
 - `e` - Ecosystem: See all dev-tools projects from .STATUS files

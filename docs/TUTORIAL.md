@@ -396,7 +396,35 @@ Press `Tab` to cycle through three layout modes without leaving the dashboard:
 **`⏱`** marks the project with your active timer  
 **`📥N`** shows in the sidebar header when you have N unprocessed inbox items
 
+**Inspector panel (Triple mode — right column):**
+```
+│ Inspector               │
+│ 🎯 atlas                │  ← selected project
+│ node-package            │
+│ ● active  75% ██████░░  │  ← status + 8-char bar
+│ ─────────────────────── │
+│ Focus                   │
+│ Implementing auth flow  │
+│ Next                    │
+│ · Add OAuth provider    │  ← up to 3 next actions
+│ · Write tests           │
+│ ─────────────────────── │
+│ ⏱ SESSION               │
+│ 24:10  ██████░░         │  ← live Pomodoro countdown
+│ ● FOCUSING              │  → ◑ PAUSED → ☕ BREAK TIME
+│ Space: pause  r: reset  │  ← only when inspector focused
+│ ─────────────────────── │
+│ Recent                  │
+│ · stuck on OAuth …      │  ← last 3 breadcrumbs
+```
+
+When inspector is focused (`Shift+Tab` to reach it):
+- `Space` → pause/resume the Pomodoro
+- `r` → reset the countdown
+- `Shift+Tab` → move focus to next panel
+
 **Layout indicator** appears in the command bar: `▣ Single` / `▥ Split` / `▦ Triple`
+
 
 ### Decision Helper
 

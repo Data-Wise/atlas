@@ -792,6 +792,44 @@ The sidebar shows a compact project list at 25–28% width:
 | Navigation    | `j`/`k` or `↑`/`↓`, only fires when sidebar has focus                       |
 | Select        | `Enter` opens project in main panel                                         |
 
+**Inspector Panel (Triple mode only — right column):**
+
+Shows the selected project's detail + a live Pomodoro mini-timer:
+
+```
+┌────────────────────────┐
+│ Inspector              │  ← cyan when focused
+├────────────────────────┤
+│ 🎯 atlas               │  name (18-char trunc)
+│ node-package           │  type
+│ ● active  75% ██████░░ │  status + 8-char bar
+│ ────────────────────── │
+│ Focus                  │
+│ Implementing auth…     │  22-char trunc
+│ Next                   │
+│ · Add OAuth provider   │  up to 3 items (comma/newline split)
+│ ────────────────────── │
+│ ⏱ SESSION              │
+│ 24:10  ██████░░        │  live countdown (useEffect tick)
+│ ● FOCUSING             │  → ◑ PAUSED → ☕ BREAK TIME
+│ ────────────────────── │
+│ Recent                 │
+│ · stuck on OAuth…      │  last 3 breadcrumbs
+└────────────────────────┘
+│ Space: pause r: reset  │  only when inspector focused
+```
+
+| Feature      | Detail                                                               |
+| ------------ | -------------------------------------------------------------------- |
+| Progress bar | 8-char `████░░░░` (clamped 0-100)                                    |
+| Timer        | MM:SS countdown from `pomodoroLength` (default 25 min)               |
+| States       | `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow) |
+| `Space`      | Pause/resume (only when inspector is focused via Shift+Tab)          |
+| `r`          | Reset timer (only when paused + inspector focused)                   |
+| Empty state  | Shows "Select a project" when no project is selected                 |
+| Breadcrumbs  | Newest-first, max 3 displayed                                        |
+| Next actions | Parsed from `project.next` via comma or newline, max 3 shown         |
+
 ---
 
 ## Initialization & Templates
