@@ -225,8 +225,8 @@ describe('Real data hooks integration', () => {
     expect(src).toContain('error');
   });
 
-  it('MOCK_CRUMBS exists for breadcrumbs prop (until Increment 3)', () => {
-    expect(src).toContain('MOCK_CRUMBS');
+  it('uses useProjectStats for real stats data', () => {
+    expect(src).toContain('useProjectStats');
   });
 
   it('shows loading state when projects are being fetched', () => {
