@@ -17,7 +17,7 @@
  *      └─ InspectorPanel (28%)  — detail + Pomodoro timer
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { MainView }     from './views/MainView.js';
 import { DetailView }   from './views/DetailView.js';
@@ -53,6 +53,13 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const [stateMachine] = useState(() => createStateMachine({ initial: STATES.BROWSE }));
   const [currentView, setCurrentView] = useState<string>(STATES.BROWSE);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // Auto-select first project when data loads
+  useEffect(() => {
+    if (projects.length > 0 && !selectedProject) {
+      setSelectedProject(projects[0]);
+    }
+  }, [projects]);
 
   // ── Project stats (focus score, heatmap, streak, breadcrumbs) ──────────────
   const projectStats = useProjectStats(selectedProject?.id ?? null);
