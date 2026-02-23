@@ -35,6 +35,7 @@ import { ThemeProvider } from '../lib/ThemeContext.js';
 import { useProjects } from '../hooks/useProjects.js';
 import { useActiveSession } from '../hooks/useActiveSession.js';
 import { useProjectStats } from '../hooks/useProjectStats.js';
+import { usePendingCaptures } from '../hooks/usePendingCaptures.js';
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
@@ -55,6 +56,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   // ── Project stats (focus score, heatmap, streak, breadcrumbs) ──────────────
   const projectStats = useProjectStats(selectedProject?.id ?? null);
+  const { count: pendingCaptures } = usePendingCaptures();
 
   // ── Layout hook (Tab cycles modes, Shift+Tab cycles focus) ────────────────
   const {
@@ -194,7 +196,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                       onSelect={handleSidebarIndexChange}
                       onSelectProject={handleSidebarSelect}
                       isActive={sidebar.isActive}
-                      pendingCaptures={2}                    // mock: 2 inbox items (Increment 4)
+                      pendingCaptures={pendingCaptures}
                       activeProjectId={activeProjectId}
                     />
                   </Box>
