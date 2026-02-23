@@ -66,7 +66,8 @@ src/
 │   ├── dashboard-blessed.js # Legacy blessed dashboard
 │   ├── dashboard-ink/       # New Ink dashboard (default, v0.9.x)
 │   │   ├── components/      # App.tsx, views/, SidebarPanel, InspectorPanel
-│   │   ├── lib/             # LayoutManager.tsx, stateMachine.ts
+│   │   ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures
+│   │   ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts
 │   │   ├── types.ts         # Shared Project interface
 │   │   └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
 │   └── dashboard/           # Blessed dashboard components
@@ -288,6 +289,10 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.9.2** - Real Data Pipeline: All mock data replaced with live ~/.atlas data
+  - AtlasContext + 4 hooks (useProjects, useActiveSession, useProjectStats, usePendingCaptures)
+  - Project filtering (tmp.*, archived, duplicates), value object extraction
+  - Cross-validated dogfood tests (dual-path verification against filesystem)
 - **v0.9.1** - Visual Enhancements: Theme System, Focus Score, Sparklines, Heatmap
   - ThemeContext with 5 built-in themes (default, nord, solarized, mono, high-contrast)
   - Focus score calculation with tier classification (○◔◑◕●)
@@ -316,6 +321,16 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 - **v0.3.x** - Dashboard themes, Pomodoro
 
 ## v0.9.x Status
+
+**v0.9.2** — Real Data Pipeline (complete):
+- AtlasContext: React Context wrapping DI Container for hooks
+- useProjects: project list with focus scores, sparklines, filtering (5s poll)
+- useActiveSession: session detection + 1s elapsed timer
+- useProjectStats: heatmap, streak, breadcrumbs for selected project (10s poll)
+- usePendingCaptures: inbox count from CaptureRepository (10s poll)
+- Project filtering: removes tmp.*, archived, deduplicates by name
+- Value object extraction: ProjectType → string, metadata bag → primitives
+- Cross-validated dogfood tests: dual-path verification (code vs filesystem oracle)
 
 **v0.9.1** — Visual Enhancements (complete):
 - ThemeContext: 5 themes with ThemeProvider/useTheme hook

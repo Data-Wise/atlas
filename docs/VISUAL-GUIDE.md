@@ -329,14 +329,20 @@ const stats = await getSessionStats.execute({ days: 91 });
 const grid = formatHeatmapGrid(stats.dailyBreakdown, { weeks: 13 });
 ```
 
-### Dashboard Mock Data
+### Dashboard Real Data Pipeline (v0.9.2)
 
-Currently the dashboard uses mock data in `App.tsx`. To wire real data:
+The dashboard uses real data from `~/.atlas` via four React hooks:
 
-1. Call `GetSessionStatsUseCase` on dashboard mount
-2. Pass `stats.focusScore` to `InspectorPanel` and sidebar project data
-3. Pass `formatHeatmapGrid(stats.dailyBreakdown)` to `InspectorPanel` and `EcosystemView`
-4. Pass `projectSparklineData(sessions, projectName)` to sidebar rows
+| Hook | Data | Poll |
+|------|------|------|
+| `useProjects` | Project list + focus scores + sparklines | 5s |
+| `useActiveSession` | Active session detection + elapsed timer | 5s + 1s tick |
+| `useProjectStats` | Heatmap, streak, breadcrumbs for selected project | 10s |
+| `usePendingCaptures` | Inbox count from CaptureRepository | 10s |
+
+All hooks access the DI Container via `AtlasContext` (React Context wrapping `Container.js`).
+Projects are filtered to remove `tmp.*` junk, archived entries, and duplicates.
+Domain value objects (`ProjectType`) are extracted to primitives before rendering.
 
 ---
 

@@ -182,10 +182,16 @@ src/
 │   │   │       ├── TimelineView.tsx # Time blocks (TIMELINE)
 │   │   │       ├── EcosystemView.tsx # Multi-project + compact heatmap
 │   │   │       └── PlanView.tsx    # Morning ritual (PLAN)
+│   │   ├── hooks/                     # ✨ Real data hooks (v0.9.2)
+│   │   │   ├── useProjects.ts        # Project list + focus/sparkline (5s poll)
+│   │   │   ├── useActiveSession.ts   # Session detection + 1s timer
+│   │   │   ├── useProjectStats.ts    # Heatmap, streak, breadcrumbs (10s poll)
+│   │   │   └── usePendingCaptures.ts # Inbox count (10s poll)
 │   │   ├── lib/
-│   │   │   ├── LayoutManager.tsx   # ✨ Layout engine: SINGLE/SPLIT/TRIPLE
-│   │   │   ├── ThemeContext.tsx     # ✨ 5 themes + ThemeProvider (v0.9.1)
-│   │   │   └── stateMachine.ts     # View state machine
+│   │   │   ├── AtlasContext.tsx       # ✨ React Context for DI Container (v0.9.2)
+│   │   │   ├── LayoutManager.tsx      # ✨ Layout engine: SINGLE/SPLIT/TRIPLE
+│   │   │   ├── ThemeContext.tsx        # ✨ 5 themes + ThemeProvider (v0.9.1)
+│   │   │   └── stateMachine.ts        # View state machine
 │   │   ├── types.ts               # Shared Project type (+ focusScore, recentActivity)
 │   │   └── constants.ts           # STATUS_ICON, STATUS_COLOR maps
 │   └── dashboard/              # Legacy blessed components
@@ -860,7 +866,16 @@ test/integration/dashboard-ink/
 ├── layoutManager.test.js   # 30 tests — LayoutManager D1
 ├── sidebarPanel.test.js    # 35 tests — SidebarPanel D2
 ├── inspectorPanel.test.js  # 40 tests — InspectorPanel D3
+├── app.test.js             # ✨ Source contract tests (hooks wired, no mocks)
 └── view-transitions.test.js # State machine transitions
+```
+
+**v0.9.2 dogfood tests (real data, cross-validated):**
+```
+test/dogfood/dashboard-ink/
+├── basic-functionality.sh     # 10 tests — file structure, deps, no mock data
+├── real-data-pipeline.sh      # 15 tests — dual-path cross-validated pipeline
+└── interactive.sh             # 7-section guided manual walkthrough
 ```
 
 ## Performance Considerations
