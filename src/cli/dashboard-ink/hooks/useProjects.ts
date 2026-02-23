@@ -70,15 +70,20 @@ export function useProjects(): UseProjectsResult {
 
             const sparkline = projectSparklineData(sessions, dp.name, 5);
 
+            // Domain Project uses value objects and metadata — extract primitives
+            const typeStr = typeof dp.type === 'string' ? dp.type
+              : dp.type?.value ?? dp.type?._value ?? String(dp.type ?? 'unknown');
+            const meta = dp.metadata ?? {};
+
             return {
               id: dp.id,
               name: dp.name,
-              type: dp.type ?? 'unknown',
-              status: dp.status ?? 'unknown',
-              progress: dp.progress ?? 0,
-              focus: dp.focus,
+              type: typeStr,
+              status: meta.status ?? dp.status ?? 'unknown',
+              progress: meta.progress ?? dp.progress ?? 0,
+              focus: meta.focus ?? dp.focus,
               path: dp.path,
-              next: dp.next,
+              next: meta.next ?? dp.next,
               recentActivity: sparkline,
               focusScore,
               focusTier,
