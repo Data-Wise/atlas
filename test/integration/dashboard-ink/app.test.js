@@ -14,15 +14,15 @@
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import { jest } from '@jest/globals';
-const require = createRequire(import.meta.url);
+const require1 = createRequire(import.meta.url);
 
-const fs   = require('fs');
-const path = require('path');
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs   = require1('fs');
+const path = require1('path');
+const testFilePath = fileURLToPath(import.meta.url);
+const testDirPath = path.dirname(testFilePath);
 
 const APP_SRC = path.resolve(
-  __dirname,
+  testDirPath,
   '../../../src/cli/dashboard-ink/components/App.tsx'
 );
 
@@ -119,7 +119,7 @@ describe('SidebarPanel wiring in App.tsx', () => {
   });
 
   it('passes projects prop', () => {
-    expect(src).toContain('projects={MOCK_PROJECTS}');
+    expect(src).toContain('projects={projects}');
   });
 
   it('passes selectedIndex (controlled)', () => {
@@ -208,32 +208,29 @@ describe('Sidebar sync logic', () => {
   });
 });
 
-// ─── 6. MOCK_PROJECTS shape ───────────────────────────────────────────────────
+// ─── 6. Real data hooks integration ──────────────────────────────────────────
 
-describe('MOCK_PROJECTS data shape', () => {
-  /**
-   * Parse MOCK_PROJECTS out of source — verify minimum required fields
-   * exist by checking field names appear in the constant blocks.
-   */
-  const requiredFields = ['id', 'name', 'type', 'status', 'progress', 'focus', 'path'];
-
-  requiredFields.forEach(field => {
-    it(`MOCK_PROJECTS contains '${field}' field`, () => {
-      expect(src).toContain(`${field}:`);
-    });
+describe('Real data hooks integration', () => {
+  it('imports useProjects hook', () => {
+    expect(src).toContain('useProjects');
   });
 
-  it('MOCK_PROJECTS has a \'next\' field (for InspectorPanel next-actions)', () => {
-    expect(src).toContain('next:');
+  it('calls useProjects() for project data', () => {
+    expect(src).toContain('useProjects()');
   });
 
-  it('MOCK_CRUMBS exists for breadcrumbs prop', () => {
-    expect(src).toContain('MOCK_CRUMBS');
+  it('destructures projects, loading, error from useProjects', () => {
+    expect(src).toContain('projects');
+    expect(src).toContain('loading');
+    expect(src).toContain('error');
   });
 
-  it('has at least 3 projects (enough for windowing demo)', () => {
-    const matches = (src.match(/id:/g) || []).length;
-    expect(matches).toBeGreaterThanOrEqual(3);
+  it('uses useProjectStats for real stats data', () => {
+    expect(src).toContain('useProjectStats');
+  });
+
+  it('shows loading state when projects are being fetched', () => {
+    expect(src).toContain('Loading projects');
   });
 });
 
