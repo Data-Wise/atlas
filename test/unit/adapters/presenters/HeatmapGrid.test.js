@@ -118,10 +118,17 @@ describe('formatHeatmapGrid', () => {
   })
 
   it('should handle date alignment correctly (Mon=row 0, Sun=row 6)', () => {
-    // Create a known Monday
-    const monday = new Date('2026-02-16') // This is a Monday
+    // Use a recent Monday that falls within the grid window
+    // Find the most recent Monday
+    const today = new Date()
+    const dayOfWeek = today.getDay() // 0=Sun
+    const daysBack = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Mon = 0 days back from Mon
+    const recentMonday = new Date(today)
+    recentMonday.setDate(today.getDate() - daysBack)
+    const dateStr = recentMonday.toISOString().split('T')[0]
+
     const dailyBreakdown = [{
-      date: '2026-02-16',
+      date: dateStr,
       dayName: 'Mon',
       sessions: 1,
       minutes: 60,
