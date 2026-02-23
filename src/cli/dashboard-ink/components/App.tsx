@@ -17,8 +17,8 @@
  *      └─ InspectorPanel (28%)  — detail + Pomodoro timer
  */
 
-import React, { useState } from 'react';
-import { Box } from 'ink';
+import React, { useState, useEffect } from 'react';
+import { Box, Text } from 'ink';
 import { MainView }     from './views/MainView.js';
 import { DetailView }   from './views/DetailView.js';
 import { FocusView }    from './views/FocusView.js';
@@ -32,107 +32,38 @@ import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
 import { ThemeProvider } from '../lib/ThemeContext.js';
-
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const MOCK_PROJECTS: Project[] = [
-  {
-    id: '1',
-    name: 'atlas',
-    type: 'node-package',
-    status: 'active',
-    progress: 100,
-    focus: 'v0.9.1 Multi-Panel Dashboard',
-    path: '/Users/dt/projects/dev-tools/atlas',
-    next: 'Wire panels into App.tsx, Run integration tests',
-    recentActivity: [20, 35, 60, 80, 90],
-    focusScore: 75,
-    focusTier: { symbol: '◕', color: 'green', label: 'strong' },
-  },
-  {
-    id: '2',
-    name: 'flow-cli',
-    type: 'zsh-package',
-    status: 'stable',
-    progress: 95,
-    focus: 'Maintenance mode',
-    path: '/Users/dt/projects/dev-tools/flow-cli',
-    recentActivity: [60, 40, 25, 15, 10],
-    focusScore: 40,
-    focusTier: { symbol: '◑', color: 'cyan', label: 'steady' },
-  },
-  {
-    id: '3',
-    name: 'mcp-server-statistical-research',
-    type: 'mcp-server',
-    status: 'active',
-    progress: 80,
-    focus: 'Add Zotero integration',
-    path: '/Users/dt/projects/dev-tools/mcp-servers/statistical-research',
-    next: 'Implement citation endpoint',
-    recentActivity: [40, 40, 50, 60, 55],
-    focusScore: 90,
-    focusTier: { symbol: '●', color: 'greenBright', label: 'deep' },
-  },
-  {
-    id: '4',
-    name: 'rmediation',
-    type: 'r-package',
-    status: 'paused',
-    progress: 60,
-    focus: 'CRAN submission prep',
-    path: '/Users/dt/projects/r-packages/rmediation',
-    next: 'Complete documentation, Add vignette',
-    recentActivity: [10, 5, 0, 15, 30],
-    focusScore: 25,
-    focusTier: { symbol: '◔', color: 'yellow', label: 'warming' },
-  },
-  {
-    id: '5',
-    name: 'causal-inference',
-    type: 'teaching',
-    status: 'active',
-    progress: 45,
-    focus: 'Week 3 lecture materials',
-    path: '/Users/dt/projects/teaching/causal-inference',
-    next: 'Record lecture video',
-    recentActivity: [25, 0, 0, 0, 0],
-    focusScore: 10,
-    focusTier: { symbol: '○', color: 'gray', label: 'drift' },
-  },
-];
-
-// Mock breadcrumbs for the inspector (would come from atlas.context.trail() in production)
-const MOCK_CRUMBS = [
-  'wiring App.tsx — Tab/Shift+Tab tested, panels visible',
-  'InspectorPanel timer resets correctly on session change',
-  'SidebarPanel windowing: 12-row limit verified',
-];
-
-// Mock heatmap grid (7 rows × 13 cols) — would come from formatHeatmapGrid(dailyBreakdown) in production
-function generateMockHeatmapGrid(): Array<Array<{ date: string; value: number; level: number }>> {
-  const grid: Array<Array<{ date: string; value: number; level: number }>> = [];
-  for (let row = 0; row < 7; row++) {
-    const cols: Array<{ date: string; value: number; level: number }> = [];
-    for (let col = 0; col < 13; col++) {
-      // Simulate increasing activity towards recent weeks
-      const base = Math.random() * (col / 13) * 4;
-      const level = Math.min(4, Math.round(base));
-      cols.push({ date: '', value: level * 15, level });
-    }
-    grid.push(cols);
-  }
-  return grid;
-}
-const MOCK_HEATMAP_GRID = generateMockHeatmapGrid();
+import { useProjects } from '../hooks/useProjects.js';
+import { useActiveSession } from '../hooks/useActiveSession.js';
+import { useProjectStats } from '../hooks/useProjectStats.js';
+import { usePendingCaptures } from '../hooks/usePendingCaptures.js';
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
+  // ── Real data hooks ─────────────────────────────────────────────────────────
+  const { projects, loading, error } = useProjects();
+  const { projectName: activeProjectName, elapsed: sessionSeconds, isActive: hasActiveSession } = useActiveSession();
+
+  // Derive activeProjectId from the active session's project name
+  const activeProjectId = hasActiveSession
+    ? projects.find(p => p.name === activeProjectName)?.id ?? null
+    : null;
+
   // ── State machine ──────────────────────────────────────────────────────────
   const [stateMachine] = useState(() => createStateMachine({ initial: STATES.BROWSE }));
   const [currentView, setCurrentView] = useState<string>(STATES.BROWSE);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(MOCK_PROJECTS[0]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // Auto-select first project when data loads
+  useEffect(() => {
+    if (projects.length > 0 && !selectedProject) {
+      setSelectedProject(projects[0]);
+    }
+  }, [projects]);
+
+  // ── Project stats (focus score, heatmap, streak, breadcrumbs) ──────────────
+  const projectStats = useProjectStats(selectedProject?.id ?? null);
+  const { count: pendingCaptures } = usePendingCaptures();
 
   // ── Layout hook (Tab cycles modes, Shift+Tab cycles focus) ────────────────
   const {
@@ -207,7 +138,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const handleSidebarIndexChange = (idx: number) => {
     setSidebarIndex(idx);
     // Keep inspector in sync even without Enter
-    setSelectedProject(MOCK_PROJECTS[idx] ?? null);
+    setSelectedProject(projects[idx] ?? null);
   };
 
   // ── Current view renderer ─────────────────────────────────────────────────
@@ -217,7 +148,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         return <PlanView onBack={showMainView} onQuit={onExit} onStartSession={showFocusView} />;
 
       case STATES.ECOSYSTEM:
-        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} heatmapGrid={MOCK_HEATMAP_GRID} streakDays={4} totalSessions={23} />;
+        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} heatmapGrid={projectStats.heatmapGrid} streakDays={projectStats.streakDays} totalSessions={projectStats.totalSessions} />;
 
       case STATES.TIMELINE:
         return <TimelineView onBack={showMainView} onQuit={onExit} onFocus={showFocusView} />;
@@ -235,9 +166,12 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
       case STATES.BROWSE:
       default:
+        if (loading && projects.length === 0) {
+          return <Box padding={1}><Text dimColor>Loading projects...</Text></Box>;
+        }
         return (
           <MainView
-            projects={MOCK_PROJECTS}
+            projects={projects}
             onQuit={onExit}
             onSelectProject={showDetailView}
             onFocus={showFocusView}
@@ -264,13 +198,13 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                 {sidebar && (
                   <Box width={`${sidebar.widthPct}%`} height="100%">
                     <SidebarPanel
-                      projects={MOCK_PROJECTS}
+                      projects={projects}
                       selectedIndex={sidebarIndex}
                       onSelect={handleSidebarIndexChange}
                       onSelectProject={handleSidebarSelect}
                       isActive={sidebar.isActive}
-                      pendingCaptures={2}                    // mock: 2 inbox items
-                      activeProjectId={MOCK_PROJECTS[0].id} // mock: atlas has active session
+                      pendingCaptures={pendingCaptures}
+                      activeProjectId={activeProjectId}
                     />
                   </Box>
                 )}
@@ -286,12 +220,12 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
                     <InspectorPanel
                       project={selectedProject ?? undefined}
                       isActive={inspector.isActive}
-                      sessionSeconds={300}        // mock: 5 min into session
+                      sessionSeconds={sessionSeconds}
                       pomodoroLength={25}
-                      breadcrumbs={MOCK_CRUMBS}
-                      heatmapGrid={MOCK_HEATMAP_GRID}
-                      streakDays={4}
-                      totalSessions={23}
+                      breadcrumbs={projectStats.breadcrumbs}
+                      heatmapGrid={projectStats.heatmapGrid}
+                      streakDays={projectStats.streakDays}
+                      totalSessions={projectStats.totalSessions}
                     />
                   </Box>
                 )}

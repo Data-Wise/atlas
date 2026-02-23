@@ -1,6 +1,9 @@
 import React from 'react';
 import { render } from 'ink';
 import { App } from './components/App.js';
+import { AtlasProvider } from './lib/AtlasContext.js';
+// @ts-ignore — JS module without type declarations
+import { Container } from '../../adapters/Container.js';
 
 /**
  * Ink Dashboard Entry Point
@@ -8,26 +11,34 @@ import { App } from './components/App.js';
  * React-based terminal UI for Atlas project dashboard.
  * Replaces the blessed-based dashboard with a modern, maintainable alternative.
  *
- * Features:
- * - All 7 views (BROWSE, DETAIL, FOCUS, ZEN, TIMELINE, ECOSYSTEM, PLAN)
- * - State machine for view transitions
- * - Keyboard navigation (j/k, Enter, f, z, T, e, p, q)
- * - 75% code reduction vs blessed version
+ * The dashboard creates its own Container since it runs as a child process
+ * (spawned via npx tsx). The AtlasProvider makes the container available
+ * to all hooks via React Context.
  */
 
 /**
  * Run the Ink dashboard
  *
- * @param {Object} atlas - Atlas container instance (not used in POC, uses mock data)
+ * @param {Object} atlas - Atlas instance (container extracted if available)
  * @returns {Promise<void>}
  */
-export async function runDashboard(atlas) {
-  const { waitUntilExit } = render(<App onExit={() => process.exit(0)} />);
+export async function runDashboard(atlas?: any) {
+  const container = atlas?.container ?? new Container();
+  const { waitUntilExit } = render(
+    <AtlasProvider container={container}>
+      <App onExit={() => process.exit(0)} />
+    </AtlasProvider>
+  );
   await waitUntilExit();
 }
 
 // Allow direct execution for testing
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const { waitUntilExit } = render(<App onExit={() => process.exit(0)} />);
+  const container = new Container();
+  const { waitUntilExit } = render(
+    <AtlasProvider container={container}>
+      <App onExit={() => process.exit(0)} />
+    </AtlasProvider>
+  );
   await waitUntilExit();
 }

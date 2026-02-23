@@ -804,9 +804,9 @@ capture.getAge();                // "2 hours ago"
 
 ---
 
-## TUI Component APIs (v0.9.1)
+## TUI Component APIs (v0.9.2)
 
-The v0.9.1 Ink dashboard exposes typed React components and hooks for building custom layouts.
+The Ink dashboard exposes typed React components and hooks for building custom layouts.
 
 ### useLayout() hook
 
@@ -893,6 +893,76 @@ interface InspectorProject {
 - States: `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow)
 - `Space` toggles pause, `r` resets (both guarded by `isActive`)
 - Timer resets automatically when `sessionSeconds` prop changes
+
+### AtlasContext (v0.9.2)
+
+React Context that provides the DI Container to all dashboard hooks:
+
+```typescript
+import { AtlasProvider, useAtlas } from '../lib/AtlasContext';
+import { Container } from '../../adapters/Container';
+
+// Wrap App at the top level
+const container = new Container();
+<AtlasProvider container={container}>
+  <App />
+</AtlasProvider>
+
+// Access in any child component
+function MyComponent() {
+  const container = useAtlas();
+  const repo = container.getProjectRepository();
+}
+```
+
+### Data Hooks (v0.9.2)
+
+Four hooks replace all mock data with live polling from `~/.atlas`:
+
+**`useProjects()`** — Project list with enrichment (5s poll)
+
+```typescript
+import { useProjects } from '../hooks/useProjects';
+
+const { projects, loading, error } = useProjects();
+// projects: Project[] — filtered, deduplicated, enriched with focusScore + sparkline
+// Filtering: removes tmp.* junk, archived, deduplicates by name (keeps most recent)
+// Enrichment: focusScore via GetSessionStatsUseCase, sparkline via StatsPresenter
+```
+
+**`useActiveSession()`** — Session detection + 1s timer
+
+```typescript
+import { useActiveSession } from '../hooks/useActiveSession';
+
+const { projectName, elapsed, isActive } = useActiveSession();
+// projectName: string | null — name of the project with an active session
+// elapsed: number — seconds since session start (ticks every 1s)
+// isActive: boolean — whether any session is currently running
+```
+
+**`useProjectStats(projectId)`** — Stats for selected project (10s poll)
+
+```typescript
+import { useProjectStats } from '../hooks/useProjectStats';
+
+const { focusScore, heatmapGrid, breadcrumbs, streakDays, totalSessions, loading }
+  = useProjectStats(selectedProject?.id ?? null);
+// heatmapGrid: 7×13 array of { date, value, level } cells
+// breadcrumbs: string[] — last 5 breadcrumb texts
+// Returns empty defaults when projectId is null
+```
+
+**`usePendingCaptures()`** — Inbox count (10s poll)
+
+```typescript
+import { usePendingCaptures } from '../hooks/usePendingCaptures';
+
+const { count } = usePendingCaptures();
+// count: number — unprocessed captures in inbox
+```
+
+**Resilience:** All hooks use stale-while-revalidate — on error, they return the last successfully fetched data and log to stderr.
 
 ---
 
@@ -1024,9 +1094,9 @@ progressBar(75, 20); // "{green-fg}███████████████
 getStatusIcon('active');  // "{green-fg}●{/}"
 getStatusIcon('blocked'); // "{red-fg}✖{/}"
 
-// Available themes
+// Available themes (v0.9.1: default, nord, solarized, mono, high-contrast)
 console.log(themes.default.primary); // "blue"
-console.log(themes.dark.primary);    // "magenta"
+console.log(themes.nord.primary);    // "blue"
 ```
 
 ### Ink Component Status Icons (v0.9.1)
@@ -1043,6 +1113,66 @@ const STATUS_ICON = {
   planning: '○',   // blue
   blocked:  '✗',   // red
 };
+```
+
+### FocusScorePresenter (v0.9.1)
+
+Format focus scores for CLI and dashboard display:
+
+```javascript
+import {
+  formatFocusScore,
+  focusTierIcon,
+  focusTierColor,
+  focusTierLabel,
+  getTierFromScore
+} from '@data-wise/atlas/presenters';
+
+// Full display string
+formatFocusScore(72);     // "◕ 72 strong"
+formatFocusScore(15);     // "○ 15 drift"
+
+// Individual components
+focusTierIcon(85);        // "●"  (deep)
+focusTierColor(85);       // "greenBright"
+focusTierLabel(85);       // "deep"
+
+// Complete tier object
+getTierFromScore(50);
+// { symbol: '◑', label: 'steady', color: 'cyan', index: 2 }
+```
+
+**Tier thresholds:**
+
+| Score | Symbol | Label | Color |
+|-------|--------|-------|-------|
+| 80-100 | `●` | deep | greenBright |
+| 60-79 | `◕` | strong | green |
+| 40-59 | `◑` | steady | cyan |
+| 20-39 | `◔` | warming | yellow |
+| 0-19 | `○` | drift | gray |
+
+### StatsPresenter Visual Helpers (v0.9.1)
+
+Generate sparkline and heatmap data for dashboards:
+
+```javascript
+import {
+  projectSparklineData,
+  formatHeatmapGrid
+} from '@data-wise/atlas/presenters';
+
+// Sparkline: array of durations per day (oldest → newest)
+const data = projectSparklineData(sessions, 'myproject', 5);
+// { values: [0, 45, 120, 30, 90], trend: 'rising' }
+
+// Heatmap: GitHub-style grid (7 rows × N weeks)
+const grid = formatHeatmapGrid(dailyBreakdown, {
+  weeks: 13,       // default: 13 weeks
+  metric: 'minutes' // or 'sessions'
+});
+// Returns { rows: string[][], maxVal: number }
+// Cells use: '·' (none), '░' (low), '▒' (med), '▓' (high), '█' (max)
 ```
 
 ---

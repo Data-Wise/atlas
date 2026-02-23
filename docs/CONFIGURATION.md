@@ -105,16 +105,24 @@ All preferences are under the `preferences` key.
 
 #### `theme`
 
-Dashboard color theme.
+Dashboard color theme (v0.9.1). Controls all panel borders, text, sparklines, heatmap, and focus tier colors.
 
 **Type:** `string`
 **Default:** `"default"`
-**Options:** `"default"`, `"dark"`, `"minimal"`
+**Options:** `"default"`, `"nord"`, `"solarized"`, `"mono"`, `"high-contrast"`
+
+| Theme | Description |
+|-------|-------------|
+| `default` | Purple accents, warm grays — general use |
+| `nord` | Arctic blue palette — dark terminals |
+| `solarized` | Warm tans and blues — light or dark |
+| `mono` | Pure grayscale — minimal distraction |
+| `high-contrast` | Maximum readability — accessibility |
 
 ```json
 {
   "preferences": {
-    "theme": "minimal"
+    "theme": "nord"
   }
 }
 ```

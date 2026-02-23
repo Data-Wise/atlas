@@ -132,7 +132,9 @@ Start dashboard: `atlas dash`
 | `?`         | Show help                                        |
 | `q`         | Quit                                             |
 
-**v0.9.1 Multi-Panel Layout Modes:**
+**v0.9.2 — Live data from `~/.atlas` via 4 React hooks (projects 5s, session 1s tick, stats 10s)**
+
+**Multi-Panel Layout Modes:**
 
 | Key        | Mode       | Layout                                 |
 | ---------- | ---------- | -------------------------------------- |
@@ -141,18 +143,22 @@ Start dashboard: `atlas dash`
 | `Tab` (3×) | `▦ Triple` | Sidebar 25% + Main 47% + Inspector 28% |
 
 **Sidebar panel (Split/Triple):**
-- Compact rows: `● atlas   75%` — icon + name + progress
+- Compact rows: `● atlas  75% ▂▃▅▇█` — focus tier + name + progress + sparkline
+- Focus tier icons: `●` deep (80+) • `◕` strong (60-79) • `◑` steady (40-59) • `◔` warming (20-39) • `○` drift (0-19)
+- Sparklines: 5-day activity `▁▂▃▄▅▆▇█` — green=rising, yellow=declining
 - `⏱` badge on row with active session
 - `📥N` inbox count in header when captures pending
 - `j/k` navigate when focused • `Enter` opens project detail
-- `Shift+Tab` to move keyboard focus between panels
 
 **Inspector panel (Triple only):**
-- Name + type + status bar + 8-char progress bar
+- Name + type + status bar + focus score (`◕ 72 strong`)
 - Focus text + up to 3 Next actions
 - Live Pomodoro mini-timer: `● FOCUSING` → `◑ PAUSED` → `☕ BREAK`
+- Activity heatmap: 7-day × 13-week grid using `· ░ ▒ ▓ █` (theme-colored)
+- Streak + best day summary line
 - `Space` pause/resume • `r` reset (when inspector focused)
-- Last 3 breadcrumbs
+
+**Themes (v0.9.1):** Press `t` to cycle: default → nord → solarized → mono → high-contrast
 
 **v0.8.0 Views:**
 - `e` - Ecosystem: See all dev-tools projects from .STATUS files
@@ -278,5 +284,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.9.1 | Made for ADHD brains</em>
+<em>Atlas v0.9.2 | Made for ADHD brains</em>
 </div>

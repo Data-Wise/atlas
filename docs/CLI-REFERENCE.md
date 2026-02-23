@@ -766,6 +766,19 @@ Press `p` to enter the morning planning ritual:
 - Smart suggestions based on history
 - Helps start the day with intention
 
+**Real Data (v0.9.2):**
+
+The dashboard displays live data from `~/.atlas` via 4 React hooks with automatic polling:
+
+| Data | Hook | Refresh |
+|------|------|---------|
+| Project list + focus scores | `useProjects` | 5s |
+| Active session + elapsed timer | `useActiveSession` | 5s + 1s tick |
+| Heatmap, streak, breadcrumbs | `useProjectStats` | 10s |
+| Inbox count | `usePendingCaptures` | 10s |
+
+Projects are filtered to remove temporary directories (`tmp.*`), archived entries, and duplicates.
+
 **Multi-Panel Layout (v0.9.1):**
 
 Press `Tab` to cycle through three layout modes:

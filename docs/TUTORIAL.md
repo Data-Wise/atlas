@@ -366,6 +366,10 @@ Press `T` (Shift+T) to see today's sessions visualized:
 
 Press `Esc` to return to the main view.
 
+### Real Data Dashboard (v0.9.2)
+
+The dashboard displays **live data** from your `~/.atlas` directory. Projects, sessions, captures, and breadcrumbs are fetched automatically and refreshed on a polling schedule (projects every 5s, stats every 10s). Temporary and archived projects are filtered out, so you only see what matters.
+
 ### Multi-Panel Layout (v0.9.1)
 
 Press `Tab` to cycle through three layout modes without leaving the dashboard:

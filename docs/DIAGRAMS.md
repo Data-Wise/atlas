@@ -850,6 +850,189 @@ graph TB
 - **SPLIT:** Sidebar (28%) + Main (72%)
 - **TRIPLE:** Sidebar (25%) + Main (47%) + Inspector (28%)
 
+## 14. Visual Pipeline (v0.9.1)
+
+Shows how session data flows through the visual enhancement layers:
+
+```mermaid
+flowchart TB
+    subgraph Data["Data Sources"]
+        Sessions["Session History"]
+        Streak["Streak Calculator"]
+    end
+
+    subgraph Domain["Domain Layer"]
+        FocusCalc["calculateFocusScore()<br/>GetSessionStatsUseCase"]
+    end
+
+    subgraph Presenters["Presenter Layer"]
+        FocusPres["FocusScorePresenter<br/>formatFocusScore() · focusTierIcon()"]
+        SparkPres["StatsPresenter<br/>projectSparklineData()"]
+        HeatPres["StatsPresenter<br/>formatHeatmapGrid()"]
+    end
+
+    subgraph Theme["Theme System"]
+        ThemeCtx["ThemeContext.tsx<br/>ThemeProvider · useTheme()"]
+        Themes["5 Themes<br/>default · nord · solarized<br/>mono · high-contrast"]
+    end
+
+    subgraph UI["Dashboard Components"]
+        Sidebar["SidebarPanel<br/>Focus tier icon + sparkline"]
+        Inspector["InspectorPanel<br/>Focus score + heatmap"]
+        Ecosystem["EcosystemView<br/>Compact heatmap"]
+        Stats["atlas stats CLI<br/>Focus score line"]
+    end
+
+    Sessions --> FocusCalc
+    Streak --> FocusCalc
+    Sessions --> SparkPres
+    Sessions --> HeatPres
+    FocusCalc --> FocusPres
+
+    FocusPres --> Sidebar
+    FocusPres --> Inspector
+    FocusPres --> Stats
+    SparkPres --> Sidebar
+    HeatPres --> Inspector
+    HeatPres --> Ecosystem
+
+    ThemeCtx --> Sidebar
+    ThemeCtx --> Inspector
+    ThemeCtx --> Ecosystem
+    Themes --> ThemeCtx
+
+    style Data fill:#fff3cd
+    style Domain fill:#f3e5f5
+    style Presenters fill:#e8f5e9
+    style Theme fill:#e1f5ff
+    style UI fill:#fce4ec
+```
+
+**Key design decisions:**
+- Theme is pure React Context — no prop drilling
+- Presenters are framework-agnostic (used by both CLI and TUI)
+- All visual data derived from one `GetSessionStatsUseCase` fetch
+- Never use red — ADHD-friendly design principle
+
+---
+
+## 15. Real Data Pipeline (v0.9.2)
+
+Shows how the Ink dashboard fetches, filters, enriches, and renders real data from `~/.atlas`:
+
+```mermaid
+flowchart TB
+    subgraph Storage["~/.atlas (Filesystem / SQLite)"]
+        ProjStore[("projects/\n*.json")]
+        SessStore[("sessions/\n*.json")]
+        CapStore[("captures/\n*.json")]
+        CrumbStore[("breadcrumbs/\n*.json")]
+    end
+
+    subgraph Container["DI Container (Container.js)"]
+        ProjRepo["getProjectRepository()"]
+        SessRepo["getSessionRepository()"]
+        CapRepo["getCaptureRepository()"]
+        CrumbRepo["getBreadcrumbRepository()"]
+        StatsUC["getGetSessionStatsUseCase()"]
+    end
+
+    subgraph Context["React Context"]
+        AtlasCtx["AtlasContext.tsx\nAtlasProvider wraps App\nuseAtlas() → Container"]
+    end
+
+    subgraph Hooks["Data Hooks (polling)"]
+        direction TB
+        HP["useProjects\n⏱ 5s poll"]
+        HA["useActiveSession\n⏱ 5s poll + 1s tick"]
+        HS["useProjectStats\n⏱ 10s poll"]
+        HC["usePendingCaptures\n⏱ 10s poll"]
+    end
+
+    subgraph Filter["useProjects Pipeline"]
+        direction TB
+        FetchAll["findAll()  →  196 raw"]
+        FilterJunk["isDisplayableProject()\nremove tmp.* + archived"]
+        Dedup["deduplicateByName()\nkeep most recent"]
+        Enrich["Enrich each project:\n• focusScore via StatsUseCase\n• focusTier via FocusScorePresenter\n• sparkline via StatsPresenter"]
+        Extract["Extract primitives:\n• ProjectType → string\n• metadata.status → string\n• metadata.progress → number"]
+        Result["59 enriched Project[]"]
+    end
+
+    subgraph Presenters["Presenter Functions"]
+        FocusPres["getTierFromScore()\nFocusScorePresenter.js"]
+        SparkPres["projectSparklineData()\nStatsPresenter.js"]
+        HeatPres["formatHeatmapGrid()\nStatsPresenter.js"]
+    end
+
+    subgraph UI["Dashboard Components"]
+        App["App.tsx\n(orchestrates hooks)"]
+        Sidebar["SidebarPanel\nproject list + sparklines\n+ focus tier icons"]
+        Inspector["InspectorPanel\nheatmap + streak\n+ session timer\n+ breadcrumbs"]
+        Main["MainView / DetailView\nproject cards"]
+    end
+
+    %% Storage → Container
+    ProjStore --> ProjRepo
+    SessStore --> SessRepo
+    CapStore --> CapRepo
+    CrumbStore --> CrumbRepo
+    SessStore --> StatsUC
+
+    %% Container → Context → Hooks
+    Container --> AtlasCtx
+    AtlasCtx --> HP & HA & HS & HC
+
+    %% useProjects pipeline
+    HP --> FetchAll
+    FetchAll --> FilterJunk
+    FilterJunk --> Dedup
+    Dedup --> Enrich
+    Enrich --> Extract
+    Extract --> Result
+
+    %% Enrichment uses presenters
+    Enrich -.-> FocusPres
+    Enrich -.-> SparkPres
+
+    %% Other hooks use repos
+    HA -->|"findActive()"| SessRepo
+    HS -->|"execute({ days: 90 })"| StatsUC
+    HS -->|"findRecent()"| CrumbRepo
+    HS -.-> HeatPres
+    HC -->|"getInbox()"| CapRepo
+
+    %% Hooks → UI
+    Result --> App
+    HA --> App
+    HS --> App
+    HC --> App
+
+    App --> Sidebar
+    App --> Inspector
+    App --> Main
+
+    %% Styles
+    style Storage fill:#fff3e0,stroke:#e65100
+    style Container fill:#e1f5ff,stroke:#01579b
+    style Context fill:#e1f5ff,stroke:#01579b
+    style Hooks fill:#f3e5f5,stroke:#4a148c
+    style Filter fill:#fce4ec,stroke:#880e4f
+    style Presenters fill:#e8f5e9,stroke:#1b5e20
+    style UI fill:#e8eaf6,stroke:#283593
+```
+
+**Key design decisions (v0.9.2):**
+
+- **AtlasContext** injects the DI Container via React Context — hooks call `useAtlas()` instead of importing Container directly
+- **Polling hierarchy**: Projects 5s, Session 5s + 1s tick, Stats/Captures 10s — balances freshness vs load
+- **Stale-while-revalidate**: All hooks keep `useRef` for last-good data; on error, return stale data with error state
+- **Project filtering**: `isDisplayableProject()` removes `tmp.*` junk and archived entries, `deduplicateByName()` keeps the most recently accessed copy — reduces 196 raw entries to ~59 displayable projects
+- **Value object extraction**: Domain `ProjectType` is a value object (`{_value: "node"}`); hooks extract to primitive strings before passing to React to avoid "Objects are not valid as a React child" crashes
+- **Cross-validated dogfood tests**: Each pipeline stage is independently verified using dual-path testing (code-under-test vs filesystem oracle)
+
+---
+
 ## Diagram Reference Guide
 
 | # | Diagram | Purpose | Key Use Case |
@@ -867,6 +1050,8 @@ graph TB
 | 11 | Presenter Layer | UI formatting separation | Dashboard TUI formatting |
 | 12 | Dashboard State Machine | Ink view state transitions | Dashboard navigation |
 | 13 | Ink Component Tree | React Ink component hierarchy | TUI architecture |
+| 14 | Visual Pipeline | Theme + focus + sparkline + heatmap flow | v0.9.1 visual features |
+| 15 | Real Data Pipeline | Container → hooks → filter → enrich → render | v0.9.2 real data wiring |
 
 ---
 
