@@ -16,6 +16,39 @@ import { projectSparklineData } from '../../../adapters/presenters/StatsPresente
 
 const POLL_INTERVAL = 5000; // 5 seconds
 
+/** Filter out temp dirs, test fixtures, and archived junk from the project list */
+function isDisplayableProject(dp: any): boolean {
+  const name = dp.name ?? '';
+  const meta = dp.metadata ?? {};
+  const status = meta.status ?? '';
+
+  // Skip temp directories (e.g. tmp.4uxrRklSiL)
+  if (/^tmp\./i.test(name)) return false;
+
+  // Skip archived projects
+  if (status === 'archive' || status === 'archived') return false;
+
+  return true;
+}
+
+/** Deduplicate by name — keep the one with the most recent lastAccessedAt */
+function deduplicateByName(projects: any[]): any[] {
+  const seen = new Map<string, any>();
+  for (const p of projects) {
+    const existing = seen.get(p.name);
+    if (!existing) {
+      seen.set(p.name, p);
+    } else {
+      const existingTime = new Date(existing.lastAccessedAt ?? 0).getTime();
+      const newTime = new Date(p.lastAccessedAt ?? 0).getTime();
+      if (newTime > existingTime) {
+        seen.set(p.name, p);
+      }
+    }
+  }
+  return Array.from(seen.values());
+}
+
 interface UseProjectsResult {
   projects: Project[];
   loading: boolean;
@@ -49,11 +82,14 @@ export function useProjects(): UseProjectsResult {
 
         if (cancelled) return;
 
+        // Filter junk (tmp.*, archived) and deduplicate by name
+        const displayable = deduplicateByName(domainProjects.filter(isDisplayableProject));
+
         // Get per-project stats for focus score
         const statsUseCase = container.getGetSessionStatsUseCase();
 
         const mapped: Project[] = await Promise.all(
-          domainProjects.map(async (dp: any) => {
+          displayable.map(async (dp: any) => {
             let focusScore = 0;
             let focusTier = getTierFromScore(0);
 

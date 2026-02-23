@@ -95,7 +95,7 @@ for (const [name, type] of checks) {
 # ─── Test: ProjectRepository returns real projects ──────────────────────────────
 
 test_project_repository() {
-    log_test "ProjectRepository.findAll() returns real projects"
+    log_test "ProjectRepository.findAll() returns real projects with valid fields"
 
     run_node '
 import { Container } from "./src/adapters/Container.js";
@@ -103,7 +103,16 @@ const c = new Container();
 const repo = c.getProjectRepository();
 const projects = await repo.findAll();
 
-console.log("COUNT:" + projects.length);
+console.log("RAW_COUNT:" + projects.length);
+
+// Count junk
+const tmp = projects.filter(p => /^tmp\./i.test(p.name));
+const archived = projects.filter(p => {
+  const status = p.metadata?.status ?? "";
+  return status === "archive" || status === "archived";
+});
+console.log("TMP_COUNT:" + tmp.length);
+console.log("ARCHIVED_COUNT:" + archived.length);
 
 if (projects.length > 0) {
   const p = projects[0];
@@ -114,14 +123,19 @@ if (projects.length > 0) {
 }
 '
 
-    local count
-    count=$(echo "$NODE_OUTPUT" | grep "^COUNT:" | cut -d: -f2)
+    local raw_count tmp_count
+    raw_count=$(echo "$NODE_OUTPUT" | grep "^RAW_COUNT:" | cut -d: -f2)
+    tmp_count=$(echo "$NODE_OUTPUT" | grep "^TMP_COUNT:" | cut -d: -f2)
 
-    if [ -n "$count" ] && [ "$count" -gt 0 ]; then
-        log_pass "Found $count projects"
+    if [ -n "$raw_count" ] && [ "$raw_count" -gt 0 ]; then
+        log_pass "Repository has $raw_count total entries"
     else
-        log_fail "No projects found (COUNT=$count)" "$NODE_OUTPUT"
+        log_fail "No projects found (RAW_COUNT=$raw_count)" "$NODE_OUTPUT"
         return
+    fi
+
+    if [ -n "$tmp_count" ]; then
+        echo -e "  ${DIM}(includes $tmp_count tmp.* entries that should be filtered)${NC}"
     fi
 
     for field in HAS_ID HAS_NAME HAS_TYPE HAS_PATH; do
@@ -131,6 +145,106 @@ if (projects.length > 0) {
             log_fail "Project missing $field" "$NODE_OUTPUT"
         fi
     done
+}
+
+# ─── Test: useProjects filtering removes junk ──────────────────────────────────
+
+test_project_filtering() {
+    log_test "useProjects filtering removes tmp.*, archived, and duplicates"
+
+    run_node '
+import { Container } from "./src/adapters/Container.js";
+const c = new Container();
+const repo = c.getProjectRepository();
+const all = await repo.findAll();
+
+// Same filter logic as useProjects hook
+function isDisplayable(dp) {
+  const name = dp.name ?? "";
+  const meta = dp.metadata ?? {};
+  const status = meta.status ?? "";
+  if (/^tmp\./i.test(name)) return false;
+  if (status === "archive" || status === "archived") return false;
+  return true;
+}
+
+function dedup(projects) {
+  const seen = new Map();
+  for (const p of projects) {
+    const existing = seen.get(p.name);
+    if (!existing) {
+      seen.set(p.name, p);
+    } else {
+      const existingTime = new Date(existing.lastAccessedAt ?? 0).getTime();
+      const newTime = new Date(p.lastAccessedAt ?? 0).getTime();
+      if (newTime > existingTime) seen.set(p.name, p);
+    }
+  }
+  return Array.from(seen.values());
+}
+
+const filtered = dedup(all.filter(isDisplayable));
+
+console.log("RAW:" + all.length);
+console.log("FILTERED:" + filtered.length);
+
+// Verify no tmp.* survived
+const tmpSurvived = filtered.filter(p => /^tmp\./i.test(p.name));
+console.log("TMP_SURVIVED:" + tmpSurvived.length);
+
+// Verify no archived survived
+const archivedSurvived = filtered.filter(p => {
+  const status = p.metadata?.status ?? "";
+  return status === "archive" || status === "archived";
+});
+console.log("ARCHIVED_SURVIVED:" + archivedSurvived.length);
+
+// Verify no duplicate names
+const names = filtered.map(p => p.name);
+const uniqueNames = new Set(names);
+console.log("DUPES:" + (names.length - uniqueNames.size));
+
+// Sanity: filtered count should be reasonable (not 196)
+console.log("REASONABLE:" + (filtered.length < all.length && filtered.length > 0 && filtered.length < 100));
+
+console.log("NAMES:" + filtered.map(p => p.name).join(", "));
+'
+
+    local raw filtered
+    raw=$(echo "$NODE_OUTPUT" | grep "^RAW:" | cut -d: -f2)
+    filtered=$(echo "$NODE_OUTPUT" | grep "^FILTERED:" | cut -d: -f2)
+
+    echo -e "  ${DIM}Raw: $raw → Filtered: $filtered${NC}"
+
+    if echo "$NODE_OUTPUT" | grep -q "TMP_SURVIVED:0"; then
+        log_pass "No tmp.* projects in filtered list"
+    else
+        local survived
+        survived=$(echo "$NODE_OUTPUT" | grep "^TMP_SURVIVED:" | cut -d: -f2)
+        log_fail "$survived tmp.* projects leaked through filter"
+    fi
+
+    if echo "$NODE_OUTPUT" | grep -q "ARCHIVED_SURVIVED:0"; then
+        log_pass "No archived projects in filtered list"
+    else
+        local survived
+        survived=$(echo "$NODE_OUTPUT" | grep "^ARCHIVED_SURVIVED:" | cut -d: -f2)
+        log_fail "$survived archived projects leaked through filter"
+    fi
+
+    if echo "$NODE_OUTPUT" | grep -q "DUPES:0"; then
+        log_pass "No duplicate project names"
+    else
+        local dupes
+        dupes=$(echo "$NODE_OUTPUT" | grep "^DUPES:" | cut -d: -f2)
+        log_fail "$dupes duplicate names in filtered list"
+    fi
+
+    if echo "$NODE_OUTPUT" | grep -q "REASONABLE:true"; then
+        log_pass "Filtered count is reasonable ($filtered projects)"
+    else
+        log_fail "Filtered count looks wrong ($filtered from $raw raw)"
+    fi
 }
 
 # ─── Test: Domain value objects map to primitives ───────────────────────────────
@@ -497,7 +611,7 @@ const projectRepo = c.getProjectRepository();
 const sessionRepo = c.getSessionRepository();
 const statsUseCase = c.getGetSessionStatsUseCase();
 
-const [domainProjects, sessions] = await Promise.all([
+const [allProjects, sessions] = await Promise.all([
   projectRepo.findAll(),
   sessionRepo.list({
     since: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
@@ -505,6 +619,15 @@ const [domainProjects, sessions] = await Promise.all([
     order: "desc",
   }),
 ]);
+
+// Filter same as useProjects hook
+const domainProjects = allProjects.filter(dp => {
+  const name = dp.name ?? "";
+  const status = dp.metadata?.status ?? "";
+  if (/^tmp\./i.test(name)) return false;
+  if (status === "archive" || status === "archived") return false;
+  return true;
+});
 
 // Enrich first 5 projects (same logic as useProjects hook)
 const enriched = await Promise.all(
@@ -806,6 +929,7 @@ main() {
 
     test_container_repositories
     test_project_repository
+    test_project_filtering
     test_value_object_mapping
     test_focus_score_pipeline
     test_sparkline_pipeline
