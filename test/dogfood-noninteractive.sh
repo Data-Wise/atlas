@@ -775,12 +775,12 @@ for view in MainView DetailView FocusView ZenView TimelineView EcosystemView Pla
     "grep '$view' '$APP_SRC'" "$view"
 done
 
-# 10. MOCK_PROJECTS and breadcrumbs
-test_contains "MOCK_PROJECTS data present" \
-  "grep 'MOCK_PROJECTS' '$APP_SRC'" "MOCK_PROJECTS"
+# 10. Real data hooks (v0.9.2 — replaced mock data)
+test_contains "useProjects hook imported" \
+  "grep 'useProjects' '$APP_SRC'" "useProjects"
 
-test_contains "MOCK_CRUMBS for breadcrumbs" \
-  "grep 'MOCK_CRUMBS' '$APP_SRC'" "MOCK_CRUMBS"
+test_contains "useActiveSession hook imported" \
+  "grep 'useActiveSession' '$APP_SRC'" "useActiveSession"
 
 test_contains "pendingCaptures prop set" \
   "grep 'pendingCaptures' '$APP_SRC'" "pendingCaptures"
