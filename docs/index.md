@@ -144,15 +144,15 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.9.1
+## :sparkles: What's New in v0.9.2
 
-!!! success "Visual Enhancements"
-    Rich visual feedback across the entire dashboard:
+!!! success "Real Data Pipeline"
+    The dashboard now displays **live data** from `~/.atlas` — all mock data removed:
 
-    - **Theme System**: 5 built-in themes (default, nord, solarized, mono, high-contrast) — press `t` to cycle
-    - **Focus Score**: Weighted quality metric (○◔◑◕●) with tier classification
-    - **Sparklines**: Inline activity charts (▁▂▃▅█) in sidebar rows with trend coloring
-    - **Activity Heatmap**: GitHub-style grid (·░▒▓█) in InspectorPanel and EcosystemView
+    - **4 React Hooks**: `useProjects`, `useActiveSession`, `useProjectStats`, `usePendingCaptures`
+    - **AtlasContext**: DI Container injected via React Context for clean data access
+    - **Smart Filtering**: Removes tmp.* junk, archived projects, and duplicates (196 raw → ~59 displayed)
+    - **Polling**: Projects 5s, Session 5s + 1s tick, Stats/Captures 10s
 
 !!! tip "Focus Score & Tiers"
     Understand your work quality at a glance:
@@ -172,7 +172,7 @@ atlas dash
     - **Compact mode** (EcosystemView): 4 rows — Mon/Wed/Fri/Sat
     - Shows streak, total sessions, and best day summary
 
-!!! note "Theme System"
+!!! note "Theme System (v0.9.1)"
     Five color themes optimized for terminal readability:
 
     - `default` — Purple accents, warm grays
@@ -182,6 +182,7 @@ atlas dash
     - `high-contrast` — Maximum readability
 
 ??? note "Previous Releases"
+    - **v0.9.1**: Visual Enhancements — themes, focus score, sparklines, heatmap
     - **v0.9.0**: Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
     - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View

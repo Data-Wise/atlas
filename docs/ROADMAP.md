@@ -6,15 +6,15 @@
 
 ---
 
-## Current Version: v0.9.1
+## Current Version: v0.9.2
 
-Visual Enhancements — themes, focus score, sparklines, activity heatmap.
+Real Data Pipeline — all mock data replaced with live `~/.atlas` data via React hooks.
 
 ---
 
-## v0.9.x - Visual Evolution ✅ COMPLETE
+## v0.9.x - Visual Evolution & Real Data ✅ COMPLETE
 
-**Theme:** Technical debt reduction, then visual enhancements
+**Theme:** Technical debt reduction, visual enhancements, real data wiring
 
 ### Sprint 1: TUI Modernization 🔧 ✅ COMPLETE (6/6)
 - [x] Evaluate blessed alternatives (ink, terminal-kit, neo-blessed) ✅
@@ -34,7 +34,15 @@ Visual Enhancements — themes, focus score, sparklines, activity heatmap.
 - [x] **Sidebar sparklines** — inline activity charts with trend coloring ✅
 - [x] **Activity heatmap** — GitHub-style grid in full and compact modes ✅
 
-**Branch:** `feature/visual-enhancements`
+### Sprint 3: Real Data Pipeline 🔌 ✅ COMPLETE (6/6)
+- [x] **AtlasContext** — React Context wrapping DI Container ✅
+- [x] **useProjects** — project list with focus scores, sparklines, filtering (5s poll) ✅
+- [x] **useActiveSession** — session detection + 1s elapsed timer ✅
+- [x] **useProjectStats** — heatmap, streak, breadcrumbs (10s poll) ✅
+- [x] **usePendingCaptures** — inbox count from CaptureRepository (10s poll) ✅
+- [x] **Project filtering** — removes tmp.*, archived, deduplicates by name ✅
+
+**Branch:** `feature/ink-real-data`
 
 ---
 
@@ -87,12 +95,9 @@ Visual Enhancements — themes, focus score, sparklines, activity heatmap.
 ## Completed Milestones
 
 ### v0.9.x Series
-- [x] v0.9.0 Sprint 1: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
-- [x] v0.9.1 D1-D4: Multi-panel layout (LayoutManager, SidebarPanel, InspectorPanel, wiring)
-- [x] v0.9.1 Visual: Theme system — 5 built-in themes, ThemeProvider, useTheme hook
-- [x] v0.9.1 Visual: Focus score — weighted formula, 5-tier classification
-- [x] v0.9.1 Visual: Sidebar sparklines — 5-day activity charts with trend coloring
-- [x] v0.9.1 Visual: Activity heatmap — GitHub-style grid, full + compact modes \u2705
+- [x] v0.9.2: Real Data Pipeline — AtlasContext + 4 hooks, project filtering, cross-validated dogfood tests
+- [x] v0.9.1: Visual Enhancements — themes, focus score, sparklines, heatmap
+- [x] v0.9.0: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
 
 ### v0.8.x Series
 - [x] v0.8.0: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation

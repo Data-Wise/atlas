@@ -804,9 +804,9 @@ capture.getAge();                // "2 hours ago"
 
 ---
 
-## TUI Component APIs (v0.9.1)
+## TUI Component APIs (v0.9.2)
 
-The v0.9.1 Ink dashboard exposes typed React components and hooks for building custom layouts.
+The Ink dashboard exposes typed React components and hooks for building custom layouts.
 
 ### useLayout() hook
 
@@ -893,6 +893,76 @@ interface InspectorProject {
 - States: `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow)
 - `Space` toggles pause, `r` resets (both guarded by `isActive`)
 - Timer resets automatically when `sessionSeconds` prop changes
+
+### AtlasContext (v0.9.2)
+
+React Context that provides the DI Container to all dashboard hooks:
+
+```typescript
+import { AtlasProvider, useAtlas } from '../lib/AtlasContext';
+import { Container } from '../../adapters/Container';
+
+// Wrap App at the top level
+const container = new Container();
+<AtlasProvider container={container}>
+  <App />
+</AtlasProvider>
+
+// Access in any child component
+function MyComponent() {
+  const container = useAtlas();
+  const repo = container.getProjectRepository();
+}
+```
+
+### Data Hooks (v0.9.2)
+
+Four hooks replace all mock data with live polling from `~/.atlas`:
+
+**`useProjects()`** — Project list with enrichment (5s poll)
+
+```typescript
+import { useProjects } from '../hooks/useProjects';
+
+const { projects, loading, error } = useProjects();
+// projects: Project[] — filtered, deduplicated, enriched with focusScore + sparkline
+// Filtering: removes tmp.* junk, archived, deduplicates by name (keeps most recent)
+// Enrichment: focusScore via GetSessionStatsUseCase, sparkline via StatsPresenter
+```
+
+**`useActiveSession()`** — Session detection + 1s timer
+
+```typescript
+import { useActiveSession } from '../hooks/useActiveSession';
+
+const { projectName, elapsed, isActive } = useActiveSession();
+// projectName: string | null — name of the project with an active session
+// elapsed: number — seconds since session start (ticks every 1s)
+// isActive: boolean — whether any session is currently running
+```
+
+**`useProjectStats(projectId)`** — Stats for selected project (10s poll)
+
+```typescript
+import { useProjectStats } from '../hooks/useProjectStats';
+
+const { focusScore, heatmapGrid, breadcrumbs, streakDays, totalSessions, loading }
+  = useProjectStats(selectedProject?.id ?? null);
+// heatmapGrid: 7×13 array of { date, value, level } cells
+// breadcrumbs: string[] — last 5 breadcrumb texts
+// Returns empty defaults when projectId is null
+```
+
+**`usePendingCaptures()`** — Inbox count (10s poll)
+
+```typescript
+import { usePendingCaptures } from '../hooks/usePendingCaptures';
+
+const { count } = usePendingCaptures();
+// count: number — unprocessed captures in inbox
+```
+
+**Resilience:** All hooks use stale-while-revalidate — on error, they return the last successfully fetched data and log to stderr.
 
 ---
 
