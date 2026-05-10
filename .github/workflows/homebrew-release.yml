@@ -9,11 +9,6 @@ on:
         description: 'Version to release (e.g., 0.8.0)'
         required: true
         type: string
-      auto_merge:
-        description: 'Auto-merge the formula PR'
-        required: false
-        type: boolean
-        default: true
 
 jobs:
   prepare:
@@ -26,9 +21,12 @@ jobs:
     steps:
       - name: Get version and calculate SHA
         id: release
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="$INPUT_VERSION"
           else
             VERSION="${GITHUB_REF#refs/tags/}"
             VERSION="${VERSION#v}"
@@ -37,7 +35,13 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
           TARBALL_URL="https://github.com/Data-Wise/atlas/archive/refs/tags/v${VERSION}.tar.gz"
-          SHA256=$(curl -sL "$TARBALL_URL" | shasum -a 256 | cut -d' ' -f1)
+          SHA256=$(curl -sL --retry 3 --retry-delay 2 "$TARBALL_URL" | shasum -a 256 | cut -d' ' -f1)
+
+          # Validate SHA256 is not empty (download failed)
+          if [ -z "$SHA256" ] || [ ${#SHA256} -ne 64 ]; then
+            echo "::error::SHA256 calculation failed. Got: '$SHA256'"
+            exit 1
+          fi
 
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
@@ -46,14 +50,96 @@ jobs:
   update-homebrew:
     name: Update Homebrew Formula
     needs: prepare
-    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main
-    with:
-      formula_name: atlas
-      version: ${{ needs.prepare.outputs.version }}
-      sha256: ${{ needs.prepare.outputs.sha256 }}
-      source_type: github
-      auto_merge: ${{ github.event.inputs.auto_merge == 'true' || github.event_name == 'release' }}
-    secrets:
-      app_id: ${{ secrets.APP_ID }}
-      app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      tap_token: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    # Inlines the formula update against the homebrew-tap manifest+sed pattern.
+    # Replaces a previous workflow_call which depended on HOMEBREW_TAP_GITHUB_TOKEN
+    # — an expiring PAT. Now uses GitHub App auth (APP_ID + APP_PRIVATE_KEY) which
+    # mints short-lived tokens per run.
+    # See Data-Wise/craft#129 for context.
+    #
+    # Note: atlas.rb is a hand-crafted formula (manifest entry has
+    # generated: false), so we sed-patch the .rb file directly instead of
+    # running the generator. The manifest's atlas entry is informational only.
+    steps:
+      - name: Mint GitHub App token (for cross-repo push to homebrew-tap)
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: Data-Wise
+          repositories: homebrew-tap
+
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v4
+        with:
+          repository: Data-Wise/homebrew-tap
+          token: ${{ steps.app-token.outputs.token }}
+          path: homebrew-tap
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update manifest entry for atlas (informational)
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SHA256: ${{ needs.prepare.outputs.sha256 }}
+        working-directory: homebrew-tap
+        run: |
+          python3 - <<'PY'
+          import json, os
+          m = json.load(open('generator/manifest.json'))
+          formulas = m.get('formulas', m)
+          atlas = formulas['atlas']
+          atlas['version'] = os.environ['VERSION']
+          atlas['sha256'] = os.environ['SHA256']
+          with open('generator/manifest.json', 'w') as f:
+              json.dump(m, f, indent=2)
+              f.write('\n')
+          print(f"manifest updated: atlas -> v{atlas['version']}")
+          PY
+
+      - name: Patch Formula/atlas.rb (hand-crafted, no regen)
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          SHA256: ${{ needs.prepare.outputs.sha256 }}
+        working-directory: homebrew-tap
+        run: |
+          FORMULA="Formula/atlas.rb"
+
+          if [ ! -f "$FORMULA" ]; then
+            echo "::error::Formula not found: $FORMULA"
+            exit 1
+          fi
+
+          # GitHub tarball URL: bump v<old>.tar.gz -> v<new>.tar.gz
+          sed -i "s|/v[0-9][^/]*\.tar\.gz|/v${VERSION}.tar.gz|g" "$FORMULA"
+
+          # SHA256 (first occurrence — main package)
+          sed -i "0,/sha256 \"[^\"]*\"/s|sha256 \"[^\"]*\"|sha256 \"${SHA256}\"|" "$FORMULA"
+
+          ruby -c "$FORMULA"
+
+          echo "Updated formula head:"
+          head -15 "$FORMULA"
+
+      - name: Commit and push to tap
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP_TOKEN: ${{ steps.app-token.outputs.token }}
+        working-directory: homebrew-tap
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/atlas.rb generator/manifest.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit (formula already at v${VERSION})"
+            exit 0
+          fi
+          git commit -m "atlas: update to v${VERSION}"
+          PUSH_URL="https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
+          git remote set-url origin "$PUSH_URL"
+          git push origin main
