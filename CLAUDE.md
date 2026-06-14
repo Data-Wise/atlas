@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.9.2 |
+| **Version** | 0.9.3 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | 1,827 (Jest) |
@@ -289,6 +289,7 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.9.3** - flow-cli Integration: CLI flags flow-cli already calls (session status --format json, project list --count/--suggest, inbox --count, trail --limit) + project list --status metadata-filter fix; live integration docs
 - **v0.9.2** - Real Data Pipeline: All mock data replaced with live ~/.atlas data
   - AtlasContext + 4 hooks (useProjects, useActiveSession, useProjectStats, usePendingCaptures)
   - Project filtering (tmp.*, archived, duplicates), value object extraction

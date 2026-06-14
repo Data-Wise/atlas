@@ -300,5 +300,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.9.2 | Made for ADHD brains</em>
+<em>Atlas v0.9.3 | Made for ADHD brains</em>
 </div>

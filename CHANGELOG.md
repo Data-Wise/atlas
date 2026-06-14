@@ -2,6 +2,22 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.9.3] - 2026-06-14
+
+### Added
+- **flow-cli integration flags** — CLI flags that flow-cli already calls, now honored by atlas:
+  - `atlas session status --format <table|json>` — JSON emits `{project, durationMinutes, state, task, startedAt}` (or `null` when no active session); fixes flow-cli's silent conflict-detection on project switch
+  - `atlas project list --count` — bare integer count of matching projects
+  - `atlas project list --suggest` — the most-recently-touched active project name
+  - `atlas inbox --count` — bare integer pending inbox count
+  - `atlas trail --limit <n>` — cap breadcrumbs to the N most recent
+- `ProjectsAPI.suggest()` and a `limit` parameter on `context.trail()`
+- `docs/INTEGRATIONS.md` — live flow-cli ↔ atlas integration (contract surface + architecture diagram)
+- Strict docs CI (`mkdocs build --strict` validate job, runs on PRs)
+
+### Fixed
+- `atlas project list --status <s>` now resolves status from project metadata — previously matched zero scanned projects, silently breaking flow-cli's contracted `project list --status=active --format=names`
+
 ## [0.7.0] - 2025-12-29
 
 ### Added

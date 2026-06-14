@@ -6,7 +6,7 @@
 
 ---
 
-## Current Version: v0.9.2
+## Current Version: v0.9.3
 
 Real Data Pipeline — all mock data replaced with live `~/.atlas` data via React hooks.
 
