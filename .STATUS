@@ -42,6 +42,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - Reviewed PR #17, applied 3 recommendations (deterministic F1 test, NaN guards, help precedence)
 - Added docs CI strict-build gate (docs.yml validate job); fixed 4 pre-existing broken spec links
 - Wrote SPEC-flow-cli-integration (atlas) + SPEC-atlas-surface-standard (flow-cli, on flow-cli dev)
+- Reviewed + corrected + merged PR #16 (F6 inbox-type-filter spec) → dev — fixed fabricated SQLite migration claim, gated back-fill on flow-cli verification
 - F1–F5 unreleased — version still 0.9.2; v0.9.3 cut pending
 
 ## ✅ Previously Completed (2026-02-23)
