@@ -54,7 +54,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - None
 
 ## 🔧 Active Worktrees
-- (none)
+- feature/flow-cli-contract-flags → ~/.git-worktrees/atlas/feature-flow-cli-contract-flags (v0.9.3 — F1–F5 CLI flags for flow-cli integration)
 
 ## 🎯 Next Action
 A) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
