@@ -2,8 +2,8 @@
 
 **Status:** Draft
 **Created:** 2026-01-07
-**From Brainstorm:** [BRAINSTORM-project-metadata-collection-2026-01-07.md](../../BRAINSTORM-project-metadata-collection-2026-01-07.md)
-**System Design:** [SYSTEM-DESIGN-project-metadata-detection-2026-01-07.md](../../SYSTEM-DESIGN-project-metadata-detection-2026-01-07.md)
+**From Brainstorm:** [BRAINSTORM-project-metadata-collection-2026-01-07.md](https://github.com/Data-Wise/atlas/blob/main/BRAINSTORM-project-metadata-collection-2026-01-07.md)
+**System Design:** [SYSTEM-DESIGN-project-metadata-detection-2026-01-07.md](https://github.com/Data-Wise/atlas/blob/main/SYSTEM-DESIGN-project-metadata-detection-2026-01-07.md)
 **Version:** 1.0
 
 ---

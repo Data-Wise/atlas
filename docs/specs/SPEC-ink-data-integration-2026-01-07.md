@@ -2,8 +2,8 @@
 
 **Status:** draft
 **Created:** 2026-01-07
-**From Brainstorm:** [BRAINSTORM-ink-real-data-integration.md](../../BRAINSTORM-ink-real-data-integration.md)
-**System Design:** [SYSTEM-DESIGN-ink-data-integration.md](../../SYSTEM-DESIGN-ink-data-integration.md)
+**From Brainstorm:** [BRAINSTORM-ink-real-data-integration.md](https://github.com/Data-Wise/atlas/blob/main/BRAINSTORM-ink-real-data-integration.md)
+**System Design:** [SYSTEM-DESIGN-ink-data-integration.md](https://github.com/Data-Wise/atlas/blob/main/SYSTEM-DESIGN-ink-data-integration.md)
 **Version:** 1.0
 
 ---
