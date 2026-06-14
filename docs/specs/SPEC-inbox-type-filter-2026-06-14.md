@@ -58,9 +58,10 @@ static TYPES = ['idea', 'task', 'bug', 'note', 'question', 'parked', 'win']
 - Simpler query: `captures.filter(c => c.type === 'win')`.
 
 **Cons:**
-- Schema migration: existing captures stored with `type: 'idea'` (the default flow-cli `catch` uses when no `-t` flag is given) are not retroactively labelled `win`.
-- Validation in `Capture._validate()` must be updated; any downstream serialization/deserialization that hard-codes the type enum must also be updated (SQLite schema, repository tests).
+- Validation in `Capture._validate()` must be updated, plus any tests that assert the type set.
 - Slightly inflates the type enum with a UX concept rather than a capture *shape*.
+
+> **No SQLite migration required** (verified): the captures table is `type TEXT NOT NULL` with **no type CHECK constraint** (`src/adapters/repositories/SQLiteDatabase.js:146`). The type enum is enforced only at the domain layer (`Capture._validate`), so SQLite already accepts any type string. The earlier-feared schema migration does not exist.
 
 ### Option B — Map `win` to an Existing Type + Tag
 
@@ -85,9 +86,9 @@ atlas inbox --type win
 
 Add `win` as a first-class `CaptureType`. The conceptual cleanliness and single code path outweigh the migration cost. The migration is low-risk:
 
-- `FileSystemCaptureRepository` reads JSON files; a one-time migration script (or lazy-upgrade on read) can stamp `type: 'win'` on any capture that has `tags: ['win']` and `type: 'idea'`.
-- Existing captures without a win tag are unaffected.
-- The SQLite schema adds `'win'` to the `CHECK` constraint; existing SQLite rows remain valid because their type is one of the existing values.
+- The change is effectively one line (`Capture.TYPES`) plus tests — the enum is the single source of truth (domain-layer `_validate`).
+- SQLite needs **no** schema change (`type TEXT NOT NULL`, no CHECK constraint).
+- A back-fill of pre-existing win captures is only relevant *if* such captures exist in atlas — see the Migration Strategy precondition below.
 
 **If the team prefers Option B** (minimal schema change), the spec author requests an explicit decision before implementation, as it changes the `--type` flag's contract from "type filter" to "type-or-tag filter".
 
@@ -171,7 +172,9 @@ No other field changes. `win` captures are stored identically to other types.
 
 ### Migration Strategy (Option A)
 
-A lazy-migration helper in `FileSystemCaptureRepository.fromJSON()`:
+> **Precondition — verify before implementing.** This back-fill only matters if flow-cli's `win` command has actually written captures into atlas as `type: 'idea' + tags: ['win']`. That is **unconfirmed**: today `atlas catch -t win` would fail validation (`win` isn't a valid type), so flow-cli's `win` likely writes to its own store, not atlas. If no win-tagged atlas captures exist, this helper is **unnecessary** — drop it. Confirm flow-cli's `win` write path (does it call `atlas catch` at all, and with what type/tags?) first.
+
+If (and only if) such captures exist, a lazy-migration helper in `FileSystemCaptureRepository.fromJSON()`:
 
 ```javascript
 // If a capture has tags: ['win'] and type: 'idea', auto-upgrade type to 'win'
@@ -201,7 +204,8 @@ This is opt-in and write-through: the migrated type is saved back to disk on nex
 1. **Option A vs B decision** — Does the team accept `win` as a first-class `CaptureType`? (Recommendation: yes. See Design Issue above.)
 2. **`catch -t win` behaviour** — After Option A ships, should `atlas catch "text" -t win` write `type: 'win'` directly? Currently `catch` only accepts `-t idea|task|bug|note`. The CLI validation must be updated in the same PR.
 3. **`--type` on `atlas inbox --count`** — Confirm composability: `atlas inbox --type win --count` should return the count of win-type inbox captures. (Expected: yes, composable.)
-4. **SQLite schema migration** — If the user has a SQLite backend, the `CHECK (type IN (...))` constraint needs a migration. Out of scope for this spec but must be tracked.
+4. ~~**SQLite schema migration**~~ — **N/A (verified).** The captures table is `type TEXT NOT NULL` with no type CHECK constraint (`SQLiteDatabase.js:146`), so a new type value needs zero DB migration. (Resolved in review 2026-06-14.)
+6. **flow-cli `win` write path** — Confirm whether flow-cli's `win` command writes to atlas (and with what type/tags). Determines whether the back-fill helper is needed at all (see Migration Strategy precondition). Also note: `catch --help` currently advertises only `idea|task|bug|note` (`bin/atlas.js:463`) though the enum has 6 types — when `win` lands, update `catch`'s `-t` help/validation alongside `inbox --help`.
 5. **`win` in triage** — Should `atlas triage` display `win` captures? Should they be auto-triageable to a `wins` project? Out of scope; flag for future spec.
 
 ---
