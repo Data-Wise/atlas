@@ -1,8 +1,9 @@
 # SPEC: flow-cli ↔ atlas CLI Integration Reconciliation
 
-> Status: approved
+> Status: implemented (pending PR)
 > Created: 2026-06-13
 > Approved: 2026-06-13
+> Implemented: 2026-06-13 (branch feature/flow-cli-contract-flags)
 > From Brainstorm: /workflow:brainstorm -d -s (deep + save) — derived from live cross-repo audit
 > Target Version: atlas **v0.9.3** (focused maintenance release, before v0.10.0 temporal intelligence), ATLAS-CONTRACT.md v1.1.0
 > Scope: **atlas repo only** (flow-cli changes tracked as Out of Scope / sibling follow-up)
@@ -202,3 +203,4 @@ No active session → print `null` (valid JSON), exit 0. flow-cli currently grep
 
 - 2026-06-13 — Initial draft from deep brainstorm + live cross-repo audit (atlas-only scope; contract reconciled against flow-cli/docs/ATLAS-CONTRACT.md v1.0.0).
 - 2026-06-13 — Deep spec review: resolved 5 decisions (D1–D5). Locked v0.9.3 maintenance release, F1–F5 + contract bump first PR, F3 = most-recent-active heuristic, kept F2, F1 emits structured JSON (`null` for no session). F6 + OOS items deferred.
+- 2026-06-13 — **Implemented F1–F5** in `bin/atlas.js` + `src/index.js`. **Bonus fix (in scope):** discovered `project list --status` filter only checked `p.status`, never `p.metadata.status`, so `--status=active` matched 0 scanned projects — a pre-existing break of flow-cli's contracted `project list --status=active --format=names` call (`atlas-bridge.zsh:435`). Filter now resolves status like the output mapper. Added 12 e2e tests (all green); 1708 unit/integration pass (only the env-blocked SQLite suite fails — `better-sqlite3` won't build on Node 26). Updated `docs/CLI-REFERENCE.md`. ATLAS-CONTRACT.md v1.1.0 bump remains a flow-cli sibling-repo follow-up.

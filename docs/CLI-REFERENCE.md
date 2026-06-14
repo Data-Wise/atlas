@@ -78,6 +78,8 @@ Options:
   -s, --status <status>    Filter by status
   -t, --tag <tag>          Filter by tag
   --format <format>        Output format: table (default), json, names
+  --count                  Print only the number of matching projects
+  --suggest                Print the single most-recently-touched active project
 ```
 
 **Examples:**
@@ -93,6 +95,12 @@ atlas project list --tag r-package
 
 # Get project names for scripting
 atlas project list --format names
+
+# Count matching projects (e.g. active project count)
+atlas project list --status active --count
+
+# Suggest one project to work on (most recent active)
+atlas project list --suggest
 ```
 
 ### `atlas project show`
@@ -201,13 +209,22 @@ atlas session end "Completed login flow, needs testing"
 Show current session status.
 
 ```bash
-atlas session status
+atlas session status [options]
+
+Options:
+  --format <format>     Output format: table (default), json
 ```
 
 **Output includes:**
 - Active session project and task
 - Duration and flow state
 - Or "No active session" message
+
+**JSON output** (`--format json`) emits a single object for scripting, or `null` when no session is active:
+
+```json
+{ "project": "atlas", "durationMinutes": 42, "state": "active", "task": "spec writing", "startedAt": "2026-06-13T09:14:00.000Z" }
+```
 
 ### `atlas session export`
 
@@ -458,6 +475,7 @@ atlas inbox [options]
 Options:
   -p, --project <name>    Filter by project
   --stats                 Show inbox statistics
+  --count                 Print only the pending inbox count
   --triage                Interactive triage mode
 ```
 
@@ -535,6 +553,7 @@ atlas trail [project] [options]
 
 Options:
   -d, --days <number>    Days to look back (default: 7)
+  --limit <n>            Max breadcrumbs to show (most recent first)
 ```
 
 **Examples:**
@@ -547,6 +566,9 @@ atlas trail myproject
 
 # Show last 30 days
 atlas trail --days 30
+
+# Show only the 5 most recent breadcrumbs
+atlas trail --limit 5
 ```
 
 ---

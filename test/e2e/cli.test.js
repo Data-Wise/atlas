@@ -199,6 +199,39 @@ describe('Atlas CLI - E2E Tests', () => {
 
       expect(exitCode).toBe(0)
     })
+
+    // flow-cli integration (F4): inbox --count
+    test('inbox --count outputs a bare integer', () => {
+      const { stdout, exitCode } = runCLI('inbox --count')
+
+      expect(exitCode).toBe(0)
+      expect(stdout.trim()).toMatch(/^\d+$/)
+    })
+
+    test('inbox --help shows --count', () => {
+      const { stdout, exitCode } = runCLI('inbox --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--count')
+    })
+  })
+
+  // flow-cli integration (F5): trail --limit
+  describe('Context Commands - Trail', () => {
+    test('trail --limit caps the number of breadcrumbs', () => {
+      const { stdout, exitCode } = runCLI('trail --days 999 --limit 2')
+
+      expect(exitCode).toBe(0)
+      const crumbLines = stdout.split('\n').filter(l => l.includes('│')).length
+      expect(crumbLines).toBeLessThanOrEqual(2)
+    })
+
+    test('trail --help shows --limit', () => {
+      const { stdout, exitCode } = runCLI('trail --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--limit')
+    })
   })
 
   describe('Completions Command', () => {
@@ -280,6 +313,44 @@ describe('Atlas CLI - E2E Tests', () => {
       expect(stdout).toContain('--tags')
       expect(stdout).toContain('--status')
     })
+
+    // flow-cli integration (F2): project list --count
+    test('project list --count outputs a bare integer', () => {
+      const { stdout, exitCode } = runCLI('project list --count')
+
+      expect(exitCode).toBe(0)
+      expect(stdout.trim()).toMatch(/^\d+$/)
+    })
+
+    // flow-cli integration (F3): project list --suggest
+    test('project list --suggest outputs a single name, never JSON', () => {
+      const { stdout, exitCode } = runCLI('project list --suggest --format=names')
+
+      expect(exitCode).toBe(0)
+      const out = stdout.trim()
+      // Contract: names output must not start with { or [ (flow-cli format guard)
+      expect(out).not.toMatch(/^[[{]/)
+      // At most one project name on one line
+      expect(out.split('\n').filter(Boolean).length).toBeLessThanOrEqual(1)
+    })
+
+    // flow-cli integration: --status filter must resolve metadata status
+    // (regression: filter previously checked p.status only, matching 0 scanned projects)
+    test('project list --status filter matches displayed status', () => {
+      const all = JSON.parse(runCLI('project list --format json').stdout)
+      const activeInJson = all.filter(p => p.status === 'active').length
+      const count = parseInt(runCLI('project list --status=active --count').stdout.trim(), 10)
+
+      expect(count).toBe(activeInJson)
+    })
+
+    test('project list --help shows --count and --suggest', () => {
+      const { stdout, exitCode } = runCLI('project list --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--count')
+      expect(stdout).toContain('--suggest')
+    })
   })
 
   describe('Session Commands', () => {
@@ -304,6 +375,34 @@ describe('Atlas CLI - E2E Tests', () => {
 
       expect(exitCode).toBe(0)
       expect(stdout).toContain('end')
+    })
+
+    // flow-cli integration (F1): session status --format json — the conflict-detection bug
+    test('session status --format json outputs valid JSON', () => {
+      const { stdout, exitCode } = runCLI('session status --format json')
+
+      expect(exitCode).toBe(0)
+      const parsed = JSON.parse(stdout) // throws if not valid JSON
+      // null when no active session; otherwise the contract object
+      if (parsed !== null) {
+        expect(parsed).toHaveProperty('project')
+        expect(parsed).toHaveProperty('durationMinutes')
+        expect(parsed).toHaveProperty('state')
+      }
+    })
+
+    test('session status default output unchanged', () => {
+      const { stdout, exitCode } = runCLI('session status')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toMatch(/Active:|No active session/)
+    })
+
+    test('session status --help shows --format', () => {
+      const { stdout, exitCode } = runCLI('session status --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--format')
     })
   })
 
