@@ -37,7 +37,14 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - Homebrew: `brew install data-wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
 
-## ✅ Just Completed (2026-02-23)
+## ✅ Just Completed (2026-06-14)
+- Merged PR #17 → dev: flow-cli integration flags F1–F5 (session status --format json, project list --count/--suggest, inbox --count, trail --limit) + status-filter fix
+- Reviewed PR #17, applied 3 recommendations (deterministic F1 test, NaN guards, help precedence)
+- Added docs CI strict-build gate (docs.yml validate job); fixed 4 pre-existing broken spec links
+- Wrote SPEC-flow-cli-integration (atlas) + SPEC-atlas-surface-standard (flow-cli, on flow-cli dev)
+- F1–F5 unreleased — version still 0.9.2; v0.9.3 cut pending
+
+## ✅ Previously Completed (2026-02-23)
 - Released v0.9.2 — Real Data Pipeline
 - Reviewed PR #13: caught auto-select bug + ORCHESTRATE cleanup
 - Merged feature/ink-real-data to dev, cleaned up worktree
@@ -54,8 +61,10 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - None
 
 ## 🔧 Active Worktrees
-- feature/flow-cli-contract-flags → ~/.git-worktrees/atlas/feature-flow-cli-contract-flags (v0.9.3 — F1–F5 CLI flags for flow-cli integration)
+- (none)
 
 ## 🎯 Next Action
-A) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
-B) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
+A) Cut v0.9.3 release (dev→main PR) — F1–F5 flags merged, version bump pending
+B) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
+C) flow-cli: finish atlas-surface-standard items 4–6 (after PR #468 review)
+D) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
