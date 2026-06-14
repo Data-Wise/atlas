@@ -43,7 +43,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - Added docs CI strict-build gate (docs.yml validate job); fixed 4 pre-existing broken spec links
 - Wrote SPEC-flow-cli-integration (atlas) + SPEC-atlas-surface-standard (flow-cli, on flow-cli dev)
 - Reviewed + corrected + merged PR #16 (F6 inbox-type-filter spec) → dev — fixed fabricated SQLite migration claim, gated back-fill on flow-cli verification
-- F1–F5 unreleased — version still 0.9.2; v0.9.3 cut pending
+- **Released v0.9.3** — PR #18 (dev→main) merged, tag v0.9.3, GitHub release, Homebrew formula + docs deploy all green
 
 ## ✅ Previously Completed (2026-02-23)
 - Released v0.9.2 — Real Data Pipeline
@@ -65,7 +65,6 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - (none)
 
 ## 🎯 Next Action
-A) Cut v0.9.3 release (dev→main PR) — F1–F5 flags merged, version bump pending
-B) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
-C) flow-cli: finish atlas-surface-standard items 4–6 (after PR #468 review)
-D) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
+A) Brainstorm v0.10.0 temporal intelligence (pattern detection, velocity, prediction)
+B) flow-cli: finish atlas-surface-standard items 4–6 (after PR #468 review)
+C) Refresh expired HOMEBREW_TAP_GITHUB_TOKEN PAT (optional)
