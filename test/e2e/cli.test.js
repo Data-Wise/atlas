@@ -6,6 +6,8 @@
 
 import { describe, test, expect } from '@jest/globals'
 import { execSync } from 'child_process'
+import { mkdtempSync, rmSync } from 'fs'
+import { tmpdir } from 'os'
 import { join } from 'path'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
@@ -388,6 +390,29 @@ describe('Atlas CLI - E2E Tests', () => {
         expect(parsed).toHaveProperty('project')
         expect(parsed).toHaveProperty('durationMinutes')
         expect(parsed).toHaveProperty('state')
+      }
+    })
+
+    // F1 deterministic: start a session in an isolated HOME and assert the JSON shape.
+    // HOME is overridden (not just ATLAS_CONFIG) because several repositories fall back
+    // to ${HOME}/.atlas directly — so this never touches the real ~/.atlas.
+    test('session status --format json returns the active-session shape', () => {
+      const home = mkdtempSync(join(tmpdir(), 'atlas-e2e-'))
+      const env = { ...process.env, NODE_ENV: 'test', HOME: home, ATLAS_CONFIG: join(home, '.atlas') }
+      try {
+        expect(runCLI('session start testproj', { env }).exitCode).toBe(0)
+
+        const { stdout, exitCode } = runCLI('session status --format json', { env })
+        expect(exitCode).toBe(0)
+
+        const s = JSON.parse(stdout)
+        expect(s).not.toBeNull()
+        expect(s.project).toBe('testproj')
+        expect(typeof s.durationMinutes).toBe('number')
+        expect(s.state).toBe('active')
+        expect(s).toHaveProperty('startedAt')
+      } finally {
+        rmSync(home, { recursive: true, force: true })
       }
     })
 

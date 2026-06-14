@@ -76,6 +76,7 @@ project
   .option('--format <format>', 'Output format (table|json|names)', 'table')
   .option('--count', 'Print only the number of matching projects')
   .option('--suggest', 'Print the single most-recently-touched active project name')
+  .addHelpText('after', '\nFlag precedence: --suggest > --count > --format.')
   .action(async (options) => {
     const a = getAtlas();
     // --suggest short-circuits: emit one active project name (flow-cli _adhd_suggest_project)
@@ -624,8 +625,13 @@ program
   .option('-d, --days <days>', 'Days to show', '7')
   .option('--limit <n>', 'Maximum number of breadcrumbs to show (most recent first)')
   .action(async (project, options) => {
-    const limit = options.limit ? parseInt(options.limit, 10) : undefined;
-    const trail = await getAtlas().context.trail(project, parseInt(options.days), limit);
+    // Guard against non-numeric input: fall back to defaults rather than NaN
+    // (NaN would flow into slice()/Date and silently yield empty output).
+    const parsedDays = parseInt(options.days, 10);
+    const days = Number.isNaN(parsedDays) ? 7 : parsedDays;
+    const parsedLimit = parseInt(options.limit, 10);
+    const limit = Number.isNaN(parsedLimit) ? undefined : parsedLimit;
+    const trail = await getAtlas().context.trail(project, days, limit);
     getAtlas().formatTrail(trail);
   });
 
