@@ -2,7 +2,12 @@ name: Deploy Docs
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs.yml'
+  pull_request:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
@@ -13,7 +18,24 @@ permissions:
   contents: write
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install mkdocs-material
+
+      - name: Build (strict)
+        run: mkdocs build --strict
+
   deploy:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

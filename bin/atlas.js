@@ -74,9 +74,24 @@ project
   .option('-s, --status <status>', 'Filter by status')
   .option('-t, --tag <tag>', 'Filter by tag')
   .option('--format <format>', 'Output format (table|json|names)', 'table')
+  .option('--count', 'Print only the number of matching projects')
+  .option('--suggest', 'Print the single most-recently-touched active project name')
+  .addHelpText('after', '\nFlag precedence: --suggest > --count > --format.')
   .action(async (options) => {
-    const projects = await getAtlas().projects.list(options);
-    getAtlas().formatOutput(projects, options.format);
+    const a = getAtlas();
+    // --suggest short-circuits: emit one active project name (flow-cli _adhd_suggest_project)
+    if (options.suggest) {
+      const name = await a.projects.suggest();
+      if (name) console.log(name);
+      return;
+    }
+    const projects = await a.projects.list(options);
+    // --count: emit a bare integer for shell consumption (flow-cli morning briefing)
+    if (options.count) {
+      console.log(projects.length);
+      return;
+    }
+    a.formatOutput(projects, options.format);
   });
 
 project
@@ -280,8 +295,29 @@ session
 session
   .command('status')
   .description('Show current session')
-  .action(async () => {
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
     const session = await getAtlas().sessions.current();
+    // --format json: structured output for flow-cli conflict detection (work.zsh).
+    // No active session -> `null` (valid JSON; flow-cli greps for a project name).
+    if (options.format === 'json') {
+      if (!session) {
+        console.log('null');
+        return;
+      }
+      const startedAt = session.startTime instanceof Date
+        ? session.startTime.toISOString()
+        : (session.startTime || null);
+      console.log(JSON.stringify({
+        project: session.project,
+        durationMinutes: session.getDuration ? session.getDuration() : null,
+        state: session.state?.value || 'active',
+        task: session.task || null,
+        startedAt
+      }));
+      return;
+    }
+    // table (default) — unchanged behavior
     if (session) {
       const duration = session.getDuration ? session.getDuration() : '?';
       console.log(`Active: ${session.project} (${duration}m)`);
@@ -436,8 +472,17 @@ program
   .option('-p, --project <project>', 'Filter by project')
   .option('--triage', 'Interactive triage mode')
   .option('--stats', 'Show inbox statistics')
+  .option('--count', 'Print only the pending inbox count')
   .action(async (options) => {
     const a = getAtlas();
+
+    // --count: emit a bare integer for shell consumption (flow-cli adhd inbox badge)
+    if (options.count) {
+      const triageUseCase = a.container.resolve('TriageInboxUseCase');
+      const stats = await triageUseCase.getStats();
+      console.log(stats.inbox);
+      return;
+    }
 
     if (options.stats) {
       const triageUseCase = a.container.resolve('TriageInboxUseCase');
@@ -578,8 +623,15 @@ program
   .command('trail [project]')
   .description('Show breadcrumb trail')
   .option('-d, --days <days>', 'Days to show', '7')
+  .option('--limit <n>', 'Maximum number of breadcrumbs to show (most recent first)')
   .action(async (project, options) => {
-    const trail = await getAtlas().context.trail(project, parseInt(options.days));
+    // Guard against non-numeric input: fall back to defaults rather than NaN
+    // (NaN would flow into slice()/Date and silently yield empty output).
+    const parsedDays = parseInt(options.days, 10);
+    const days = Number.isNaN(parsedDays) ? 7 : parsedDays;
+    const parsedLimit = parseInt(options.limit, 10);
+    const limit = Number.isNaN(parsedLimit) ? undefined : parsedLimit;
+    const trail = await getAtlas().context.trail(project, days, limit);
     getAtlas().formatTrail(trail);
   });
 

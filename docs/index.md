@@ -144,6 +144,19 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
+## :sparkles: What's New in v0.9.3
+
+!!! success "flow-cli Integration"
+    atlas now honors the CLI flags flow-cli already calls — closing contract drift between the two tools:
+
+    - **`session status --format json`** — structured output (`{project, durationMinutes, state, task, startedAt}`) for shell conflict-detection
+    - **`project list --count` / `--suggest`** — bare count, and the most-recently-touched active project
+    - **`inbox --count`** — pending inbox count for shell badges
+    - **`trail --limit <n>`** — cap breadcrumbs to the N most recent
+    - **Fix:** `project list --status` now resolves status from project metadata (previously matched nothing)
+
+    See [Integrations](INTEGRATIONS.md) for the full flow-cli ↔ atlas contract.
+
 ## :sparkles: What's New in v0.9.2
 
 !!! success "Real Data Pipeline"

@@ -259,6 +259,22 @@ atlas config prefs set adhd.celebrationLevel enthusiastic
 
 ---
 
+## Scripting & flow-cli Integration
+
+Flags built for shells/wrappers (used by flow-cli). All print to stdout only and exit 0.
+
+| Command | Output | Example |
+| ------- | ------ | ------- |
+| `session status --format json` | `{project,durationMinutes,state,task,startedAt}` or `null` | `atlas session status --format json` |
+| `project list --count` | bare integer | `atlas project list --status active --count` |
+| `project list --suggest` | one project name (most-recent active) | `atlas project list --suggest` |
+| `inbox --count` | bare integer | `atlas inbox --count` |
+| `trail --limit N` | newest-N breadcrumbs | `atlas trail --limit 5` |
+
+> See [Integrations](INTEGRATIONS.md) for the full flow-cli ↔ atlas contract.
+
+---
+
 ## File Locations
 
 | What      | Where                  |
@@ -284,5 +300,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.9.2 | Made for ADHD brains</em>
+<em>Atlas v0.9.3 | Made for ADHD brains</em>
 </div>

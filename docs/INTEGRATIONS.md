@@ -31,7 +31,7 @@ The dev-tools ecosystem follows a three-layer architecture:
 
 **Design Principle:** Each layer delegates instant operations down to lower layers.
 - `aiterm feature` → delegates to `flow-cli g feature` for git ops
-- `flow dash` → queries atlas for project state (future)
+- `flow dash` → shells out to `atlas dashboard` for the live TUI
 - `tm ghost` → delegates to aiterm for rich terminal status
 
 ---
@@ -101,31 +101,72 @@ The dev-tools ecosystem follows a three-layer architecture:
 
 ---
 
-### 🔗 flow-cli ↔ atlas (Future)
+### 🔗 flow-cli ↔ atlas (Live)
 
-**Type:** Query (ZSH → State Engine)
-**Status:** Planned Q1 2026
+**Type:** CLI shell-out (ZSH → atlas binary)
+**Status:** Active. flow-cli wraps the `atlas` CLI across ~20 integration points, with ZSH-native fallbacks on hot paths so commands never block when atlas is absent.
 
-**Planned Integrations:**
+flow-cli never touches `~/.atlas/` directly — all reads/writes go through the `atlas` binary. Its own fallback state lives in `$FLOW_DATA_DIR` (`~/.local/share/flow/`).
 
-```bash
-# flow-cli will query atlas for live data
-flow dash dev         # atlas.query("dev-tools", status="active")
-flow pick --recent    # atlas.query("recent-sessions")
-flow status <project> # atlas.get_project_state("project-name")
+```mermaid
+graph LR
+    subgraph flow["flow-cli (ZSH, <10ms)"]
+        FC[command wrappers]
+        FB[(FLOW_DATA_DIR<br/>fallback state)]
+    end
+    subgraph atlas["atlas (Node.js CLI)"]
+        CLI[atlas binary]
+        STORE[(~/.atlas/<br/>*.json)]
+    end
+    FC -->|"_flow_has_atlas?"| CLI
+    FC -.->|atlas absent| FB
+    CLI --> STORE
 ```
 
-**What will flow:**
-- Project status and metadata
-- Session history
-- Dependency relationships
-- Integration maps
+**Capability detection.** flow-cli probes `command -v atlas` once per session (cached in `_FLOW_ATLAS_AVAILABLE`), honoring `FLOW_ATLAS_ENABLED` (`auto|yes|no`). When atlas is missing, hot-path commands degrade to ZSH-native fallbacks; warm-path commands print an install hint.
 
-**Design:**
-- Atlas provides query API
-- flow-cli caches results (<10ms response)
-- Cache invalidates on .STATUS file changes
-- Background refresh every 5 minutes
+#### Hot path (atlas optional — ZSH fallback exists)
+
+| flow-cli | atlas command | Fallback when atlas absent |
+|----------|---------------|----------------------------|
+| `_flow_session_start` | `atlas session start <project>` | worklog file |
+| `_flow_session_end` | `atlas session end [note]` | worklog file |
+| `_flow_catch` | `atlas catch <text> [--project=X]` | `inbox.md` |
+| `_flow_inbox` | `atlas inbox` | `cat inbox.md` |
+| `_flow_where` | `atlas where [project]` | filesystem + `.STATUS` scan |
+| `_flow_crumb` | `atlas crumb <text> [--project=X]` | `trail.log` |
+| `_flow_list_projects` | `atlas project list --status=<s> --format=names` | `.STATUS` glob scan |
+
+#### Warm path (atlas required)
+
+`atlas dash` / `dashboard`, `stats`, `plan`, `park` / `unpark` / `parked`, `focus`, `trail`, `triage`. No ZSH fallback — flow-cli shows an install message if atlas is unavailable.
+
+#### New flags (atlas v0.9.3 — fulfilling the contract)
+
+flow-cli already called these; atlas v0.9.3 implements them:
+
+| Flag | Output | Used by |
+|------|--------|---------|
+| `atlas session status --format json` | `{project,durationMinutes,state,task,startedAt}` or `null` | conflict detection on project switch |
+| `atlas project list --count` | bare integer | morning briefing |
+| `atlas project list --suggest` | one project name (most-recent active) | project suggestion |
+| `atlas inbox --count` | bare integer | inbox badge |
+| `atlas trail --limit <n>` | newest-N breadcrumbs | recent-activity view |
+
+Also fixed in v0.9.3: `atlas project list --status=<s>` now resolves status from project metadata (previously matched zero scanned projects).
+
+#### Output format & exit-code contract
+
+| Format | Shape | Consumers |
+|--------|-------|-----------|
+| `names` | one item per line, no headers | `project list` (flow-cli pipes directly) |
+| `json` | valid JSON object/array | scripting |
+| `shell` | `KEY="value"` pairs | `project show` |
+| `table` | human-readable (default) | interactive |
+
+Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixed `names` result as a format violation and falls back to a filesystem scan. Exit codes are stable: `0` success, `1` error, `2` not found.
+
+> The authoritative, versioned contract lives in flow-cli at [`docs/ATLAS-CONTRACT.md`](https://github.com/Data-Wise/flow-cli/blob/main/docs/ATLAS-CONTRACT.md). atlas treats it as the source of truth for the CLI surface flow-cli depends on.
 
 ---
 
@@ -216,7 +257,7 @@ flow status <project> # atlas.get_project_state("project-name")
 
 ```
 atlas (state engine)
-  ← (future) flow-cli (queries for state)
+  ← flow-cli (shells out to atlas CLI for state; ZSH fallbacks on hot paths)
   ← (future) aiterm (queries for coordination)
 
 flow-cli (shell workflow)
@@ -333,7 +374,7 @@ homebrew-tap
 
 | File | Purpose | Used By |
 |------|---------|---------|
-| `.STATUS` | Project status metadata | flow-cli, atlas (future) |
+| `.STATUS` | Project status metadata | flow-cli, atlas (`sync --from-status`) |
 | `CLAUDE.md` | Claude Code instructions | Claude Code CLI |
 | `package.json` | Node.js metadata | Node-based tools |
 | `pyproject.toml` | Python metadata | Python-based tools |
