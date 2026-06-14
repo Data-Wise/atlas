@@ -117,6 +117,22 @@ const active = await atlas.projects.list({ status: 'active' });
 const rPackages = await atlas.projects.list({ tag: 'r-package' });
 ```
 
+### Suggest a Project
+
+Returns the single most-recently-touched **active** project name — the one to resume next. Ranks recent projects and intersects with the active set, falling back to the first active project, then `null`.
+
+```javascript
+const name = await atlas.projects.suggest();
+```
+
+**Returns:** `Promise<string|null>` — project name, or `null` when none qualify.
+
+**Example:**
+```javascript
+const next = await atlas.projects.suggest();
+if (next) console.log(`Resume: ${next}`);
+```
+
 ### Get Project
 
 ```javascript
@@ -558,16 +574,20 @@ await atlas.context.breadcrumb('Need to refactor auth module');
 ### Get Trail
 
 ```javascript
-const trail = await atlas.context.trail(project, days);
+const trail = await atlas.context.trail(project, days, limit);
 ```
 
 **Parameters:**
 - `project` (string): Project name (optional)
 - `days` (number): Days to look back (default: 7)
+- `limit` (number): Max breadcrumbs to return, most recent first (default: 50)
 
 **Example:**
 ```javascript
 const trail = await atlas.context.trail('myproject', 14);
+
+// Only the 5 most recent breadcrumbs
+const recent = await atlas.context.trail('myproject', 14, 5);
 
 trail.forEach(crumb => {
   console.log(`${crumb.timestamp}: ${crumb.text}`);

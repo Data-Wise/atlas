@@ -443,7 +443,9 @@ class ProjectsAPI {
 
     let filtered = allProjects;
     if (options.status) {
-      filtered = filtered.filter(p => p.status === options.status);
+      // Resolve status the same way the output mapping does — scanned projects
+      // carry status in metadata, so filtering on p.status alone matched nothing.
+      filtered = filtered.filter(p => (p.status || p.metadata?.status) === options.status);
     }
     if (options.tag) {
       filtered = filtered.filter(p => p.tags?.includes(options.tag));
@@ -455,6 +457,21 @@ class ProjectsAPI {
       status: p.status || p.metadata?.status,
       type: p.type
     }));
+  }
+
+  /**
+   * Suggest a single project to work on: the most-recently-touched active project.
+   * Ranks recent projects (GetRecentProjectsUseCase) and intersects with the active
+   * set, falling back to the first active project, then null.
+   * @returns {Promise<string|null>} project name, or null when none qualify
+   */
+  async suggest() {
+    const useCase = this.container.resolve('GetRecentProjectsUseCase');
+    const { projects } = await useCase.execute({ limit: 10, includeStats: false });
+    const active = await this.list({ status: 'active' });
+    const activeNames = new Set(active.map(p => p.name));
+    const ranked = projects.find(p => activeNames.has(p.name));
+    return ranked?.name || active[0]?.name || null;
   }
 
   async get(name) {
@@ -609,9 +626,9 @@ class ContextAPI {
     return await logCrumbUseCase.execute({ text, project });
   }
 
-  async trail(project, days = 7) {
+  async trail(project, days = 7, limit) {
     const trailUseCase = this.container.resolve('GetTrailUseCase');
-    return await trailUseCase.execute({ project, days });
+    return await trailUseCase.execute({ project, days, limit });
   }
 
   async getStatus(project) {
