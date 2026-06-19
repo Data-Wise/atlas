@@ -649,6 +649,29 @@ atlas project list --tag r-package
 atlas project list --format json
 ```
 
+### flow-cli Integration (v0.9.3)
+
+Atlas exposes machine-readable flags designed for shell wrapper scripts like [flow-cli](https://github.com/Data-Wise/flow-cli):
+
+```bash
+# Session state as JSON (for scripting)
+atlas session status --format json
+# → {"project":"atlas","durationMinutes":25,"state":"active","task":"Work session","startedAt":"..."}
+
+# Bare integer counts (no labels, no formatting)
+atlas inbox --count           # → 3
+atlas project list --count    # → 54
+
+# Smart project suggestion (most recently active)
+atlas project list --suggest  # → atlas
+
+# Limit breadcrumb output
+atlas trail --limit 3         # shows last 3 crumbs only
+atlas trail --limit 5 --days 7
+```
+
+These flags are used by `at` (the flow-cli atlas dispatcher) to embed live atlas state into shell prompts, dashboards, and health-check scripts without parsing human-readable output.
+
 ### Shell Completions
 
 ```bash
