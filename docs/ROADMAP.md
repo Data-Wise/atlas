@@ -49,9 +49,14 @@ Real Data Pipeline — all mock data replaced with live `~/.atlas` data via Reac
 ## v0.10.0 - Temporal Intelligence
 
 ### Analytics
-- [ ] Pattern detection ("most productive Tuesday mornings") *(spec written 2026-06-19)*
-- [ ] Velocity analytics (sessions/week, trends) *(spec written 2026-06-19)*
-- [ ] Prediction engine ("this will take ~2.5 hours") *(spec written 2026-06-19)*
+- [x] Pattern detection — `atlas stats --patterns` (best day/hour, dead zones) *(implemented 2026-06-19)*
+- [x] Velocity analytics — `atlas stats --velocity` (4-week rolling window, trend, sparkline) *(implemented 2026-06-19)*
+- [x] Prediction engine — `atlas stats --calibrate <proj> --minutes <n>` (Bayesian calibration) *(implemented 2026-06-19)*
+
+### Deferred to v0.11
+- [ ] AnalyticsView in Ink dashboard (key `a`)
+- [ ] Dead-zone calendar export (iCal)
+- [ ] Multi-project calibration comparison
 
 ---
 
@@ -93,6 +98,9 @@ Real Data Pipeline — all mock data replaced with live `~/.atlas` data via Reac
 ---
 
 ## Completed Milestones
+
+### v0.10.x Series
+- [x] v0.10.0: Temporal Intelligence — `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine`; `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests
 
 ### v0.9.x Series
 - [x] v0.9.3: flow-cli Integration — `--format json`, `--count`, `--suggest`, `--limit`, `--days` flags; live integration docs (INTEGRATIONS.md)
