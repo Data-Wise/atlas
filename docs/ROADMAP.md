@@ -2,7 +2,7 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-06-19
 
 ---
 
@@ -49,9 +49,9 @@ Real Data Pipeline — all mock data replaced with live `~/.atlas` data via Reac
 ## v0.10.0 - Temporal Intelligence
 
 ### Analytics
-- [ ] Pattern detection ("most productive Tuesday mornings")
-- [ ] Velocity analytics (sessions/week, trends)
-- [ ] Prediction engine ("this will take ~2.5 hours")
+- [ ] Pattern detection ("most productive Tuesday mornings") *(spec written 2026-06-19)*
+- [ ] Velocity analytics (sessions/week, trends) *(spec written 2026-06-19)*
+- [ ] Prediction engine ("this will take ~2.5 hours") *(spec written 2026-06-19)*
 
 ---
 
@@ -95,6 +95,7 @@ Real Data Pipeline — all mock data replaced with live `~/.atlas` data via Reac
 ## Completed Milestones
 
 ### v0.9.x Series
+- [x] v0.9.3: flow-cli Integration — `--format json`, `--count`, `--suggest`, `--limit`, `--days` flags; live integration docs (INTEGRATIONS.md)
 - [x] v0.9.2: Real Data Pipeline — AtlasContext + 4 hooks, project filtering, cross-validated dogfood tests
 - [x] v0.9.1: Visual Enhancements — themes, focus score, sparklines, heatmap
 - [x] v0.9.0: TUI Modernization — Ink replaces blessed, 7 views migrated, 73% code reduction
