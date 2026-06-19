@@ -2,6 +2,25 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.10.0] - 2026-06-19
+
+### Added
+- **VelocityCalculator** — 4-week rolling velocity analytics over existing session history
+  - ISO-week bucketing: sessions/week, focus hours, consistency score
+  - Trend detection: compares mean(weeks 1-2) vs mean(weeks 3-4), ±10% threshold → ↑/↓/→
+  - Sparkline output using block characters `▁▂▃▄▅▆▇█`
+  - `atlas stats --velocity`
+- **PatternAnalyzer** — 90-day productivity pattern detection
+  - Best day and best hour by flow rate (sessions where `getDuration() >= 15min`)
+  - Dead zones: hour/day slots with 0 flow rate and ≥3 sessions observed
+  - `atlas stats --patterns`
+- **PredictionEngine** — Bayesian per-project time calibration
+  - Filters completed sessions for a project, removes outliers via MAD-based robust Z-score
+  - Ratio fallback when MAD = 0 (all durations identical); priorWeight = 3 toward 1.0
+  - Confidence tiers: low (<5 sessions), medium (5-9), high (≥10)
+  - `atlas stats --calibrate <project> --minutes <n>`
+- 31 new unit tests across 3 test files
+
 ## [0.9.3] - 2026-06-14
 
 ### Added
