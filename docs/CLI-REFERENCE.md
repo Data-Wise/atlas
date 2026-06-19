@@ -283,6 +283,12 @@ Options:
   -p, --project <name>  Filter analytics by project
   --format <format>     Output format: table (default), json, text, md
   -e, --export [file]   Export to file (auto-names if no file given)
+
+Temporal Intelligence (v0.10.0):
+  --velocity            4-week rolling velocity: sessions/week, focus hours, trend
+  --patterns            Productivity patterns from last 90 days (best day/hour, dead zones)
+  --calibrate <proj>    Time calibration factor for a project (use with --minutes)
+  --minutes <n>         Proposed duration in minutes for --calibrate (default: 30)
 ```
 
 **Examples:**
@@ -319,6 +325,15 @@ atlas stats --format json --export stats.json
 
 # Export monthly report
 atlas stats month --export monthly-review.md
+
+# Velocity trend (last 4 complete weeks)
+atlas stats --velocity
+
+# Productivity patterns (best day/hour, dead zones)
+atlas stats --patterns
+
+# Time calibration for a project (30 min proposed)
+atlas stats --calibrate atlas --minutes 30
 ```
 
 **Output includes:**

@@ -1,6 +1,6 @@
 {
   "name": "@data-wise/atlas",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "description": "Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow",
   "type": "module",
   "main": "src/index.js",

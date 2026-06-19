@@ -385,8 +385,91 @@ program
   .option('-p, --project <name>', 'Filter by project')
   .option('--format <format>', 'Output format (table|json|text|md)', 'table')
   .option('-e, --export [file]', 'Export to file (auto-names if no file given)')
+  .option('--velocity', 'Show 4-week velocity trend (sessions/week, focus hours, consistency)')
+  .option('--patterns', 'Show productivity patterns (best day/hour, dead zones) from last 90 days')
+  .option('--calibrate <project>', 'Show time calibration factor for a project')
+  .option('--minutes <n>', 'Proposed duration in minutes for --calibrate (default: 30)', '30')
   .action(async (period, options) => {
     const atlasInstance = getAtlas();
+
+    // ── Temporal Intelligence flags ──────────────────────────────────────
+    if (options.velocity) {
+      const { VelocityCalculator } = await import('../src/utils/VelocityCalculator.js');
+      const sessionRepo = atlasInstance.container.resolve('SessionRepository');
+      const now = new Date();
+      const since = new Date(now);
+      since.setDate(since.getDate() - 28);
+      const sessions = await sessionRepo.findByDateRange(since, now);
+      const { weeksData, trend, sparkline } = new VelocityCalculator(sessions).calculate();
+      const arrow = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+      console.log(`\nVelocity (last 4 weeks)          trend: ${arrow} ${trend}`);
+      console.log('Week       Sessions  Focus hrs  Consistency');
+      for (const w of weeksData) {
+        const days = Math.round(w.consistency * 7);
+        const bar = '█'.repeat(days) + '░'.repeat(7 - days);
+        console.log(`${w.week}   ${String(w.sessionCount).padEnd(9)} ${String(w.focusHours + 'h').padEnd(10)} ${bar}  (${days}/7 days)`);
+      }
+      if (sparkline) console.log(`Sparkline: ${sparkline}`);
+      return;
+    }
+
+    if (options.patterns) {
+      const { PatternAnalyzer } = await import('../src/utils/PatternAnalyzer.js');
+      const sessionRepo = atlasInstance.container.resolve('SessionRepository');
+      const now = new Date();
+      const since = new Date(now);
+      since.setDate(since.getDate() - 90);
+      const sessions = await sessionRepo.findByDateRange(since, now);
+      const { bestDay, bestHour, deadZones, flowRateByDay, flowRateByHour } = new PatternAnalyzer(sessions).analyze();
+      console.log('\nProductivity patterns (last 90 days)');
+      if (bestDay) {
+        const pct = Math.round((flowRateByDay[bestDay] || 0) * 100);
+        console.log(`Best day:  ${bestDay}  (flow rate ${pct}%)`);
+      } else {
+        console.log('Best day:  insufficient data (need >= 3 sessions per day)');
+      }
+      if (bestHour !== null) {
+        const pct = Math.round((flowRateByHour[bestHour] || 0) * 100);
+        const label = `${String(bestHour).padStart(2, '0')}:00`;
+        console.log(`Best hour: ${label}    (flow rate ${pct}%)`);
+      } else {
+        console.log('Best hour: insufficient data (need >= 3 sessions per hour)');
+      }
+      if (deadZones.length > 0) {
+        const zones = deadZones.map(z => z.type === 'day' ? z.day : `${z.hour}:00`).join(', ');
+        console.log(`Dead zones: ${zones}`);
+      } else {
+        console.log('Dead zones: none detected');
+      }
+      return;
+    }
+
+    if (options.calibrate) {
+      const { PredictionEngine } = await import('../src/utils/PredictionEngine.js');
+      const sessionRepo = atlasInstance.container.resolve('SessionRepository');
+      const now = new Date();
+      const since = new Date(now);
+      since.setDate(since.getDate() - 365);
+      const sessions = await sessionRepo.findByDateRange(since, now);
+      const proposed = parseInt(options.minutes, 10);
+      if (isNaN(proposed) || proposed <= 0) {
+        console.error('Error: --minutes must be a positive integer');
+        process.exit(1);
+      }
+      const result = new PredictionEngine(sessions).calibrate(options.calibrate, proposed);
+      console.log(`\nTime calibration for "${options.calibrate}" (${proposed} min proposed)`);
+      console.log(`Historical sessions: ${result.historicalN}   Confidence: ${result.confidence}`);
+      if (result.historicalN === 0) {
+        console.log('Calibration factor:  1.0x (no history — using prior)');
+      } else {
+        const direction = result.calibrationFactor > 1 ? `you typically run ${Math.round((result.calibrationFactor - 1) * 100)}% over` : `you typically finish ${Math.round((1 - result.calibrationFactor) * 100)}% early`;
+        console.log(`Calibration factor:  ${result.calibrationFactor}x (${direction})`);
+      }
+      console.log(`Adjusted estimate:   ${result.adjustedEstimate} min`);
+      if (result.outliersExcluded) console.log(`Outliers excluded:   ${result.outliersExcluded}`);
+      return;
+    }
+    // ── End temporal intelligence ────────────────────────────────────────
 
     // If exporting, use appropriate format
     let format = options.format;

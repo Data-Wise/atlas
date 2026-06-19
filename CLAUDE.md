@@ -31,10 +31,10 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.9.3 |
+| **Version** | 0.10.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,827 (Jest) |
+| **Tests** | 1,858 (Jest) |
 | **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
@@ -289,6 +289,7 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.10.0** - Temporal Intelligence: VelocityCalculator (4-week rolling), PatternAnalyzer (90-day flow patterns), PredictionEngine (Bayesian calibration + MAD outlier removal); `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests
 - **v0.9.3** - flow-cli Integration: CLI flags flow-cli already calls (session status --format json, project list --count/--suggest, inbox --count, trail --limit) + project list --status metadata-filter fix; live integration docs
 - **v0.9.2** - Real Data Pipeline: All mock data replaced with live ~/.atlas data
   - AtlasContext + 4 hooks (useProjects, useActiveSession, useProjectStats, usePendingCaptures)
