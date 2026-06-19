@@ -1,9 +1,9 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.10.0 PR OPEN
+## Phase: v0.10.0 RELEASED
 ## Priority: 1
-## Progress: 85
+## Progress: 100
 
 ## Focus: v0.10.0 temporal intelligence — pattern detection, velocity analytics, prediction engine
 ## Next: Brainstorm and spec v0.10.0
@@ -38,10 +38,9 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - npm: `npm install -g @data-wise/atlas`
 
 ## ✅ Just Completed (2026-06-19)
-- Implemented v0.10.0 temporal intelligence: VelocityCalculator (4-week rolling), PatternAnalyzer (90-day flow), PredictionEngine (Bayesian calibration + MAD outlier removal)
-- Added CLI flags to `atlas stats`: --velocity, --patterns, --calibrate, --minutes
-- 31 unit tests (31/31 passing); mkdocs build --strict clean; docs updated (CLI-REFERENCE, REFCARD, ROADMAP, index.md)
-- Committed + pushed feature/temporal-intelligence → PR #19 (→ dev)
+- **Released v0.10.0** — PR #19 (feature→dev) + PR #20 (dev→main) merged; tag v0.10.0 + GitHub release published; Homebrew auto-update triggered
+- Temporal intelligence: VelocityCalculator, PatternAnalyzer, PredictionEngine; `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests
+- Fixed dogfood version assertion (0.9.x → 0.10.x) before release merge
 
 ## ✅ Previously Completed (2026-06-14)
 - Merged PR #17 → dev: flow-cli integration flags F1–F5 (session status --format json, project list --count/--suggest, inbox --count, trail --limit) + status-filter fix
@@ -71,4 +70,4 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - ~/.git-worktrees/atlas/temporal-intelligence  [feature/temporal-intelligence]  v0.10.0 temporal intelligence
 
 ## 🎯 Next Action
-Review + merge PR #19 (feature/temporal-intelligence → dev) then release v0.10.0
+Plan v0.11.0 — platform expansion (remote sync, IDE extensions, terminal integrations) or deferred v0.10 items (AnalyticsView in Ink, dead-zone iCal, multi-project calibration)
