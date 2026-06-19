@@ -144,6 +144,16 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
+## :sparkles: What's New in v0.10.0
+
+!!! success "Temporal Intelligence"
+    Three new read-only analytics utilities mine your existing session history — no new data collection:
+
+    - **`atlas stats --velocity`** — 4-week rolling velocity: sessions/week, focus hours, consistency bar, trend arrow (↑/↓/→)
+    - **`atlas stats --patterns`** — Productivity patterns from 90 days: best day, best hour, dead zones (slots with 0 flow)
+    - **`atlas stats --calibrate <project> --minutes <n>`** — Bayesian time calibration: how much you historically over/under-run a project, with confidence level
+    - **3 pure utility classes** in `src/utils/`: `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine` (31 unit tests)
+
 ## :sparkles: What's New in v0.9.3
 
 !!! success "flow-cli Integration"
