@@ -37,6 +37,11 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - Homebrew: `brew install data-wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
 
+## ✅ Just Completed (2026-06-20)
+- Wrote **SPEC-ecosystem-integration-gaps** (docs/specs/, committed `a92f4e3`) — cross-repo map for atlas↔nexus + flow-cli↔obsidian-cli-ops; 7 locked decisions; RFC#35-verified; corrected a stale "atlas↔nexus done" claim (real state = a 5-month-stale text-parsing MCP shim in `statistical-research`)
+- Verified v0.10.0 release integrity — "dev N ahead of main" is a benign **squash-merge artifact** (zero code diff vs main), not an unreleased gap; project memory updated
+- Cross-repo (research-domain): built the **MediationVerse dashboard sync** as a local launchd job (replacing a documented-but-nonexistent sync); fixed 3 false auto-sync claims; regenerated dashboard from `.STATUS`; restructured medfit/medsim `.STATUS` (next:/done: convention). Script committed in new `r-packages/scripts` repo
+
 ## ✅ Just Completed (2026-06-19)
 - **Released v0.10.0** — PR #19 (feature→dev) + PR #20 (dev→main) merged; tag v0.10.0 + GitHub release published; Homebrew auto-update triggered
 - Temporal intelligence: VelocityCalculator, PatternAnalyzer, PredictionEngine; `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests
@@ -70,4 +75,6 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - (none)
 
 ## 🎯 Next Action
-Plan v0.11.0 — platform expansion (remote sync, IDE extensions, terminal integrations) or deferred v0.10 items (AnalyticsView in Ink, dead-zone iCal, multi-project calibration)
+A) **Advance integration spec** (docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md) — build is gated on obsidian-cli-ops **RFC#35** (`obs write`). One step buildable now: flow-cli `obs-bridge` (read-only) — worktree was verified-ready but NOT created. atlas's own part (P1: `catch` → obs write-through) waits on RFC#35.
+B) Plan v0.11.0 — platform expansion (remote sync, IDE extensions, terminal integrations) or deferred v0.10 items (AnalyticsView in Ink, dead-zone iCal, multi-project calibration)
+C) (separate repo) flow-cli has an apparently-unreleased v7.13.0 (dev=7.13.0, main=7.12.0) — verify/release from a flow-cli session
