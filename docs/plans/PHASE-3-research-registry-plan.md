@@ -2,7 +2,11 @@
 
 > Parent: RFC-000. Builds on PR #21 (atlas Phase 1+2, merged-ready). Author posture: expert
 > backend (atlas Node/Clean-Arch, obs Python core) + frontend (the vault board / optional HTML).
-> Date: 2026-06-25. Status: **proposed — awaiting go.**
+> Date: 2026-06-25. Status: **CORE MERGED — board live.**
+>
+> **Shipped + merged:** atlas #21 (registry kind/target/tasks + json/MCP), #23 (`atlas doctor` audit + `--fix`), #24 (json progress/next/priority); docs-standards #1 (ADR-001 ownership + settings contract); savant #46 (skills); pmed-modern #3 (.STATUS); obs #59 (`obs link`), #60 + #61 (`obs research board`). Live board rendered to vault `00_meta/_RESEARCH-BOARD.md` (3 manuscripts + 1 program). Coverage: `atlas doctor` = 47/276 (real projects).
+>
+> **Remaining (small, next batch):** collider `journal:`→venue; `MediationVerse_Dashboard` target + retire `status-sync` + scheduled `--dry-run` drift guard; wire scaffolders to call `obs link`; `atlas doctor --fix --write` curated CLAUDE.md backfill + registry hygiene; MCP `progress/next` parity. See §7 + RESEARCH_HUB → Research-Ops Platform.
 
 ---
 
