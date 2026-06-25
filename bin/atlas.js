@@ -1023,6 +1023,38 @@ templateCmd
   });
 
 program
+  .command('doctor')
+  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .obs/sync.yml)')
+  .option('--kind <kind>', 'Only audit a given kind (manuscript|program|package)')
+  .option('--all', 'List all projects, not just those with gaps')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    const { summary, rows } = await a.projects.doctor(options);
+    if (options.format === 'json') {
+      console.log(JSON.stringify({ summary, rows }, null, 2));
+      process.exit(summary.missingStatus > 0 ? 1 : 0);
+    }
+    console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
+    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)\n`);
+    const show = options.all ? rows : rows.filter(r => !r.ok);
+    if (show.length === 0) {
+      console.log('   ✅ all projects satisfy the required contract (.STATUS + CLAUDE.md)');
+    } else {
+      for (const r of show) {
+        const miss = [
+          r.has.status ? '' : '.STATUS',
+          r.has.claude ? '' : 'CLAUDE.md',
+          r.has.obsSync ? '' : '.obs/sync.yml'
+        ].filter(Boolean).join(', ');
+        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : '🟢');
+        console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
+      }
+    }
+    process.exit(summary.missingStatus > 0 ? 1 : 0);
+  });
+
+program
   .command('sync')
   .description('Sync registry from .STATUS files')
   .option('-d, --dry-run', 'Show what would be synced')
