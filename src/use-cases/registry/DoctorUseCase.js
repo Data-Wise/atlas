@@ -1,16 +1,18 @@
 /**
  * DoctorUseCase
  *
- * Read-only audit of the born-ready Project Settings Contract
+ * Audit (and optionally fix) the born-ready Project Settings Contract
  * (docs-standards ADR-001 — research-ops ecosystem ownership):
  *   - .STATUS    (atlas registry header)            [required]
  *   - CLAUDE.md  (project rules / Claude context)   [required: warn]
- *   - .obs/sync.yml | .flow/obsidian-sync.yml (mirror map) [info — `obs link` owns it]
- * Registration is implied (the project is in the registry).
+ *   - .obs/sync.yml | .flow/obsidian-sync.yml       [info — `obs link` owns it]
  *
- * No writes. Returns a structured report; the CLI maps it to an exit code.
+ * Audit is read-only. `fix()` previews by default and only writes CLAUDE.md when
+ * `write` is set — it never creates `.obs/sync.yml` (that schema belongs to `obs link`).
+ * By default the audit excludes registry cruft (worktrees, /tmp, node_modules);
+ * pass `allRegistered` to include everything.
  */
-import { existsSync } from 'node:fs'
+import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 export class DoctorUseCase {
@@ -18,23 +20,29 @@ export class DoctorUseCase {
    * @param {Object} deps
    * @param {IProjectRepository} deps.projectRepository
    * @param {(p:string)=>boolean} [deps.fileExists] - injectable for tests
+   * @param {(p:string,c:string)=>void} [deps.writeFile] - injectable for tests
    */
-  constructor({ projectRepository, fileExists = existsSync }) {
+  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync }) {
     if (!projectRepository) throw new Error('projectRepository is required')
     this.projectRepository = projectRepository
     this.fileExists = fileExists
+    this.writeFile = writeFile
   }
 
-  /**
-   * @param {Object} [options]
-   * @param {string|null} [options.kind] - only audit a given kind (manuscript|program|package)
-   * @returns {Promise<{summary: Object, rows: Array}>}
-   */
-  async execute(options = {}) {
-    const { kind = null } = options
-    const projects = await this.projectRepository.findAll()
+  /** Skip registry cruft so the audit reflects real projects. */
+  _isAuditable(path) {
+    if (!path) return false
+    if (path.includes('/worktrees/')) return false
+    if (path.includes('/node_modules/')) return false
+    if (path.startsWith('/tmp/') || path.startsWith('/private/tmp/')) return false
+    return true
+  }
 
-    const rows = projects
+  async _rows(options = {}) {
+    const { kind = null, allRegistered = false } = options
+    const projects = await this.projectRepository.findAll()
+    return projects
+      .filter(p => allRegistered || this._isAuditable(p.path || p.id))
       .filter(p => !kind || (p.metadata?.kind || p.kind) === kind)
       .map(p => {
         const path = p.path || p.id
@@ -45,8 +53,6 @@ export class DoctorUseCase {
             this.fileExists(join(path, '.obs', 'sync.yml')) ||
             this.fileExists(join(path, '.flow', 'obsidian-sync.yml'))
         }
-        // Contract: .STATUS is the hard requirement; CLAUDE.md is required-but-warn;
-        // .obs/sync.yml is info-only until `obs link` owns the schema.
         const missingRequired = []
         if (!has.status) missingRequired.push('.STATUS')
         if (!has.claude) missingRequired.push('CLAUDE.md')
@@ -59,7 +65,10 @@ export class DoctorUseCase {
           ok: missingRequired.length === 0
         }
       })
+  }
 
+  async execute(options = {}) {
+    const rows = await this._rows(options)
     const summary = {
       total: rows.length,
       ok: rows.filter(r => r.ok).length,
@@ -68,6 +77,38 @@ export class DoctorUseCase {
       missingObsSync: rows.filter(r => !r.has.obsSync).length
     }
     return { summary, rows }
+  }
+
+  /**
+   * Create missing CLAUDE.md (preview unless options.write). Never creates
+   * .obs/sync.yml — that belongs to `obs link` (ADR-001).
+   * @returns {Promise<{actions: Array, wrote: boolean}>}
+   */
+  async fix(options = {}) {
+    const write = options.write === true
+    const rows = await this._rows(options)
+    const actions = []
+    for (const r of rows) {
+      if (!r.has.claude) {
+        const path = join(r.path, 'CLAUDE.md')
+        if (write) this.writeFile(path, this._claudeStub(r))
+        actions.push({ project: r.name, file: 'CLAUDE.md', path, written: write })
+      }
+    }
+    return { actions, wrote: write }
+  }
+
+  _claudeStub(r) {
+    return [
+      `# ${r.name} — Claude context`,
+      '',
+      '**Purpose:** <one line — what this project is>',
+      '',
+      '## Conventions',
+      '- Branch workflow: `main` ← `feature/*` (PR only). See `~/.claude/CLAUDE.md`.',
+      '- Settings contract (`atlas doctor`): `.STATUS` + `CLAUDE.md` + `.obs/sync.yml`. See docs-standards ADR-001.',
+      ''
+    ].join('\n')
   }
 }
 

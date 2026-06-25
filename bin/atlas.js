@@ -1026,10 +1026,21 @@ program
   .command('doctor')
   .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .obs/sync.yml)')
   .option('--kind <kind>', 'Only audit a given kind (manuscript|program|package)')
-  .option('--all', 'List all projects, not just those with gaps')
+  .option('--all', 'List all audited projects, not just those with gaps')
+  .option('--all-registered', 'Include worktrees / tmp / non-project registry entries')
+  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .obs/sync.yml is left to `obs link`')
+  .option('--write', 'With --fix, actually write the files')
   .option('--format <format>', 'Output format (table|json)', 'table')
   .action(async (options) => {
     const a = getAtlas();
+    if (options.fix) {
+      const { actions, wrote } = await a.projects.doctorFix(options);
+      if (options.format === 'json') { console.log(JSON.stringify({ actions, wrote }, null, 2)); return; }
+      console.log(`\n🩺 atlas doctor --fix ${wrote ? '(applied)' : '(preview — pass --write to apply)'}`);
+      if (actions.length === 0) console.log('   ✅ nothing to fix');
+      else for (const ac of actions) console.log(`   ${wrote ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
+      return;
+    }
     const { summary, rows } = await a.projects.doctor(options);
     if (options.format === 'json') {
       console.log(JSON.stringify({ summary, rows }, null, 2));
