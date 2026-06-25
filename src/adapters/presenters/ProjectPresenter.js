@@ -96,7 +96,10 @@ export function formatProjectSummary(project) {
     lastAccessed: formatTimeAgo(project.lastAccessedAt),
     progress: project.progress || project.metadata?.progress || 0,
     nextAction: project.next || project.metadata?.next || null,
-    focus: project.focus || project.metadata?.focus || null
+    focus: project.focus || project.metadata?.focus || null,
+    kind: project.kind || project.metadata?.kind || null,
+    target: project.target || project.metadata?.target || null,
+    taskCount: project.metadata?.tasks?.length || 0
   }
 }
 

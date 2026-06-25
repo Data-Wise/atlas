@@ -148,6 +148,9 @@ export class SyncFromStatusUseCase {
       focus: parsed.focus,
       next: parsed.next,
       version: parsed.version,
+      kind: parsed.kind || null,
+      target: parsed.target || null,
+      tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
     }
@@ -197,6 +200,9 @@ export class SyncFromStatusUseCase {
       focus: parsed.focus,
       next: parsed.next,
       version: parsed.version,
+      kind: parsed.kind || null,
+      target: parsed.target || null,
+      tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
     }
@@ -227,7 +233,9 @@ export class SyncFromStatusUseCase {
       oldMeta.priority !== newMeta.priority ||
       oldMeta.phase !== newMeta.phase ||
       oldMeta.focus !== newMeta.focus ||
-      oldMeta.next !== newMeta.next
+      oldMeta.next !== newMeta.next ||
+      (oldMeta.kind || null) !== (newMeta.kind || null) ||
+      JSON.stringify(oldMeta.tasks || []) !== JSON.stringify(newMeta.tasks || [])
     )
   }
 
@@ -251,6 +259,14 @@ export class SyncFromStatusUseCase {
     }
     if (oldMeta.phase !== newMeta.phase) {
       changes.push(`phase: ${oldMeta.phase || 'none'} → ${newMeta.phase}`)
+    }
+    if ((oldMeta.kind || null) !== (newMeta.kind || null)) {
+      changes.push(`kind: ${oldMeta.kind || 'none'} → ${newMeta.kind || 'none'}`)
+    }
+    const oldTaskCount = (oldMeta.tasks || []).length
+    const newTaskCount = (newMeta.tasks || []).length
+    if (oldTaskCount !== newTaskCount) {
+      changes.push(`tasks: ${oldTaskCount} → ${newTaskCount}`)
     }
 
     return changes
