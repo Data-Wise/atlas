@@ -450,12 +450,20 @@ class ProjectsAPI {
     if (options.tag) {
       filtered = filtered.filter(p => p.tags?.includes(options.tag));
     }
+    if (options.kind) {
+      // Research-registry: filter by kind (manuscript|program|package). Scanned
+      // projects carry kind in metadata, like status above.
+      filtered = filtered.filter(p => (p.kind || p.metadata?.kind) === options.kind);
+    }
 
     return filtered.map(p => ({
       name: p.name,
       path: p.path,
       status: p.status || p.metadata?.status,
-      type: p.type
+      type: p.type,
+      kind: p.kind || p.metadata?.kind || null,
+      target: p.target || p.metadata?.target || null,
+      taskCount: p.metadata?.tasks?.length || 0
     }));
   }
 

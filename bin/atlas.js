@@ -73,6 +73,7 @@ project
   .description('List all projects')
   .option('-s, --status <status>', 'Filter by status')
   .option('-t, --tag <tag>', 'Filter by tag')
+  .option('--kind <kind>', 'Filter by kind (manuscript|program|package)')
   .option('--format <format>', 'Output format (table|json|names)', 'table')
   .option('--count', 'Print only the number of matching projects')
   .option('--suggest', 'Print the single most-recently-touched active project name')
