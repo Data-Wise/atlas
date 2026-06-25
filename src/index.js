@@ -423,6 +423,20 @@ class ProjectsAPI {
     return result;
   }
 
+  async doctor(options = {}) {
+    const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
+    const projectRepository = this.container.resolve('ProjectRepository');
+    const uc = new DoctorUseCase({ projectRepository });
+    return uc.execute(options);
+  }
+
+  async doctorFix(options = {}) {
+    const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
+    const projectRepository = this.container.resolve('ProjectRepository');
+    const uc = new DoctorUseCase({ projectRepository });
+    return uc.fix(options);
+  }
+
   async unregister(name) {
     const projectRepo = this.container.resolve('ProjectRepository');
     const deleted = await projectRepo.delete(name);
