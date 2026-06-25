@@ -67,3 +67,16 @@ Purely additive. Rollback = revert PR; package behavior untouched. Migration ste
 **Result:** `atlas sync --from-status --paths ~/projects/research` → **0 errors**; all 15 research `.STATUS` ingested (pmed-modern active 92%, product-of-three draft 95%, collider "revise & resubmit" 95%, sensitivity paused 40%, …). Installed `atlas project list` now shows them.
 
 **Durability note:** the installed Homebrew binary (`@data-wise/atlas` 0.10.0) runs a published copy, so it won't carry the read-side guard until a release ships with this commit. The store is already repaired, so the installed `atlas` reads it fine today; a *future* `atlas sync` from the unpatched binary that re-introduces a >500 description could recur until the release. Fix = cut an atlas release with this branch, then `brew upgrade`.
+
+## 12. Implementation status (2026-06-25)
+
+| Phase | Scope | Status |
+|---|---|---|
+| **Bugfix** | registry-load robustness (§11) | ✅ done + test |
+| **Phase 1** | parse `kind`/`target`/`tasks` → `metadata`; `summarize()` `byKind`; change detection | ✅ done + tests |
+| **Phase 2** | `project list --kind`; `kind`/`target`/`taskCount` in `--format json` + MCP `atlas_get_projects` | ✅ done + tests |
+| **Phase 3** | obs `research board` consuming the JSON; table-view `kind` column; formal `Task` entities + `atlas task` over proposals; `StatusFileGateway` parity | ⏳ planned |
+
+**Decisions realized:** proposals = task entries on the program Project (stored in `metadata.tasks`, not heavyweight Projects); `kind`/`target`/`tasks` live in `metadata` (no Project-schema change). Live-verified end-to-end: `~ pmed-modern: kind: none → program, tasks: 0 → 5`; `project list --kind program --format json` → `pmed-modern | kind=program | tasks=5`.
+
+Gap analysis + Phase-3 roadmap: [`GAP-ANALYSIS-research-registry.md`](GAP-ANALYSIS-research-registry.md). User guide: [`../RESEARCH-REGISTRY.md`](../RESEARCH-REGISTRY.md).

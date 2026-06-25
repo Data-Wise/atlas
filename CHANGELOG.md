@@ -2,6 +2,20 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Added
+- **Research registry** — `sync --from-status` now parses research `.STATUS` metadata so manuscripts and programs appear in the registry alongside packages:
+  - `kind:` (`manuscript` | `program`), `target:`/`venue:` (publication venue), and a `tasks:` block (`- text: ...; priority: ...; done: ...`) capturing a program's proposals as task entries.
+  - `StatusFileParser.summarize()` groups projects `byKind`.
+  - `atlas project list --kind <manuscript|program|package>` filter.
+  - `kind` / `target` / `taskCount` exposed in `project list --format json` and MCP `atlas_get_projects` (consumed by the obs research board).
+  - New parser / sync / formatter tests; full unit suite green (1470).
+- **Docs** — [Research Registry guide](docs/RESEARCH-REGISTRY.md), gap analysis, and Phase-3 roadmap.
+
+### Fixed
+- **Registry-load robustness** — a single stored project whose `description` exceeded the 500-char limit threw inside `FileSystemProjectRepository.findAll()`, cascading "Failed to load projects" to every sync target (one corrupt row bricked the whole registry). `_deserializeProject` now truncates `description` on read; `SyncRegistryUseCase` truncates the next-action-derived description on write (parity with `metadata.notes`). Regression test added.
+
 ## [0.10.0] - 2026-06-19
 
 ### Added

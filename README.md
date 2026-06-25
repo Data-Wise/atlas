@@ -28,6 +28,7 @@
 | [Visual Diagrams](https://data-wise.github.io/atlas/DIAGRAMS/) | Mermaid architecture diagrams |
 | [Programmatic API](https://data-wise.github.io/atlas/API-GUIDE/) | Using Atlas as a library |
 | [MCP Server](https://data-wise.github.io/atlas/MCP-SERVER/) | Model Context Protocol integration |
+| [Research Registry](https://data-wise.github.io/atlas/RESEARCH-REGISTRY/) | Manuscripts, programs & proposals in the registry |
 | [Configuration](https://data-wise.github.io/atlas/CONFIGURATION/) | All settings and preferences |
 
 ## Overview
@@ -105,6 +106,7 @@ atlas where
 ```bash
 atlas project add ~/projects/medrobust --tags=r-package,active
 atlas project list --status=active
+atlas project list --kind program          # research registry: programs/manuscripts
 atlas project show medrobust
 atlas project remove oldproject
 ```
@@ -155,7 +157,12 @@ atlas focus myproject "Delta method SEs"        # Set focus
 atlas sync                     # Import from .STATUS files
 atlas sync --dry-run           # Preview what would sync
 atlas sync --watch             # Watch mode (5s interval)
+atlas sync --from-status --paths ~/projects/research   # Research registry
 ```
+
+Research `.STATUS` files may declare `kind:` (manuscript|program), `target:` (venue), and a
+`tasks:` block (proposals). These surface via `project list --kind`, `--format json`, and MCP.
+See **[Research Registry](docs/RESEARCH-REGISTRY.md)**.
 
 ### Inbox Triage
 ```bash
