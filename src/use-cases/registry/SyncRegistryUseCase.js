@@ -171,9 +171,13 @@ export class SyncRegistryUseCase {
       project.metadata.metrics = statusData.metrics
     }
 
-    // Set focus from first next action
+    // Set focus from first next action.
+    // Truncate to the Project description limit (parity with metadata.notes below):
+    // some research .STATUS files yield a next-action longer than 500 chars, which
+    // otherwise makes `new Project()` throw "description too long" during sync.
     if (statusData.next && statusData.next.length > 0) {
-      project.description = project.description || statusData.next[0].action
+      project.description =
+        project.description || (statusData.next[0].action || '').substring(0, 500)
     }
 
     // Parse body for additional context

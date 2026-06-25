@@ -88,14 +88,17 @@ List registered projects.
 {
   status?: 'active' | 'paused' | 'completed' | 'archived',
   tag?: string,
+  kind?: 'manuscript' | 'program' | 'package',  // research registry filter
   limit?: number  // Default: 20
 }
 
 // Returns
 [
-  { name, path, type, status },
+  { name, path, type, status, kind, target, taskCount },
   ...
 ]
+// kind/target/taskCount are populated for research .STATUS projects
+// (manuscripts/programs); null/0 for ordinary packages.
 ```
 
 ### atlas_get_sessions

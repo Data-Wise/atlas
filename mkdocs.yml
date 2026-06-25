@@ -85,6 +85,7 @@ nav:
     - Workflows: WORKFLOWS.md
     - Visual Guide: VISUAL-GUIDE.md
     - CLI Reference: CLI-REFERENCE.md
+    - Research Registry: RESEARCH-REGISTRY.md
     - Configuration: CONFIGURATION.md
   - Architecture:
     - Overview: ARCHITECTURE.md

@@ -80,6 +80,11 @@ const TOOLS = [
           type: 'string',
           description: 'Filter by tag'
         },
+        kind: {
+          type: 'string',
+          enum: ['manuscript', 'program', 'package'],
+          description: 'Filter by kind (research registry)'
+        },
         limit: {
           type: 'number',
           description: 'Maximum projects to return (default: 20)',
@@ -371,7 +376,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'atlas_get_projects': {
         const projects = await atlas.projects.list({
           status: args?.status,
-          tag: args?.tag
+          tag: args?.tag,
+          kind: args?.kind
         })
         const limited = projects.slice(0, args?.limit || 20)
         return {

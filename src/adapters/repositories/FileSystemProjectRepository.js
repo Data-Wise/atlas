@@ -166,7 +166,10 @@ export class FileSystemProjectRepository extends IProjectRepository {
     return new Project(data.id, data.name, {
       type: data.type,
       path: data.path,
-      description: data.description,
+      description:
+        typeof data.description === 'string'
+          ? data.description.substring(0, 500)
+          : data.description,
       tags: data.tags,
       metadata: data.metadata,
       createdAt: new Date(data.createdAt),

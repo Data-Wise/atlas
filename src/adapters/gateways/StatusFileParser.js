@@ -118,7 +118,10 @@ export class StatusFileParser {
       focus: null,
       next: null,
       version: null,
-      updated: null
+      updated: null,
+      kind: null,
+      target: null,
+      tasks: []
     }
 
     const lines = content.split('\n')
@@ -147,6 +150,12 @@ export class StatusFileParser {
             break
           case 'type':
             data.type = value.trim()
+            break
+          case 'kind':
+            data.kind = value.trim().toLowerCase()
+            break
+          case 'target':
+            data.target = value.trim()
             break
           case 'phase':
             data.phase = value.trim()
@@ -187,10 +196,14 @@ export class StatusFileParser {
       focus: null,
       next: null,
       version: null,
-      updated: null
+      updated: null,
+      kind: null,
+      target: null,
+      tasks: []
     }
 
     const lines = content.split('\n')
+    let inTasks = false
 
     for (const line of lines) {
       const trimmed = line.trim()
@@ -198,13 +211,32 @@ export class StatusFileParser {
       // Skip comments and empty lines
       if (!trimmed || trimmed.startsWith('#')) continue
 
+      // Collect items under a `tasks:` block (proposals → tasks)
+      if (inTasks) {
+        if (trimmed.startsWith('- ')) {
+          const item = this._parseTaskItem(trimmed)
+          if (item) data.tasks.push(item)
+          continue
+        }
+        // Anything else ends the tasks block; fall through to normal parsing
+        inTasks = false
+      }
+
       // Match key: value pattern (split on first colon only)
       const colonIndex = trimmed.indexOf(':')
       if (colonIndex > 0 && /^\w+$/.test(trimmed.slice(0, colonIndex))) {
         const key = trimmed.slice(0, colonIndex).trim()
         const value = trimmed.slice(colonIndex + 1).trim()
-        if (!value) continue
         const lowerKey = key.toLowerCase()
+
+        // `tasks:` opens a block of `- text: ...; priority: ...; done: ...` items
+        if (lowerKey === 'tasks' && !value) {
+          inTasks = true
+          data.tasks = []
+          continue
+        }
+
+        if (!value) continue
         const cleanValue = this._cleanValue(value)
 
         switch (lowerKey) {
@@ -223,6 +255,13 @@ export class StatusFileParser {
             break
           case 'type':
             data.type = cleanValue
+            break
+          case 'kind':
+            data.kind = cleanValue.toLowerCase()
+            break
+          case 'target':
+          case 'venue':
+            data.target = cleanValue
             break
           case 'phase':
             data.phase = cleanValue
@@ -251,6 +290,38 @@ export class StatusFileParser {
   }
 
   /**
+   * Parse a single inline task item from a `tasks:` block.
+   * Format: `- text: "define estimand"; priority: P1; done: false`
+   * @private
+   */
+  _parseTaskItem(line) {
+    const body = line.replace(/^-\s+/, '')
+    const item = {}
+    for (const seg of body.split(';')) {
+      const ci = seg.indexOf(':')
+      if (ci < 0) continue
+      const key = seg.slice(0, ci).trim().toLowerCase()
+      const val = this._cleanValue(seg.slice(ci + 1).trim())
+      switch (key) {
+        case 'text':
+          item.text = val
+          break
+        case 'priority':
+          item.priority = val
+          break
+        case 'done':
+          item.done = val === 'true' || val === true
+          break
+        case 'est':
+        case 'estimate':
+          item.est = val
+          break
+      }
+    }
+    return item.text ? item : null
+  }
+
+  /**
    * Clean a value (remove quotes, parse types)
    * @private
    */
@@ -275,6 +346,7 @@ export class StatusFileParser {
     const summary = {
       total: scanResults.length,
       byStatus: {},
+      byKind: {},
       byPriority: { 1: [], 2: [], 3: [] },
       byProgress: { complete: [], inProgress: [], notStarted: [] }
     }
@@ -289,6 +361,13 @@ export class StatusFileParser {
         summary.byStatus[status] = []
       }
       summary.byStatus[status].push({ path, ...parsed })
+
+      // Group by kind (manuscript / program / package / unspecified)
+      const kind = parsed.kind || 'unspecified'
+      if (!summary.byKind[kind]) {
+        summary.byKind[kind] = []
+      }
+      summary.byKind[kind].push({ path, ...parsed })
 
       // Group by priority
       const priorityKey = Math.min(3, Math.max(1, priority))
