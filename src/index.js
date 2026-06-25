@@ -477,7 +477,10 @@ class ProjectsAPI {
       type: p.type,
       kind: p.kind || p.metadata?.kind || null,
       target: p.target || p.metadata?.target || null,
-      taskCount: p.metadata?.tasks?.length || 0
+      taskCount: p.metadata?.tasks?.length || 0,
+      progress: p.progress ?? p.metadata?.progress ?? null,
+      next: p.next || p.metadata?.next || null,
+      priority: p.priority || p.metadata?.priority || null
     }));
   }
 
