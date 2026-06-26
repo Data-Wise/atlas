@@ -252,6 +252,7 @@ export class StatusFileParser {
             break
           case 'priority':
             data.priority = parseInt(cleanValue, 10) || 3
+            data.priorityLabel = cleanValue
             break
           case 'type':
             data.type = cleanValue
@@ -261,6 +262,7 @@ export class StatusFileParser {
             break
           case 'target':
           case 'venue':
+          case 'journal':
             data.target = cleanValue
             break
           case 'phase':

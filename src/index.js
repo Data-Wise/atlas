@@ -480,7 +480,7 @@ class ProjectsAPI {
       taskCount: p.metadata?.tasks?.length || 0,
       progress: p.progress ?? p.metadata?.progress ?? null,
       next: p.next || p.metadata?.next || null,
-      priority: p.priority || p.metadata?.priority || null
+      priority: p.metadata?.priorityLabel || p.priority || p.metadata?.priority || null
     }));
   }
 

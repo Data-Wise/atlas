@@ -41,4 +41,12 @@ describe('formatProjects — research kind/target/tasks', () => {
     expect(out).not.toContain('Venue:')
     expect(out).not.toContain('Tasks:')
   })
+
+  it('renders progress and next when present (FW-4)', () => {
+    const out = formatProjects([
+      { name: 'pmed-modern', type: 'research', status: 'active', kind: 'program', progress: 92, next: 'advance 05' }
+    ])
+    expect(out).toContain('Progress: 92%')
+    expect(out).toContain('Next: advance 05')
+  })
 })
