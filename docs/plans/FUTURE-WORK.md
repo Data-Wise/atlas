@@ -11,6 +11,33 @@
 
 ---
 
+## Status — updated 2026-06-26
+
+**Shipped since this plan was written:**
+
+- ✅ **M1 board-truth (FW-1, FW-3, FW-4)** — `journal:`→venue alias, raw priority label preserved, MCP `progress`/`next` parity. (PR #33)
+- ✅ **FW-10 registry hygiene** — removed 204 leaked test-temp entries (`/var/folders/.../T/tmp.*`) + 20 orphans (dead paths + stale `probmed` worktrees). Root cause was the CLI ignoring the documented `ATLAS_DATA_DIR`, so `dogfood-interactive-v2.sh` leaked fixtures into `~/.atlas`; **fixed** (PR #34) + dogfood version assertion made release-agnostic. Registry now reflects real projects; `doctor` honest at ~46/62.
+- ✅ **FW-24 release** — **atlas v0.11.0** cut (dev→main #35, GitHub Release, tap auto-bumped via `homebrew-release.yml`, `brew upgrade`). Installed binary now carries registry/`doctor`/`--kind`/board-truth. Reconciled a pre-existing dev↔main squash-merge divergence with a verified `-s ours` back-merge.
+- ✅ **FW-15 (the real bug)** — plain `sync` was **stripping** research `kind/target/tasks/priorityLabel` (not merely ignoring them); any `atlas sync` wiped the research registry. **Fixed**: `SyncRegistryUseCase._preserveResearchMetadata` carries them forward on update; regression test added. Issue #36.
+
+**Decisions locked this session:**
+
+- **mcp-servers → umbrella-only.** The 9 child repos (own `.git`, 3 levels deep) are not tracked individually; atlas's scanner is 2-deep, so they'd re-orphan every sync. Track the umbrella `mcp-servers` only.
+
+**Still open from this plan:** FW-9 (curated `CLAUDE.md` backfill — 7 dev-tools + `examark` `.STATUS`, in progress), FW-15 doc note (CLI-REFERENCE), FW-2/5/6/7 (dashboard surfaces), FW-8/11–14 (born-ready + scheduler), FW-16/18–23 (tests + docs), FW-25 (obs release), FW-17/26 (stretch).
+
+**New follow-ups discovered this session** — now planned in detail in [`ATLAS-FIX-PLAN.md`](ATLAS-FIX-PLAN.md)
+(per-item design, tests, docs, acceptance). Tracking issues: **#40 (FW-27)**, **#41 (FW-28)**, **#42 (FW-29)**,
+the docs/test deep-dives **#43–#46** (FW-15-doc/16/18/20), and the 0.11.1 ship **#39**.
+
+| ID | Task | Repo | Effort | Acceptance |
+|----|------|------|--------|-----------|
+| FW-27 | Make sync research-safe by design: either make `--from-status` the default, or have plain `sync` **warn** when it would touch a project carrying research metadata (belt-and-suspenders over the FW-15 preserve-fix) | atlas | **S–M** | plain sync never silently degrades a research project; warn or no-op |
+| FW-28 | Scanner depth / sub-repo tracking: either support an explicit deeper scan path for monorepo-style dirs (`mcp-servers/*`) or document umbrella-only as policy in CLI-REFERENCE | atlas | **S** | sub-repos either tracked stably or explicitly out-of-scope |
+| FW-29 | Venue parse strips trailing inline comments: `target: CSDA … # was JASA` currently stores the comment in the venue string | atlas (StatusFileParser) | **S** | venue = `CSDA`, comment dropped; test |
+
+---
+
 ## E1 — Board completeness & data fidelity
 Make the dashboard show everything, accurately.
 

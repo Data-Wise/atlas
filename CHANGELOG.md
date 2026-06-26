@@ -4,6 +4,14 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-06-26
+
+### Fixed
+- **Plain sync no longer strips research metadata** — `atlas sync` / `sync --remove-orphans` (`SyncRegistryUseCase`) used to null `kind`/`target`/`tasks`/`priorityLabel` that `sync --from-status` had populated, silently emptying the research registry on every routine sync. It now carries those fields forward on update (`_preserveResearchMetadata`). Regression test added. (#36)
+
+### Documentation
+- Brought reference docs current to v0.11.x: `atlas doctor` + the plain-sync vs `--from-status` ownership contract in RESEARCH-REGISTRY and CLI-REFERENCE; `progress`/`next`/`priority` in MCP-SERVER; a research-registry + doctor data-flow (mermaid) in ARCHITECTURE; REFCARD bumped to v0.11.0. Added `docs/plans/ATLAS-FIX-PLAN.md` (the research-ops fix plan) and cross-linked `FUTURE-WORK.md` with the tracking issues (#39–#46).
+
 ## [0.11.0] - 2026-06-25
 
 ### Added

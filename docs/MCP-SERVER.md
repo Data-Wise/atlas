@@ -94,11 +94,12 @@ List registered projects.
 
 // Returns
 [
-  { name, path, type, status, kind, target, taskCount },
+  { name, path, type, status, kind, target, taskCount, progress, next, priority },
   ...
 ]
 // kind/target/taskCount are populated for research .STATUS projects
 // (manuscripts/programs); null/0 for ordinary packages.
+// progress/next/priority give the obs research board parity with `project list --json`.
 ```
 
 ### atlas_get_sessions

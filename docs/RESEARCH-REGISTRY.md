@@ -56,6 +56,11 @@ atlas sync --from-status --paths ~/projects/research --report
 Sync is idempotent. The change report calls out research fields, e.g.
 `~ pmed-modern: kind: none → program, tasks: 0 → 5`.
 
+> **Which sync owns research metadata?** `sync --from-status` is the **authority** — it parses and updates
+> `kind`/`target`/`tasks`/`priority`. A plain `atlas sync` (packages-only) **preserves** existing research
+> metadata but does not re-parse it, so re-run `--from-status` after editing a manuscript's `.STATUS`.
+> *(Plain sync used to silently strip these fields — fixed in 0.11.1; see issue #36.)*
+
 ---
 
 ## Querying
@@ -70,7 +75,7 @@ atlas project list --kind program --format json
 # → [{ "name":"pmed-modern", "kind":"program", "target":"Epidemiology / JASA", "taskCount":5, ... }]
 ```
 
-`--format json` items include `name, path, status, type, kind, target, taskCount`.
+`--format json` items include `name, path, status, type, kind, target, taskCount, progress, next, priority`.
 
 ### Via MCP (for Claude / the obs research board)
 
@@ -84,6 +89,22 @@ atlas_get_projects({ kind: 'program' })
 //      Venue: Epidemiology / JASA
 //      Tasks: 5
 ```
+
+---
+
+## Validating — `atlas doctor`
+
+`atlas doctor` audits every registered project against the **Project Settings Contract**
+(`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) and reports the gaps:
+
+```bash
+atlas doctor                      # audit all real projects (excludes worktrees/tmp)
+atlas doctor --kind manuscript    # restrict to one kind
+atlas doctor --fix --write        # create missing CLAUDE.md (preview without --write)
+```
+
+It exits non-zero on a missing `.STATUS` (a CI / launchd drift guard). The contract itself is defined in
+`dev-tools/docs-standards` (ADR-001).
 
 ---
 

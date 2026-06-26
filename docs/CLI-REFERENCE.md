@@ -1068,6 +1068,8 @@ atlas sync --from-status --paths ~/projects/research
 ```
 
 > **Research registry:** with `--from-status`, atlas also parses `kind:` (manuscript|program), `target:`/`venue:`, and a `tasks:` block (proposals → task entries on the program). Surfaced via `project list --kind`, `--format json`, and MCP `atlas_get_projects`. See [Research Registry](RESEARCH-REGISTRY.md).
+>
+> **Ownership:** `--from-status` is the **authority** for research metadata — a plain `atlas sync` is packages-only and *preserves* existing `kind`/`target`/`tasks` but does not re-parse them. Re-run `--from-status` after editing a manuscript's `.STATUS`. *(Plain sync previously stripped these — fixed in 0.11.1, issue #36.)*
 
 ### `atlas doctor`
 
