@@ -1,6 +1,6 @@
 # Atlas Fix Plan — research-ops hardening (docs + tests first)
 
-> **Status:** Proposed — tracking issues **[#39–#46](https://github.com/Data-Wise/atlas/issues)** filed · **Date:** 2026-06-26 · **Owner:** DT · **Branch model:** `feature/*` → `dev` → `main`
+> **Status:** ✅ **COMPLETE** — all items shipped in **v0.11.1–v0.12.2**; issues **#39–#46 + #49 closed**. Follow-on scheduling backlog filed as **#61/#62/#63**. · **Date:** 2026-06-26 · **Owner:** DT · **Branch model:** `feature/*` → `dev` → `main`
 > **Scope:** the data-integrity fixes found this session (FW-27/28/29), the FW-15 doc note, the deferred
 > atlas docs/test deep-dives (FW-16/18/20), and the `0.11.1` patch that ships the already-merged FW-15 fix.
 > Every work item carries an explicit **Testing** deliverable and **Documentation** deliverable — no fix is

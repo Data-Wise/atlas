@@ -11,7 +11,36 @@
 
 ---
 
-## Status — updated 2026-06-26
+## Status — ✅ ATLAS-FIX plan COMPLETE (2026-06-26)
+
+**All 8 ATLAS-FIX items shipped and released.** Releases this session: **v0.11.1 → v0.12.0 → v0.12.1 → v0.12.2** (installed).
+
+| Item | Issue | Shipped in |
+|---|---|---|
+| R0 — 0.11.1 ship | #39 ✅ | v0.11.1 |
+| FW-27 — sync research-safe (warn + `--research`, ADR-002) | #40 ✅ | v0.12.0 |
+| FW-28 — scanner `.atlas-scan-children` marker (ADR-003) | #41 ✅ | v0.12.0 |
+| FW-29 — venue inline-comment strip | #42 ✅ | v0.12.0 |
+| FW-16 — focused `list`/`--kind`/MCP tests | #44 ✅ | v0.12.0 |
+| FW-15-doc / FW-18 / FW-20 — docs | #43/#45/#46 ✅ | docs-currency (#47) |
+| FW-30 — sync id convergence (path-fallback) | #49 ✅ | v0.12.1 |
+| FW-9 — curated `CLAUDE.md` backfill | — ✅ | 7 dev-tools + `examark` |
+
+Plus: **Cookbook** (`docs/COOKBOOK.md`), API/Doctor docs, ARCHITECTURE refresh, the research-ops **overview** +
+**ADR-002/003** (docs-standards), and the public **research-ops page** (website). `doctor` honest at 54/62.
+
+**New backlog (this session) — scheduling / automation:**
+- **#61** — schedule `atlas sync --research` + `obs research board` before the action board (FW-12).
+- **#62** — dedupe `mediationverse-status-sync` (launchd + cloud task are redundant).
+- **#63** — render the package dashboard via `obs research board`, retire the status-sync script (FW-2/FW-11).
+
+**Still open (E-level backlog, #27–#32):** FW-2/5/6/7 (dashboard surfaces), FW-8/13/14 (born-ready scaffolders + `.obs/`
+migration + obs config), FW-21/22 (savant skills index — docs-standards overview done), FW-17/26 (stretch).
+`obs research board` and the obs release (FW-25) have **shipped**.
+
+---
+
+## Status — mid-session log (historical)
 
 **Shipped since this plan was written:**
 
