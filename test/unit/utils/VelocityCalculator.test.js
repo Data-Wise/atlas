@@ -12,18 +12,22 @@ function mockSession(startTime, durationMinutes) {
 
 // Helper: get the Monday of the ISO week N weeks before the current week
 function weeksAgoMonday(n) {
+  // Build dates in LOCAL time to match VelocityCalculator's local-date ISO-week
+  // bucketing. UTC-midnight dates shift to the previous day in negative-offset
+  // timezones (e.g. ABQ, UTC-6/7) and bucket into the wrong week — the source of
+  // the prior date-dependent flakiness.
   const now = new Date()
-  const day = now.getUTCDay() || 7
-  const thisMonday = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
-  thisMonday.setUTCDate(thisMonday.getUTCDate() - (day - 1))
+  const day = now.getDay() || 7
+  const thisMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  thisMonday.setDate(thisMonday.getDate() - (day - 1))
   const target = new Date(thisMonday)
-  target.setUTCDate(target.getUTCDate() - n * 7)
+  target.setDate(target.getDate() - n * 7)
   return target
 }
 
 function addDays(date, n) {
   const d = new Date(date)
-  d.setUTCDate(d.getUTCDate() + n)
+  d.setDate(d.getDate() + n)
   return d
 }
 
