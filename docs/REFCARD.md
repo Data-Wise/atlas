@@ -99,6 +99,7 @@ flowchart LR
 | -------------------- | ------------------------- | -------------------------- |
 | `plan`               | Guided daily planning     | `atlas plan`               |
 | `sync --from-status` | Import from .STATUS files | `atlas sync --from-status` |
+| `doctor` | Audit the settings contract | `atlas doctor` |
 
 ### Projects
 

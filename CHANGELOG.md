@@ -11,7 +11,9 @@ All notable changes to Atlas are documented here.
   - `atlas project list --kind <manuscript|program|package>` filter.
   - `kind` / `target` / `taskCount` exposed in `project list --format json` and MCP `atlas_get_projects` (consumed by the obs research board).
   - New parser / sync / formatter tests; full unit suite green (1470).
-- **Docs** — [Research Registry guide](docs/RESEARCH-REGISTRY.md), gap analysis, and Phase-3 roadmap.
+- **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--kind`, `--all-registered`, and `--fix`/`--write` (creates missing `CLAUDE.md`). Excludes worktrees/tmp by default; exits 1 on missing `.STATUS` (CI/launchd drift guard).
+- **`project list --json`** now also returns `progress`, `next`, and `priority` (research-board fidelity).
+- **Docs** — [Research Registry guide](docs/RESEARCH-REGISTRY.md), [Research Registry & Doctor tutorial](docs/tutorials/research-registry.md), gap analysis, and Phase-3 roadmap.
 
 ### Fixed
 - **Registry-load robustness** — a single stored project whose `description` exceeded the 500-char limit threw inside `FileSystemProjectRepository.findAll()`, cascading "Failed to load projects" to every sync target (one corrupt row bricked the whole registry). `_deserializeProject` now truncates `description` on read; `SyncRegistryUseCase` truncates the next-action-derived description on write (parity with `metadata.notes`). Regression test added.
