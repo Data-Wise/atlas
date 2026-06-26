@@ -63,7 +63,9 @@ export class Atlas {
   }
 
   _defaultConfigPath() {
-    return process.env.ATLAS_CONFIG || `${process.env.HOME}/.atlas`;
+    // ATLAS_DATA_DIR is the documented data-dir override (see docs/CONFIGURATION.md)
+    // and is honored by the MCP entry point; honor it here too so the CLI matches.
+    return process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR || `${process.env.HOME}/.atlas`;
   }
 
   /**
