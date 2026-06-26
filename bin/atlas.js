@@ -1073,19 +1073,23 @@ program
   .option('-p, --paths <paths>', 'Comma-separated root paths to scan')
   .option('--remove-orphans', 'Remove projects no longer on disk')
   .option('--from-status', 'Scan for .STATUS files in dev-tools ecosystem')
+  .option('--research', 'Research-aware sync (alias for --from-status; defaults to ~/projects/research)')
   .option('--report', 'Show ecosystem summary without syncing')
   .action(async (options) => {
-    // New --from-status mode uses SyncFromStatusUseCase
-    if (options.fromStatus || options.report) {
+    // New --from-status mode (also reached via the --research alias) uses SyncFromStatusUseCase
+    if (options.fromStatus || options.research || options.report) {
       const { homedir } = await import('os');
       const { join } = await import('path');
       const atlas = getAtlas();
       const syncUseCase = atlas.container.resolve('SyncFromStatusUseCase');
 
-      // Default to ~/projects/dev-tools if no paths specified
+      // Default scan root: --research → ~/projects/research, otherwise ~/projects/dev-tools
+      const defaultRoot = options.research
+        ? join(homedir(), 'projects', 'research')
+        : join(homedir(), 'projects', 'dev-tools');
       const rootPath = options.paths
         ? options.paths.split(',')[0].trim().replace(/^~/, homedir())
-        : join(homedir(), 'projects', 'dev-tools');
+        : defaultRoot;
 
       console.log(`🔍 Scanning ${rootPath} for .STATUS files...`);
 
@@ -1190,6 +1194,15 @@ program
       const result = await getAtlas().sync(syncOptions);
       console.log(result.message);
       showSyncStats(result.stats);
+
+      if (result.warnings && result.warnings.length > 0) {
+        for (const w of result.warnings) {
+          if (w.type === 'research-not-refreshed') {
+            console.log(`\n⚠️  ${w.projects.length} research project(s) preserved but not refreshed by plain sync: ${w.projects.join(', ')}`);
+            console.log(`   Run \`${w.remedy}\` to update kind/target/tasks.`);
+          }
+        }
+      }
 
       if (result.errors.length > 0) {
         console.log('\n⚠️  Errors:');
