@@ -77,3 +77,19 @@ describe('PatternAnalyzer — rate semantics', () => {
     expect(flowRateByHour[9]).toBe(1)
   })
 })
+
+describe('PatternAnalyzer — malformed startTime is skipped, not bucketed', () => {
+  test('an unparseable startTime string does not create NaN/undefined buckets', () => {
+    const sessions = [
+      ...repeat(3, () => sessionOn('Monday', 9, 60)),
+      { startTime: 'not-a-date', getDuration: () => 60, outcome: 'completed', state: { isActive: () => false, isEnded: () => true } }
+    ]
+    const { bestDay, flowRateByHour, flowRateByDay } = new PatternAnalyzer(sessions).analyze()
+
+    // The valid sessions still drive the analysis...
+    expect(bestDay).toBe('Monday')
+    // ...and the bad session leaked no spurious bucket keys.
+    expect(Object.keys(flowRateByHour)).not.toContain('NaN')
+    expect(Object.keys(flowRateByDay)).not.toContain('undefined')
+  })
+})

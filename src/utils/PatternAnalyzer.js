@@ -57,6 +57,7 @@ export class PatternAnalyzer {
     for (const session of this._sessions) {
       if (!session.startTime) continue
       const t = session.startTime instanceof Date ? session.startTime : new Date(session.startTime)
+      if (Number.isNaN(t.getTime())) continue // unparseable startTime → skip, don't bucket into NaN/undefined
       const hour = t.getHours()
       const day = DAYS[t.getDay()]
       const flow = isFlowSession(session) ? 1 : 0
