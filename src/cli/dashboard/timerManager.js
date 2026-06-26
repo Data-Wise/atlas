@@ -243,7 +243,7 @@ export function createTimerManager(options = {}) {
    * @param {Function} callback - Callback function
    */
   function on(event, callback) {
-    if (callbacks.hasOwnProperty(event)) {
+    if (Object.hasOwn(callbacks, event)) {
       callbacks[event] = callback
     }
   }
