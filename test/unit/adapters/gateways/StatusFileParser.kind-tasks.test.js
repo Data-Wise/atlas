@@ -76,4 +76,20 @@ describe('StatusFileParser — kind/target/tasks (research-registry)', () => {
     expect(d.priorityLabel).toBe('P0')
     expect(d.priority).toBe(3) // free-text P0 → numeric fallback unchanged
   })
+
+  test('strips a trailing inline comment from target/venue/journal (FW-29)', () => {
+    const y = parser._parseYAMLFormat(['status: draft', 'target: CSDA # was JASA — retargeted 2026-06-25'].join('\n'), 'p3')
+    expect(y.target).toBe('CSDA')
+
+    const v = parser._parseYAMLFormat(['status: draft', 'venue: AMPPS   # R&R'].join('\n'), 'collider')
+    expect(v.target).toBe('AMPPS')
+
+    const m = parser._parseMarkdownFormat(['## Status: draft', '## Target: Biometrika # tentative'].join('\n'), 'x')
+    expect(m.target).toBe('Biometrika')
+  })
+
+  test('keeps a # that is part of the venue when not whitespace-anchored (FW-29)', () => {
+    const d = parser._parseYAMLFormat(['status: draft', 'target: Journal#3'].join('\n'), 'x')
+    expect(d.target).toBe('Journal#3')
+  })
 })

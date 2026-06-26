@@ -4,6 +4,19 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-06-26
+
+### Added
+- **`atlas sync --research`** — research-aware sync alias (forwards to `--from-status`, defaults to `~/projects/research`). (#40)
+- **Plain-sync research warning** — a plain `atlas sync` now warns and names the research projects it preserved but did not refresh, with the remedy (`atlas sync --from-status`). Ownership contract: docs-standards ADR-002. Unit + e2e tests. (#40)
+
+### Fixed
+- **Venue/target inline comments** — `target:` / `venue:` / `journal:` now strip a trailing whitespace-anchored `# comment` (e.g. `CSDA # was JASA` → `CSDA`); a `#` without a preceding space is kept. (#42)
+- **Scanner umbrella policy** — a project-dir is a scan leaf by default (umbrella-only); a `.atlas-scan-children` marker opts an umbrella in to having its child repos scanned too (bounded by maxDepth). Integration test added. Policy: docs-standards ADR-003. (#41)
+
+### Tests
+- **Focused research-surface coverage** — direct unit tests for `ProjectsAPI.list()` research fields + `--kind` filter (previously only transitive). (#44)
+
 ## [0.11.1] - 2026-06-26
 
 ### Fixed

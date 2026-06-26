@@ -6,7 +6,7 @@
 
 import { describe, test, expect } from '@jest/globals'
 import { execSync } from 'child_process'
-import { mkdtempSync, rmSync } from 'fs'
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { fileURLToPath } from 'url'
@@ -549,6 +549,39 @@ describe('Atlas CLI - E2E Tests', () => {
 
       expect(exitCode).toBe(0)
       expect(stdout).toContain('DRY RUN')
+    })
+
+    test('sync --help lists the --research alias (FW-27)', () => {
+      const { stdout, exitCode } = runCLI('sync --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--research')
+    })
+
+    test('plain sync warns about research projects it did not refresh (FW-27)', () => {
+      const home = mkdtempSync(join(tmpdir(), 'atlas-fw27-'))
+      const env = {
+        ...process.env,
+        NODE_ENV: 'test',
+        HOME: home,
+        ATLAS_CONFIG: join(home, '.atlas'),
+        ATLAS_DATA_DIR: join(home, '.atlas')
+      }
+      const proj = join(home, 'proj')
+      mkdirSync(join(proj, 'manu'), { recursive: true })
+      writeFileSync(join(proj, 'manu', '.STATUS'), 'status: active\nkind: manuscript\ntarget: JASA\n')
+
+      // Real-world order: plain sync registers (path id) → from-status sets kind → plain sync warns.
+      runCLI(`sync --paths "${proj}"`, { env })
+      runCLI(`sync --from-status --paths "${proj}"`, { env })
+      const { stdout, exitCode } = runCLI(`sync --paths "${proj}"`, { env })
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('not refreshed by plain sync')
+      expect(stdout).toContain('manu')
+      expect(stdout).toContain('atlas sync --from-status')
+
+      rmSync(home, { recursive: true, force: true })
     })
   })
 

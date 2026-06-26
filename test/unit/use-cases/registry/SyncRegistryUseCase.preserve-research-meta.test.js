@@ -128,3 +128,61 @@ describe('SyncRegistryUseCase — research metadata preservation', () => {
     expect(saved.metadata.target).toBeUndefined()
   })
 })
+
+describe('SyncRegistryUseCase — research-not-refreshed warning (FW-27)', () => {
+  function existingResearch(id, path, name, kind) {
+    return {
+      id,
+      path,
+      name,
+      type: { value: 'general' },
+      description: `${name} desc`,
+      totalSessions: 0,
+      totalDuration: 0,
+      metadata: { status: 'active', kind }
+    }
+  }
+
+  test('plain sync warns about research projects it preserved but did not refresh', async () => {
+    const repo = new MockProjectRepository()
+    repo.projects.set('m1', existingResearch('m1', '/x/m1', 'manuscript-one', 'manuscript'))
+    repo.projects.set('pr1', existingResearch('pr1', '/x/pr1', 'program-one', 'program'))
+    repo.projects.set('pkg', { id: 'pkg', path: '/x/pkg', name: 'pkg-one', type: { value: 'general' }, metadata: { status: 'active' } })
+    const gateway = new MockStatusFileGateway({}) // no .STATUS changes
+    const fs = new MockFsProjectRepository([
+      scannedProject('m1', '/x/m1'),
+      scannedProject('pr1', '/x/pr1'),
+      scannedProject('pkg', '/x/pkg')
+    ])
+    const useCase = new SyncRegistryUseCase({
+      projectRepository: repo,
+      statusFileGateway: gateway,
+      fileSystemProjectRepository: fs
+    })
+
+    const result = await useCase.execute({ rootPaths: ['/x'], removeOrphans: false })
+
+    expect(result.warnings).toHaveLength(1)
+    const w = result.warnings[0]
+    expect(w.type).toBe('research-not-refreshed')
+    expect(w.projects).toEqual(expect.arrayContaining(['manuscript-one', 'program-one']))
+    expect(w.projects).not.toContain('pkg-one')
+    expect(w.remedy).toBe('atlas sync --from-status')
+  })
+
+  test('no warning when no research projects are present', async () => {
+    const repo = new MockProjectRepository()
+    repo.projects.set('pkg', { id: 'pkg', path: '/x/pkg', name: 'pkg-one', type: { value: 'general' }, metadata: { status: 'active' } })
+    const gateway = new MockStatusFileGateway({})
+    const fs = new MockFsProjectRepository([scannedProject('pkg', '/x/pkg')])
+    const useCase = new SyncRegistryUseCase({
+      projectRepository: repo,
+      statusFileGateway: gateway,
+      fileSystemProjectRepository: fs
+    })
+
+    const result = await useCase.execute({ rootPaths: ['/x'], removeOrphans: false })
+
+    expect(result.warnings).toHaveLength(0)
+  })
+})

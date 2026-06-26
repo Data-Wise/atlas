@@ -12,6 +12,17 @@
 import { readFile, readdir, stat, access, constants } from 'node:fs/promises'
 import { join, basename, dirname } from 'node:path'
 
+/**
+ * Strip a trailing whitespace-anchored inline comment from a .STATUS value,
+ * e.g. `CSDA # was JASA — retargeted` → `CSDA`. The leading-whitespace anchor
+ * keeps a `#` that is part of the value itself (no preceding space).
+ * @param {string} value
+ * @returns {string}
+ */
+function stripInlineComment(value) {
+  return String(value == null ? '' : value).replace(/\s+#.*$/, '').trim()
+}
+
 export class StatusFileParser {
   /**
    * Scan a directory tree for all .STATUS files
@@ -155,7 +166,7 @@ export class StatusFileParser {
             data.kind = value.trim().toLowerCase()
             break
           case 'target':
-            data.target = value.trim()
+            data.target = stripInlineComment(value)
             break
           case 'phase':
             data.phase = value.trim()
@@ -263,7 +274,7 @@ export class StatusFileParser {
           case 'target':
           case 'venue':
           case 'journal':
-            data.target = cleanValue
+            data.target = stripInlineComment(cleanValue)
             break
           case 'phase':
             data.phase = cleanValue

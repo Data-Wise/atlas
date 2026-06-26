@@ -97,6 +97,25 @@ How many directory levels deep to scan for projects.
 
 ---
 
+## Per-project scan markers
+
+### `.atlas-scan-children`
+
+By default the scanner treats a project directory as a **leaf** — when a directory is itself a project
+(has `.STATUS` / `package.json` / etc.), atlas records it and does **not** descend into its children. This keeps
+an "umbrella" directory (a monorepo that is itself a project) from sprawling its child repos into the registry.
+
+To opt an umbrella in to having its child repos scanned too, drop an empty marker file in it:
+
+```bash
+touch ~/projects/dev-tools/mcp-servers/.atlas-scan-children
+```
+
+The scanner then records the umbrella **and** its children (still bounded by `scanDepth`). Policy:
+docs-standards **ADR-003**.
+
+---
+
 ## Preferences
 
 All preferences are under the `preferences` key.

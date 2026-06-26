@@ -449,6 +449,13 @@ export class FileSystemProjectRepository extends IProjectRepository {
           )
           projects.push(project)
           if (progressCallback) progressCallback(project)
+
+          // FW-28: a project-dir is a leaf by default (umbrella-only). If it opts
+          // in via a `.atlas-scan-children` marker, also recurse into its children
+          // so nested first-class repos (e.g. an mcp-servers/* monorepo) are found.
+          if (await this._hasScanChildrenMarker(projectPath)) {
+            await this._scanRecursive(projectPath, projects, progressCallback, currentDepth + 1, maxDepth)
+          }
         } else {
           // Not a project, recurse deeper
           await this._scanRecursive(projectPath, projects, progressCallback, currentDepth + 1, maxDepth)
@@ -456,6 +463,22 @@ export class FileSystemProjectRepository extends IProjectRepository {
       }
     } catch (error) {
       // Silently skip directories that fail to read
+    }
+  }
+
+  /**
+   * Whether a project directory opts in to having its children scanned too
+   * (the FW-28 umbrella / monorepo marker). Default is umbrella-only.
+   * @param {string} projectPath
+   * @returns {Promise<boolean>}
+   * @private
+   */
+  async _hasScanChildrenMarker(projectPath) {
+    try {
+      await fs.access(join(projectPath, '.atlas-scan-children'))
+      return true
+    } catch {
+      return false
     }
   }
 
