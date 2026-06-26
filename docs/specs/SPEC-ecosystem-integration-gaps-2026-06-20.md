@@ -1,7 +1,8 @@
 # SPEC: Ecosystem Integration Gaps — atlas ↔ nexus, flow-cli ↔ obsidian-cli-ops
 
-> **Status:** draft
+> **Status:** updated — RFC#35 landed, vault CRUD → IPC bridge (v4.2.0 target)
 > **Created:** 2026-06-20
+> **Last Updated:** 2026-06-26
 > **From Brainstorm:** `/workflow:brainstorm -d -s` (deep, save) — this session
 > **Scope:** Cross-repo. Saved in `atlas/docs/specs/` because atlas is the ecosystem hub and the session repo, but the work spans **four+ repos** (atlas, flow-cli, obsidian-cli-ops, mcp-servers/statistical-research). atlas does NOT own the flow-cli or obs work.
 > **Goal:** Find integration gaps (primary) + plan tighter integration where it makes sense (secondary).
@@ -87,7 +88,7 @@ flowchart TB
 |------|-------------------------------|
 | **atlas** | Outputs: `--format json/names/shell`, `--count`, `--suggest`, `stats --velocity/--patterns`, `session export --format ical/json`; `atlas-mcp` server with 5 read + 4 write tools; clean JSON in `~/.atlas/captures.json` + `breadcrumbs.json`. **Zero** Obsidian/nexus references in its own code. **No markdown export** for captures/breadcrumbs (only iCal sessions). |
 | **flow-cli** | `atlas-bridge.zsh` + `docs/ATLAS-CONTRACT.md` (hot/warm/opportunistic paths, `command -v` probe + session cache). Dispatcher convention = 4 components (fn + help + completions + man). `obs` is a **help-text stub only** — no dispatcher function exists. Dropped its `obs.1`; obs binary/man now owned by obsidian-cli-ops. |
-| **obsidian-cli-ops** | `obs` v3.5.0 (Python + ZSH). **25 CLI commands, all read-only** (search, analyze, health, ai, trends, daily-digest). **Writes (`create_note`, `append_to_note`, `write_note`) are MCP-only** — no CLI equivalent. `.STATUS`→vault sync is in `IDEAS.md`, unbuilt. RFC#35 considers absorbing nexus-cli (moving target). |
+| **obsidian-cli-ops** | `obs` v4.1.0 (Python + ZSH). **45 CLI commands, all read-only** (search, analyze, health, ai, trends, daily-digest, **+obs config, +obs research** absorbed from nexus-cli). **Writes (`create_note`, `append_to_note`, `write_note`) are MCP-only** — no CLI equivalent. Vault CRUD CLI targeted for v4.2.0 as **IPC bridge to the official Obsidian app** (requires app running; offline FS-direct approach declined). nexus-cli retired (v0.7.0 PyPI deprecation notice, tap cask `deprecate!`, repo archived 2026-06-21). RFC#35 Phase 1 complete as of v4.0.0 (2026-06-22). |
 | **nexus** | Docs + `vault-template/` (PARA: `00_inbox`…`60_tasks`) + frontmatter schemas + early `nexus-desktop/` Electron app. Designed a 5-layer stack WITH atlas in mind. **Not a runnable service** — terminates at manual Obsidian + Claude. |
 | **statistical-research** (the actual bridge) | MCP server (`src/index.ts`) with `atlas_get_context/recent/stats`. Implementation shells out via `Bun.spawn(["atlas","where"])` and **parses text** (predates atlas JSON). Last commit **2026-01-11** → ignores atlas v0.9.3 JSON + v0.10.0 temporal. Tool names (`atlas_get_recent/stats`) **don't match** atlas-mcp's own tools (`atlas_get_sessions/trail/inbox`) → drift/duplication. |
 
@@ -170,18 +171,18 @@ Reordered around D1–D6: the capture write-through is the product; everything e
 
 ```
 CRITICAL PATH (capture scatter → unified capture):
-  P0  obsidian-cli-ops  →  obs write / obs daily       [= RFC#35 Phase 1; PORT nexus-cli, 422-tested] — OTHER TEAM'S REPO
-  P1  atlas             →  catch = write-through to obs + queue/flush fallback (D2/D4)   [Medium] — build now (D5)
+  P0  obsidian-cli-ops  →  obs write / obs daily       [v4.2.0 target; IPC bridge to official Obsidian CLI] — OTHER TEAM'S REPO ⚠️ STILL PENDING
+  P1  atlas             →  catch = write-through to obs + queue/flush fallback (D2/D4)   [Medium] — scaffold now (D5), wire on P0
   P1' atlas             →  retire TriageInbox use-case; captures repo → write-ahead queue (D3)   [Medium] — coordinated w/ P1
-  P2  flow-cli          →  obs-bridge.zsh + obs dispatcher; `catch` routes via atlas (D2)   [Low, pattern exists]
+  P2  flow-cli          →  obs-bridge.zsh + obs dispatcher; `catch` routes via atlas (D2)   [Low, pattern exists; unblocked on obs v4.1.0 read surface]
 
 PARALLEL CLEANUP (off critical path — D1 says this isn't the pain):
   C1  statistical-research → consume atlas-mcp/JSON, delete 3 text-parse tools (D6, resolves A1/A2)   [Medium]
 ```
 
-**Build-order logic:** P1/P1'/P2 are all in *your* repos and buildable **now** against the planned `obs write` contract (D5) — they don't wait on P0 to be *written*, only to be *wired* at the end. P0 is the other team's RFC#35 Phase 1 (a port, not new code). C1 is independent and can happen anytime.
+**Build-order logic:** P1/P1'/P2 are all in *your* repos and scaffoldable **now** against the planned `obs write` contract (D5) — they don't wait on P0 to be *wired*, only *built*. P0 is the keystone but is now confirmed as **IPC bridge** (official Obsidian CLI, requires app running); this amends D4's queue-trigger: "obs down" = Obsidian app not running via IPC, not obs binary missing. C1 is independent and can happen anytime.
 
-**The honest critical-path truth:** the one thing you cannot ship without is P0 — and it's **not in your control**. Until obsidian-cli-ops lands `obs write` (RFC#35 Phase 1), your P1/P2 are built-but-dark. So the real first action is **socializing the dependency** with the obs side (Open Q1 sub-question), not writing atlas code.
+**The honest critical-path truth:** the one thing you cannot ship without is P0 — and it's **not in your control**. obsidian-cli-ops v4.1.0 shipped 2026-06-26 but deferred vault CRUD again to v4.2.0. Until that IPC bridge lands, P1/P2 are built-but-dark. RFC#35 Phase 1 (nexus-cli absorption) is complete; the outstanding item is the vault-write CLI surface (5.1), now scoped as a thin bridge.
 
 ---
 
@@ -241,7 +242,7 @@ N/A — CLI + MCP only. No GUI surface (nexus-desktop is out of scope).
 
 ## Open Questions
 
-1. ~~**RFC#35 (nexus-cli → obs merge):** ship Phase 0 before or after it lands?~~ **RESOLVED 2026-06-20:** All RFC#35 options keep vault-write in `obs`; the keystone *is* RFC#35 Phase 1 (port nexus-cli's `vault write/daily/template`). Build it as RFC#35 Phase 1 — no rework risk. Remaining sub-question: does obsidian-cli-ops want atlas/flow-cli as named consumers in the RFC#35 acceptance criteria? *(Owner: obsidian-cli-ops)*
+1. ~~**RFC#35 (nexus-cli → obs merge):** ship Phase 0 before or after it lands?~~ **RESOLVED 2026-06-20:** All RFC#35 options keep vault-write in `obs`; the keystone *is* RFC#35 Phase 1. ~~**Phase 1 LANDED**: obsidian-cli-ops v4.0.0 (2026-06-22) absorbed nexus-cli (`obs config`, `obs research`); nexus-cli retired.~~ **However: vault CRUD (5.1 / `obs write`) was NOT part of Phase 1.** It is the outstanding item, now targeted as v4.2.0 via IPC bridge to the official Obsidian CLI. Remaining sub-question: when does v4.2.0 land, and will atlas/flow-cli be named consumers in acceptance criteria? *(Owner: obsidian-cli-ops)*
 2. **Vault targeting:** which vault does atlas write to — config in `~/.atlas/config.json` (new `obsidianVault` key) or passed per-call? *(Still open — needs the vault id obs uses.)*
 3. ~~**Mirror vs move?**~~ **RESOLVED (D2):** route — vault is source of truth; `atlas catch` is a write-through.
 4. ~~**statistical-research vs atlas-mcp?**~~ **RESOLVED (D6):** consolidate to one surface (statistical-research consumes atlas-mcp). Off critical path.
@@ -271,3 +272,4 @@ N/A — CLI + MCP only. No GUI surface (nexus-desktop is out of scope).
 - **2026-06-20** — Initial draft from deep brainstorm. Investigation via 4 parallel agents + advisor-prompted verification that corrected the nexus doc's stale "atlas↔nexus ✅ complete (2025-01-11)" claim → actual state is a 5-month-stale text-parsing MCP shim in a sixth repo (statistical-research), last touched 2026-01-11.
 - **2026-06-20 (update)** — RFC#35 verified against obsidian-cli-ops `SPEC-merge-nexus-cli-2026-06-19.md`. Keystone reframed: not blocked by RFC#35, it **is** RFC#35 Phase 1. Keystone is a **port** of nexus-cli's existing `vault write/daily/template` (422 tests) → `obs write/daily/template`, not new development. Corrected API names (`obs create-note` → `obs write`). B3 + Open Q1 resolved.
 - **2026-06-20 (decisions)** — Six decisions locked via grilling (D1–D6): pain = capture scatter; route not mirror; triage dies (vault wins); queue+flush never-block; build-my-side-now; consolidate MCP. Spec pivoted from "all gaps" to an opinionated capture-write-through build. Flagged strategic narrowing of atlas (cedes triage). 2 new open questions (flush trigger, which types route).
+- **2026-06-26 (findings)** — RFC#35 Phase 1 verified complete: obsidian-cli-ops v4.0.0 (2026-06-22) absorbed nexus-cli (`obs config` + `obs research` namespaces, 27 tests); nexus-cli retired to PyPI deprecation + tap `deprecate!` + repo archived. v4.1.0 also shipped (2026-06-26, MCP correctness). **Vault CRUD (obs write/daily/template) NOT shipped** — confirmed deferred to v4.2.0, redesigned as IPC bridge to the official Obsidian app (offline FS-direct approach declined per obsidian-cli-ops SPEC-next-overhaul-2026-06-22 §1). Key implication: D4's "obs down" trigger is now "Obsidian app not running via IPC" (not "obs binary missing"). Queue+flush design still sound; trigger timing differs. Atlas P1 scaffold buildable now against planned IPC contract; wiring waits on obs v4.2.0.
