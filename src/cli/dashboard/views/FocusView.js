@@ -6,7 +6,6 @@
 
 import blessed from 'blessed'
 import { DIALOG_FOCUS_TIMER } from '../constants.js'
-import { progressBar } from '../../../adapters/presenters/index.js'
 
 /**
  * Create the focus view

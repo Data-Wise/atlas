@@ -72,7 +72,6 @@ export class Atlas {
    * Initialize atlas configuration
    */
   async init(options = {}) {
-    const { global: isGlobal = false } = options;
     const { mkdir } = await import('fs/promises');
     const { existsSync } = await import('fs');
     

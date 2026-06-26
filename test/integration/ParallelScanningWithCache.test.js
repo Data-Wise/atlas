@@ -266,7 +266,7 @@ describe('Parallel Scanning with Caching (Integration)', () => {
 
       // Verify all directories scanned
       expect(results.size).toBe(5)
-      for (const [path, projects] of results) {
+      for (const [, projects] of results) {
         expect(projects).toHaveLength(2)
         expect(projects.every(p => p.type.value === 'node')).toBe(true)
       }

@@ -219,7 +219,7 @@ describe('Dashboard View Transitions', () => {
 
   describe('All States Reachability', () => {
     it('should be able to reach all 7 states from BROWSE', () => {
-      const stateMachine = createStateMachine({ initial: STATES.BROWSE });
+      const _stateMachine = createStateMachine({ initial: STATES.BROWSE });
       const allStates = [
         STATES.BROWSE,
         STATES.DETAIL,

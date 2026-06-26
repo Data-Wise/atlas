@@ -6,7 +6,6 @@
  * a comprehensive registry of all known projects.
  */
 
-import { Project } from '../../domain/entities/Project.js'
 
 export class SyncRegistryUseCase {
   /**

@@ -3,7 +3,6 @@
  */
 
 import { GetSessionStatsUseCase } from '../../../../src/use-cases/session/GetSessionStatsUseCase.js'
-import { BusinessRules } from '../../../../src/domain/constants/BusinessRules.js'
 
 describe('Focus Score Calculation', () => {
   let useCase

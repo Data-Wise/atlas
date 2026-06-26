@@ -187,7 +187,7 @@ export class FileSystemProjectRepository extends IProjectRepository {
       return this._projectByIdCache.get(projectId)
     }
     // Fallback: load and search
-    const projects = await this._loadProjects()
+    await this._loadProjects()
     return this._projectByIdCache.get(projectId) || null
   }
 
@@ -197,7 +197,7 @@ export class FileSystemProjectRepository extends IProjectRepository {
       return this._projectByPathCache.get(path)
     }
     // Fallback: load and search
-    const projects = await this._loadProjects()
+    await this._loadProjects()
     return this._projectByPathCache.get(path) || null
   }
 

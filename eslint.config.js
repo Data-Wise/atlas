@@ -24,6 +24,10 @@ export default [
       // TypeScript sources need a TS parser we don't depend on.
       '**/*.ts',
       '**/*.tsx',
+      // Legacy blessed dashboard — unimported, superseded by the Ink dashboard
+      // (src/cli/dashboard-ink/**). Its unused widget bindings are side-effecting
+      // constructions; linting dead code we're removing adds only noise.
+      'src/cli/dashboard-blessed.js',
     ],
   },
 
@@ -40,9 +44,11 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      // Real signal, but the codebase has never been linted — surface as
-      // warnings so `npm run lint` stays exit-0 while gaps get cleaned up.
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      // Unused *args* and *caught errors* are intentional here: interface
+      // stubs (domain/**/I*.js) and mock signatures name params to document
+      // the contract, and `catch (e)` after an existence probe ignores `e`.
+      // Unused imports / local vars are real dead code — keep warning on those.
+      'no-unused-vars': ['warn', { args: 'none', caughtErrors: 'none', varsIgnorePattern: '^_' }],
       // Empty `catch {}` after an existence probe (fs.access) is an
       // intentional idiom here; still flag genuinely-empty blocks elsewhere.
       'no-empty': ['error', { allowEmptyCatch: true }],

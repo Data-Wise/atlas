@@ -6,7 +6,6 @@
 
 import { join } from 'node:path'
 import { existsSync } from 'node:fs'
-import { readFile } from 'fs/promises'
 
 // Import repositories
 import { SQLiteDatabase } from '../adapters/repositories/SQLiteDatabase.js'

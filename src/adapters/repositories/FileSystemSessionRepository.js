@@ -14,7 +14,7 @@
  */
 
 import { promises as fs } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { dirname } from 'node:path'
 import { Session } from '../../domain/entities/Session.js'
 import { SessionState } from '../../domain/value-objects/SessionState.js'
 import { ISessionRepository } from '../../domain/repositories/ISessionRepository.js'

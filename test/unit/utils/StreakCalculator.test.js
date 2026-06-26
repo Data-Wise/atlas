@@ -17,10 +17,6 @@ describe('StreakCalculator', () => {
     startTime: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000)
   })
 
-  const createSessionOnDate = (dateStr) => ({
-    startTime: new Date(dateStr)
-  })
-
   describe('calculateStreak - Basic Cases', () => {
     test('returns 0 for empty sessions array', () => {
       const result = StreakCalculator.calculateStreak([])

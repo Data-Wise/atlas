@@ -9,7 +9,7 @@
  * 2. YAML-style: status: active, progress: 75
  */
 
-import { readFile, readdir, stat, access, constants } from 'node:fs/promises'
+import { readFile, readdir, access, constants } from 'node:fs/promises'
 import { join, basename, dirname } from 'node:path'
 
 /**

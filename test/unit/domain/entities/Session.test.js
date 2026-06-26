@@ -3,7 +3,6 @@
  */
 
 import { Session } from '../../../../src/domain/entities/Session.js'
-import { SessionState } from '../../../../src/domain/value-objects/SessionState.js'
 import {
   SessionStartedEvent,
   SessionEndedEvent,
