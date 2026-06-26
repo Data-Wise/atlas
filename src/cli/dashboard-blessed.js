@@ -2744,8 +2744,11 @@ export async function runDashboard(atlas, options = {}) {
     }
   }
 
-  // Enhanced cleanup that clears ALL intervals
+  // Enhanced cleanup that clears ALL intervals. Intentionally wraps the
+  // hoisted `cleanup` declaration — earlier key handlers (lines ~2230/2234)
+  // call cleanup() before this point, so it must stay a hoisted function.
   const originalCleanup = cleanup
+  // eslint-disable-next-line no-func-assign
   cleanup = function() {
     originalCleanup()
     stopRefreshInterval()
