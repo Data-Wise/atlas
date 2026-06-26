@@ -1040,6 +1040,7 @@ Options:
   -p, --paths <paths>     Comma-separated paths to scan
   --remove-orphans        Remove projects whose paths no longer exist
   --from-status           Scan for .STATUS files in ecosystem
+  --research              Research-aware sync (alias for --from-status; defaults to ~/projects/research)
   --report                Show ecosystem summary without syncing
 ```
 
@@ -1065,11 +1066,14 @@ atlas sync --report
 
 # Research registry: parse kind/target/tasks from research .STATUS
 atlas sync --from-status --paths ~/projects/research
+
+# Same thing, shorter (defaults to ~/projects/research)
+atlas sync --research
 ```
 
 > **Research registry:** with `--from-status`, atlas also parses `kind:` (manuscript|program), `target:`/`venue:`, and a `tasks:` block (proposals → task entries on the program). Surfaced via `project list --kind`, `--format json`, and MCP `atlas_get_projects`. See [Research Registry](RESEARCH-REGISTRY.md).
 >
-> **Ownership:** `--from-status` is the **authority** for research metadata — a plain `atlas sync` is packages-only and *preserves* existing `kind`/`target`/`tasks` but does not re-parse them. Re-run `--from-status` after editing a manuscript's `.STATUS`. *(Plain sync previously stripped these — fixed in 0.11.1, issue #36.)*
+> **Ownership:** `--from-status` (or its `--research` alias) is the **authority** for research metadata — a plain `atlas sync` is packages-only and *preserves* existing `kind`/`target`/`tasks` but does not re-parse them, and now **warns**, naming the research projects it did not refresh, with the remedy. Re-run `--from-status` after editing a manuscript's `.STATUS`. *(Plain sync previously stripped these — fixed in 0.11.1, issue #36; ownership contract: docs-standards ADR-002.)*
 
 ### `atlas doctor`
 

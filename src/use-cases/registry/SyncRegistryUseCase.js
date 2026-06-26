@@ -44,6 +44,7 @@ export class SyncRegistryUseCase {
       unchanged: [],
       orphaned: [],
       errors: [],
+      warnings: [],
       stats: {
         totalProjects: 0,
         withStatusFile: 0,
@@ -72,6 +73,11 @@ export class SyncRegistryUseCase {
 
     result.stats.totalProjects = allProjects.length
 
+    // Research projects (kind manuscript/program) encountered during a plain sync:
+    // their metadata is preserved but NOT refreshed here, so we warn the user to
+    // re-run `sync --from-status` (the authority for research metadata).
+    const researchProjects = []
+
     // Process each discovered project
     for (const project of allProjects) {
       if (onProgress) onProgress(project)
@@ -95,6 +101,11 @@ export class SyncRegistryUseCase {
 
         // Check if project already exists in registry
         const existing = await this.projectRepository.findById(project.id)
+
+        const existingKind = existing && existing.metadata && existing.metadata.kind
+        if (existingKind === 'manuscript' || existingKind === 'program') {
+          researchProjects.push(existing.name || project.name)
+        }
 
         if (existing) {
           // Check if anything changed
@@ -141,6 +152,14 @@ export class SyncRegistryUseCase {
           }
         }
       }
+    }
+
+    if (researchProjects.length > 0) {
+      result.warnings.push({
+        type: 'research-not-refreshed',
+        projects: researchProjects,
+        remedy: 'atlas sync --from-status'
+      })
     }
 
     return result
