@@ -40,6 +40,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - npm: `npm install -g @data-wise/atlas`
 
 ## ✅ Just Completed (2026-06-26)
+- **Adopted ESLint + CI lint gate** — merged PR #56 (eslint flat config + 3 real fixes) and PR #57 (CI `Lint` job gating PRs on `npm run lint`); resolves the long-dead lint script. dev CI green with the new Lint job. 135 pre-existing `no-unused-vars` warnings remain (non-blocking — eslint exits 0 on warnings) as a follow-up cleanup. Pruned 6 stale merged local branches + the ci-lint-gate worktree.
 - **Released v0.12.1** (patch) — FW-30 id convergence (#49), better-sqlite3 Node-26 bump, PatternAnalyzer crash fix (#58), cookbook docs, +42 edge tests. dev→main PR + GitHub release; Homebrew + docs auto-deploy.
 - **Merged PR #58** (feature/test-hardening → dev, squash `40fb761`): 42 edge tests across the v0.11–v0.12 research-sync surface + v0.10 temporal intelligence, **plus a real PatternAnalyzer crash fix** — an unparseable string `startTime` threw a TypeError that crashed the whole `analyze()` call (`byDay[undefined].total++`). Also confirmed the scanner `>`/`>=` depth guards are compensating conventions, not a bug. Suite 1947/1947 (89 suites), CI green on Node 18/20/22.
 - **Fixed Node 26 test failures** — bumped better-sqlite3 `^12.5.0` → `^12.11.1` (12.5.0 capped at Node 25; V8 removed `PropertyCallbackInfo::This()`). 29 SQLite tests now green locally.
@@ -85,7 +86,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - None
 
 ## 🔧 Active Worktrees
-- `~/.git-worktrees/atlas/unruffled-brahmagupta-0aed2a` (feature/ci-lint-gate) — ESLint config / dead-lint-script fix (separate task)
+- (none)
 
 ## 🎯 Next Action
 A) **Promote the [Unreleased] dev tail to main** — FW-30 id-convergence fix (#54/#49) + research-ops cookbook (#55) are on dev only (4 ahead of main). Cut a v0.12.1/docs release if wanted; otherwise they ride the next feature release. The gap is benign pre-release accumulation, not a missed release.
