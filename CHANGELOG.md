@@ -4,6 +4,8 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-06-26
+
 ### Added
 - **`atlas sync --research`** — research-aware sync alias (forwards to `--from-status`, defaults to `~/projects/research`). (#40)
 - **Plain-sync research warning** — a plain `atlas sync` now warns and names the research projects it preserved but did not refresh, with the remedy (`atlas sync --from-status`). Ownership contract: docs-standards ADR-002. Unit + e2e tests. (#40)
