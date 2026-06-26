@@ -78,6 +78,10 @@ export function formatProjects(projects) {
     if (target) lines.push(`   Venue: ${target}`)
     const taskCount = p.taskCount ?? p.metadata?.tasks?.length
     if (taskCount) lines.push(`   Tasks: ${taskCount}`)
+    const progress = p.progress ?? p.metadata?.progress
+    if (progress !== undefined && progress !== null) lines.push(`   Progress: ${progress}%`)
+    const next = p.next || p.metadata?.next
+    if (next) lines.push(`   Next: ${next}`)
     if (p.path) lines.push(`   Path: ${p.path}`)
     lines.push('')
   })

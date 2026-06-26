@@ -68,4 +68,12 @@ describe('StatusFileParser — kind/target/tasks (research-registry)', () => {
     expect(d.kind).toBe('manuscript')
     expect(d.target).toBe('AMPPS')
   })
+
+  test('parses journal: as a venue alias and preserves priorityLabel (FW-1/FW-3)', () => {
+    const s = ['status: revise & resubmit', 'priority: P0', 'journal: AMPPS', 'kind: manuscript'].join('\n')
+    const d = parser._parseYAMLFormat(s, 'collider')
+    expect(d.target).toBe('AMPPS')
+    expect(d.priorityLabel).toBe('P0')
+    expect(d.priority).toBe(3) // free-text P0 → numeric fallback unchanged
+  })
 })

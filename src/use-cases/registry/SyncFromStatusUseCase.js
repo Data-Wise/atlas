@@ -144,6 +144,7 @@ export class SyncFromStatusUseCase {
       status: parsed.status,
       progress: parsed.progress,
       priority: parsed.priority,
+      priorityLabel: parsed.priorityLabel || null,
       phase: parsed.phase,
       focus: parsed.focus,
       next: parsed.next,
@@ -196,6 +197,7 @@ export class SyncFromStatusUseCase {
       status: parsed.status,
       progress: parsed.progress,
       priority: parsed.priority,
+      priorityLabel: parsed.priorityLabel || null,
       phase: parsed.phase,
       focus: parsed.focus,
       next: parsed.next,
@@ -235,6 +237,8 @@ export class SyncFromStatusUseCase {
       oldMeta.focus !== newMeta.focus ||
       oldMeta.next !== newMeta.next ||
       (oldMeta.kind || null) !== (newMeta.kind || null) ||
+      (oldMeta.target || null) !== (newMeta.target || null) ||
+      (oldMeta.priorityLabel || null) !== (newMeta.priorityLabel || null) ||
       JSON.stringify(oldMeta.tasks || []) !== JSON.stringify(newMeta.tasks || [])
     )
   }
