@@ -8,6 +8,8 @@
 ## Focus: v0.12.2 shipped — ESLint flat config, CI lint gate, zero-warning cleanup
 ## Next: v0.13.0 (AnalyticsView, dead-zone iCal, multi-project calibration) OR ecosystem P1 scaffold (atlas catch→obs write-through, feature/catch-obs-bridge worktree, gated on obs v4.2.0 IPC bridge)
 
+## Research-ops: ATLAS-FIX plan ✅ COMPLETE (shipped v0.11.1–v0.12.2). Scheduling automation queued — #61 (research-board refresh in the Mon pipeline), #62 (dedupe mediationverse-sync), #63 (obs package dashboard). Plan: docs/plans/FUTURE-WORK.md + ATLAS-FIX-PLAN.md.
+
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
 Clean Architecture-based state management for developer workflows. Designed
