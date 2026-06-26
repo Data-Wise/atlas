@@ -103,6 +103,10 @@ export class SyncRegistryUseCase {
               // Preserve statistics from existing record
               project.totalSessions = existing.totalSessions
               project.totalDuration = existing.totalDuration
+              // Preserve research metadata owned by `sync --from-status`.
+              // The plain StatusFileGateway does not parse kind/target/tasks/priorityLabel,
+              // so re-saving the scanned project would otherwise strip them on every update.
+              this._preserveResearchMetadata(existing, project)
               await this.projectRepository.save(project)
             }
             result.updated.push(project)
@@ -183,6 +187,25 @@ export class SyncRegistryUseCase {
     // Parse body for additional context
     if (statusData.body) {
       project.metadata.notes = statusData.body.substring(0, 500)
+    }
+  }
+
+  /**
+   * Carry forward research metadata (kind/target/tasks/priorityLabel) from the
+   * existing registry record onto the freshly-scanned project before saving.
+   *
+   * These fields are owned by `sync --from-status` (StatusFileParser); the
+   * packages-only plain sync does not parse them, so without this the plain
+   * sync would null them out on every update — silently undoing a research sync.
+   * @private
+   */
+  _preserveResearchMetadata(existing, updated) {
+    const existingMeta = existing.metadata || {}
+    updated.metadata = updated.metadata || {}
+    for (const key of ['kind', 'target', 'tasks', 'priorityLabel']) {
+      if (updated.metadata[key] === undefined && existingMeta[key] !== undefined) {
+        updated.metadata[key] = existingMeta[key]
+      }
     }
   }
 
