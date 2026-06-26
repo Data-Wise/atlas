@@ -4,6 +4,8 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-06-26
+
 ### Fixed
 - **Plain sync no longer strips research metadata** — `atlas sync` / `sync --remove-orphans` (`SyncRegistryUseCase`) used to null `kind`/`target`/`tasks`/`priorityLabel` that `sync --from-status` had populated, silently emptying the research registry on every routine sync. It now carries those fields forward on update (`_preserveResearchMetadata`). Regression test added. (#36)
 
