@@ -4,6 +4,19 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-06-26
+
+### Fixed
+- **Sync id convergence** — plain `atlas sync` now resolves an existing project by **path** when the id misses, so it updates the entry `sync --from-status` registered (which uses a different id scheme) instead of creating a duplicate. Research metadata is preserved through the convergence; regression test added. (#49)
+- **Node 26 support** — bumped `better-sqlite3` `^12.5.0` → `^12.11.1`. The old release capped its `engines` at Node 25 and its native addon failed to build on Node 26 (V8 removed `v8::PropertyCallbackInfo::This()`), which surfaced as 29 failing SQLite integration tests on Node 26. The full suite is now green on Node 18/20/22/26.
+- **PatternAnalyzer crash on malformed `startTime`** — a session whose `startTime` was an unparseable string produced an Invalid Date, so `DAYS[NaN]` was `undefined` and `byDay[undefined].total++` threw a `TypeError`, crashing the entire `analyze()` call. Such rows are now skipped via a `Number.isNaN(t.getTime())` guard. (#58)
+
+### Tests
+- **Edge-case hardening** — 42 new characterization/edge tests across the v0.11–v0.12 research-sync surface (parser comment-stripping, tasks-block, sync research-safe preserve + FW-30 convergence, doctor audit, scanner marker) and the v0.10 temporal-intelligence modules (VelocityCalculator, PatternAnalyzer, PredictionEngine), plus a `scanDirectory` depth-convention characterization test. Suite: 1947 passing (89 suites). (#58)
+
+### Documentation
+- New **Cookbook** (`docs/COOKBOOK.md`) — 10 research-ops recipes (tag a manuscript, research-safe sync, doctor audit, retarget a venue, monorepo marker, recover after a plain sync, render the vault board, MCP, hygiene). API-GUIDE documents the research `list()` fields + the **Doctor API**; the research-registry tutorial + ARCHITECTURE cover `--research`, the `.atlas-scan-children` marker, and id convergence. Cookbook added to the mkdocs nav.
+
 ## [0.12.0] - 2026-06-26
 
 ### Added

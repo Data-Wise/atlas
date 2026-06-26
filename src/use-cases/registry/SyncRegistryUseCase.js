@@ -99,8 +99,20 @@ export class SyncRegistryUseCase {
           else if (status === 'archived') result.stats.archived++
         }
 
-        // Check if project already exists in registry
-        const existing = await this.projectRepository.findById(project.id)
+        // Check if project already exists in registry. Resolve by id, then fall
+        // back to path (FW-30): `sync --from-status` and the plain scanner derive
+        // different ids (name-slug vs full path), so without the path fallback a
+        // plain sync would create a DUPLICATE entry for a project that
+        // `--from-status` registered first. Reusing the stored id makes save()
+        // update that entry instead of inserting a second one.
+        let existing = await this.projectRepository.findById(project.id)
+        if (!existing && typeof this.projectRepository.findByPath === 'function') {
+          const byPath = await this.projectRepository.findByPath(project.path)
+          if (byPath) {
+            existing = byPath
+            project.id = byPath.id
+          }
+        }
 
         const existingKind = existing && existing.metadata && existing.metadata.kind
         if (existingKind === 'manuscript' || existingKind === 'program') {

@@ -309,6 +309,11 @@ flowchart LR
 
 See [`RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and [`MCP-SERVER.md`](MCP-SERVER.md).
 
+**Scanner & identity.** A project directory is a scan leaf by default; a `.atlas-scan-children` marker lets an
+umbrella expose its child repos (ADR-003). The plain sync resolves an existing project by **path** when its id
+misses, so the two sync paths (`--from-status` name-slug id vs the scanner's full-path id) converge on one
+registry entry instead of duplicating (#49).
+
 ## Domain Entities
 
 ### Project Entity
