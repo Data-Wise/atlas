@@ -106,7 +106,12 @@ const projects = await atlas.projects.list(options);
 **Options:**
 - `status` (string): Filter by status
 - `tag` (string): Filter by tag
+- `kind` (string): Filter by research kind — `manuscript` | `program` | `package`
 - `limit` (number): Max results
+
+**Returns** an array of `{ name, path, status, type, kind, target, taskCount, progress, next, priority }`.
+`kind`/`target`/`taskCount` are populated for research `.STATUS` projects (manuscripts/programs) and
+`null`/`0` for ordinary packages.
 
 **Example:**
 ```javascript
@@ -115,6 +120,10 @@ const active = await atlas.projects.list({ status: 'active' });
 
 // Get projects with specific tag
 const rPackages = await atlas.projects.list({ tag: 'r-package' });
+
+// Research registry: only manuscripts, with venue + progress
+const manuscripts = await atlas.projects.list({ kind: 'manuscript' });
+// → [{ name: 'collider', kind: 'manuscript', target: 'AMPPS', progress: 95, ... }]
 ```
 
 ### Suggest a Project
@@ -219,6 +228,28 @@ await atlas.projects.completeNextAction('myproject', 'Write tests');
 ```javascript
 await atlas.projects.unregister(name);
 ```
+
+---
+
+## Doctor API
+
+Audit projects against the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`).
+
+```javascript
+// Read-only audit
+const report = await atlas.doctor({ kind: 'manuscript' });
+// → { summary: { total, ok, missingStatus, missingClaude, missingObsSync }, rows: [...] }
+
+// Create missing CLAUDE.md (preview unless write: true)
+const fixed = await atlas.doctorFix({ write: true });
+```
+
+**`doctor(options)`** — `options.kind` restricts to a kind; `options.allRegistered` includes worktrees/tmp.
+Returns `{ summary, rows }`, where each row is
+`{ name, path, kind, has: { status, claude, obsSync }, missingRequired, ok }`.
+
+**`doctorFix(options)`** — with `write: true`, creates missing `CLAUDE.md` stubs; otherwise previews.
+`.obs/sync.yml` is left to `obs link`.
 
 ---
 
