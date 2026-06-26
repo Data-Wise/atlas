@@ -10,6 +10,7 @@ All notable changes to Atlas are documented here.
 
 ### Fixed
 - **Venue/target inline comments** — `target:` / `venue:` / `journal:` now strip a trailing whitespace-anchored `# comment` (e.g. `CSDA # was JASA` → `CSDA`); a `#` without a preceding space is kept. (#42)
+- **Scanner umbrella policy** — a project-dir is a scan leaf by default (umbrella-only); a `.atlas-scan-children` marker opts an umbrella in to having its child repos scanned too (bounded by maxDepth). Integration test added. Policy: docs-standards ADR-003. (#41)
 
 ### Tests
 - **Focused research-surface coverage** — direct unit tests for `ProjectsAPI.list()` research fields + `--kind` filter (previously only transitive). (#44)
