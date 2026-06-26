@@ -26,7 +26,9 @@
 
 **Still open from this plan:** FW-9 (curated `CLAUDE.md` backfill — 7 dev-tools + `examark` `.STATUS`, in progress), FW-15 doc note (CLI-REFERENCE), FW-2/5/6/7 (dashboard surfaces), FW-8/11–14 (born-ready + scheduler), FW-16/18–23 (tests + docs), FW-25 (obs release), FW-17/26 (stretch).
 
-**New follow-ups discovered this session:**
+**New follow-ups discovered this session** — now planned in detail in [`ATLAS-FIX-PLAN.md`](ATLAS-FIX-PLAN.md)
+(per-item design, tests, docs, acceptance). Tracking issues: **#40 (FW-27)**, **#41 (FW-28)**, **#42 (FW-29)**,
+the docs/test deep-dives **#43–#46** (FW-15-doc/16/18/20), and the 0.11.1 ship **#39**.
 
 | ID | Task | Repo | Effort | Acceptance |
 |----|------|------|--------|-----------|
