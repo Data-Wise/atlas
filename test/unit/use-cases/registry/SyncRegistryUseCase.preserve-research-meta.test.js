@@ -17,6 +17,12 @@ class MockProjectRepository {
   async findById(id) {
     return this.projects.get(id) || null
   }
+  async findByPath(path) {
+    for (const p of this.projects.values()) {
+      if (p.path === path) return p
+    }
+    return null
+  }
   async findAll() {
     return [...this.projects.values()]
   }
@@ -184,5 +190,44 @@ describe('SyncRegistryUseCase — research-not-refreshed warning (FW-27)', () =>
     const result = await useCase.execute({ rootPaths: ['/x'], removeOrphans: false })
 
     expect(result.warnings).toHaveLength(0)
+  })
+})
+
+describe('SyncRegistryUseCase — id/path convergence (FW-30)', () => {
+  test('plain sync updates a from-status entry by path instead of duplicating', async () => {
+    const repo = new MockProjectRepository()
+    // `--from-status` registered this with a name-slug id.
+    repo.projects.set('manu', {
+      id: 'manu',
+      path: '/x/manu',
+      name: 'manu',
+      type: { value: 'general' },
+      description: 'manu desc',
+      totalSessions: 0,
+      totalDuration: 0,
+      metadata: { status: 'active', kind: 'manuscript', target: 'JASA' }
+    })
+    // The plain scanner produces a FULL-PATH id for the same project.
+    const gateway = new MockStatusFileGateway({ '/x/manu': { status: 'active', progress: 50, next: [{ action: 'go' }] } })
+    const fs = new MockFsProjectRepository([
+      { id: '/x/manu', path: '/x/manu', name: 'manu', type: { value: 'general' }, description: null, metadata: {}, totalSessions: 0, totalDuration: 0 }
+    ])
+    const useCase = new SyncRegistryUseCase({
+      projectRepository: repo,
+      statusFileGateway: gateway,
+      fileSystemProjectRepository: fs
+    })
+
+    const result = await useCase.execute({ rootPaths: ['/x'], removeOrphans: false })
+
+    // Exactly ONE entry, still keyed by the original id — no duplicate.
+    expect(repo.projects.size).toBe(1)
+    const saved = await repo.findById('manu')
+    expect(saved).toBeTruthy()
+    // research metadata preserved across the convergence
+    expect(saved.metadata.kind).toBe('manuscript')
+    expect(saved.metadata.target).toBe('JASA')
+    // and the research-not-refreshed warning still fires
+    expect(result.warnings.some(w => w.type === 'research-not-refreshed' && w.projects.includes('manu'))).toBe(true)
   })
 })

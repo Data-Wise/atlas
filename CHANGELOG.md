@@ -4,6 +4,9 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+### Fixed
+- **Sync id convergence** — plain `atlas sync` now resolves an existing project by **path** when the id misses, so it updates the entry `sync --from-status` registered (which uses a different id scheme) instead of creating a duplicate. Research metadata is preserved through the convergence; regression test added. (#49)
+
 ## [0.12.0] - 2026-06-26
 
 ### Added
