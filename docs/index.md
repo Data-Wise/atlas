@@ -144,6 +144,40 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
+## :sparkles: What's New in v0.12.2
+
+!!! success "ESLint Adoption"
+    Full lint hygiene across the codebase — no new user-facing features, no breaking changes:
+
+    - **ESLint flat config** (`eslint.config.js`) — lints all plain-JS sources + tests; TypeScript and legacy blessed dashboard ignored
+    - **CI lint gate** — `Lint` job on every PR; exits non-zero on errors (warnings non-blocking)
+    - **Zero-warning cleanup** — all 135 pre-existing `no-unused-vars` warnings pruned; `npm run lint` exits clean
+
+## :sparkles: What's New in v0.12.1
+
+!!! success "Patch: Node 26 + Stability"
+    - **Node 26 support** — `better-sqlite3` bumped to `^12.11.1`; SQLite suite green on Node 18/20/22/26
+    - **FW-30 id convergence** — plain `atlas sync` resolves by path, so it updates the `sync --from-status` entry instead of duplicating
+    - **PatternAnalyzer crash fix** — unparseable `startTime` strings skipped instead of crashing `analyze()`
+    - **+42 edge tests** across research-sync and temporal-intelligence modules (1947 passing, 89 suites)
+    - **Research-ops Cookbook** — 10 recipes in `docs/COOKBOOK.md`
+
+## :sparkles: What's New in v0.12.0
+
+!!! success "Research-Safe Sync"
+    - **`atlas sync --research`** — research-aware alias (defaults to `~/projects/research`)
+    - **Plain-sync warning** — names research projects it preserved-but-skipped, with the remedy
+    - **`.atlas-scan-children` marker** — opt-in umbrella scanning for monorepo layouts
+    - **Venue comment strip** — `CSDA # was JASA` → `CSDA` (inline comments stripped from target/venue fields)
+
+## :sparkles: What's New in v0.11.0
+
+!!! success "Research Registry + Doctor"
+    - **Research registry** — `sync --from-status` parses `kind:`, `target:`/`venue:`, `tasks:` from research `.STATUS` files; manuscripts and programs appear in the project registry
+    - **`atlas project list --kind manuscript|program|package`** — filter by project type
+    - **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--fix`
+    - **`project list --json`** — now also returns `progress`, `next`, `priority`
+
 ## :sparkles: What's New in v0.10.0
 
 !!! success "Temporal Intelligence"
