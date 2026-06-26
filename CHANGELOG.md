@@ -4,6 +4,8 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-06-25
+
 ### Added
 - **Research registry** — `sync --from-status` now parses research `.STATUS` metadata so manuscripts and programs appear in the registry alongside packages:
   - `kind:` (`manuscript` | `program`), `target:`/`venue:` (publication venue), and a `tasks:` block (`- text: ...; priority: ...; done: ...`) capturing a program's proposals as task entries.
