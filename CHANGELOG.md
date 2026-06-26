@@ -8,6 +8,12 @@ All notable changes to Atlas are documented here.
 - **`atlas sync --research`** — research-aware sync alias (forwards to `--from-status`, defaults to `~/projects/research`). (#40)
 - **Plain-sync research warning** — a plain `atlas sync` now warns and names the research projects it preserved but did not refresh, with the remedy (`atlas sync --from-status`). Ownership contract: docs-standards ADR-002. Unit + e2e tests. (#40)
 
+### Fixed
+- **Venue/target inline comments** — `target:` / `venue:` / `journal:` now strip a trailing whitespace-anchored `# comment` (e.g. `CSDA # was JASA` → `CSDA`); a `#` without a preceding space is kept. (#42)
+
+### Tests
+- **Focused research-surface coverage** — direct unit tests for `ProjectsAPI.list()` research fields + `--kind` filter (previously only transitive). (#44)
+
 ## [0.11.1] - 2026-06-26
 
 ### Fixed
