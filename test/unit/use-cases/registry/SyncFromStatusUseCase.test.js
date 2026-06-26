@@ -4,7 +4,7 @@
  * Tests for ecosystem sync from .STATUS files.
  */
 
-import { jest, beforeEach, describe, test, expect } from '@jest/globals'
+import { beforeEach, describe, test, expect } from '@jest/globals'
 import { SyncFromStatusUseCase } from '../../../../src/use-cases/registry/SyncFromStatusUseCase.js'
 import { Project } from '../../../../src/domain/entities/Project.js'
 

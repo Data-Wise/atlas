@@ -74,21 +74,16 @@ See [`docs/RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and
 
 ---
 
-## v0.11.0 - Platform Expansion
+## v0.13.0 - Analytics + Calendar (Planned)
 
-### Remote Sync
-- [ ] GitHub Issues sync (read project issues)
-- [ ] GitLab integration
-- [ ] Google Calendar Sync (two-way)
+### Dashboard
+- [ ] AnalyticsView in Ink dashboard (key `a`) — deferred from v0.10.0
+- [ ] Dead-zone iCal export — focus block calendar events from `--patterns` dead zones
+- [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
 
-### IDE Extensions
-- [ ] VS Code extension for .STATUS editing
-- [ ] Neovim plugin (telescope picker)
-
-### Terminal Integrations
-- [ ] Native Zellij integration
-- [ ] tmux status line component
-- [ ] Starship prompt segment
+### Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
+- [ ] `atlas catch` write-through to Obsidian (`obs write`)
+- [ ] flow-cli `obs-bridge` (read-only, buildable now)
 
 ---
 
@@ -112,6 +107,15 @@ See [`docs/RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and
 ---
 
 ## Completed Milestones
+
+### v0.12.x Series
+- [x] v0.12.2: ESLint adoption — flat config, CI lint gate, zero-warning cleanup across all sources
+- [x] v0.12.1: Patch — Node 26 support (better-sqlite3 12.11.1), FW-30 id convergence, PatternAnalyzer crash fix, +42 edge tests, research-ops Cookbook
+- [x] v0.12.0: Research-safe sync — `sync --research` alias, plain-sync warning, `.atlas-scan-children` marker, venue comment strip
+
+### v0.11.x Series
+- [x] v0.11.1: Plain sync metadata preserve — `kind`/`target`/`tasks`/`priorityLabel` carried forward via `_preserveResearchMetadata`; regression test
+- [x] v0.11.0: Research registry + Doctor — `sync --from-status` parses research `.STATUS` (kind/target/tasks); `project list --kind`; `atlas doctor` contract audit with `--fix`; registry-load robustness; `ATLAS_DATA_DIR` env precedence
 
 ### v0.10.x Series
 - [x] v0.10.0: Temporal Intelligence — `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine`; `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests

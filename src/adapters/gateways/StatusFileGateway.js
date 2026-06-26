@@ -55,7 +55,6 @@ export class StatusFileGateway {
     const data = {}
     let currentSection = null
     let currentArray = null
-    let indentLevel = 0
 
     for (const line of frontmatter.split('\n')) {
       const trimmed = line.trim()
@@ -76,7 +75,6 @@ export class StatusFileGateway {
           data[currentSection] = {}
           currentArray = null // Reset array context
         }
-        indentLevel = currentIndent
         continue
       }
 

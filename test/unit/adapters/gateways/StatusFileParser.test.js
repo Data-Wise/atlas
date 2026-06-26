@@ -4,7 +4,7 @@
  * Tests for the .STATUS file scanner and parser.
  */
 
-import { jest, beforeEach, afterEach, describe, test, expect } from '@jest/globals'
+import { beforeEach, afterEach, describe, test, expect } from '@jest/globals'
 import { StatusFileParser } from '../../../../src/adapters/gateways/StatusFileParser.js'
 import { writeFile, mkdir, rm } from 'node:fs/promises'
 import { join } from 'node:path'

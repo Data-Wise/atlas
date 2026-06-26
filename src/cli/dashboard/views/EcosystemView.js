@@ -114,7 +114,7 @@ export function createEcosystemView(screen) {
   })
 
   // Title bar
-  const titleBar = blessed.box({
+  const _titleBar = blessed.box({
     parent: ecosystemView,
     top: 0,
     left: 0,

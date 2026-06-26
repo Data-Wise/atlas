@@ -4,7 +4,7 @@
  * Tests for blessed-specific TUI formatting functions.
  */
 
-import { jest, describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 import {
   sparkline,
   progressBar,

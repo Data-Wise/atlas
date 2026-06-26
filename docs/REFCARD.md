@@ -133,6 +133,14 @@ Start dashboard: `atlas dash`
 | `?`         | Show help                                        |
 | `q`         | Quit                                             |
 
+**v0.12.2 — ESLint adoption: flat config, CI lint gate, 0 warnings across all sources**
+
+**v0.12.1 — Patch: Node 26 support (better-sqlite3 12.11.1) · FW-30 id convergence · PatternAnalyzer crash fix · +42 edge tests**
+
+**v0.12.0 — `atlas sync --research` alias · plain-sync research warning · `.atlas-scan-children` marker · venue comment strip**
+
+**v0.11.1 — Plain sync preserves research metadata (`kind`/`target`/`tasks`) via `_preserveResearchMetadata`**
+
 **v0.11.0 — Research registry: `atlas project list --kind manuscript|program` · `atlas doctor` (settings-contract audit) · `sync --from-status` parses kind/target/tasks**
 
 **v0.10.0 — Temporal Intelligence: `atlas stats --velocity` / `--patterns` / `--calibrate`**
@@ -305,5 +313,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.11.0 | Made for ADHD brains</em>
+<em>Atlas v0.12.2 | Made for ADHD brains</em>
 </div>

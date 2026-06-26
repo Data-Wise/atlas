@@ -5,7 +5,7 @@
  * Formatter tests are in formatters.test.js
  */
 
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 
 describe('Atlas MCP Server', () => {
   describe('Tool Definitions', () => {

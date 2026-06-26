@@ -77,7 +77,7 @@ export class SyncFromStatusUseCase {
     }
 
     // Process each found .STATUS file
-    for (const { path, file, parsed } of scanResults) {
+    for (const { path, parsed } of scanResults) {
       if (onProgress) onProgress({ path, parsed })
 
       try {

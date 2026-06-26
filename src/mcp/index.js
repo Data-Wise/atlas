@@ -36,7 +36,6 @@ import {
   formatTrail,
   formatInbox,
   formatPlan,
-  formatDuration,
   formatSessionStart,
   formatSessionEnd,
   formatCapture,

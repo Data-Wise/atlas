@@ -352,7 +352,7 @@ export function showTaskPrompt(screen, onSubmit, onSkip) {
     inputOnFocus: true
   })
 
-  const hint = blessed.box({
+  const _hint = blessed.box({
     parent: promptBox,
     bottom: 0,
     left: 1,

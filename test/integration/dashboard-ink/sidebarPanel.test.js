@@ -280,7 +280,7 @@ describe('Windowing (calcWindow)', () => {
     it('visible slice always includes the selected project', () => {
       const projects = makeProjects(30);
       for (let i = 0; i < 30; i++) {
-        const { windowStart, visible } = calcWindow(projects, i, WINDOW);
+        const { visible } = calcWindow(projects, i, WINDOW);
         const visibleIds = visible.map(p => p.id);
         expect(visibleIds).toContain(projects[i].id);
       }
@@ -310,7 +310,7 @@ describe('Windowing (calcWindow)', () => {
     it('indicator range: windowStart+1 to min(windowStart+WINDOW, total)', () => {
       const projects = makeProjects(20);
       const selectedIndex = 15;
-      const { windowStart, visible } = calcWindow(projects, selectedIndex, WINDOW);
+      const { windowStart } = calcWindow(projects, selectedIndex, WINDOW);
       const rangeStart = windowStart + 1;
       const rangeEnd   = Math.min(windowStart + WINDOW, projects.length);
       expect(rangeStart).toBeGreaterThanOrEqual(1);

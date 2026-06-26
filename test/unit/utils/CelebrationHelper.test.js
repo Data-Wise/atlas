@@ -388,7 +388,7 @@ describe('CelebrationHelper', () => {
         console.log(`DIAGNOSTIC: ${level}:${art}`)
 
         // Art should contain emoji or stars
-        const hasContent = /[✨🎉🎊🏆★☆]/.test(art)
+        const hasContent = /[✨🎉🎊🏆★☆]/u.test(art)
         expect(hasContent).toBe(true)
       }
     })

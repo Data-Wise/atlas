@@ -6,9 +6,7 @@
  */
 
 import { Project } from '../../domain/entities/Project.js'
-import { ProjectType } from '../../domain/value-objects/ProjectType.js'
 import { IProjectRepository } from '../../domain/repositories/IProjectRepository.js'
-import { SQLiteDatabase } from './SQLiteDatabase.js'
 
 export class SQLiteProjectRepository extends IProjectRepository {
   /**

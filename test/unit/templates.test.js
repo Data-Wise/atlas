@@ -3,17 +3,13 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { tmpdir } from 'os';
 import {
   listTemplates,
   getTemplate,
   applyTemplate,
   getTemplateIds,
-  saveTemplate,
   deleteTemplate,
-  exportTemplate,
   getTemplatesDir
 } from '../../src/templates/index.js';
 
@@ -128,8 +124,7 @@ describe('Templates', () => {
   });
 
   describe('saveTemplate()', () => {
-    const testDir = join(tmpdir(), `atlas-test-templates-${Date.now()}`);
-    const originalDir = getTemplatesDir();
+    const _originalDir = getTemplatesDir();
 
     // Note: We can't easily mock getTemplatesDir, so these tests
     // will actually use the real templates dir. We test the function

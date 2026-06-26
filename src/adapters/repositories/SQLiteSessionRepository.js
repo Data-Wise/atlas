@@ -6,7 +6,6 @@
 
 import { Session } from '../../domain/entities/Session.js'
 import { SessionState } from '../../domain/value-objects/SessionState.js'
-import { ISessionRepository } from '../../domain/repositories/ISessionRepository.js'
 
 export class SQLiteSessionRepository {
   /**

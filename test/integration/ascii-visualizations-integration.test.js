@@ -116,8 +116,7 @@ describe('ASCII Visualizations - Integration Tests', () => {
       // Should show 100% completion rate
       expect(output).toMatch(/Completed:.*5\/5.*\[██████████\].*100%/)
 
-      // Should show total duration with blocks
-      const totalDuration = 25 + 35 + 45 + 55 + 65 // 225 minutes
+      // Should show total duration with blocks (25 + 35 + 45 + 55 + 65 = 225 minutes)
       expect(output).toMatch(/Duration:.*3h 45m/)
 
       // Should show sparkline trend for session durations
@@ -222,8 +221,6 @@ describe('ASCII Visualizations - Integration Tests', () => {
 
       await controller.handle({ recentDays: 7 })
 
-      const output = consoleOutput.join('\n')
-
       // Should show increasing sparkline pattern
       const trendLine = consoleOutput.find(
         line => line.includes('Trend:') && line.match(/[▁▂▃▄▅▆▇█]/)
@@ -326,8 +323,6 @@ describe('ASCII Visualizations - Integration Tests', () => {
       const controller = new StatusController(useCase)
 
       await controller.handle()
-
-      const output = consoleOutput.join('\n')
 
       // Sparkline should show flat trend (all same character)
       const trendLine = consoleOutput.find(line => line.includes('Trend:'))

@@ -4,7 +4,7 @@
  * Tests for UI-agnostic project formatting functions.
  */
 
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 import {
   formatTimeAgo,
   formatDuration,

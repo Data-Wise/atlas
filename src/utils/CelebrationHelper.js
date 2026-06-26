@@ -100,7 +100,7 @@ export class CelebrationHelper {
    * @private
    */
   static _getMessage(level, options) {
-    const { duration, outcome, streak, newPersonalBest } = options
+    const { streak, newPersonalBest } = options
 
     // Priority messages
     if (newPersonalBest) {

@@ -4,7 +4,7 @@
  * Tests for the morning planning ritual use case.
  */
 
-import { jest, beforeEach, describe, test, expect } from '@jest/globals'
+import { beforeEach, describe, test, expect } from '@jest/globals'
 import { PlanDayUseCase } from '../../../../src/use-cases/session/PlanDayUseCase.js'
 
 // Mock Session
