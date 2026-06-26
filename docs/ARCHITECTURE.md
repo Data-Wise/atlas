@@ -285,6 +285,30 @@ sequenceDiagram
     CLI-->>User: Synced X projects
 ```
 
+### Research Registry & Doctor Flow
+
+Two use-cases sit over the same `.STATUS` surface, with different authority over research metadata:
+
+- **`SyncRegistryUseCase`** (plain `atlas sync`) — packages-only registry refresh. Preserves existing
+  research metadata but does not parse it (`_preserveResearchMetadata`).
+- **`SyncFromStatusUseCase`** (`atlas sync --from-status`) — the research-aware path. `StatusFileParser`
+  reads `kind`/`target`/`tasks` (two `.STATUS` formats) into `project.metadata`; `summarize()` groups `byKind`.
+- **`DoctorUseCase`** (`atlas doctor`) — read-only audit of the Project Settings Contract, with `--fix`/`--write`.
+
+```mermaid
+flowchart LR
+    STATUS[".STATUS files"] -->|"sync --from-status"| Parser["StatusFileParser<br/>kind / target / tasks"]
+    Parser --> Registry["Project Repository<br/>~/.atlas/projects.json"]
+    STATUS -->|"plain sync"| SyncReg["SyncRegistryUseCase<br/>preserve research meta"]
+    SyncReg --> Registry
+    Registry --> List["project list --kind / --json"]
+    Registry --> MCP["MCP atlas_get_projects"]
+    Registry --> Doctor["atlas doctor<br/>contract audit"]
+    MCP --> Board["obs research board → vault"]
+```
+
+See [`RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and [`MCP-SERVER.md`](MCP-SERVER.md).
+
 ## Domain Entities
 
 ### Project Entity

@@ -133,6 +133,8 @@ Start dashboard: `atlas dash`
 | `?`         | Show help                                        |
 | `q`         | Quit                                             |
 
+**v0.11.0 — Research registry: `atlas project list --kind manuscript|program` · `atlas doctor` (settings-contract audit) · `sync --from-status` parses kind/target/tasks**
+
 **v0.10.0 — Temporal Intelligence: `atlas stats --velocity` / `--patterns` / `--calibrate`**
 
 **v0.9.2 — Live data from `~/.atlas` via 4 React hooks (projects 5s, session 1s tick, stats 10s)**
@@ -303,5 +305,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.10.0 | Made for ADHD brains</em>
+<em>Atlas v0.11.0 | Made for ADHD brains</em>
 </div>

@@ -1,6 +1,6 @@
 # Atlas Fix Plan — research-ops hardening (docs + tests first)
 
-> **Status:** Proposed · **Date:** 2026-06-26 · **Owner:** DT · **Branch model:** `feature/*` → `dev` → `main`
+> **Status:** Proposed — tracking issues **[#39–#46](https://github.com/Data-Wise/atlas/issues)** filed · **Date:** 2026-06-26 · **Owner:** DT · **Branch model:** `feature/*` → `dev` → `main`
 > **Scope:** the data-integrity fixes found this session (FW-27/28/29), the FW-15 doc note, the deferred
 > atlas docs/test deep-dives (FW-16/18/20), and the `0.11.1` patch that ships the already-merged FW-15 fix.
 > Every work item carries an explicit **Testing** deliverable and **Documentation** deliverable — no fix is
@@ -260,9 +260,22 @@ P3 docs          : FW-15-doc → FW-20 → FW-18   (CLI-REF note, then guides, t
 
 ## 6. Tracking
 
-One GitHub issue per item (labels `research-ops`, milestone `0.12.0` except R0 = `0.11.1`), each with a
-checklist of **impl · unit/integration/e2e tests · docs · CHANGELOG · acceptance**. ADR-002/ADR-003 land in
+One GitHub issue per item (labels `research-ops`), each with a checklist of
+**impl · unit/integration/e2e tests · docs · CHANGELOG · acceptance**. ADR-002/ADR-003 land in
 `dev-tools/docs-standards/adr/`. This plan is the index; issues are the execution surface.
+
+| Item | Issue | Target |
+|---|---|---|
+| R0 — release 0.11.1 | [#39](https://github.com/Data-Wise/atlas/issues/39) | 0.11.1 |
+| FW-27 — sync research-safe + ADR-002 | [#40](https://github.com/Data-Wise/atlas/issues/40) | 0.12.0 |
+| FW-28 — scanner depth + ADR-003 | [#41](https://github.com/Data-Wise/atlas/issues/41) | 0.12.0 |
+| FW-29 — venue comment parse | [#42](https://github.com/Data-Wise/atlas/issues/42) | 0.12.0 |
+| FW-15-doc — CLI-REF ownership note | [#43](https://github.com/Data-Wise/atlas/issues/43) | 0.12.0 |
+| FW-16 — focused list/--kind/MCP tests | [#44](https://github.com/Data-Wise/atlas/issues/44) | 0.12.0 |
+| FW-18 — ARCHITECTURE + mermaid | [#45](https://github.com/Data-Wise/atlas/issues/45) | 0.12.0 |
+| FW-20 — RESEARCH-REGISTRY/MCP-SERVER refresh | [#46](https://github.com/Data-Wise/atlas/issues/46) | 0.12.0 |
+
+Related: #36 (the bug this plan hardens), #27–#32 (the parent research-ops epics), `docs/plans/FUTURE-WORK.md` (the backlog this draws from).
 
 ## 7. Risks & mitigations
 
