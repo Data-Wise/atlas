@@ -73,6 +73,7 @@ project
   .description('List all projects')
   .option('-s, --status <status>', 'Filter by status')
   .option('-t, --tag <tag>', 'Filter by tag')
+  .option('--kind <kind>', 'Filter by kind (manuscript|program|package)')
   .option('--format <format>', 'Output format (table|json|names)', 'table')
   .option('--count', 'Print only the number of matching projects')
   .option('--suggest', 'Print the single most-recently-touched active project name')
@@ -1019,6 +1020,49 @@ templateCmd
     } else {
       console.log(`Templates directory: ${dir}`);
     }
+  });
+
+program
+  .command('doctor')
+  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .obs/sync.yml)')
+  .option('--kind <kind>', 'Only audit a given kind (manuscript|program|package)')
+  .option('--all', 'List all audited projects, not just those with gaps')
+  .option('--all-registered', 'Include worktrees / tmp / non-project registry entries')
+  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .obs/sync.yml is left to `obs link`')
+  .option('--write', 'With --fix, actually write the files')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    if (options.fix) {
+      const { actions, wrote } = await a.projects.doctorFix(options);
+      if (options.format === 'json') { console.log(JSON.stringify({ actions, wrote }, null, 2)); return; }
+      console.log(`\n🩺 atlas doctor --fix ${wrote ? '(applied)' : '(preview — pass --write to apply)'}`);
+      if (actions.length === 0) console.log('   ✅ nothing to fix');
+      else for (const ac of actions) console.log(`   ${wrote ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
+      return;
+    }
+    const { summary, rows } = await a.projects.doctor(options);
+    if (options.format === 'json') {
+      console.log(JSON.stringify({ summary, rows }, null, 2));
+      process.exit(summary.missingStatus > 0 ? 1 : 0);
+    }
+    console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
+    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)\n`);
+    const show = options.all ? rows : rows.filter(r => !r.ok);
+    if (show.length === 0) {
+      console.log('   ✅ all projects satisfy the required contract (.STATUS + CLAUDE.md)');
+    } else {
+      for (const r of show) {
+        const miss = [
+          r.has.status ? '' : '.STATUS',
+          r.has.claude ? '' : 'CLAUDE.md',
+          r.has.obsSync ? '' : '.obs/sync.yml'
+        ].filter(Boolean).join(', ');
+        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : '🟢');
+        console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
+      }
+    }
+    process.exit(summary.missingStatus > 0 ? 1 : 0);
   });
 
 program

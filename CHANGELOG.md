@@ -2,6 +2,25 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+## [0.11.0] - 2026-06-25
+
+### Added
+- **Research registry** — `sync --from-status` now parses research `.STATUS` metadata so manuscripts and programs appear in the registry alongside packages:
+  - `kind:` (`manuscript` | `program`), `target:`/`venue:` (publication venue), and a `tasks:` block (`- text: ...; priority: ...; done: ...`) capturing a program's proposals as task entries.
+  - `StatusFileParser.summarize()` groups projects `byKind`.
+  - `atlas project list --kind <manuscript|program|package>` filter.
+  - `kind` / `target` / `taskCount` exposed in `project list --format json` and MCP `atlas_get_projects` (consumed by the obs research board).
+  - New parser / sync / formatter tests; full unit suite green (1470).
+- **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--kind`, `--all-registered`, and `--fix`/`--write` (creates missing `CLAUDE.md`). Excludes worktrees/tmp by default; exits 1 on missing `.STATUS` (CI/launchd drift guard).
+- **`project list --json`** now also returns `progress`, `next`, and `priority` (research-board fidelity).
+- **Docs** — [Research Registry guide](docs/RESEARCH-REGISTRY.md), [Research Registry & Doctor tutorial](docs/tutorials/research-registry.md), gap analysis, and Phase-3 roadmap.
+
+### Fixed
+- **Registry-load robustness** — a single stored project whose `description` exceeded the 500-char limit threw inside `FileSystemProjectRepository.findAll()`, cascading "Failed to load projects" to every sync target (one corrupt row bricked the whole registry). `_deserializeProject` now truncates `description` on read; `SyncRegistryUseCase` truncates the next-action-derived description on write (parity with `metadata.notes`). Regression test added.
+- **Store-isolation env var** — the CLI now honors `ATLAS_DATA_DIR` (documented in `docs/CONFIGURATION.md` and already honored by the MCP entry point) as a fallback after `ATLAS_CONFIG`, so the documented data-dir override actually works for `bin/atlas.js`. Previously the CLI silently ignored it and wrote to `~/.atlas`, which let `test/dogfood-interactive-v2.sh` (which set only `ATLAS_DATA_DIR`) leak its `mktemp` fixtures into the real registry; that script now also exports `ATLAS_CONFIG`. New `Config` env-precedence tests (`ATLAS_CONFIG` > `ATLAS_DATA_DIR` > `~/.atlas`).
+
 ## [0.10.0] - 2026-06-19
 
 ### Added

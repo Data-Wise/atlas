@@ -80,7 +80,7 @@ function deepMerge(target, source) {
 
 export class Config {
   constructor(configDir) {
-    this.configDir = configDir || process.env.ATLAS_CONFIG || `${process.env.HOME}/.atlas`
+    this.configDir = configDir || process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR || `${process.env.HOME}/.atlas`
     this.configPath = join(this.configDir, 'config.json')
     this._config = null
   }

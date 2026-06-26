@@ -63,7 +63,9 @@ export class Atlas {
   }
 
   _defaultConfigPath() {
-    return process.env.ATLAS_CONFIG || `${process.env.HOME}/.atlas`;
+    // ATLAS_DATA_DIR is the documented data-dir override (see docs/CONFIGURATION.md)
+    // and is honored by the MCP entry point; honor it here too so the CLI matches.
+    return process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR || `${process.env.HOME}/.atlas`;
   }
 
   /**
@@ -423,6 +425,20 @@ class ProjectsAPI {
     return result;
   }
 
+  async doctor(options = {}) {
+    const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
+    const projectRepository = this.container.resolve('ProjectRepository');
+    const uc = new DoctorUseCase({ projectRepository });
+    return uc.execute(options);
+  }
+
+  async doctorFix(options = {}) {
+    const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
+    const projectRepository = this.container.resolve('ProjectRepository');
+    const uc = new DoctorUseCase({ projectRepository });
+    return uc.fix(options);
+  }
+
   async unregister(name) {
     const projectRepo = this.container.resolve('ProjectRepository');
     const deleted = await projectRepo.delete(name);
@@ -450,12 +466,23 @@ class ProjectsAPI {
     if (options.tag) {
       filtered = filtered.filter(p => p.tags?.includes(options.tag));
     }
+    if (options.kind) {
+      // Research-registry: filter by kind (manuscript|program|package). Scanned
+      // projects carry kind in metadata, like status above.
+      filtered = filtered.filter(p => (p.kind || p.metadata?.kind) === options.kind);
+    }
 
     return filtered.map(p => ({
       name: p.name,
       path: p.path,
       status: p.status || p.metadata?.status,
-      type: p.type
+      type: p.type,
+      kind: p.kind || p.metadata?.kind || null,
+      target: p.target || p.metadata?.target || null,
+      taskCount: p.metadata?.tasks?.length || 0,
+      progress: p.progress ?? p.metadata?.progress ?? null,
+      next: p.next || p.metadata?.next || null,
+      priority: p.metadata?.priorityLabel || p.priority || p.metadata?.priority || null
     }));
   }
 

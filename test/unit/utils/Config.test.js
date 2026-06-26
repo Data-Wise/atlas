@@ -24,6 +24,51 @@ describe('Config', () => {
     }
   });
 
+  describe('configDir resolution (env precedence)', () => {
+    let savedConfig;
+    let savedDataDir;
+
+    beforeEach(() => {
+      savedConfig = process.env.ATLAS_CONFIG;
+      savedDataDir = process.env.ATLAS_DATA_DIR;
+      delete process.env.ATLAS_CONFIG;
+      delete process.env.ATLAS_DATA_DIR;
+    });
+
+    afterEach(() => {
+      if (savedConfig === undefined) delete process.env.ATLAS_CONFIG;
+      else process.env.ATLAS_CONFIG = savedConfig;
+      if (savedDataDir === undefined) delete process.env.ATLAS_DATA_DIR;
+      else process.env.ATLAS_DATA_DIR = savedDataDir;
+    });
+
+    it('explicit configDir argument wins over env vars', () => {
+      process.env.ATLAS_CONFIG = '/tmp/from-config-env';
+      process.env.ATLAS_DATA_DIR = '/tmp/from-data-env';
+      expect(new Config('/tmp/explicit').configDir).toBe('/tmp/explicit');
+    });
+
+    it('honors ATLAS_CONFIG when no argument is given', () => {
+      process.env.ATLAS_CONFIG = '/tmp/from-config-env';
+      expect(new Config().configDir).toBe('/tmp/from-config-env');
+    });
+
+    it('falls back to ATLAS_DATA_DIR (documented data-dir override) when ATLAS_CONFIG is unset', () => {
+      process.env.ATLAS_DATA_DIR = '/tmp/from-data-env';
+      expect(new Config().configDir).toBe('/tmp/from-data-env');
+    });
+
+    it('prefers ATLAS_CONFIG over ATLAS_DATA_DIR when both are set', () => {
+      process.env.ATLAS_CONFIG = '/tmp/from-config-env';
+      process.env.ATLAS_DATA_DIR = '/tmp/from-data-env';
+      expect(new Config().configDir).toBe('/tmp/from-config-env');
+    });
+
+    it('falls back to ~/.atlas when no env vars are set', () => {
+      expect(new Config().configDir).toBe(`${process.env.HOME}/.atlas`);
+    });
+  });
+
   describe('load()', () => {
     it('returns default config when no file exists', async () => {
       const cfg = await config.load();

@@ -72,7 +72,16 @@ export function formatProjects(projects) {
   projects.forEach(p => {
     const statusIcon = p.status === 'active' ? '🟢' : p.status === 'paused' ? '⏸️' : '⚪'
     lines.push(`${statusIcon} ${p.name}`)
-    lines.push(`   Type: ${p.type || 'unknown'} | Status: ${p.status || 'unknown'}`)
+    const kind = p.kind || p.metadata?.kind
+    lines.push(`   Type: ${p.type || 'unknown'} | Status: ${p.status || 'unknown'}${kind ? ` | Kind: ${kind}` : ''}`)
+    const target = p.target || p.metadata?.target
+    if (target) lines.push(`   Venue: ${target}`)
+    const taskCount = p.taskCount ?? p.metadata?.tasks?.length
+    if (taskCount) lines.push(`   Tasks: ${taskCount}`)
+    const progress = p.progress ?? p.metadata?.progress
+    if (progress !== undefined && progress !== null) lines.push(`   Progress: ${progress}%`)
+    const next = p.next || p.metadata?.next
+    if (next) lines.push(`   Next: ${next}`)
     if (p.path) lines.push(`   Path: ${p.path}`)
     lines.push('')
   })

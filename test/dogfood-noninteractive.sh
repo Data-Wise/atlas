@@ -162,7 +162,9 @@ echo -e "${DIM}Test dir: $TEST_DIR${NC}"
 header "1. Version & Help"
 
 test_matches "Version format" "$ATLAS --version" "^[0-9]+\.[0-9]+\.[0-9]+$"
-test_contains "Version is 0.10.x" "$ATLAS --version" "0.10"
+# Release-agnostic: assert the CLI version matches package.json (no hardcoded minor).
+EXPECTED_VERSION="$(node -p "require('$(dirname "$0")/../package.json').version" 2>/dev/null || echo '')"
+test_contains "Version matches package.json (${EXPECTED_VERSION})" "$ATLAS --version" "$EXPECTED_VERSION"
 test_contains "Help shows usage" "$ATLAS --help" "Usage: atlas"
 test_contains "Help shows session cmd" "$ATLAS --help" "session"
 test_contains "Help shows project cmd" "$ATLAS --help" "project"

@@ -12,6 +12,20 @@ Real Data Pipeline — all mock data replaced with live `~/.atlas` data via Reac
 
 ---
 
+## 🔬 Research Registry (in progress — PR #21)
+
+Manuscripts, multi-paper programs, and proposals as first-class registry citizens.
+
+- ✅ **Bugfix** — registry-load robustness (one over-long `description` no longer bricks `findAll()`).
+- ✅ **Phase 1** — parse `kind`/`target`/`tasks` from research `.STATUS` → `metadata`; `summarize()` `byKind`.
+- ✅ **Phase 2** — `project list --kind`; `kind`/`target`/`taskCount` in `--format json` + MCP `atlas_get_projects`.
+- ⏳ **Phase 3** — obs `research board`; table-view `kind` column + `atlas plan` grouping; parser parity; release.
+
+See [`docs/RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and
+[`docs/specs/GAP-ANALYSIS-research-registry.md`](specs/GAP-ANALYSIS-research-registry.md).
+
+---
+
 ## v0.9.x - Visual Evolution & Real Data ✅ COMPLETE
 
 **Theme:** Technical debt reduction, visual enhancements, real data wiring
