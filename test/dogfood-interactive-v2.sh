@@ -26,9 +26,12 @@ PASSED=0
 FAILED=0
 SKIPPED=0
 
-# Test temp directory
+# Test temp directory — isolate the atlas store so test fixtures never leak
+# into the real ~/.atlas registry. The CLI write path honors ATLAS_CONFIG;
+# set ATLAS_DATA_DIR too (MCP entry point) so both surfaces stay sandboxed.
 TEST_DIR=$(mktemp -d)
-export ATLAS_DATA_DIR="$TEST_DIR"
+export ATLAS_CONFIG="$TEST_DIR/.atlas"
+export ATLAS_DATA_DIR="$TEST_DIR/.atlas"
 
 # Use local dev version instead of installed version
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

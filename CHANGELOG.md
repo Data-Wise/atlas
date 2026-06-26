@@ -17,6 +17,7 @@ All notable changes to Atlas are documented here.
 
 ### Fixed
 - **Registry-load robustness** — a single stored project whose `description` exceeded the 500-char limit threw inside `FileSystemProjectRepository.findAll()`, cascading "Failed to load projects" to every sync target (one corrupt row bricked the whole registry). `_deserializeProject` now truncates `description` on read; `SyncRegistryUseCase` truncates the next-action-derived description on write (parity with `metadata.notes`). Regression test added.
+- **Store-isolation env var** — the CLI now honors `ATLAS_DATA_DIR` (documented in `docs/CONFIGURATION.md` and already honored by the MCP entry point) as a fallback after `ATLAS_CONFIG`, so the documented data-dir override actually works for `bin/atlas.js`. Previously the CLI silently ignored it and wrote to `~/.atlas`, which let `test/dogfood-interactive-v2.sh` (which set only `ATLAS_DATA_DIR`) leak its `mktemp` fixtures into the real registry; that script now also exports `ATLAS_CONFIG`. New `Config` env-precedence tests (`ATLAS_CONFIG` > `ATLAS_DATA_DIR` > `~/.atlas`).
 
 ## [0.10.0] - 2026-06-19
 
