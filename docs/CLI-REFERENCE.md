@@ -103,7 +103,7 @@ atlas project list --status active --count
 # Suggest one project to work on (most recent active)
 atlas project list --suggest
 
-# Research registry: list programs/manuscripts; JSON carries kind/target/taskCount
+# Research registry: list programs/manuscripts; JSON carries kind/target/taskCount/progress/next/priority
 atlas project list --kind program
 atlas project list --kind manuscript --format json
 ```
@@ -1068,6 +1068,34 @@ atlas sync --from-status --paths ~/projects/research
 ```
 
 > **Research registry:** with `--from-status`, atlas also parses `kind:` (manuscript|program), `target:`/`venue:`, and a `tasks:` block (proposals → task entries on the program). Surfaced via `project list --kind`, `--format json`, and MCP `atlas_get_projects`. See [Research Registry](RESEARCH-REGISTRY.md).
+
+### `atlas doctor`
+
+Audit every project against the **Project Settings Contract** (docs-standards `adr/ADR-001`): `.STATUS` (required), `CLAUDE.md` (required), and `.obs/sync.yml` / `.flow/obsidian-sync.yml` (info — owned by `obs link`).
+
+```bash
+atlas doctor [options]
+
+Options:
+  --kind <kind>        Only audit a kind (manuscript|program|package)
+  --all                List all audited projects, not just those with gaps
+  --all-registered     Include worktrees / tmp / non-project registry entries
+  --fix                Create missing CLAUDE.md (preview unless --write)
+  --write              With --fix, actually write the files
+  --format <format>    table (default) | json
+```
+
+Exit code **1** when any project is missing `.STATUS` (a drift guard for CI / launchd); **0** otherwise. By default worktrees, `/tmp`, and `node_modules` paths are excluded — pass `--all-registered` to include them.
+
+**Examples:**
+```bash
+atlas doctor                              # audit real projects
+atlas doctor --kind program --format json # research programs, as JSON
+atlas doctor --fix                        # preview missing CLAUDE.md
+atlas doctor --fix --write                # actually create them
+```
+
+> The `.obs/sync.yml` column is informational until [`obs link`](https://github.com/Data-Wise/obsidian-cli-ops) creates the mirror map. See [Research Registry](RESEARCH-REGISTRY.md).
 
 ---
 

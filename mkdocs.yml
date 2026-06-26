@@ -86,6 +86,7 @@ nav:
     - Visual Guide: VISUAL-GUIDE.md
     - CLI Reference: CLI-REFERENCE.md
     - Research Registry: RESEARCH-REGISTRY.md
+    - Research Registry Tutorial: tutorials/research-registry.md
     - Configuration: CONFIGURATION.md
   - Architecture:
     - Overview: ARCHITECTURE.md

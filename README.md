@@ -164,6 +164,16 @@ Research `.STATUS` files may declare `kind:` (manuscript|program), `target:` (ve
 `tasks:` block (proposals). These surface via `project list --kind`, `--format json`, and MCP.
 See **[Research Registry](docs/RESEARCH-REGISTRY.md)**.
 
+### Doctor
+```bash
+atlas doctor                   # Audit projects for the settings contract
+atlas doctor --kind program    # Only research programs
+atlas doctor --fix             # Preview missing CLAUDE.md (--write to apply)
+```
+
+Audits every project for `.STATUS` + `CLAUDE.md` (+ `.obs/sync.yml`, info). Exits 1 on missing `.STATUS`.
+See **[Research Registry](docs/RESEARCH-REGISTRY.md)**.
+
 ### Inbox Triage
 ```bash
 atlas inbox                    # Show inbox items
