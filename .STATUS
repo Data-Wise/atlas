@@ -29,7 +29,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 1,876 passing / 1,905 (Jest, 79 of 80 suites) — the 29 "failures" are the SQLite integration suite, a better-sqlite3 native-ABI mismatch on local Node 26 only; green in CI (Node 18/20/22)
+- Total: 1,905 passing (Jest, 80 suites) — green on Node 26 after the better-sqlite3 12.11.1 bump (12.5.0 capped at Node 25; the SQLite suite previously failed locally with a native-ABI mismatch)
 - Ink: 277 passing (10 suites)
 - Dogfood: 183 (shell test suite)
 
