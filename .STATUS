@@ -82,7 +82,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - None
 
 ## 🔧 Active Worktrees
-- (none)
+- `~/.git-worktrees/atlas/feature-test-hardening` (feature/test-hardening) — edge-case tests for the v0.11–v0.12 research-sync surface (+27 tests); pushed to origin
 
 ## 🎯 Next Action
 A) **Promote the [Unreleased] dev tail to main** — FW-30 id-convergence fix (#54/#49) + research-ops cookbook (#55) are on dev only (4 ahead of main). Cut a v0.12.1/docs release if wanted; otherwise they ride the next feature release. The gap is benign pre-release accumulation, not a missed release.
