@@ -2,7 +2,14 @@
 
 All notable changes to Atlas are documented here.
 
-## [Unreleased]
+## [Unreleased] — v0.12.2 (chore/ci)
+
+### Chore
+- **ESLint flat config** (`eslint.config.js`) — opt-in flat config (ESLint 8.57 `ESLINT_USE_FLAT_CONFIG=true`); lints `src/` + `test/` plain-JS files; TypeScript (`**/*.ts`, `**/*.tsx`) and legacy `dashboard-blessed.js` ignored. Rules: `args:none` + `caughtErrors:none` for interface-stub and catch-probe idioms; `no-empty: allowEmptyCatch`. (#56)
+- **Zero-warning cleanup** — pruned all 135 pre-existing `no-unused-vars` warnings across 34 files (`src/` and `test/`); `npm run lint` now exits 0 with 0 warnings/errors. Notable: `StatusFileGateway.js` write-only `indentLevel` removed (declaration + assignment cascade); `dashboard-blessed.js` ignored (unimported legacy, side-effecting widget bindings kept as `_`-prefixed bindings where parent-attachment is a side effect). (`aec0784`)
+
+### CI
+- **Lint gate** — new `Lint` job in `test.yml` runs `npm run lint` on every PR; exits non-zero on errors (warnings are non-blocking). (#57)
 
 ## [0.12.1] - 2026-06-26
 
