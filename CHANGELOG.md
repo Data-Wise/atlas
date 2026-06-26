@@ -2,7 +2,7 @@
 
 All notable changes to Atlas are documented here.
 
-## [Unreleased] — v0.12.2 (chore/ci)
+## [0.12.2] - 2026-06-26
 
 ### Chore
 - **ESLint flat config** (`eslint.config.js`) — opt-in flat config (ESLint 8.57 `ESLINT_USE_FLAT_CONFIG=true`); lints `src/` + `test/` plain-JS files; TypeScript (`**/*.ts`, `**/*.tsx`) and legacy `dashboard-blessed.js` ignored. Rules: `args:none` + `caughtErrors:none` for interface-stub and catch-probe idioms; `no-empty: allowEmptyCatch`. (#56)
