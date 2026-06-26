@@ -40,6 +40,8 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - npm: `npm install -g @data-wise/atlas`
 
 ## ✅ Just Completed (2026-06-26)
+- **Merged PR #58** (feature/test-hardening → dev, squash `40fb761`): 42 edge tests across the v0.11–v0.12 research-sync surface + v0.10 temporal intelligence, **plus a real PatternAnalyzer crash fix** — an unparseable string `startTime` threw a TypeError that crashed the whole `analyze()` call (`byDay[undefined].total++`). Also confirmed the scanner `>`/`>=` depth guards are compensating conventions, not a bug. Suite 1947/1947 (89 suites), CI green on Node 18/20/22.
+- **Fixed Node 26 test failures** — bumped better-sqlite3 `^12.5.0` → `^12.11.1` (12.5.0 capped at Node 25; V8 removed `PropertyCallbackInfo::This()`). 29 SQLite tests now green locally.
 - **Released v0.12.0** — `atlas sync --research` alias (defaults to `~/projects/research`); plain-sync research **warning** that names projects it preserved-but-did-not-refresh, with the remedy; `.atlas-scan-children` opt-in marker so an umbrella dir's child repos get scanned (bounded by maxDepth); venue/`target:` inline-comment strip (`CSDA # was JASA` → `CSDA`); focused unit tests for the research `list()` surface (#40/#41/#42/#44)
 - **Released v0.11.1** — plain `atlas sync` / `--remove-orphans` no longer strips research metadata; `kind`/`target`/`tasks`/`priorityLabel` carried forward on update via `_preserveResearchMetadata`; regression test (#36)
 - On **dev, awaiting next release** (`[Unreleased]` tail, 4 ahead of main): FW-30 sync id-convergence — plain sync resolves an existing project by **path** so it updates the `sync --from-status` entry instead of duplicating (#54/#49); research-ops **Cookbook** (10 recipes) + API-GUIDE Doctor API + tutorial/ARCHITECTURE refresh (#55)
@@ -82,7 +84,7 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - None
 
 ## 🔧 Active Worktrees
-- `~/.git-worktrees/atlas/feature-test-hardening` (feature/test-hardening) — edge-case tests for the v0.11–v0.12 research-sync surface (+27 tests); pushed to origin
+- `~/.git-worktrees/atlas/unruffled-brahmagupta-0aed2a` (feature/ci-lint-gate) — ESLint config / dead-lint-script fix (separate task)
 
 ## 🎯 Next Action
 A) **Promote the [Unreleased] dev tail to main** — FW-30 id-convergence fix (#54/#49) + research-ops cookbook (#55) are on dev only (4 ahead of main). Cut a v0.12.1/docs release if wanted; otherwise they ride the next feature release. The gap is benign pre-release accumulation, not a missed release.
