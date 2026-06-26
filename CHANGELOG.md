@@ -7,6 +7,9 @@ All notable changes to Atlas are documented here.
 ### Fixed
 - **Sync id convergence** — plain `atlas sync` now resolves an existing project by **path** when the id misses, so it updates the entry `sync --from-status` registered (which uses a different id scheme) instead of creating a duplicate. Research metadata is preserved through the convergence; regression test added. (#49)
 
+### Documentation
+- New **Cookbook** (`docs/COOKBOOK.md`) — 10 research-ops recipes (tag a manuscript, research-safe sync, doctor audit, retarget a venue, monorepo marker, recover after a plain sync, render the vault board, MCP, hygiene). API-GUIDE documents the research `list()` fields + the **Doctor API**; the research-registry tutorial + ARCHITECTURE cover `--research`, the `.atlas-scan-children` marker, and id convergence. Cookbook added to the mkdocs nav.
+
 ## [0.12.0] - 2026-06-26
 
 ### Added

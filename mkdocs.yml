@@ -83,6 +83,7 @@ nav:
     - Installation: getting-started/installation.md
   - User Guide:
     - Workflows: WORKFLOWS.md
+    - Cookbook: COOKBOOK.md
     - Visual Guide: VISUAL-GUIDE.md
     - CLI Reference: CLI-REFERENCE.md
     - Research Registry: RESEARCH-REGISTRY.md

@@ -26,9 +26,12 @@ tasks:                           # a program's proposals (optional)
 ## 2. Sync into the registry
 
 ```bash
-atlas sync --from-status --paths ~/projects/research
+atlas sync --research        # shorthand; = --from-status --paths ~/projects/research
 # ~ pmed-modern: kind: none → program, tasks: 0 → 5
 ```
+
+> `--from-status` / `--research` is the **authority** for research metadata. A plain `atlas sync` preserves it
+> but does not re-parse it, and warns you to re-run this — see the [Cookbook](../COOKBOOK.md) (Recipe 7) and ADR-002.
 
 ## 3. Query
 
