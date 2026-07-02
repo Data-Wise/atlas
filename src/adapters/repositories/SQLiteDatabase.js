@@ -10,7 +10,7 @@ import { dirname } from 'node:path'
 import { mkdirSync, existsSync } from 'node:fs'
 
 export class SQLiteDatabase {
-  static SCHEMA_VERSION = 1
+  static SCHEMA_VERSION = 2
 
   /**
    * @param {string} dbPath - Path to SQLite database file
@@ -66,8 +66,9 @@ export class SQLiteDatabase {
       this._migrateV1()
     }
 
-    // Add future migrations here:
-    // if (currentVersion < 2) { this._migrateV2() }
+    if (currentVersion < 2) {
+      this._migrateV2()
+    }
   }
 
   /**
@@ -182,6 +183,54 @@ export class SQLiteDatabase {
     `)
 
     this._setSchemaVersion(1)
+  }
+
+  /**
+   * Migration to version 2: Tasks and Schedule Records
+   * @private
+   */
+  _migrateV2() {
+    this.db.exec(`
+      -- Tasks table
+      CREATE TABLE IF NOT EXISTS tasks (
+        id TEXT PRIMARY KEY,
+        description TEXT NOT NULL,
+        priority TEXT NOT NULL,
+        project_id TEXT,
+        session_id TEXT,
+        completed INTEGER DEFAULT 0,
+        completed_at TEXT,
+        tags TEXT, -- JSON array
+        metadata TEXT, -- JSON object
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        due_date TEXT,
+        estimated_minutes INTEGER,
+        actual_minutes INTEGER,
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+        FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE SET NULL
+      );
+
+      -- Schedule records table
+      CREATE TABLE IF NOT EXISTS schedule_records (
+        id TEXT PRIMARY KEY,
+        date TEXT NOT NULL,
+        label TEXT NOT NULL,
+        type TEXT NOT NULL,
+        project TEXT,
+        recurrence TEXT DEFAULT 'none',
+        source TEXT NOT NULL
+      );
+
+      -- Indexes for tasks and schedule records
+      CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
+      CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed);
+      CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON tasks(due_date);
+      CREATE INDEX IF NOT EXISTS idx_schedule_records_date ON schedule_records(date);
+      CREATE INDEX IF NOT EXISTS idx_schedule_records_project ON schedule_records(project);
+    `)
+
+    this._setSchemaVersion(2)
   }
 
   /**

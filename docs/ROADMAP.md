@@ -2,27 +2,26 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-06-19
+**Last Updated:** 2026-07-02
 
 ---
 
-## Current Version: v0.9.3
+## Current Version: v0.12.2
 
-Real Data Pipeline — all mock data replaced with live `~/.atlas` data via React hooks.
+ESLint Adoption — full lint hygiene, flat config, CI gate, and Node 26 compatibility.
 
 ---
 
-## 🔬 Research Registry (in progress — PR #21)
+## ⏳ v0.13.0 - Task CLI & Schedule Push/Agenda (In Progress)
 
-Manuscripts, multi-paper programs, and proposals as first-class registry citizens.
+Merge native `Task.dueDate` + pushed schedule records from flow-cli agenda into a unified data contract.
 
-- ✅ **Bugfix** — registry-load robustness (one over-long `description` no longer bricks `findAll()`).
-- ✅ **Phase 1** — parse `kind`/`target`/`tasks` from research `.STATUS` → `metadata`; `summarize()` `byKind`.
-- ✅ **Phase 2** — `project list --kind`; `kind`/`target`/`taskCount` in `--format json` + MCP `atlas_get_projects`.
-- ⏳ **Phase 3** — obs `research board`; table-view `kind` column + `atlas plan` grouping; parser parity; release.
+- ✅ **CLI Project Remove Fix (v0.12.3 / v0.13.0-pre)** — Resolves name-to-UUID mismatch when removing projects via CLI case-insensitively and handles duplicate collisions.
+- ⏳ **Track B: Task CLI** — Add `atlas task {add,list,done,rm}` commands with `--due`/`--priority`/`--project` filters.
+- ⏳ **Track B: Schedule Push** — Add `atlas schedule push --format=json --data=<json>` to receive pre-normalized dated records.
+- ⏳ **Track B: Agenda Merging** — Add `atlas agenda <window-days> --format=json` merging native tasks + pushed schedule records.
 
-See [`docs/RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and
-[`docs/specs/GAP-ANALYSIS-research-registry.md`](specs/GAP-ANALYSIS-research-registry.md).
+See [`docs/specs/SPEC-atlas-task-agenda-2026-07-02.md`](specs/SPEC-atlas-task-agenda-2026-07-02.md).
 
 ---
 

@@ -25,6 +25,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # Use local version instead of Homebrew-installed version
 ATLAS="node $PROJECT_DIR/bin/atlas.js"
+VERSION=$(grep '"version":' "$PROJECT_DIR/package.json" | head -n 1 | cut -d '"' -f 4)
 
 # Colors (disabled when logging to file)
 if [[ "$1" == "--log" ]] || [[ ! -t 1 ]]; then
@@ -289,8 +290,8 @@ test_basic_commands() {
   header "1. Basic Commands"
 
   subheader "Version & Help"
-  check "Version flag" "$ATLAS --version" "0.1.0"
-  check "Version short" "$ATLAS -v" "0.1.0"
+  check "Version flag" "$ATLAS --version" "$VERSION"
+  check "Version short" "$ATLAS -v" "$VERSION"
   check "Help flag" "$ATLAS --help" "Usage: atlas"
   check "Help short" "$ATLAS -h" "Usage: atlas"
   check "Help lists project" "$ATLAS --help" "project"
@@ -395,7 +396,7 @@ test_sessions() {
   check "Session ended" "$ATLAS session status" "No active session"
 
   subheader "Session Edge Cases"
-  run_expect_fail "End without active session" "$ATLAS session end 'No session'" || true
+  check "End without active session" "$ATLAS session end 'No session'" "No active session"
   run "Start another session" "$ATLAS session start atlas"
   # Leave it active for other tests
 }

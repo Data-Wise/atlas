@@ -133,15 +133,24 @@ atlas project show myproject --format shell
 
 ### `atlas project remove`
 
-Unregister a project from Atlas (does not delete files).
+Unregister a project from Atlas by its name (case-insensitive) or project path/ID (does not delete files).
 
 ```bash
-atlas project remove <name>
+atlas project remove <name-or-id>
 ```
+
+**Behavior:**
+*   **Case-Insensitive Resolution**: Matches registered projects by name case-insensitively.
+*   **UUID/Path Fallback**: Falls back to direct path/ID matching if no name matches.
+*   **Ambiguity Guard**: If multiple registered projects share the same name, Atlas aborts and lists conflicting paths/IDs to avoid accidental deletion.
 
 **Example:**
 ```bash
+# Remove by name
 atlas project remove old-project
+
+# Remove by ID/path (e.g. if names collide)
+atlas project remove /Users/dt/projects/old-project
 ```
 
 ---

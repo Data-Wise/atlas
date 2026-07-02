@@ -2,6 +2,11 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Fixed
+- **CLI project remove resolution** — Resolves project remove command using case-insensitive project names rather than strictly UUIDs. Handles duplicate project name collision by prompting the user with paths and UUIDs of conflicting projects. (#22)
+
 ## [0.12.2] - 2026-06-26
 
 ### Chore
