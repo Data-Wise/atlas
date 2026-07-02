@@ -59,7 +59,7 @@ export class ScheduleRecord {
       date: this.date,
       label: this.label,
       type: this.type,
-      project: this.project,
+      project: this.project || '',
       recurrence: this.recurrence
     }
   }
