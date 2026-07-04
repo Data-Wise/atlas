@@ -146,7 +146,7 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.13.0
+## :sparkles: What's New
 
 !!! success "Task CLI, Schedule Push & Agenda"
     Two major additions: a native task CLI for CRUD operations, and a full-screen analytics view in the dashboard.
@@ -159,20 +159,6 @@ atlas dash
     - **CLI project remove fix** — case-insensitive name resolution with duplicate collision handling
     - **Testing infrastructure** — Vitest + ink-testing-library + Playwright E2E
 
-!!! info "Previous Releases"
-    - **v0.12.2**: ESLint adoption — flat config, CI lint gate, zero-warning cleanup
-    - **v0.12.1**: Patch — Node 26 support, FW-30 id convergence, PatternAnalyzer crash fix, +42 edge tests
-    - **v0.12.0**: Research-safe sync — `sync --research` alias, plain-sync warning, `.atlas-scan-children` marker
-    - **v0.11.0**: Research registry + Doctor — `sync --from-status` parses research metadata, `atlas doctor`
-    - **v0.10.0**: Temporal Intelligence — velocity, patterns, calibration
-    - **v0.9.x**: Ink TUI modernization, visual enhancements, real data pipeline, flow-cli integration
-    - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
-    - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
-    - **v0.6.x**: Session analytics, stats export
-    - **v0.5.x**: Park/unpark, templates, configuration wizard
-    - **v0.4.x**: ADHD utilities, dashboard redesign
-    - **v0.3.x**: Dashboard themes, Pomodoro
-
 !!! success "Patch: Node 26 + Stability"
     - **Node 26 support** — `better-sqlite3` bumped to `^12.11.1`; SQLite suite green on Node 18/20/22/26
     - **FW-30 id convergence** — plain `atlas sync` resolves by path, so it updates the `sync --from-status` entry instead of duplicating
@@ -180,23 +166,17 @@ atlas dash
     - **+42 edge tests** across research-sync and temporal-intelligence modules (1947 passing, 89 suites)
     - **Research-ops Cookbook** — 10 recipes in `docs/COOKBOOK.md`
 
-## :sparkles: What's New in v0.12.0
-
 !!! success "Research-Safe Sync"
     - **`atlas sync --research`** — research-aware alias (defaults to `~/projects/research`)
     - **Plain-sync warning** — names research projects it preserved-but-skipped, with the remedy
     - **`.atlas-scan-children` marker** — opt-in umbrella scanning for monorepo layouts
     - **Venue comment strip** — `CSDA # was JASA` → `CSDA` (inline comments stripped from target/venue fields)
 
-## :sparkles: What's New in v0.11.0
-
 !!! success "Research Registry + Doctor"
     - **Research registry** — `sync --from-status` parses `kind:`, `target:`/`venue:`, `tasks:` from research `.STATUS` files; manuscripts and programs appear in the project registry
     - **`atlas project list --kind manuscript|program|package`** — filter by project type
     - **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--fix`
     - **`project list --json`** — now also returns `progress`, `next`, `priority`
-
-## :sparkles: What's New in v0.10.0
 
 !!! success "Temporal Intelligence"
     Three new read-only analytics utilities mine your existing session history — no new data collection:
@@ -205,8 +185,6 @@ atlas dash
     - **`atlas stats --patterns`** — Productivity patterns from 90 days: best day, best hour, dead zones (slots with 0 flow)
     - **`atlas stats --calibrate <project> --minutes <n>`** — Bayesian time calibration: how much you historically over/under-run a project, with confidence level
     - **3 pure utility classes** in `src/utils/`: `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine` (31 unit tests)
-
-## :sparkles: What's New in v0.9.3
 
 !!! success "flow-cli Integration"
     atlas now honors the CLI flags flow-cli already calls — closing contract drift between the two tools:
@@ -218,8 +196,6 @@ atlas dash
     - **Fix:** `project list --status` now resolves status from project metadata (previously matched nothing)
 
     See [Integrations](INTEGRATIONS.md) for the full flow-cli ↔ atlas contract.
-
-## :sparkles: What's New in v0.9.2
 
 !!! success "Real Data Pipeline"
     The dashboard now displays **live data** from `~/.atlas` — all mock data removed:
@@ -256,12 +232,13 @@ atlas dash
     - `mono` — Pure grayscale
     - `high-contrast` — Maximum readability
 
-??? note "Previous Releases"
-    - **v0.9.1**: Visual Enhancements — themes, focus score, sparklines, heatmap
-    - **v0.9.0**: Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
+!!! note "Previous Releases"
     - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
     - **v0.6.x**: Session analytics, stats export
+    - **v0.5.x**: Park/unpark, templates, configuration wizard
+    - **v0.4.x**: ADHD utilities, dashboard redesign
+    - **v0.3.x**: Dashboard themes, Pomodoro
 
 ## :heart: ADHD-Friendly Design
 
@@ -278,4 +255,5 @@ Atlas is designed with ADHD in mind:
 
 - [GitHub Repository](https://github.com/Data-Wise/atlas)
 - [Issue Tracker](https://github.com/Data-Wise/atlas/issues)
-- [Changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md)
+- [Changelog](CHANGELOG.md)
+- [What's New](WHAT-S-NEW.md)
