@@ -133,8 +133,10 @@ atlas dash
 
 | Guide | Description |
 |-------|-------------|
+| [What's New](WHAT-S-NEW.md) | Release highlights |
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
 | [Quick Reference](REFCARD.md) | Printable command cheat sheet |
+| [Cheatsheet](CHEATSHEET.md) | Compact command reference |
 | [Workflows](WORKFLOWS.md) | ADHD-friendly workflow patterns |
 | [Visual Guide](VISUAL-GUIDE.md) | Themes, focus score, sparklines, heatmap |
 | [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
@@ -144,16 +146,32 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.12.2
+## :sparkles: What's New in v0.13.0
 
-!!! success "ESLint Adoption"
-    Full lint hygiene across the codebase — no new user-facing features, no breaking changes:
+!!! success "Task CLI, Schedule Push & Agenda"
+    Two major additions: a native task CLI for CRUD operations, and a full-screen analytics view in the dashboard.
 
-    - **ESLint flat config** (`eslint.config.js`) — lints all plain-JS sources + tests; TypeScript and legacy blessed dashboard ignored
-    - **CI lint gate** — `Lint` job on every PR; exits non-zero on errors (warnings non-blocking)
-    - **Zero-warning cleanup** — all 135 pre-existing `no-unused-vars` warnings pruned; `npm run lint` exits clean
+    - **Task CLI** — `atlas task add/list/done/rm` with `--due`/`--priority`/`--project` filters
+    - **`atlas agenda`** — merged chronological view of tasks + pushed schedule records
+    - **`atlas schedule push`** — receive pre-normalized dated records from external tools
+    - **AnalyticsView** (`a` key) — full-screen velocity sparkline + flow-pattern heatmap
+    - **StatusBar** — unified 3-zone status bar (session, key hints, layout)
+    - **CLI project remove fix** — case-insensitive name resolution with duplicate collision handling
+    - **Testing infrastructure** — Vitest + ink-testing-library + Playwright E2E
 
-## :sparkles: What's New in v0.12.1
+!!! info "Previous Releases"
+    - **v0.12.2**: ESLint adoption — flat config, CI lint gate, zero-warning cleanup
+    - **v0.12.1**: Patch — Node 26 support, FW-30 id convergence, PatternAnalyzer crash fix, +42 edge tests
+    - **v0.12.0**: Research-safe sync — `sync --research` alias, plain-sync warning, `.atlas-scan-children` marker
+    - **v0.11.0**: Research registry + Doctor — `sync --from-status` parses research metadata, `atlas doctor`
+    - **v0.10.0**: Temporal Intelligence — velocity, patterns, calibration
+    - **v0.9.x**: Ink TUI modernization, visual enhancements, real data pipeline, flow-cli integration
+    - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
+    - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
+    - **v0.6.x**: Session analytics, stats export
+    - **v0.5.x**: Park/unpark, templates, configuration wizard
+    - **v0.4.x**: ADHD utilities, dashboard redesign
+    - **v0.3.x**: Dashboard themes, Pomodoro
 
 !!! success "Patch: Node 26 + Stability"
     - **Node 26 support** — `better-sqlite3` bumped to `^12.11.1`; SQLite suite green on Node 18/20/22/26

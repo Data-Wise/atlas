@@ -85,6 +85,19 @@ flowchart LR
 | `stats month`     | Monthly summary  | `atlas stats month`              |
 | `stats --project` | Project-specific | `atlas stats --project atlas`    |
 | `stats --export`  | Export report    | `atlas stats --export weekly.md` |
+| `stats --velocity` | 4-week velocity | `atlas stats --velocity`         |
+| `stats --patterns` | Best day/hour   | `atlas stats --patterns`         |
+
+### Tasks (v0.13.0)
+
+| Command      | What it does        | Example                                 |
+| ------------ | ------------------- | --------------------------------------- |
+| `task add`   | Add a task          | `atlas task add "Write docs" --priority high` |
+| `task list`  | List tasks          | `atlas task list --incomplete --project myapp` |
+| `task done`  | Complete a task     | `atlas task done <id>`                  |
+| `task rm`    | Delete a task       | `atlas task rm <id>`                    |
+| `agenda`     | Merged task+schedule view | `atlas agenda 14 --format json`    |
+| `schedule push` | Push schedule records | `atlas schedule push --data '<json>'` |
 
 ### Calendar Export (v0.7.0)
 
@@ -100,6 +113,7 @@ flowchart LR
 | `plan`               | Guided daily planning     | `atlas plan`               |
 | `sync --from-status` | Import from .STATUS files | `atlas sync --from-status` |
 | `doctor` | Audit the settings contract | `atlas doctor` |
+| `agenda` | Merged task+schedule view | `atlas agenda 14` |
 
 ### Projects
 
@@ -119,6 +133,7 @@ Start dashboard: `atlas dash`
 | ----------- | ------------------------------------------------ |
 | `j` / `k`   | Navigate up/down                                 |
 | `Enter`     | Select project                                   |
+| `a`         | Analytics view (v0.13.0)                         |
 | `f`         | Focus mode (Pomodoro)                            |
 | `z`         | Zen mode                                         |
 | `T`         | Timeline view                                    |
@@ -133,19 +148,13 @@ Start dashboard: `atlas dash`
 | `?`         | Show help                                        |
 | `q`         | Quit                                             |
 
+**v0.13.0 — Task CLI (`atlas task add/list/done/rm`) · `atlas schedule push` · `atlas agenda` · AnalyticsView (`a` key) · StatusBar · CLI project remove fix · Vitest + Playwright E2E**
+
 **v0.12.2 — ESLint adoption: flat config, CI lint gate, 0 warnings across all sources**
 
 **v0.12.1 — Patch: Node 26 support (better-sqlite3 12.11.1) · FW-30 id convergence · PatternAnalyzer crash fix · +42 edge tests**
 
 **v0.12.0 — `atlas sync --research` alias · plain-sync research warning · `.atlas-scan-children` marker · venue comment strip**
-
-**v0.11.1 — Plain sync preserves research metadata (`kind`/`target`/`tasks`) via `_preserveResearchMetadata`**
-
-**v0.11.0 — Research registry: `atlas project list --kind manuscript|program` · `atlas doctor` (settings-contract audit) · `sync --from-status` parses kind/target/tasks**
-
-**v0.10.0 — Temporal Intelligence: `atlas stats --velocity` / `--patterns` / `--calibrate`**
-
-**v0.9.2 — Live data from `~/.atlas` via 4 React hooks (projects 5s, session 1s tick, stats 10s)**
 
 **Multi-Panel Layout Modes:**
 
@@ -313,5 +322,5 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.12.2 | Made for ADHD brains</em>
+<em>Atlas v0.13.0 | Made for ADHD brains</em>
 </div>

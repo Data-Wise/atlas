@@ -661,6 +661,151 @@ Energy level today? [H]igh / [M]edium / [L]ow
 
 ---
 
+## Task Management (v0.13.0+)
+
+### `atlas task`
+
+Manage tasks with CRUD operations.
+
+```bash
+atlas task [command]
+
+Commands:
+  add <description>    Add a new task
+  list [options]       List tasks
+  done <id>            Mark task as completed
+  rm <id>              Delete a task
+```
+
+### `atlas task add`
+
+Add a new task.
+
+```bash
+atlas task add <description> [options]
+
+Options:
+  -p, --priority <level>    Priority: low, medium, high (default: medium)
+  --due <date>              Due date (YYYY-MM-DD)
+  --project <name>          Associate with project
+```
+
+**Examples:**
+```bash
+# Simple task
+atlas task add "Write documentation"
+
+# High priority with due date
+atlas task add "Fix login bug" --priority high --due 2026-07-10
+
+# Project-specific
+atlas task add "Add tests" --project myapp --priority medium
+```
+
+### `atlas task list`
+
+List tasks with optional filters.
+
+```bash
+atlas task list [options]
+
+Options:
+  --completed          Show completed tasks only
+  --incomplete         Show incomplete tasks only
+  --overdue            Show overdue tasks only
+  --due-soon           Show tasks due soon only
+  --project <name>     Filter by project
+  --format <format>    Output format: table (default), json
+```
+
+**Examples:**
+```bash
+# All incomplete tasks
+atlas task list --incomplete
+
+# Overdue tasks for a project
+atlas task list --overdue --project myapp
+
+# JSON output
+atlas task list --format json
+```
+
+### `atlas task done`
+
+Mark a task as completed.
+
+```bash
+atlas task done <task-id>
+```
+
+### `atlas task rm`
+
+Delete a task.
+
+```bash
+atlas task rm <task-id>
+```
+
+---
+
+## Schedule & Agenda (v0.13.0+)
+
+### `atlas schedule push`
+
+Push schedule data from external tools (e.g., flow-cli agenda).
+
+```bash
+atlas schedule push [options]
+
+Options:
+  --data <json>        JSON data payload (array of schedule records)
+  --format <format>    Output format (default: json)
+```
+
+**Schedule record format:**
+```json
+[
+  {
+    "date": "2026-07-04",
+    "label": "Write documentation",
+    "type": "task",
+    "source": "flow-cli",
+    "priority": "high"
+  }
+]
+```
+
+**Examples:**
+```bash
+# Push schedule data
+atlas schedule push --data '[{"date":"2026-07-04","label":"Write docs","source":"flow-cli"}]'
+```
+
+### `atlas agenda`
+
+Show a merged chronological view of tasks and pushed schedule records.
+
+```bash
+atlas agenda [window-days] [options]
+
+Arguments:
+  window-days    Number of days to include (default: 7)
+
+Options:
+  --format <format>    Output format: table (default), json
+```
+
+**Examples:**
+```bash
+# Default 7-day window
+atlas agenda
+
+# 14-day window as JSON
+atlas agenda 14 --format json
+```
+
+---
+
 ## Context Parking (v0.5.1+)
 
 ### `atlas park`
@@ -754,6 +899,7 @@ atlas dash
 | `↑↓` / `j`/`k` | Navigate projects                     |
 | `Enter`     | Open project detail                       |
 | `Esc`       | Back / Exit current view                  |
+| `a`         | Analytics view (v0.13.0)                  |
 | `f`         | Enter focus mode (Pomodoro)               |
 | `z`         | Zen mode                                  |
 | `T`         | Timeline view (time blocks)               |
@@ -798,6 +944,14 @@ Press `T` (Shift+T) to enter the time block view:
 - Color-coded by project
 - Shows session durations and gaps
 - Helps identify work patterns
+
+**Analytics View (v0.13.0):**
+
+Press `a` to enter the full-screen analytics view:
+- **Focus Velocity** — 30-day ASCII sparkline, trend indicator, and 4-week summary table
+- **Flow Patterns** — 7×24 hour-day heatmap for productivity distribution, including best day/hour and dead zone callouts
+- **Navigation** — Tab-locked single-panel layout with project cycling (← →)
+- Quick-links to Focus (`f`) and Detail (`Enter`)
 
 **Ecosystem View (v0.8.0):**
 

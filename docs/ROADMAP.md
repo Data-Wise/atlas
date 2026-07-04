@@ -6,20 +6,17 @@
 
 ---
 
-## Current Version: v0.12.2
+## Current Version: v0.13.0
 
-ESLint Adoption — full lint hygiene, flat config, CI gate, and Node 26 compatibility.
+Task CLI & Schedule Push/Agenda — native task CRUD, merged agenda view, analytics dashboard, and E2E testing infrastructure.
 
 ---
 
-## ⏳ v0.13.0 - Task CLI & Schedule Push/Agenda (In Progress)
+## ⏳ v0.14.0 - Analytics + Calendar (Planned)
 
-Merge native `Task.dueDate` + pushed schedule records from flow-cli agenda into a unified data contract.
-
-- ✅ **CLI Project Remove Fix (v0.12.3 / v0.13.0-pre)** — Resolves name-to-UUID mismatch when removing projects via CLI case-insensitively and handles duplicate collisions.
-- ⏳ **Track B: Task CLI** — Add `atlas task {add,list,done,rm}` commands with `--due`/`--priority`/`--project` filters.
-- ⏳ **Track B: Schedule Push** — Add `atlas schedule push --format=json --data=<json>` to receive pre-normalized dated records.
-- ⏳ **Track B: Agenda Merging** — Add `atlas agenda <window-days> --format=json` merging native tasks + pushed schedule records.
+- [ ] Dead-zone iCal export — focus block calendar events from `--patterns` dead zones
+- [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
+- [ ] Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
 
 See [`docs/specs/SPEC-atlas-task-agenda-2026-07-02.md`](specs/SPEC-atlas-task-agenda-2026-07-02.md).
 
