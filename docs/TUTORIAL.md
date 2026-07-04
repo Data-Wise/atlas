@@ -326,7 +326,7 @@ atlas dash
 | `Tab`   | **Cycle layout mode** | Single → Split → Triple  |
 | `d`     | Decision helper       | "What should I work on?" |
 | `/`     | Search                | Find a project           |
-| `a`     | Filter: active only   | See active projects      |
+| `a`     | Analytics view        | Deep productivity insights |
 | `*`     | Clear filter          | Show all                 |
 | `q`     | Quit                  | Exit dashboard           |
 

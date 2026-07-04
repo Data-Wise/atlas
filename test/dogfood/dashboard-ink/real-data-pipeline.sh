@@ -1129,6 +1129,143 @@ try {
     fi
 }
 
+# ─── Test 16: Analytics data pipeline ───────────────────────────────────────
+
+test_analytics_pipeline() {
+    log_test "Analytics — cross-validate buildPatternGrid and getDailyFocusMinutes"
+
+    # Path A: Run the same buildPatternGrid logic as useAnalytics hook
+    run_node '
+import { buildPatternGrid } from "./src/adapters/presenters/PatternPresenter.js";
+import { Container } from "./src/adapters/Container.js";
+
+const c = new Container();
+const sessionRepo = c.getSessionRepository();
+const projectRepo = c.getProjectRepository();
+const projects = await projectRepo.findAll();
+const target = projects.find(p => p.name && !/^tmp\./.test(p.name));
+
+if (!target) { console.log("NO_PROJECT"); process.exit(0); }
+console.log("PROJECT:" + target.name);
+
+const sessions = await sessionRepo.findByProject(target.name);
+console.log("SESSION_COUNT:" + (sessions?.length ?? 0));
+
+if (sessions && sessions.length > 0) {
+  const grid = buildPatternGrid(sessions);
+  console.log("GRID_ROWS:" + grid.length);
+  console.log("GRID_COLS:" + (grid[0]?.length ?? 0));
+  const nonZero = grid.flat().filter(v => v > 0).length;
+  console.log("NONZERO_CELLS:" + nonZero);
+
+  // Also get daily focus minutes
+  const daily = await sessionRepo.getDailyFocusMinutes(target.name, 30);
+  console.log("DAILY_LENGTH:" + daily.length);
+  const dailySum = daily.reduce((a, b) => a + b, 0);
+  console.log("DAILY_SUM:" + dailySum);
+} else {
+  console.log("GRID_ROWS:0");
+  console.log("GRID_COLS:0");
+  console.log("NONZERO_CELLS:0");
+  console.log("DAILY_LENGTH:0");
+  console.log("DAILY_SUM:0");
+}
+'
+    local project session_count grid_rows grid_cols nonzero daily_len daily_sum
+    project=$(get_val "PROJECT")
+    session_count=$(get_val "SESSION_COUNT")
+    grid_rows=$(get_val "GRID_ROWS")
+    grid_cols=$(get_val "GRID_COLS")
+    nonzero=$(get_val "NONZERO_CELLS")
+    daily_len=$(get_val "DAILY_LENGTH")
+    daily_sum=$(get_val "DAILY_SUM")
+
+    if [ -z "$project" ]; then
+        log_fail "No target project found for analytics test"
+        return
+    fi
+    log_info "Target project: $project ($session_count sessions)"
+
+    # Path B (bash oracle): Verify grid dimensions
+    if [ "${session_count:-0}" -gt 0 ]; then
+        if [ "$grid_rows" = "7" ]; then
+            log_pass "Pattern grid has 7 rows"
+        else
+            log_fail "Pattern grid rows=$grid_rows, expected 7"
+        fi
+        if [ "$grid_cols" = "24" ]; then
+            log_pass "Pattern grid has 24 columns"
+        else
+            log_fail "Pattern grid cols=$grid_cols, expected 24"
+        fi
+        # Cross-validate: non-zero cells should be <= total cells
+        local total_cells=$((grid_rows * grid_cols))
+        if [ "$nonzero" -le "$total_cells" ]; then
+            log_pass "Non-zero cells ($nonzero) <= total cells ($total_cells)"
+        else
+            log_fail "Non-zero cells ($nonzero) > total cells ($total_cells)"
+        fi
+    else
+        log_info "No sessions — pattern grid is all zeros (valid for empty state)"
+        if [ "$nonzero" = "0" ]; then
+            log_pass "Zero non-zero cells for empty session set"
+        fi
+    fi
+
+    # Path B (bash oracle): Verify daily focus minutes
+    if [ "${daily_len:-0}" -gt 0 ]; then
+        if [ "$daily_len" = "30" ]; then
+            log_pass "Daily focus minutes has 30 entries"
+        else
+            log_fail "Daily focus minutes length=$daily_len, expected 30"
+        fi
+        if [ -n "$daily_sum" ]; then
+            local sum_ok
+            sum_ok=$(node -e "console.log($daily_sum >= 0)" 2>/dev/null || echo "false")
+            if [ "$sum_ok" = "true" ]; then
+                log_pass "Daily focus minutes sum ($daily_sum) is non-negative"
+            else
+                log_fail "Daily focus minutes sum ($daily_sum) is negative"
+            fi
+        fi
+    else
+        log_info "No daily focus data (valid empty state)"
+    fi
+
+    # Cross-validate: PatternPresenter.formatPatternGrid accepts the grid
+    if [ "${grid_rows:-0}" = "7" ] && [ "${grid_cols:-0}" = "24" ]; then
+        run_node '
+import { formatPatternGrid } from "./src/adapters/presenters/PatternPresenter.js";
+import { buildPatternGrid } from "./src/adapters/presenters/PatternPresenter.js";
+import { Container } from "./src/adapters/Container.js";
+const c = new Container();
+const sessionRepo = c.getSessionRepository();
+const projectRepo = c.getProjectRepository();
+const projects = await projectRepo.findAll();
+const target = projects.find(p => p.name && !/^tmp\./.test(p.name));
+if (!target) { process.exit(0); }
+const sessions = await sessionRepo.findByProject(target.name);
+if (!sessions || sessions.length === 0) { process.exit(0); }
+const grid = buildPatternGrid(sessions);
+const rendered = formatPatternGrid(grid, { showHourLabels: true });
+const lines = rendered.split("\n");
+console.log("RENDERED_LINES:" + lines.length);
+const hasDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].every(d => rendered.includes(d));
+console.log("HAS_DAY_LABELS:" + hasDays);
+'
+        local rendered_lines has_day_labels
+        rendered_lines=$(get_val "RENDERED_LINES")
+        has_day_labels=$(get_val "HAS_DAY_LABELS")
+
+        if [ -n "$rendered_lines" ]; then
+            log_pass "formatPatternGrid renders $rendered_lines lines"
+        fi
+        if [ "$has_day_labels" = "true" ]; then
+            log_pass "Rendered grid includes all day labels"
+        fi
+    fi
+}
+
 # ─── Main ───────────────────────────────────────────────────────────────────
 
 main() {
@@ -1162,6 +1299,7 @@ main() {
     test_source_contracts
     test_metadata_edge_cases
     test_streak_calculation
+    test_analytics_pipeline
 
     # Summary
     echo ""

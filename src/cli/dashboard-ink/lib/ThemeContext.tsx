@@ -18,6 +18,7 @@ export interface Theme {
     borderInactive: string;
     headerActive: string;
     headerInactive: string;
+    highlightBg: string;
   };
   status: Record<string, string>;
   text: {
@@ -51,6 +52,7 @@ const defaultTheme: Theme = {
     borderInactive: 'gray',
     headerActive: 'cyan',
     headerInactive: 'gray',
+    highlightBg: '#1a3a1a',
   },
   status: {
     active: 'green',
@@ -90,6 +92,7 @@ const nordTheme: Theme = {
     borderInactive: '#4C566A',
     headerActive: '#81A1C1',
     headerInactive: '#4C566A',
+    highlightBg: '#2e3440',
   },
   status: {
     active: '#8FBCBB',
@@ -129,6 +132,7 @@ const solarizedTheme: Theme = {
     borderInactive: '#586E75',
     headerActive: '#268BD2',
     headerInactive: '#586E75',
+    highlightBg: '#073642',
   },
   status: {
     active: '#859900',
@@ -168,6 +172,7 @@ const monoTheme: Theme = {
     borderInactive: 'gray',
     headerActive: 'white',
     headerInactive: 'gray',
+    highlightBg: '#3a3a3a',
   },
   status: {
     active: 'white',
@@ -207,6 +212,7 @@ const highContrastTheme: Theme = {
     borderInactive: 'white',
     headerActive: 'cyanBright',
     headerInactive: 'white',
+    highlightBg: '#1a1a1a',
   },
   status: {
     active: 'greenBright',

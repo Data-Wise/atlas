@@ -41,8 +41,9 @@ describe('App.tsx import graph', () => {
     expect(src).toContain('LayoutManager');
   });
 
-  it('imports LayoutStatusBar from LayoutManager', () => {
-    expect(src).toContain('LayoutStatusBar');
+  it('imports StatusBar from ./StatusBar.js', () => {
+    expect(src).toContain("import { StatusBar }");
+    expect(src).toContain("'./StatusBar.js'");
   });
 
   it('imports LAYOUT constant', () => {
@@ -104,10 +105,12 @@ describe('LayoutManager wiring in App.tsx', () => {
     expect(src).toContain('inspector &&');
   });
 
-  it('renders LayoutStatusBar in command bar', () => {
-    expect(src).toContain('<LayoutStatusBar');
+  it('renders StatusBar in command bar', () => {
+    expect(src).toContain('<StatusBar');
+    expect(src).toContain('currentView={currentView}');
     expect(src).toContain('layout={layout}');
     expect(src).toContain('focusPanel={focusPanel}');
+    expect(src).toContain('hasActiveSession={hasActiveSession}');
   });
 });
 

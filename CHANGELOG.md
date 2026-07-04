@@ -4,6 +4,20 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+### Added
+- **AnalyticsView Dashboard View** — New full-screen view (`a` key) providing deep productivity insights:
+  - **Focus Velocity**: 30-day ASCII sparkline, trend indicator, and 4-week summary table.
+  - **Flow Patterns**: 7×24 hour-day heatmap for productivity distribution, including best day/hour and dead zone callouts.
+  - **Navigation**: Tab-locked single-panel layout with project cycling (← →) and quick-links to Focus (`f`) and Detail (`Enter`).
+- **StatusBar Component** — Unified 3-zone status bar for the Ink dashboard:
+  - **Session Zone**: Active session dot, project name, and elapsed timer.
+  - **Key Hints Zone**: Context-aware key-binding hints for the current view state.
+  - **Layout Zone**: Current layout mode icon and pending capture count.
+- **Testing Infrastructure** — Expanded E2E testing suite:
+  - Integrated Vitest + `ink-testing-library` for component-level E2E.
+  - Integrated Playwright for CLI subprocess E2E.
+  - Added analytics dogfood tests for dual-path verification (code vs oracle).
+
 ### Fixed
 - **CLI project remove resolution** — Resolves project remove command using case-insensitive project names rather than strictly UUIDs. Handles duplicate project name collision by prompting the user with paths and UUIDs of conflicting projects. (#22)
 

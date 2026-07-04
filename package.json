@@ -35,7 +35,11 @@
     "test:ink": "npm test -- --testPathPattern=test/.*dashboard-ink",
     "test:ink:unit": "npm test -- --testPathPattern=test/unit/.*dashboard-ink",
     "test:ink:e2e": "npm test -- --testPathPattern=test/e2e/dashboard-ink",
+    "test:ink:e2e:vitest": "npx vitest run --config vitest.config.e2e.ts",
+    "test:playwright": "npx playwright test --config playwright.config.ts",
+    "test:playwright:install": "npx playwright install chromium",
     "test:ink:dogfood": "bash test/dogfood/dashboard-ink/basic-functionality.sh",
+    "test:ink:dogfood:analytics": "bash test/dogfood/dashboard-ink/analytics-dogfood.sh",
     "test:ink:all": "npm run test:ink && npm run test:ink:dogfood",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
@@ -82,6 +86,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.1",
+    "@playwright/test": "^1.61.1",
     "@swc/core": "^1.15.11",
     "@swc/jest": "^0.2.39",
     "@types/react": "^19.2.7",
@@ -91,6 +96,7 @@
     "ink-testing-library": "^4.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.7.4",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^4.1.9"
   }
 }

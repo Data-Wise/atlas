@@ -17,6 +17,16 @@ coverage/
 *.swo
 .DS_Store
 
+# Playwright test artifacts
+test-results/
+playwright-report/
+
+# Planning artifacts (ORCHESTRATE stays on feature branches)
+ORCHESTRATE-*.md
+
+# Grill sessions
+docs/grill-*.md
+
 # Environment
 .env
 .env.local
