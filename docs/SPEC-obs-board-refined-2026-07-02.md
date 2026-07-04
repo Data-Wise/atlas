@@ -6,9 +6,20 @@
 > **Fact-checked against live state 2026-07-04.** This draft sat untracked/uncommitted since
 > 2026-07-02. Verification found the general board mechanism shipped further than this doc
 > assumed (correct file path, launchd job already installed), but one target (§ "Two board
-> targets" #2) conflicts with an existing, separately-scheduled mechanism this doc didn't know
+> targets" #2) conflicted with an existing, separately-scheduled mechanism this doc didn't know
 > about. See "Verification findings" below before treating any "Files to touch" entry as
 > greenfield work.
+>
+> **Scope decision (2026-07-04): Target 2 is dropped.** `obs board` will not write
+> `MediationVerse_Dashboard.md`. That file stays exclusively owned by
+> `mediationverse-status-sync.py` (R-package ecosystem, `~/projects/r-packages/scripts/`) on its
+> own schedule. Rationale: the two systems already sit on opposite sides of a real ecosystem
+> boundary — CRAN-cascade/R-package dependency logic vs. general dev-tools vault planning — that
+> doesn't need bridging. A read-only parity-check variant was considered and rejected: it would
+> require `obs board` to independently re-derive CRAN dependency-ordering logic just to compare
+> against the other script's output, creating ongoing dual-maintenance for a benefit (drift
+> detection) the existing script hasn't shown a need for. `obs board`'s scope is now
+> `_ACTION-BOARD.md` only.
 
 ## Verification findings (2026-07-04)
 
@@ -32,12 +43,15 @@ atlas project list --kind --format json
          ├── ranker: stable sort (priority → progress desc → id)
          ├── renderer: markdown via templates
          └── writer: marker-bounded atomic (<!-- obs:board:start/end -->)
-                └──► vault: _ACTION-BOARD.md + MediationVerse_Dashboard.md
+                └──► vault: _ACTION-BOARD.md
 ```
 
-## Two board targets
+*(`MediationVerse_Dashboard.md` removed from this diagram — see "Scope decision" above.
+`obs board` has exactly one output target.)*
 
-### 1. `_ACTION-BOARD.md` — Manuscripts & Programs
+## Board target
+
+### `_ACTION-BOARD.md` — Manuscripts & Programs
 
 ```
 ## 🎯 Research Action Board            generated: 2026-06-25
@@ -57,15 +71,9 @@ TL;DR — deterministic summary
 | pmed-modern | Epi/JASA | 🟢 active | ███████░░ 92% | 0/5 | advance 05 |
 ```
 
-### 2. `MediationVerse_Dashboard.md` — Package CRAN cascade
-
-```
-## MediationVerse — CRAN Cascade
-| Package | CRAN | Dependencies | Next |
-| medfit  | ✅ 0.2.1   | — | — |
-| medrobust | 🔴 —   | medfit | submit_cran() |
-| medsim   | 🟡 —    | medfit, medrobust | await medrobust |
-```
+*(The former "Target 2" `MediationVerse_Dashboard.md` CRAN-cascade table is no longer part
+of this spec's scope — that view continues to live exclusively in
+`mediationverse-status-sync.py`, unchanged.)*
 
 ## Design rules
 
@@ -83,20 +91,25 @@ TL;DR — deterministic summary
 | Issue | Status |
 |-------|--------|
 | **Collider `journal:`→`venue:` field mapping** | Not yet verified this pass — still needs checking against atlas's `target:` convention |
-| **MediationVerse_Dashboard target parity** | **Superseded, not a rough edge to fix — a scope decision needed.** Drop this target from `obs board`, or explicitly scope it read-only (parity-check against `mediationverse-status-sync.py`'s output, never a second writer) |
+| **MediationVerse_Dashboard target parity** | ✅ **Resolved 2026-07-04 — target dropped.** `obs board` will never write this file; see "Scope decision" above. No remaining action. |
 | **Scheduled Monday 09:15 launchd job** | ✅ **Done** — `com.data-wise.obs-board-refresh.plist`, verified live |
 | **`--ai` opt-in TL;DR** | Still open — layered AI refinement contract undefined |
 | **Cross-repo JSON contract test** | Still open — `tests/fixtures/atlas-snapshot.json` not committed |
 | **Research HUB status block** | Deferred from scope (Decision 3) — unchanged |
 | **`kind:`/`tasks:` in remaining `.STATUS` files** | ✅ `kind:` done in collider/sensitivity/"product of three"; `tasks:` still missing in the 2 checked; "sequential" repo not found — name needs correcting before this item can be finished |
 
-**Net remaining scope, once corrected:** 2 fully open items (`--ai` flag, JSON contract test fixture), 1 scope decision required before proceeding (MediationVerse target), 1 partially-done cleanup (`tasks:` headers + the "sequential" name correction), 1 unverified item carried over (collider field mapping). Meaningfully smaller than the original 7-item list implied — most of what looked outstanding had already shipped.
+**Net remaining scope, fully resolved 2026-07-04:** 2 fully open items (`--ai` flag, JSON
+contract test fixture), 1 partially-done cleanup (`tasks:` headers + the "sequential" name
+correction), 1 unverified item carried over (collider field mapping). The MediationVerse
+scope decision is now closed (dropped, see above) — no open decisions remain, only
+implementation work. Meaningfully smaller than the original 7-item list implied — most of
+what looked outstanding had already shipped.
 
 ## Files to touch (obsidian-cli-ops repo, not atlas)
 
 | File | Change |
 |------|--------|
-| `src/python/core/board.py` | *(corrected from `research/board.py`)* — already has adapter + ranker + writer (core); this item is about the MediationVerse-target scope decision above, not new-from-scratch work |
+| `src/python/core/board.py` | *(corrected from `research/board.py`)* — already has adapter + ranker + writer (core) for the single remaining target (`_ACTION-BOARD.md`); no MediationVerse-target code needed given the scope decision above |
 | `src/python/core/templates/` | *(path unverified this pass — confirm actual location before assuming `research/templates/`)* |
 | `src/obs.zsh` | dispatch already wired (`obs board refresh`/`obs board status` per obsidian-cli-ops v4.3.0) |
 | `src/python/obs_cli.py` | add the still-missing `--ai` flag; confirm `--out`/`--targets`/`--dry-run`/`--json` are already present (v4.3.0 board work likely added most of these) before assuming they're new |
