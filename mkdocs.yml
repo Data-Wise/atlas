@@ -97,5 +97,6 @@ nav:
     - Integrations: INTEGRATIONS.md
   - Developer:
     - API Guide: API-GUIDE.md
+    - API Recipes: API-RECIPES.md
     - MCP Server: MCP-SERVER.md
     - Roadmap: ROADMAP.md

@@ -1,6 +1,6 @@
 # Atlas Cookbook
 
-> Task-oriented recipes for the research-ops workflow. Each recipe is **problem → do this → notes**.
+> Task-oriented recipes for research-ops and dev workflows. Each recipe is **problem → do this → notes**.
 > New here? Start with the [Research Registry tutorial](tutorials/research-registry.md); for the big picture
 > see [RESEARCH-REGISTRY.md](RESEARCH-REGISTRY.md) and the cross-tool
 > [research-ops overview](https://github.com/Data-Wise/docs-standards/blob/main/research-ops/overview.md).
@@ -177,3 +177,161 @@ atlas doctor                         # confirm the count reflects real projects
 
 **Notes.** If `--from-status` registered a project before any plain sync, the two used to create a duplicate;
 that is fixed (plain sync resolves by path) — see CHANGELOG / issue #49.
+
+---
+
+## Recipe 11 — Start and end a work session
+
+**You want** to track focused work time on a project.
+
+```bash
+atlas session start atlas               # start timer for atlas project
+atlas session status                    # show current session state
+atlas session end "refactored parsers"  # end with a completion note
+```
+
+**Notes.** Sessions are the foundation for streaks, analytics, and the dashboard. End-of-day: run `atlas session end` to close cleanly. If you forget, `atlas where` shows your last breadcrumb trail.
+
+---
+
+## Recipe 12 — Quick-capture ideas and tasks
+
+**You want** to jot down an idea without breaking flow.
+
+```bash
+atlas catch "add dark mode to dashboard"            # quick capture
+atlas catch "check medfit CRAN" --project=medfit    # capture to a specific project
+atlas inbox                                          # list all pending captures
+atlas triage                                         # process inbox
+```
+
+**Notes.** Captures are ADHD-friendly: write it down now, process later. The `inbox` command shows what's pending; `triage` walks through each item interactively.
+
+---
+
+## Recipe 13 — Context switching (park/unpark)
+
+**You want** to switch tasks without losing where you were.
+
+```bash
+atlas park "switching to urgent bug fix"    # save current context
+# ... do the urgent thing ...
+atlas unpark                                 # restore saved context
+atlas parked                                 # list all saved contexts
+```
+
+**Notes.** Park creates a breadcrumb with your context note. Unpark restores the most recent. Multiple parks stack — `parked` lists them all with timestamps.
+
+---
+
+## Recipe 14 — Manage tasks with due dates and priorities
+
+**You want** to track actionable tasks with deadlines.
+
+```bash
+atlas task add "Review CRAN submission" --due=2026-07-10 --priority=P1
+atlas task add "Write changelog entry"
+atlas task list                          # all incomplete tasks
+atlas task list --overdue                # past due
+atlas task list --due-soon               # due within 3 days
+atlas task list --completed              # done tasks
+atlas task done 3                        # mark task #3 complete
+atlas task rm 5                          # delete task #5
+```
+
+**Notes.** Tasks are chronological by default. Use `--project=X` to filter. Priority levels: P0 (critical), P1 (high), P2 (medium), P3 (low). Due dates support relative formats: `tomorrow`, `next-friday`, `+3d`.
+
+---
+
+## Recipe 15 — Merged agenda view
+
+**You want** to see today's combined schedule from multiple sources.
+
+```bash
+atlas agenda                  # show today's merged agenda
+atlas agenda 7                # show next 7 days
+atlas agenda --format=json    # machine-readable output
+```
+
+**Notes.** Agenda merges scheduled records, tasks with due dates, and session history into a chronological view. Great for morning planning or end-of-day review.
+
+---
+
+## Recipe 16 — Morning ritual with `plan`
+
+**You want** a guided daily planning routine.
+
+```bash
+atlas plan                    # interactive morning ritual
+```
+
+**Notes.** `plan` walks you through: review yesterday's sessions, check inbox, set today's focus, review overdue tasks, plan energy blocks. ADHD-friendly: short prompts, no decision paralysis.
+
+---
+
+## Recipe 17 — View analytics and patterns
+
+**You want** to understand your work patterns over time.
+
+```bash
+atlas stats                       # quick overview
+atlas stats --velocity            # 4-week rolling velocity
+atlas stats --patterns            # 90-day flow patterns
+atlas stats --calibrate           # Bayesian calibration analysis
+atlas stats --export --format=md  # export as Markdown table
+```
+
+**Notes.** Velocity shows your output rate trend. Patterns reveal your best hours and typical session lengths. Calibration shows prediction accuracy — useful for estimating future work.
+
+---
+
+## Recipe 18 — Dashboard TUI navigation
+
+**You want** to use the interactive terminal dashboard.
+
+```bash
+atlas dash                   # launch TUI dashboard
+```
+
+**Dashboard keys:**
+
+| Key | View | Purpose |
+|-----|------|---------|
+| `f` | Focus | Deep-work timer (Pomodoro) |
+| `T` | Timeline | Session history timeline |
+| `z` | Zen | Minimal focus mode |
+| `e` | Ecosystem | Cross-project overview |
+| `p` | Plan | Morning ritual in dashboard |
+| `a` | Analytics | Session analytics with heatmap |
+| `Tab` | Layout | Cycle SINGLE → SPLIT → TRIPLE |
+| `?` | Help | Keyboard shortcuts |
+
+**Notes.** The dashboard uses your `~/.atlas/` data — no configuration needed. Analytics view shows heatmap, velocity, and pattern data with interactive controls.
+
+---
+
+## Recipe 19 — Export session data
+
+**You want** to export session history for external use.
+
+```bash
+atlas session export                    # iCal format (default)
+atlas session export --format=json      # JSON for scripting
+atlas session export --project=atlas    # filter by project
+```
+
+**Notes.** iCal export works with Google Calendar, Apple Calendar, Outlook. JSON export is useful for custom visualizations or integrating with other tools.
+
+---
+
+## Recipe 20 — Sync from `.STATUS` files
+
+**You want** to import research metadata from your existing `.STATUS` files.
+
+```bash
+atlas sync --from-status                         # import from default paths
+atlas sync --from-status --paths ~/projects      # custom path
+atlas sync --from-status --dry-run               # preview changes
+```
+
+**Notes.** `--from-status` (or its `--research` alias) is the authority for research metadata. Plain `atlas sync` preserves existing `kind`/`target`/`tasks` but does not re-parse them. See Recipe 2 for full research sync workflow.
