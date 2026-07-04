@@ -2,7 +2,7 @@
 
 All notable changes to Atlas are documented here.
 
-## [Unreleased]
+## [0.13.0] - 2026-07-04
 
 ### Added
 - **AnalyticsView Dashboard View** — New full-screen view (`a` key) providing deep productivity insights:

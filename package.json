@@ -1,6 +1,6 @@
 {
   "name": "@data-wise/atlas",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "description": "Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow",
   "type": "module",
   "main": "src/index.js",
@@ -44,7 +44,11 @@
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint src/ test/",
     "format": "prettier --write 'src/**/*.js' 'test/**/*.js'",
     "start": "node bin/atlas.js",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "release:version": "npm version --no-git-tag-version",
+    "release:tag": "git tag -a v$npm_package_version -m \"Release v$npm_package_version\"",
+    "release:push": "git push origin main --follow-tags",
+    "release:github": "gh release create v$npm_package_version --generate-notes"
   },
   "keywords": [
     "project-management",
