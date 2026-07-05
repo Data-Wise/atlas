@@ -255,5 +255,5 @@ Atlas is designed with ADHD in mind:
 
 - [GitHub Repository](https://github.com/Data-Wise/atlas)
 - [Issue Tracker](https://github.com/Data-Wise/atlas/issues)
-- [Changelog](CHANGELOG.md)
+- [Changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md)
 - [What's New](WHAT-S-NEW.md)
