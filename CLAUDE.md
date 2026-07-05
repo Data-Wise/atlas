@@ -31,10 +31,10 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.10.0 |
+| **Version** | 0.13.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,858 (Jest) |
+| **Tests** | 1,978 (Jest) |
 | **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
@@ -149,6 +149,14 @@ atlas
 │   ├── start/end/pause/resume
 │   ├── status/history/current
 │   └── export            # iCal/JSON export (v0.7.0)
+├── task
+│   ├── add [--due/--priority/--project]
+│   ├── list [--completed/--incomplete/--overdue/--due-soon]
+│   ├── done <id>
+│   └── rm <id>
+├── schedule
+│   └── push [--format/--data]
+├── agenda [window-days] [--format]
 ├── stats                 # Session analytics
 ├── plan                  # Morning ritual (v0.8.0)
 ├── catch/inbox/triage    # Quick capture
@@ -157,6 +165,7 @@ atlas
 ├── template              # Template management
 ├── config                # Configuration
 ├── sync [--from-status]  # Registry sync
+├── doctor                # Settings contract audit
 ├── dash                  # Dashboard TUI
 └── status                # Quick status
 ```
@@ -289,6 +298,12 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.13.0** - Task CLI & Schedule Push/Agenda: Implement Tasks & Schedule Records persistence (SQLite & FileSystem), Task CRUD CLI (`atlas task`), schedule sync/push (`atlas schedule push`), and chronological merged agenda (`atlas agenda`). Also: AnalyticsView (`a` key), StatusBar, Vitest + ink-testing-library + Playwright E2E.
+- **v0.12.2** - ESLint adoption: flat config, CI lint gate, zero-warning cleanup across all sources
+- **v0.12.1** - Node 26 support (better-sqlite3 12.11.1), FW-30 id convergence, PatternAnalyzer crash fix, +42 edge tests
+- **v0.12.0** - Research-safe sync: `sync --research` alias, plain-sync warning, `.atlas-scan-children` marker, venue comment strip
+- **v0.11.1** - Plain sync preserves research metadata via `_preserveResearchMetadata`
+- **v0.11.0** - Research registry + Doctor: `sync --from-status` parses research metadata, `atlas doctor`, `project list --kind`
 - **v0.10.0** - Temporal Intelligence: VelocityCalculator (4-week rolling), PatternAnalyzer (90-day flow patterns), PredictionEngine (Bayesian calibration + MAD outlier removal); `atlas stats --velocity / --patterns / --calibrate`; 31 unit tests
 - **v0.9.3** - flow-cli Integration: CLI flags flow-cli already calls (session status --format json, project list --count/--suggest, inbox --count, trail --limit) + project list --status metadata-filter fix; live integration docs
 - **v0.9.2** - Real Data Pipeline: All mock data replaced with live ~/.atlas data

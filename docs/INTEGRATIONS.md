@@ -1,9 +1,9 @@
 # Dev Tools Ecosystem Integrations
 
-**Last Updated:** 2026-01-07
+**Last Updated:** 2026-07-04
 **Migrated From:** dev-planning/docs/INTEGRATION-MAP.md
 
-> Comprehensive map of how all 19 dev-tools projects connect and depend on each other.
+> Comprehensive map of how all dev-tools projects connect and depend on each other.
 
 ---
 
@@ -36,7 +36,7 @@ The dev-tools ecosystem follows a three-layer architecture:
 
 ---
 
-## Current Architecture (2026-01-07)
+## Current Architecture (2026-07-04)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -104,7 +104,7 @@ The dev-tools ecosystem follows a three-layer architecture:
 ### 🔗 flow-cli ↔ atlas (Live)
 
 **Type:** CLI shell-out (ZSH → atlas binary)
-**Status:** Active. flow-cli wraps the `atlas` CLI across ~20 integration points, with ZSH-native fallbacks on hot paths so commands never block when atlas is absent.
+**Status:** Active. flow-cli wraps the `atlas` CLI across ~25 integration points, with ZSH-native fallbacks on hot paths so commands never block when atlas is absent.
 
 flow-cli never touches `~/.atlas/` directly — all reads/writes go through the `atlas` binary. Its own fallback state lives in `$FLOW_DATA_DIR` (`~/.local/share/flow/`).
 
@@ -183,7 +183,10 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 | **nexus** | Bun | Knowledge workflow (Obsidian, courses) | Claude Desktop, CLI |
 | **rforge** | npm | R package ecosystem management | Claude Desktop, CLI |
 | **obsidian-ops** | Python/uv | Obsidian vault operations | Claude Desktop, CLI |
-| **atlas** | npm | Project state, sessions, captures | Claude Desktop, CLI |
+| **desktop-commander** | npm | Persistent shells, filesystem | Claude Desktop, CLI |
+| **linear** | npx | Linear project management | Claude Desktop, CLI |
+| **memory** | npx | Knowledge graph persistence | Claude Desktop, CLI |
+| **session** | npx | Session state persistence | Claude Desktop, CLI |
 | **playwright** | npx | Browser automation | Claude Desktop, CLI |
 | **docling** | Python/uv | PDF processing | Claude Desktop, CLI |
 | **github** | npx | GitHub API integration | Claude Desktop, CLI |
@@ -212,7 +215,7 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 | Formula | Version | Source | Runtime |
 |---------|---------|--------|---------|
 | aiterm | v0.6.0 | PyPI | Python |
-| atlas | v0.9.0 | npm | Node.js |
+| atlas | v0.13.0 | npm | Node.js |
 | examark | v0.6.6 | npm | Node.js |
 | flow-cli | v4.8.1 | GitHub | ZSH |
 | mcp-bridge | v1.0.0 | npm | Node.js |
@@ -407,7 +410,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 - Warn about circular dependencies
 - Show integration impact (changing X affects Y, Z)
 
-**Timeline:** Q1 2026
+**Status:** Partially implemented — EcosystemView in dashboard
 
 ### 2. Unified MCP Configuration
 
@@ -418,7 +421,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 - Centralized in atlas or flow-cli
 - Version control for MCP setup
 
-**Timeline:** Q1 2026
+**Status:** Desktop-commander + session + memory + linear MCP servers added
 
 ### 3. Cross-Tool Session Tracking
 
@@ -429,7 +432,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 - Automatic context recovery
 - Integrated time tracking
 
-**Timeline:** Q2 2026
+**Status:** Active — `atlas session start/end/pause/resume`, session export (v0.7.0)
 
 ---
 
@@ -494,5 +497,5 @@ brew reinstall data-wise/tap/<formula>
 ---
 
 **Maintained by:** Atlas (source of truth for relationships)
-**Last Audit:** 2026-02-21
-**Next Review:** Q2 2026
+**Last Audit:** 2026-07-04
+**Next Review:** Q3 2026

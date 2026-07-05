@@ -2,6 +2,8 @@
 
 Use Atlas as a library in your Node.js applications for project tracking, session management, and workflow automation.
 
+> **Looking for practical examples?** See [API-RECIPES.md](API-RECIPES.md) for working code recipes covering task management, analytics, sessions, and more.
+
 ## Installation
 
 ```bash

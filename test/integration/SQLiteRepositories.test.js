@@ -10,10 +10,14 @@ import { SQLiteProjectRepository } from '../../src/adapters/repositories/SQLiteP
 import { SQLiteSessionRepository } from '../../src/adapters/repositories/SQLiteSessionRepository.js'
 import { SQLiteCaptureRepository } from '../../src/adapters/repositories/SQLiteCaptureRepository.js'
 import { SQLiteBreadcrumbRepository } from '../../src/adapters/repositories/SQLiteBreadcrumbRepository.js'
+import { SQLiteTaskRepository } from '../../src/adapters/repositories/SQLiteTaskRepository.js'
+import { SQLiteScheduleRecordRepository } from '../../src/adapters/repositories/SQLiteScheduleRecordRepository.js'
 import { Project } from '../../src/domain/entities/Project.js'
 import { Session } from '../../src/domain/entities/Session.js'
 import { Capture } from '../../src/domain/entities/Capture.js'
 import { Breadcrumb } from '../../src/domain/entities/Breadcrumb.js'
+import { Task } from '../../src/domain/entities/Task.js'
+import { ScheduleRecord } from '../../src/domain/entities/ScheduleRecord.js'
 import { Container } from '../../src/adapters/Container.js'
 
 describe('SQLite Repositories Integration', () => {
@@ -23,6 +27,8 @@ describe('SQLite Repositories Integration', () => {
   let sessionRepo
   let captureRepo
   let breadcrumbRepo
+  let taskRepo
+  let scheduleRecordRepo
 
   beforeAll(() => {
     // Create temp directory for test database
@@ -38,6 +44,8 @@ describe('SQLite Repositories Integration', () => {
     sessionRepo = new SQLiteSessionRepository(db)
     captureRepo = new SQLiteCaptureRepository(db)
     breadcrumbRepo = new SQLiteBreadcrumbRepository(db)
+    taskRepo = new SQLiteTaskRepository(db)
+    scheduleRecordRepo = new SQLiteScheduleRecordRepository(db)
   })
 
   afterAll(() => {
@@ -58,14 +66,16 @@ describe('SQLite Repositories Integration', () => {
         'breadcrumbs',
         'captures',
         'projects',
+        'schedule_records',
         'schema_version',
-        'sessions'
+        'sessions',
+        'tasks'
       ])
     })
 
     test('tracks schema version', () => {
       const version = db.queryOne('SELECT version FROM schema_version')
-      expect(version.version).toBe(1)
+      expect(version.version).toBe(2)
     })
 
     test('enables WAL mode', () => {
@@ -268,6 +278,60 @@ describe('SQLite Repositories Integration', () => {
     test('gets statistics', () => {
       const stats = breadcrumbRepo.getStats()
       expect(stats.total_breadcrumbs).toBeGreaterThan(0)
+    })
+  })
+
+  describe('SQLiteTaskRepository', () => {
+    test('saves and retrieves task', async () => {
+      const task = new Task('task-123', 'Implement schedule push', {
+        projectId: 'test-proj',
+        priority: 'high',
+        dueDate: new Date('2026-07-05')
+      })
+
+      await taskRepo.save(task)
+      const retrieved = await taskRepo.findById('task-123')
+
+      expect(retrieved).not.toBeNull()
+      expect(retrieved.id).toBe('task-123')
+      expect(retrieved.description).toBe('Implement schedule push')
+      expect(retrieved.projectId).toBe('test-proj')
+      expect(retrieved.priority.value).toBe('high')
+      expect(retrieved.dueDate.toISOString().split('T')[0]).toBe('2026-07-05')
+    })
+
+    test('finds all tasks', async () => {
+      const tasks = await taskRepo.findAll()
+      expect(tasks.length).toBeGreaterThan(0)
+      expect(tasks.some(t => t.id === 'task-123')).toBe(true)
+    })
+
+    test('deletes task', async () => {
+      const deleted = await taskRepo.delete('task-123')
+      expect(deleted).toBe(true)
+      const retrieved = await taskRepo.findById('task-123')
+      expect(retrieved).toBeNull()
+    })
+  })
+
+  describe('SQLiteScheduleRecordRepository', () => {
+    test('saves and retrieves schedule records', async () => {
+      const record = new ScheduleRecord({
+        date: '2026-07-05',
+        label: 'Submit paper',
+        project: 'test-proj',
+        type: 'research'
+      })
+
+      await scheduleRecordRepo.saveAll([record])
+      const retrieved = await scheduleRecordRepo.findAll()
+
+      expect(retrieved.length).toBeGreaterThan(0)
+      const found = retrieved.find(r => r.label === 'Submit paper')
+      expect(found).toBeDefined()
+      expect(found.date).toBe('2026-07-05')
+      expect(found.project).toBe('test-proj')
+      expect(found.type).toBe('research')
     })
   })
 

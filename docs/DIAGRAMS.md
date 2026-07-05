@@ -392,6 +392,20 @@ graph TD
     %% Plan Command
     Atlas -->|plan| Plan["plan<br/>Morning ritual"]
 
+    %% Task Commands
+    Atlas -->|task| TaskCmd["task<br/>Task management"]
+    TaskCmd -->|add| TAdd["add DESC<br/>Add new task"]
+    TaskCmd -->|list| TList["list<br/>List tasks"]
+    TaskCmd -->|done| TDone["done ID<br/>Complete task"]
+    TaskCmd -->|rm| TRm["rm ID<br/>Delete task"]
+
+    %% Schedule Commands
+    Atlas -->|schedule| ScheduleCmd["schedule<br/>Schedule sync"]
+    ScheduleCmd -->|push| SPush["push<br/>Push schedule data"]
+
+    %% Agenda Command
+    Atlas -->|agenda| Agenda["agenda [DAYS]<br/>Merged task+schedule view"]
+
     %% Stats Command
     Atlas -->|stats| Stats["stats<br/>Session analytics"]
 
@@ -415,6 +429,9 @@ graph TD
     style CTrail fill:#e8f5e9,stroke:#1b5e20
     style Plan fill:#e8f5e9,stroke:#1b5e20
     style Stats fill:#e8f5e9,stroke:#1b5e20
+    style TaskCmd fill:#e8f5e9,stroke:#1b5e20
+    style ScheduleCmd fill:#e8f5e9,stroke:#1b5e20
+    style Agenda fill:#e8f5e9,stroke:#1b5e20
     style Sync fill:#fff3e0,stroke:#e65100
     style Register fill:#fff3e0,stroke:#e65100
 ```
@@ -799,24 +816,37 @@ stateDiagram-v2
     BROWSE --> TIMELINE: T key
     BROWSE --> ECOSYSTEM: e key
     BROWSE --> PLAN: p key
+    BROWSE --> ANALYTICS: a key
 
     DETAIL --> BROWSE: Escape
     DETAIL --> FOCUS: f key
+    DETAIL --> ANALYTICS: a key
 
     FOCUS --> BROWSE: Escape
     FOCUS --> ZEN: z key
+    FOCUS --> ANALYTICS: a key
 
     ZEN --> BROWSE: Escape
     ZEN --> FOCUS: f key
+    ZEN --> ANALYTICS: a key
 
     TIMELINE --> BROWSE: Escape
+    TIMELINE --> ANALYTICS: a key
+
     ECOSYSTEM --> BROWSE: Escape
     ECOSYSTEM --> DETAIL: Enter
+    ECOSYSTEM --> ANALYTICS: a key
+
     PLAN --> BROWSE: Escape
     PLAN --> FOCUS: Start session
+    PLAN --> ANALYTICS: a key
+
+    ANALYTICS --> BROWSE: Escape
+    ANALYTICS --> DETAIL: Enter on project
+    ANALYTICS --> FOCUS: f key
 ```
 
-**States:** BROWSE (card list), DETAIL (project), FOCUS (Pomodoro), ZEN (minimal), TIMELINE (time blocks), ECOSYSTEM (multi-project), PLAN (morning ritual)
+**States:** BROWSE (card list), DETAIL (project), FOCUS (Pomodoro), ZEN (minimal), TIMELINE (time blocks), ECOSYSTEM (multi-project), PLAN (morning ritual), ANALYTICS (velocity + patterns)
 
 **Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts`
 

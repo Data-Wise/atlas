@@ -18,16 +18,18 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Box, Text } from 'ink';
-import { MainView }     from './views/MainView.js';
-import { DetailView }   from './views/DetailView.js';
-import { FocusView }    from './views/FocusView.js';
-import { ZenView }      from './views/ZenView.js';
-import { TimelineView } from './views/TimelineView.js';
-import { EcosystemView } from './views/EcosystemView.js';
-import { PlanView }     from './views/PlanView.js';
+import { Box, Text, useInput } from 'ink';
+import { MainView }       from './views/MainView.js';
+import { DetailView }     from './views/DetailView.js';
+import { FocusView }      from './views/FocusView.js';
+import { ZenView }        from './views/ZenView.js';
+import { TimelineView }   from './views/TimelineView.js';
+import { EcosystemView }  from './views/EcosystemView.js';
+import { PlanView }       from './views/PlanView.js';
+import { AnalyticsView }  from './views/AnalyticsView.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
-import { useLayout, LayoutManager, LayoutStatusBar, LAYOUT } from '../lib/LayoutManager.js';
+import { useLayout, LayoutManager, LAYOUT } from '../lib/LayoutManager.js';
+import { StatusBar } from './StatusBar.js';
 import { SidebarPanel }   from './SidebarPanel.js';
 import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
@@ -70,7 +72,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     layout,
     focusPanel,
     renderProps,
-  } = useLayout({ initial: LAYOUT.SINGLE });
+  } = useLayout({ initial: LAYOUT.SINGLE, locked: currentView === STATES.ANALYTICS });
 
   // ── Sidebar controlled selection ──────────────────────────────────────────
   const [sidebarIndex, setSidebarIndex] = useState(0);
@@ -126,6 +128,25 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     }
   };
 
+  const showAnalyticsView = () => {
+    const ok = stateMachine.transition(STATES.ANALYTICS);
+    if (ok) {
+      setCurrentView(STATES.ANALYTICS);
+    }
+  };
+
+  const handleAnalyticsSelectProject = (id: string) => {
+    const p = projects.find(x => x.id === id) ?? null;
+    setSelectedProject(p);
+  };
+
+  // ── Global key dispatch ─────────────────────────────────────────────────────
+  useInput((input, _key) => {
+    if (input === 'a' && currentView !== STATES.ANALYTICS) {
+      showAnalyticsView();
+    }
+  });
+
   // ── Sidebar → main panel sync ──────────────────────────────────────────────
   const handleSidebarSelect = (project: Project) => {
     setSelectedProject(project);
@@ -163,6 +184,17 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
         return selectedProject
           ? <DetailView project={selectedProject} onBack={showMainView} />
           : null;
+
+      case STATES.ANALYTICS:
+        return (
+          <AnalyticsView
+            onBack={showMainView}
+            onFocus={showFocusView}
+            projects={projects}
+            selectedProjectId={selectedProject?.id ?? null}
+            onSelectProject={handleAnalyticsSelectProject}
+          />
+        );
 
       case STATES.BROWSE:
       default:
@@ -234,9 +266,17 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
           </LayoutManager>
         </Box>
 
-        {/* Command bar — LayoutStatusBar at the right end */}
-        <Box paddingX={1} justifyContent="flex-end">
-          <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
+        {/* Status bar — full-width 3-zone bar */}
+        <Box paddingX={1} width="100%">
+          <StatusBar
+            currentView={currentView}
+            layout={layout}
+            focusPanel={focusPanel}
+            hasActiveSession={hasActiveSession}
+            activeProjectName={activeProjectName}
+            sessionSeconds={sessionSeconds}
+            pendingCaptures={pendingCaptures}
+          />
         </Box>
 
       </Box>

@@ -27,3 +27,31 @@ export interface Project {
     label: string;
   };
 }
+
+/** 30-day velocity data for one week (AnalyticsView) */
+export interface WeekSummary {
+  label: string;
+  totalMinutes: number;
+  sessionCount: number;
+  trend: number;
+  note?: string;
+}
+
+/** A low-flow time slot (AnalyticsView) */
+export interface DeadZone {
+  day: string;
+  hour: string;
+  intensity: number;
+}
+
+/** Merged analytics payload from useAnalytics hook */
+export interface AnalyticsData {
+  velocitySparkline: number[];
+  velocityTrend: number;
+  velocityAvg: number;
+  weeklySummaries: WeekSummary[];
+  patternGrid: number[][];
+  patternBestDay: string;
+  patternBestHour: string;
+  patternDeadZones: DeadZone[];
+}

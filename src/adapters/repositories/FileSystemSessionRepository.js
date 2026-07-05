@@ -218,4 +218,27 @@ export class FileSystemSessionRepository extends ISessionRepository {
   async findAll() {
     return this.list()
   }
+
+  async getDailyFocusMinutes(projectName, days) {
+    const sessions = await this._loadSessions()
+    const buckets = new Array(days).fill(0)
+    const now = Date.now()
+    const msPerDay = 24 * 60 * 60 * 1000
+
+    for (const session of sessions) {
+      if (session.project !== projectName) continue
+      if (!session.startTime) continue
+
+      const startMs = session.startTime.getTime()
+      const daysAgo = Math.floor((now - startMs) / msPerDay)
+
+      if (daysAgo >= 0 && daysAgo < days) {
+        const minutes = session.getDuration() / 60
+        const idx = days - 1 - daysAgo // oldest first
+        buckets[idx] += minutes
+      }
+    }
+
+    return buckets
+  }
 }

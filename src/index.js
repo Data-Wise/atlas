@@ -53,6 +53,7 @@ export class Atlas {
     this.sessions = new SessionsAPI(this.container);
     this.capture = new CaptureAPI(this.container);
     this.context = new ContextAPI(this.container);
+    this.tasks = new TasksAPI(this.container);
   }
 
   /**
@@ -270,6 +271,22 @@ export class Atlas {
     });
   }
 
+  formatTasks(tasks) {
+    if (!tasks?.length) {
+      console.log('☐ No tasks found');
+      return;
+    }
+    console.log(`\n☐ TASKS (${tasks.length} tasks)`);
+    console.log('─'.repeat(40));
+    tasks.forEach((task, i) => {
+      const checkbox = task.completed ? '☒' : '☐';
+      const priorityStr = task.priority?.value || task.priority || 'medium';
+      const dueStr = task.dueDate ? ` (Due: ${new Date(task.dueDate).toISOString().split('T')[0]})` : '';
+      const projStr = task.projectId ? ` [${task.projectId}]` : '';
+      console.log(`${i + 1}. ${checkbox} ${task.description}${projStr}${dueStr} (${priorityStr})`);
+    });
+  }
+
   async formatStats(options = {}) {
     const { formatStatsTable, formatStatsJson, formatStatsText, formatStatsMarkdown } = await import('./adapters/presenters/StatsPresenter.js');
     const stats = await this.sessions.stats(options);
@@ -440,7 +457,20 @@ class ProjectsAPI {
 
   async unregister(name) {
     const projectRepo = this.container.resolve('ProjectRepository');
-    const deleted = await projectRepo.delete(name);
+    const all = await projectRepo.findAll();
+    const matches = all.filter(p => p.name.toLowerCase() === name.toLowerCase());
+
+    let targetId;
+    if (matches.length > 1) {
+      const list = matches.map(p => `  - ${p.name} (${p.path}) [ID: ${p.id}]`).join('\n');
+      throw new Error(`Ambiguous project name "${name}". Multiple matches found:\n${list}\n\nPlease specify by ID instead.`);
+    } else if (matches.length === 1) {
+      targetId = matches[0].id;
+    } else {
+      targetId = name;
+    }
+
+    const deleted = await projectRepo.delete(targetId);
     return {
       success: deleted,
       message: deleted ? `Unregistered: ${name}` : `Project not found: ${name}`
@@ -660,6 +690,45 @@ class ContextAPI {
   async getStatus(project) {
     const statusUseCase = this.container.resolve('GetStatusUseCase');
     return await statusUseCase.execute(project);
+  }
+}
+
+/**
+ * Tasks API - Task management and agenda scheduling
+ */
+class TasksAPI {
+  constructor(container) {
+    this.container = container;
+  }
+
+  async add(description, options = {}) {
+    const addTaskUseCase = this.container.resolve('AddTaskUseCase');
+    return await addTaskUseCase.execute({ description, options });
+  }
+
+  async list(filters = {}) {
+    const listTasksUseCase = this.container.resolve('ListTasksUseCase');
+    return await listTasksUseCase.execute(filters);
+  }
+
+  async complete(taskId) {
+    const completeTaskUseCase = this.container.resolve('CompleteTaskUseCase');
+    return await completeTaskUseCase.execute({ taskId });
+  }
+
+  async remove(taskId) {
+    const removeTaskUseCase = this.container.resolve('RemoveTaskUseCase');
+    return await removeTaskUseCase.execute({ taskId });
+  }
+
+  async receiveSchedule(data) {
+    const receiveSchedulePushUseCase = this.container.resolve('ReceiveSchedulePushUseCase');
+    return await receiveSchedulePushUseCase.execute({ data });
+  }
+
+  async agenda(windowDays) {
+    const agendaUseCase = this.container.resolve('AgendaUseCase');
+    return await agendaUseCase.execute({ windowDays });
   }
 }
 

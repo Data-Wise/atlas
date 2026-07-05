@@ -48,7 +48,9 @@ Atlas helps you:
 - **Part 3: ADHD Features** (5 min) - Context switching & restoration
 - **Part 4: Dashboard** (3 min) - Visual project overview
 - **Part 5: Templates** (3 min) - Starting new projects
-- **Part 6: Tips & Tricks** - Power user shortcuts
+- **Part 6: Task Management** (2 min) - Tasks and agenda (v0.13.0)
+- **Part 7: Analytics View** (2 min) - Deep productivity insights (v0.13.0)
+- **Part 8: Tips & Tricks** - Power user shortcuts
 
 **Each section has "Try This Now" prompts** - do them for best results!
 
@@ -318,15 +320,12 @@ atlas dash
 | ------- | --------------------- | ------------------------ |
 | `↑↓`    | Move between projects | Navigate up/down         |
 | `Enter` | View project details  | Select a project         |
-| `s`     | Start session         | Start working            |
-| `e`     | End session           | Stop working             |
-| `c`     | Quick capture         | Add an idea              |
+| `a`     | Analytics view        | Deep productivity insights |
 | `f`     | Focus mode (Pomodoro) | 25-min timer             |
 | `T`     | Timeline view         | Today's time blocks      |
 | `Tab`   | **Cycle layout mode** | Single → Split → Triple  |
 | `d`     | Decision helper       | "What should I work on?" |
 | `/`     | Search                | Find a project           |
-| `a`     | Filter: active only   | See active projects      |
 | `*`     | Clear filter          | Show all                 |
 | `q`     | Quit                  | Exit dashboard           |
 
@@ -576,7 +575,79 @@ My additional content here
 
 ---
 
-## Part 6: Tips & Tricks
+## Part 6: Task Management (v0.13.0)
+
+### Working with Tasks
+
+Atlas tracks tasks alongside sessions and captures:
+
+```bash
+# Add a task
+atlas task add "Implement OAuth login" --priority high --project myapp
+
+# List incomplete tasks
+atlas task list --incomplete
+
+# Complete a task
+atlas task done <task-id>
+
+# Delete a task
+atlas task rm <task-id>
+```
+
+### Merged Agenda
+
+See tasks and schedule items in chronological order:
+
+```bash
+# 7-day view (default)
+atlas agenda
+
+# 14-day window
+atlas agenda 14
+
+# JSON output for scripting
+atlas agenda --format json
+```
+
+### Try This Now #10: Your First Task
+
+```bash
+# Add a task for this project
+atlas task add "Try the dashboard analytics view" --project myproject
+
+# List your tasks
+atlas task list --incomplete
+
+# Complete it when done
+atlas task done <id>
+```
+
+---
+
+## Part 7: Analytics View (v0.13.0)
+
+### Deep Productivity Insights
+
+Press `a` in the dashboard for the full-screen analytics view:
+
+- **Focus Velocity** — 30-day sparkline showing your session trends
+- **Flow Patterns** — 7×24 heatmap showing your best working hours
+- **Project Cycling** — Use `←`/`→` to see analytics per project
+
+### Try This Now #11: Explore Analytics
+
+```bash
+atlas dash
+# Press 'a' to enter analytics view
+# Use ←/→ to cycle projects
+# Press 'f' to jump to focus mode
+# Press Esc to return to browse
+```
+
+---
+
+## Part 8: Tips & Tricks
 
 ### Workflow Shortcuts
 
@@ -892,6 +963,7 @@ ls ~/.atlas/parked/
 - [Configuration](./CONFIGURATION.md) - All settings explained
 - [API Guide](./API-GUIDE.md) - Use Atlas in your code
 - [Architecture](./ARCHITECTURE.md) - How it works
+- [What's New](./WHAT-S-NEW.md) - Release highlights
 
 ### Integration Ideas
 

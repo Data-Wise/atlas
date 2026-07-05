@@ -316,4 +316,50 @@ export class Task {
 
     return descriptionMatch || tagMatch || priorityMatch || projectMatch
   }
+
+  /**
+   * Serialize to JSON
+   * @returns {Object}
+   */
+  toJSON() {
+    return {
+      id: this.id,
+      description: this.description,
+      priority: this.priority.value,
+      projectId: this.projectId,
+      sessionId: this.sessionId,
+      completed: this.completed,
+      completedAt: this.completedAt ? (this.completedAt instanceof Date ? this.completedAt.toISOString() : this.completedAt) : null,
+      tags: [...this.tags],
+      metadata: this.metadata,
+      createdAt: this.createdAt ? (this.createdAt instanceof Date ? this.createdAt.toISOString() : this.createdAt) : null,
+      updatedAt: this.updatedAt ? (this.updatedAt instanceof Date ? this.updatedAt.toISOString() : this.updatedAt) : null,
+      dueDate: this.dueDate ? (this.dueDate instanceof Date ? this.dueDate.toISOString() : this.dueDate) : null,
+      estimatedMinutes: this.estimatedMinutes,
+      actualMinutes: this.actualMinutes
+    }
+  }
+
+  /**
+   * Deserialize from JSON
+   * @param {Object} json
+   * @returns {Task}
+   */
+  static fromJSON(json) {
+    if (!json) return null
+    return new Task(json.id, json.description, {
+      priority: json.priority,
+      projectId: json.projectId,
+      sessionId: json.sessionId,
+      completed: json.completed,
+      completedAt: json.completedAt ? new Date(json.completedAt) : null,
+      tags: json.tags,
+      metadata: json.metadata,
+      createdAt: json.createdAt ? new Date(json.createdAt) : null,
+      updatedAt: json.updatedAt ? new Date(json.updatedAt) : null,
+      dueDate: json.dueDate ? new Date(json.dueDate) : null,
+      estimatedMinutes: json.estimatedMinutes,
+      actualMinutes: json.actualMinutes
+    })
+  }
 }

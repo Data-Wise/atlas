@@ -88,4 +88,14 @@ export class ISessionRepository {
   async findByDateRange(startDate, endDate) {
     throw new Error('findByDateRange() not implemented')
   }
+
+  /**
+   * Get daily focus minutes for a project over the last N days
+   * @param {string} projectName
+   * @param {number} days - Number of days to look back
+   * @returns {Promise<number[]>} Array of length `days`, each = total focus minutes for that day (oldest first)
+   */
+  async getDailyFocusMinutes(projectName, days) {
+    throw new Error('getDailyFocusMinutes() not implemented')
+  }
 }

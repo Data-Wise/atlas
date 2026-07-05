@@ -160,6 +160,35 @@ export class SQLiteSessionRepository {
 
   // Additional SQLite-specific methods
 
+  async getDailyFocusMinutes(projectName, days) {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+    const rows = this.db.query(
+      `SELECT start_time, end_time, total_paused_time
+       FROM sessions
+       WHERE project = ? AND start_time >= ?
+       ORDER BY start_time ASC`,
+      [projectName, since]
+    )
+
+    const buckets = new Array(days).fill(0)
+    const now = Date.now()
+    const msPerDay = 24 * 60 * 60 * 1000
+
+    for (const row of rows) {
+      const startMs = new Date(row.start_time).getTime()
+      const endMs = row.end_time ? new Date(row.end_time).getTime() : now
+      const minutes = ((endMs - startMs) / 60000) - (row.total_paused_time / 60)
+      const daysAgo = Math.floor((now - startMs) / msPerDay)
+
+      if (daysAgo >= 0 && daysAgo < days) {
+        const idx = days - 1 - daysAgo
+        buckets[idx] += Math.max(0, minutes)
+      }
+    }
+
+    return buckets
+  }
+
   /**
    * Get session statistics
    * @returns {Object} Session stats

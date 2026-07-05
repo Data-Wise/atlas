@@ -540,6 +540,88 @@ atlas session start "feature: user-dashboard"
 atlas session end "PR #42 ready for review"
 ```
 
+### Task Management (v0.13.0)
+
+**Goal:** Track actionable tasks with deadlines and priorities
+
+```bash
+# Add tasks during session
+atlas task add "Review CRAN submission" --due=2026-07-10 --priority=P1
+atlas task add "Write changelog entry" --project=atlas
+
+# Check what's due
+atlas task list                   # all incomplete
+atlas task list --overdue         # past due
+atlas task list --due-soon        # due within 3 days
+
+# Complete tasks
+atlas task done 3                 # mark task #3 complete
+atlas task rm 5                   # delete task #5
+```
+
+**Workflow:**
+```mermaid
+flowchart TD
+    A[Start session] --> B[Work on tasks]
+    B --> C{New task?}
+    C -->|Yes| D[atlas task add]
+    D --> B
+    C -->|No| E{Task done?}
+    E -->|Yes| F[atlas task done]
+    F --> B
+    E -->|No| B
+    B --> G[End session]
+    G --> H[atlas task list --overdue]
+    H --> I[Plan tomorrow]
+```
+
+### Agenda View (v0.13.0)
+
+**Goal:** See today's combined schedule from multiple sources
+
+```bash
+# View merged agenda
+atlas agenda                     # today
+atlas agenda 7                   # next 7 days
+
+# Agenda combines:
+# - Scheduled records (meetings, deadlines)
+# - Tasks with due dates
+# - Session history
+```
+
+**Morning planning workflow:**
+```mermaid
+sequenceDiagram
+    participant You
+    participant Atlas
+
+    You->>Atlas: atlas agenda
+    Atlas-->>You: Today's merged schedule
+
+    You->>Atlas: atlas plan
+    Atlas-->>You: Guided morning ritual
+
+    You->>Atlas: atlas task list --due-soon
+    Atlas-->>You: Tasks needing attention
+
+    You->>Atlas: atlas session start
+    Atlas-->>You: Ready to work!
+```
+
+### Schedule Push (v0.13.0)
+
+**Goal:** Sync scheduled records to agenda
+
+```bash
+# Push schedule to agenda
+atlas schedule push               # default JSON format
+atlas schedule push --format=md   # Markdown table
+atlas schedule push --data '{"title":"Meeting","date":"2026-07-10"}'
+```
+
+**Use case:** Automate schedule sync from external sources (Google Calendar, Linear, etc.)
+
 ### With Zellij/tmux
 
 **Layout suggestion:**
@@ -600,7 +682,10 @@ Create `.vscode/tasks.json`:
 | Need to switch | `park` → switch → `session start` → later: `unpark` |
 | Feeling stuck  | `crumb "stuck on X"` → take break                   |
 | End of day     | `session end` → `stats` → `crumb "tomorrow: X"`     |
-| Monday morning | `stats week` → `parked` → `inbox --triage`          |
+| Monday morning | `plan` → `agenda` → `task list --due-soon`          |
+| Track tasks    | `task add "X" --due=today --priority=P1`            |
+| Check agenda   | `agenda` → `task list` → `session start`            |
+| Review patterns| `stats --velocity` → `stats --patterns`             |
 
 ---
 
@@ -613,6 +698,7 @@ mindmap
       start
       end
       status
+      export
     Capture
       catch
       inbox
@@ -625,8 +711,19 @@ mindmap
       park
       unpark
       parked
+    Tasks
+      add
+      list
+      done
+      rm
+    Schedule
+      agenda
+      plan
+      push
     Analytics
       stats
+      velocity
+      patterns
       dashboard
     Projects
       add

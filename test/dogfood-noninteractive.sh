@@ -401,8 +401,10 @@ test_contains "Exports PanelBox component" \
   "grep -c 'export const PanelBox' '$LAYOUT_SRC'" \
   "1"
 
-test_contains "Exports LayoutStatusBar component" \
-  "grep -c 'export const LayoutStatusBar' '$LAYOUT_SRC'" \
+STATUS_BAR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/StatusBar.tsx"
+
+test_contains "Exports StatusBar component" \
+  "grep -c 'export const StatusBar' '$STATUS_BAR_SRC'" \
   "1"
 
 # 3. Width percentages: verify they sum to 100 per mode (grep + awk)
@@ -710,8 +712,8 @@ test_contains "Imports useLayout" \
 test_contains "Imports LayoutManager" \
   "grep 'LayoutManager' '$APP_SRC'" "LayoutManager"
 
-test_contains "Imports LayoutStatusBar" \
-  "grep 'LayoutStatusBar' '$APP_SRC'" "LayoutStatusBar"
+test_contains "Imports StatusBar" \
+  "grep 'StatusBar' '$APP_SRC'" "StatusBar"
 
 test_contains "Imports LAYOUT constant" \
   "grep 'LAYOUT' '$APP_SRC'" "LAYOUT"
@@ -764,11 +766,11 @@ test_contains "handleSidebarIndexChange updates inspector" \
 test_contains "handleSidebarSelect guards on BROWSE" \
   "grep 'STATES.BROWSE' '$APP_SRC'" "BROWSE"
 
-# 8. LayoutStatusBar in command bar
-test_contains "LayoutStatusBar rendered" \
-  "grep '<LayoutStatusBar' '$APP_SRC'" "<LayoutStatusBar"
+# 8. StatusBar in command bar
+test_contains "StatusBar rendered" \
+  "grep '<StatusBar' '$APP_SRC'" "<StatusBar"
 
-test_contains "LayoutStatusBar receives layout prop" \
+test_contains "StatusBar receives layout prop" \
   "grep 'layout={layout}' '$APP_SRC'" "layout={layout}"
 
 # 9. All 7 views still present

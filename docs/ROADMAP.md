@@ -2,27 +2,23 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-06-19
+**Last Updated:** 2026-07-02
 
 ---
 
-## Current Version: v0.9.3
+## Current Version: v0.13.0
 
-Real Data Pipeline — all mock data replaced with live `~/.atlas` data via React hooks.
+Task CLI & Schedule Push/Agenda — native task CRUD, merged agenda view, analytics dashboard, and E2E testing infrastructure.
 
 ---
 
-## 🔬 Research Registry (in progress — PR #21)
+## ⏳ v0.14.0 - Analytics + Calendar (Planned)
 
-Manuscripts, multi-paper programs, and proposals as first-class registry citizens.
+- [ ] Dead-zone iCal export — focus block calendar events from `--patterns` dead zones
+- [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
+- [ ] Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
 
-- ✅ **Bugfix** — registry-load robustness (one over-long `description` no longer bricks `findAll()`).
-- ✅ **Phase 1** — parse `kind`/`target`/`tasks` from research `.STATUS` → `metadata`; `summarize()` `byKind`.
-- ✅ **Phase 2** — `project list --kind`; `kind`/`target`/`taskCount` in `--format json` + MCP `atlas_get_projects`.
-- ⏳ **Phase 3** — obs `research board`; table-view `kind` column + `atlas plan` grouping; parser parity; release.
-
-See [`docs/RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and
-[`docs/specs/GAP-ANALYSIS-research-registry.md`](specs/GAP-ANALYSIS-research-registry.md).
+See [`docs/specs/SPEC-atlas-task-agenda-2026-07-02.md`](specs/SPEC-atlas-task-agenda-2026-07-02.md).
 
 ---
 

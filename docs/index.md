@@ -133,8 +133,10 @@ atlas dash
 
 | Guide | Description |
 |-------|-------------|
+| [What's New](WHAT-S-NEW.md) | Release highlights |
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
 | [Quick Reference](REFCARD.md) | Printable command cheat sheet |
+| [Cheatsheet](CHEATSHEET.md) | Compact command reference |
 | [Workflows](WORKFLOWS.md) | ADHD-friendly workflow patterns |
 | [Visual Guide](VISUAL-GUIDE.md) | Themes, focus score, sparklines, heatmap |
 | [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
@@ -144,16 +146,18 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New in v0.12.2
+## :sparkles: What's New
 
-!!! success "ESLint Adoption"
-    Full lint hygiene across the codebase — no new user-facing features, no breaking changes:
+!!! success "Task CLI, Schedule Push & Agenda"
+    Two major additions: a native task CLI for CRUD operations, and a full-screen analytics view in the dashboard.
 
-    - **ESLint flat config** (`eslint.config.js`) — lints all plain-JS sources + tests; TypeScript and legacy blessed dashboard ignored
-    - **CI lint gate** — `Lint` job on every PR; exits non-zero on errors (warnings non-blocking)
-    - **Zero-warning cleanup** — all 135 pre-existing `no-unused-vars` warnings pruned; `npm run lint` exits clean
-
-## :sparkles: What's New in v0.12.1
+    - **Task CLI** — `atlas task add/list/done/rm` with `--due`/`--priority`/`--project` filters
+    - **`atlas agenda`** — merged chronological view of tasks + pushed schedule records
+    - **`atlas schedule push`** — receive pre-normalized dated records from external tools
+    - **AnalyticsView** (`a` key) — full-screen velocity sparkline + flow-pattern heatmap
+    - **StatusBar** — unified 3-zone status bar (session, key hints, layout)
+    - **CLI project remove fix** — case-insensitive name resolution with duplicate collision handling
+    - **Testing infrastructure** — Vitest + ink-testing-library + Playwright E2E
 
 !!! success "Patch: Node 26 + Stability"
     - **Node 26 support** — `better-sqlite3` bumped to `^12.11.1`; SQLite suite green on Node 18/20/22/26
@@ -162,23 +166,17 @@ atlas dash
     - **+42 edge tests** across research-sync and temporal-intelligence modules (1947 passing, 89 suites)
     - **Research-ops Cookbook** — 10 recipes in `docs/COOKBOOK.md`
 
-## :sparkles: What's New in v0.12.0
-
 !!! success "Research-Safe Sync"
     - **`atlas sync --research`** — research-aware alias (defaults to `~/projects/research`)
     - **Plain-sync warning** — names research projects it preserved-but-skipped, with the remedy
     - **`.atlas-scan-children` marker** — opt-in umbrella scanning for monorepo layouts
     - **Venue comment strip** — `CSDA # was JASA` → `CSDA` (inline comments stripped from target/venue fields)
 
-## :sparkles: What's New in v0.11.0
-
 !!! success "Research Registry + Doctor"
     - **Research registry** — `sync --from-status` parses `kind:`, `target:`/`venue:`, `tasks:` from research `.STATUS` files; manuscripts and programs appear in the project registry
     - **`atlas project list --kind manuscript|program|package`** — filter by project type
     - **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--fix`
     - **`project list --json`** — now also returns `progress`, `next`, `priority`
-
-## :sparkles: What's New in v0.10.0
 
 !!! success "Temporal Intelligence"
     Three new read-only analytics utilities mine your existing session history — no new data collection:
@@ -187,8 +185,6 @@ atlas dash
     - **`atlas stats --patterns`** — Productivity patterns from 90 days: best day, best hour, dead zones (slots with 0 flow)
     - **`atlas stats --calibrate <project> --minutes <n>`** — Bayesian time calibration: how much you historically over/under-run a project, with confidence level
     - **3 pure utility classes** in `src/utils/`: `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine` (31 unit tests)
-
-## :sparkles: What's New in v0.9.3
 
 !!! success "flow-cli Integration"
     atlas now honors the CLI flags flow-cli already calls — closing contract drift between the two tools:
@@ -200,8 +196,6 @@ atlas dash
     - **Fix:** `project list --status` now resolves status from project metadata (previously matched nothing)
 
     See [Integrations](INTEGRATIONS.md) for the full flow-cli ↔ atlas contract.
-
-## :sparkles: What's New in v0.9.2
 
 !!! success "Real Data Pipeline"
     The dashboard now displays **live data** from `~/.atlas` — all mock data removed:
@@ -238,12 +232,13 @@ atlas dash
     - `mono` — Pure grayscale
     - `high-contrast` — Maximum readability
 
-??? note "Previous Releases"
-    - **v0.9.1**: Visual Enhancements — themes, focus score, sparklines, heatmap
-    - **v0.9.0**: Ink TUI Modernization, Multi-Panel Dashboard, 73% code reduction
+!!! note "Previous Releases"
     - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
     - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
     - **v0.6.x**: Session analytics, stats export
+    - **v0.5.x**: Park/unpark, templates, configuration wizard
+    - **v0.4.x**: ADHD utilities, dashboard redesign
+    - **v0.3.x**: Dashboard themes, Pomodoro
 
 ## :heart: ADHD-Friendly Design
 
@@ -260,4 +255,5 @@ Atlas is designed with ADHD in mind:
 
 - [GitHub Repository](https://github.com/Data-Wise/atlas)
 - [Issue Tracker](https://github.com/Data-Wise/atlas/issues)
-- [Changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md)
+- [Changelog](CHANGELOG.md)
+- [What's New](WHAT-S-NEW.md)

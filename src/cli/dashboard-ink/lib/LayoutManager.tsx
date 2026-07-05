@@ -85,6 +85,8 @@ interface UseLayoutOptions {
   initial?: LayoutMode;
   /** Which panel is keyboard-focused. Defaults to 'main'. */
   initialFocus?: 'sidebar' | 'main' | 'inspector';
+  /** When true, Tab/Shift+Tab are no-ops (e.g. ANALYTICS full-screen view). */
+  locked?: boolean;
 }
 
 interface UseLayoutResult {
@@ -112,6 +114,7 @@ export function useLayout(options: UseLayoutOptions = {}): UseLayoutResult {
   const [focusPanel, setFocus] = useState<'sidebar' | 'main' | 'inspector'>(
     options.initialFocus ?? 'main'
   );
+  const locked = options.locked ?? false;
 
   const cycleLayout = useCallback(() => {
     setLayout(prev => {
@@ -124,11 +127,10 @@ export function useLayout(options: UseLayoutOptions = {}): UseLayoutResult {
     });
   }, []);
 
-  // Tab key: cycle layout
+  // Tab key: cycle layout (locked when AnalyticsView is active)
   useInput((input, key) => {
+    if (locked) return;
     if (key.tab && !key.shift) {
-      cycleLayout();
-    } else if (key.shift && key.tab && layout !== LAYOUT.SINGLE) {
       setFocus(prev => {
         if (layout === LAYOUT.SPLIT) {
           return prev === 'sidebar' ? 'main' : 'sidebar';
@@ -165,46 +167,6 @@ export function useLayout(options: UseLayoutOptions = {}): UseLayoutResult {
 
   return { layout, focusPanel, cycleLayout, setLayout, setFocus, renderProps };
 }
-
-// ─── LayoutStatusBar ──────────────────────────────────────────────────────────
-
-interface LayoutStatusBarProps {
-  layout: LayoutMode;
-  focusPanel: 'sidebar' | 'main' | 'inspector';
-}
-
-/**
- * Small indicator showing current layout mode.
- * Intended for the bottom command bar — import and render alongside other hints.
- *
- * @example
- *   <LayoutStatusBar layout={layout} focusPanel={focusPanel} />
- */
-export const LayoutStatusBar: React.FC<LayoutStatusBarProps> = ({ layout, focusPanel }) => {
-  const icon: Record<LayoutMode, string> = {
-    [LAYOUT.SINGLE]: '▣',
-    [LAYOUT.SPLIT]:  '▥',
-    [LAYOUT.TRIPLE]: '▦',
-  };
-  const label: Record<LayoutMode, string> = {
-    [LAYOUT.SINGLE]: 'Single',
-    [LAYOUT.SPLIT]:  'Split',
-    [LAYOUT.TRIPLE]: 'Triple',
-  };
-
-  return (
-    <Box>
-      <Text color="gray">Tab: </Text>
-      <Text color="magenta" bold>{icon[layout]} {label[layout]}</Text>
-      {layout !== LAYOUT.SINGLE && (
-        <>
-          <Text color="gray">  focus: </Text>
-          <Text color="cyan">{focusPanel}</Text>
-        </>
-      )}
-    </Box>
-  );
-};
 
 // ─── LayoutManager component ──────────────────────────────────────────────────
 

@@ -15,6 +15,18 @@
 
 **[View all demos →](https://data-wise.github.io/atlas/DEMOS/)**
 
+## What's New in v0.13.0
+
+- **Task CLI** — `atlas task add/list/done/rm` with `--due`/`--priority`/`--project` filters
+- **`atlas agenda`** — merged chronological view of tasks + pushed schedule records
+- **`atlas schedule push`** — receive pre-normalized dated records from external tools
+- **AnalyticsView** (`a` key) — full-screen velocity sparkline + flow-pattern heatmap
+- **StatusBar** — unified 3-zone status bar (session, key hints, layout)
+- **CLI project remove fix** — case-insensitive name resolution with duplicate collision handling
+- **Testing infrastructure** — Vitest + ink-testing-library + Playwright E2E
+
+---
+
 ## Documentation
 
 **📚 [Full Documentation Site](https://data-wise.github.io/atlas/)**
@@ -124,6 +136,21 @@ atlas stats --project medrobust    # Project-specific
 atlas stats --format json          # JSON output
 ```
 
+### Task Management
+```bash
+atlas task add "Implement OAuth" --priority high --project myapp
+atlas task list --incomplete --project myapp
+atlas task done <task-id>
+atlas task rm <task-id>
+atlas agenda                  # 7-day merged view
+atlas agenda 14 --format json # 14-day window
+```
+
+### Schedule Push
+```bash
+atlas schedule push --format json --data '[{"date":"2026-07-04","label":"Write docs","source":"flow-cli"}]'
+```
+
 ### Quick Capture
 ```bash
 atlas catch "check VanderWeele 2015 appendix"
@@ -194,6 +221,7 @@ atlas dash                     # Alias for dashboard
 | `↑↓` / `j`/`k` | Navigate projects |
 | `Enter` | Open project detail view |
 | `Esc` | Return to main view / Exit current view |
+| `a` | Analytics view (v0.13.0) |
 | `f` | Enter focus mode (Pomodoro timer) |
 | `z` | Zen mode (minimal distraction) |
 | `T` | Timeline view (time blocks) |
@@ -229,6 +257,11 @@ atlas dash                     # Alias for dashboard
 - **Decision helper**: "What should I work on?" suggestions (`d`)
 - **Break reminders**: Notification after Pomodoro completes
 - **Terminal-adaptive**: Adjusts to terminal size, warns if too small
+
+#### Analytics View (v0.13.0)
+- **Analytics view**: Full-screen velocity sparkline + flow-pattern heatmap (`a`)
+- **Project cycling**: Use `←`/`→` to see analytics per project
+- **Quick-links**: Jump to Focus (`f`) or Detail (`Enter`)
 
 #### Dashboard Features (v0.3.1+)
 - **Theme cycling**: Press `t` to cycle through themes (default, dark, minimal)

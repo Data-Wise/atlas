@@ -1477,6 +1477,155 @@ prefs
     console.log(JSON.stringify(defaults.preferences, null, 2));
   });
 
+// Task management commands
+const task = program.command('task').description('Task management');
+
+task
+  .command('add <description>')
+  .description('Add a new task')
+  .option('-p, --project <project>', 'Associated project')
+  .option('-d, --due <date>', 'Due date (YYYY-MM-DD)')
+  .option('--priority <priority>', 'Priority level (low|medium|high)', 'medium')
+  .action(async (description, options) => {
+    const a = getAtlas();
+    try {
+      const result = await a.tasks.add(description, {
+        projectId: options.project,
+        dueDate: options.due,
+        priority: options.priority
+      });
+      console.log(`✓ Task added: ${result.id} [${result.description}]`);
+    } catch (error) {
+      console.error(`❌ Error adding task: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+task
+  .command('list')
+  .description('List tasks')
+  .option('-p, --project <project>', 'Filter by project')
+  .option('--completed', 'Show completed tasks only')
+  .option('--incomplete', 'Show incomplete tasks only')
+  .option('--overdue', 'Show overdue tasks only')
+  .option('--due-soon', 'Show tasks due soon only')
+  .option('-q, --query <query>', 'Search query')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      let completed;
+      if (options.completed) completed = true;
+      if (options.incomplete) completed = false;
+
+      const filters = {
+        project: options.project,
+        completed,
+        overdue: options.overdue,
+        dueSoon: options.dueSoon,
+        query: options.query
+      };
+
+      const tasks = await a.tasks.list(filters);
+
+      if (options.format === 'json') {
+        a.formatOutput(tasks.map(t => t.getSummary()), 'json');
+      } else {
+        a.formatTasks(tasks);
+      }
+    } catch (error) {
+      console.error(`❌ Error listing tasks: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+task
+  .command('done <id>')
+  .description('Mark task as completed')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      const result = await a.tasks.complete(id);
+      console.log(`✓ Task marked as complete: ${result.id} [${result.description}]`);
+    } catch (error) {
+      console.error(`❌ Error completing task: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+task
+  .command('rm <id>')
+  .description('Delete a task')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      await a.tasks.remove(id);
+      console.log(`✓ Task deleted: ${id}`);
+    } catch (error) {
+      console.error(`❌ Error deleting task: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+// Schedule commands
+const schedule = program.command('schedule').description('Schedule sync/push operations');
+
+schedule
+  .command('push')
+  .description('Push schedule data')
+  .option('--data <json>', 'JSON data payload')
+  .option('--format <format>', 'Output format', 'json')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      if (!options.data) {
+        console.error('❌ Error: --data option is required');
+        process.exit(1);
+      }
+      const result = await a.tasks.receiveSchedule(options.data);
+      if (options.format === 'json') {
+        a.formatOutput({ success: true, count: result.length }, 'json');
+      } else {
+        console.log(`✓ Pushed ${result.length} schedule records successfully.`);
+      }
+    } catch (error) {
+      console.error(`❌ Error pushing schedule: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+// Agenda command
+program
+  .command('agenda [window-days]')
+  .description('Show tasks and schedule items')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (windowDays, options) => {
+    const a = getAtlas();
+    try {
+      const days = windowDays !== undefined ? parseInt(windowDays, 10) : 7;
+      const agenda = await a.tasks.agenda(days);
+
+      if (options.format === 'json') {
+        a.formatOutput(agenda, 'json');
+      } else {
+        if (!agenda.length) {
+          console.log(`No agenda items for the next ${days} days.`);
+          return;
+        }
+        console.log(`\n📅 AGENDA (Next ${days} days)`);
+        console.log('─'.repeat(55));
+        agenda.forEach(item => {
+          const typeStr = item.type ? `[${item.type}]` : '';
+          const projStr = item.project ? `(${item.project})` : '';
+          console.log(`${item.date} │ ${typeStr.padEnd(10)} │ ${item.label} ${projStr}`);
+        });
+      }
+    } catch (error) {
+      console.error(`❌ Error getting agenda: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
 // Show help if no command was provided (before parsing to avoid Commander errors)
 if (process.argv.length <= 2) {
   program.outputHelp();

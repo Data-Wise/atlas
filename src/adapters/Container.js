@@ -18,6 +18,8 @@ import { FileSystemSessionRepository } from './repositories/FileSystemSessionRep
 import { FileSystemProjectRepository } from './repositories/FileSystemProjectRepository.js'
 import { FileSystemCaptureRepository } from './repositories/FileSystemCaptureRepository.js'
 import { FileSystemBreadcrumbRepository } from './repositories/FileSystemBreadcrumbRepository.js'
+import { FileSystemTaskRepository } from './repositories/FileSystemTaskRepository.js'
+import { FileSystemScheduleRecordRepository } from './repositories/FileSystemScheduleRecordRepository.js'
 
 // SQLite repositories
 import { SQLiteDatabase } from './repositories/SQLiteDatabase.js'
@@ -25,6 +27,8 @@ import { SQLiteProjectRepository } from './repositories/SQLiteProjectRepository.
 import { SQLiteSessionRepository } from './repositories/SQLiteSessionRepository.js'
 import { SQLiteCaptureRepository } from './repositories/SQLiteCaptureRepository.js'
 import { SQLiteBreadcrumbRepository } from './repositories/SQLiteBreadcrumbRepository.js'
+import { SQLiteTaskRepository } from './repositories/SQLiteTaskRepository.js'
+import { SQLiteScheduleRecordRepository } from './repositories/SQLiteScheduleRecordRepository.js'
 import { CreateSessionUseCase } from '../use-cases/session/CreateSessionUseCase.js'
 import { EndSessionUseCase } from '../use-cases/session/EndSessionUseCase.js'
 import { ScanProjectsUseCase } from '../use-cases/project/ScanProjectsUseCase.js'
@@ -43,6 +47,12 @@ import { UpdateStatusUseCase } from '../use-cases/status/UpdateStatusUseCase.js'
 import { GetSessionStatsUseCase } from '../use-cases/session/GetSessionStatsUseCase.js'
 import { ExportSessionsUseCase } from '../use-cases/session/ExportSessionsUseCase.js'
 import { PlanDayUseCase } from '../use-cases/session/PlanDayUseCase.js'
+import { AddTaskUseCase } from '../use-cases/task/AddTaskUseCase.js'
+import { ListTasksUseCase } from '../use-cases/task/ListTasksUseCase.js'
+import { CompleteTaskUseCase } from '../use-cases/task/CompleteTaskUseCase.js'
+import { RemoveTaskUseCase } from '../use-cases/task/RemoveTaskUseCase.js'
+import { ReceiveSchedulePushUseCase } from '../use-cases/task/ReceiveSchedulePushUseCase.js'
+import { AgendaUseCase } from '../use-cases/task/AgendaUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
@@ -161,6 +171,24 @@ export class Container {
     })
   }
 
+  getTaskRepository() {
+    return this._resolve('taskRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteTaskRepository(this.getDatabase())
+      }
+      return new FileSystemTaskRepository(this.config.dataDir)
+    })
+  }
+
+  getScheduleRecordRepository() {
+    return this._resolve('scheduleRecordRepository', () => {
+      if (this.usingSQLite()) {
+        return new SQLiteScheduleRecordRepository(this.getDatabase())
+      }
+      return new FileSystemScheduleRecordRepository(this.config.dataDir)
+    })
+  }
+
   // ============================================================================
   // USE CASES - Session (Application Layer)
   // ============================================================================
@@ -249,6 +277,64 @@ export class Container {
         captureRepository: this.getCaptureRepository(),
         projectRepository: this.getProjectRepository(),
         eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Task
+  // ============================================================================
+
+  getAddTaskUseCase() {
+    return this._resolve('addTaskUseCase', () => {
+      return new AddTaskUseCase({
+        taskRepository: this.getTaskRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getListTasksUseCase() {
+    return this._resolve('listTasksUseCase', () => {
+      return new ListTasksUseCase({
+        taskRepository: this.getTaskRepository()
+      })
+    })
+  }
+
+  getCompleteTaskUseCase() {
+    return this._resolve('completeTaskUseCase', () => {
+      return new CompleteTaskUseCase({
+        taskRepository: this.getTaskRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getRemoveTaskUseCase() {
+    return this._resolve('removeTaskUseCase', () => {
+      return new RemoveTaskUseCase({
+        taskRepository: this.getTaskRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getReceiveSchedulePushUseCase() {
+    return this._resolve('receiveSchedulePushUseCase', () => {
+      return new ReceiveSchedulePushUseCase({
+        scheduleRecordRepository: this.getScheduleRecordRepository(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
+  getAgendaUseCase() {
+    return this._resolve('agendaUseCase', () => {
+      return new AgendaUseCase({
+        taskRepository: this.getTaskRepository(),
+        scheduleRecordRepository: this.getScheduleRecordRepository(),
+        projectRepository: this.getProjectRepository()
       })
     })
   }
@@ -399,6 +485,14 @@ export class Container {
       'GetInboxUseCase': () => this.getGetInboxUseCase(),
       'TriageInboxUseCase': () => this.getTriageInboxUseCase(),
 
+      // Task use cases
+      'AddTaskUseCase': () => this.getAddTaskUseCase(),
+      'ListTasksUseCase': () => this.getListTasksUseCase(),
+      'CompleteTaskUseCase': () => this.getCompleteTaskUseCase(),
+      'RemoveTaskUseCase': () => this.getRemoveTaskUseCase(),
+      'ReceiveSchedulePushUseCase': () => this.getReceiveSchedulePushUseCase(),
+      'AgendaUseCase': () => this.getAgendaUseCase(),
+
       // Context use cases
       'GetContextUseCase': () => this.getGetContextUseCase(),
       'LogBreadcrumbUseCase': () => this.getLogBreadcrumbUseCase(),
@@ -421,6 +515,8 @@ export class Container {
       'ProjectRepository': () => this.getProjectRepository(),
       'CaptureRepository': () => this.getCaptureRepository(),
       'BreadcrumbRepository': () => this.getBreadcrumbRepository(),
+      'TaskRepository': () => this.getTaskRepository(),
+      'ScheduleRecordRepository': () => this.getScheduleRecordRepository(),
       
       // Services
       'EventPublisher': () => this.getEventPublisher()
@@ -454,6 +550,14 @@ export class Container {
       getInbox: this.getGetInboxUseCase(),
       triageInbox: this.getTriageInboxUseCase(),
 
+      // Task
+      addTask: this.getAddTaskUseCase(),
+      listTasks: this.getListTasksUseCase(),
+      completeTask: this.getCompleteTaskUseCase(),
+      removeTask: this.getRemoveTaskUseCase(),
+      receiveSchedulePush: this.getReceiveSchedulePushUseCase(),
+      agenda: this.getAgendaUseCase(),
+
       // Context
       getContext: this.getGetContextUseCase(),
       logBreadcrumb: this.getLogBreadcrumbUseCase(),
@@ -477,7 +581,9 @@ export class Container {
       sessions: this.getSessionRepository(),
       projects: this.getProjectRepository(),
       captures: this.getCaptureRepository(),
-      breadcrumbs: this.getBreadcrumbRepository()
+      breadcrumbs: this.getBreadcrumbRepository(),
+      tasks: this.getTaskRepository(),
+      scheduleRecords: this.getScheduleRecordRepository()
     }
   }
 }

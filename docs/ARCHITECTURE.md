@@ -667,25 +667,37 @@ stateDiagram-v2
     BROWSE --> TIMELINE: T key
     BROWSE --> ECOSYSTEM: e key
     BROWSE --> PLAN: p key
+    BROWSE --> ANALYTICS: a key
 
     DETAIL --> BROWSE: Escape
     DETAIL --> FOCUS: f key
+    DETAIL --> ANALYTICS: a key
 
     FOCUS --> BROWSE: Escape
     FOCUS --> ZEN: z key
+    FOCUS --> ANALYTICS: a key
 
     ZEN --> BROWSE: Escape
     ZEN --> FOCUS: f key
+    ZEN --> ANALYTICS: a key
 
     TIMELINE --> BROWSE: Escape
     TIMELINE --> FOCUS: f key
+    TIMELINE --> ANALYTICS: a key
 
     ECOSYSTEM --> BROWSE: Escape
     ECOSYSTEM --> DETAIL: Enter on project
     ECOSYSTEM --> FOCUS: f key
+    ECOSYSTEM --> ANALYTICS: a key
 
     PLAN --> BROWSE: Escape
     PLAN --> FOCUS: Start session
+    PLAN --> DETAIL: Select project
+    PLAN --> ANALYTICS: a key
+
+    ANALYTICS --> BROWSE: Escape
+    ANALYTICS --> DETAIL: Enter on project
+    ANALYTICS --> FOCUS: f key
 ```
 
 **States:**
@@ -698,6 +710,7 @@ stateDiagram-v2
 | `TIMELINE`  | TimelineView  | Time block visualization         |
 | `ECOSYSTEM` | EcosystemView | Multi-project ecosystem overview |
 | `PLAN`      | PlanView      | Morning ritual daily planning    |
+| `ANALYTICS` | AnalyticsView | Velocity + pattern analytics     |
 
 **Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts`
 
@@ -883,7 +896,7 @@ test/
 
 **Test Commands:**
 ```bash
-npm test                  # All 1,486+ tests
+npm test                  # All 1,978 tests
 npm run test:debug        # With --detectOpenHandles
 npm run test:unit         # Unit tests only
 npm run test:coverage     # With coverage report

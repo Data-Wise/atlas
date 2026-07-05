@@ -1,14 +1,14 @@
 # Visual Guide
 
-> Theme system, focus score, sparklines, and activity heatmap — everything added in v0.9.1.
+> Theme system, focus score, sparklines, activity heatmap, and AnalyticsView — everything added in v0.9.1 and v0.13.0.
 
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-07-04
 
 ---
 
 ## Overview
 
-v0.9.1 adds four visual enhancement layers to the Atlas dashboard:
+Atlas adds five visual enhancement layers to the dashboard:
 
 | Feature | Location | Purpose |
 |---------|----------|---------|
@@ -16,6 +16,7 @@ v0.9.1 adds four visual enhancement layers to the Atlas dashboard:
 | [Focus Score](#focus-score) | Inspector, `atlas stats` | Weighted quality metric with tier classification |
 | [Sparklines](#sparklines) | Sidebar rows | 5-day inline activity charts |
 | [Activity Heatmap](#activity-heatmap) | Inspector, Ecosystem | 13-week GitHub-style activity grid |
+| [AnalyticsView](#analyticsview-v0130) | Dashboard (`a` key) | Interactive analytics with heatmap, velocity, and patterns |
 
 ---
 
@@ -346,6 +347,80 @@ Domain value objects (`ProjectType`) are extracted to primitives before renderin
 
 ---
 
+## AnalyticsView (v0.13.0)
+
+### Overview
+
+AnalyticsView is a dedicated analytics dashboard accessible via the `a` key. It provides interactive exploration of session patterns, velocity, and activity heatmaps.
+
+### Access
+
+```bash
+atlas dash
+# Press 'a' to open AnalyticsView
+```
+
+### Features
+
+| Feature | Description | Controls |
+|---------|-------------|----------|
+| **Heatmap** | 13-week activity grid (GitHub-style) | `←`/`→` to scroll weeks |
+| **Velocity** | 4-week rolling velocity trend | Visual sparkline |
+| **Patterns** | Best hours, typical session length | Bar chart |
+| **Focus Score** | Weighted quality metric | Tier display |
+
+### Layout
+
+```
+┌──────────────────────────────────────────────────────┐
+│ AnalyticsView                                        │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│  ┌─────────────────┐  ┌────────────────────────────┐│
+│  │ Activity Heatmap │  │ Velocity (4w)              ││
+│  │ Mon ·░▒▓█·░▒▓█  │  │ ▂▃▅▆█▇▅▃▂▄▅▇▆▄▅           ││
+│  │ Tue ·····░░▒▒▓▓  │  │ 2.3 sessions/day           ││
+│  │ Wed ░░··░░▒▒▓▓  │  │ Trend: ↑ up                ││
+│  │ Thu ·····░░░▒▒  │  └────────────────────────────┘│
+│  │ Fri ····░░░▒▒▓  │                                │
+│  │ Sat ·····░░░▒▒  │  ┌────────────────────────────┐│
+│  │ Sun ░░·····░░▒  │  │ Best Hours                 ││
+│  │ 🔥 4d streak    │  │ ████░░░░░░ 09:00-11:00     ││
+│  └─────────────────┘  └────────────────────────────┘│
+│                                                      │
+│  [←/→ scroll]  [f focus]  [Enter select]            │
+└──────────────────────────────────────────────────────┘
+```
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `a` | Open AnalyticsView |
+| `←`/`→` | Scroll heatmap weeks |
+| `f` | Start focus session |
+| `Enter` | Select project |
+| `Esc` | Return to main view |
+
+### Data Source
+
+AnalyticsView reads from `~/.atlas/sessions/` and aggregates:
+- **Heatmap**: Session minutes per day, normalized to 5 levels (·░▒▓█)
+- **Velocity**: Sessions per day over 4-week rolling window
+- **Patterns**: Session start times and durations across 90 days
+
+### Integration with Stats
+
+AnalyticsView uses the same underlying data as `atlas stats`:
+
+```bash
+atlas stats --velocity     # CLI equivalent of velocity panel
+atlas stats --patterns     # CLI equivalent of patterns panel
+atlas stats --calibrate    # Bayesian calibration analysis
+```
+
+---
+
 ## File Reference
 
 | File | Layer | Purpose |
@@ -358,6 +433,7 @@ Domain value objects (`ProjectType`) are extracted to primitives before renderin
 | `src/cli/dashboard-ink/components/shared/HeatmapComponent.tsx` | Presentation | Heatmap React component |
 | `src/cli/dashboard-ink/components/SidebarPanel.tsx` | Presentation | Sparklines + focus tier icons |
 | `src/cli/dashboard-ink/components/InspectorPanel.tsx` | Presentation | Focus score breakdown + heatmap |
+| `src/cli/dashboard-ink/components/views/AnalyticsView.tsx` | Presentation | Analytics view with heatmap, velocity, patterns |
 | `src/cli/dashboard-ink/types.ts` | Presentation | `focusScore`, `focusTier`, `recentActivity` fields |
 
 ### Test Files

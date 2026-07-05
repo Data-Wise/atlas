@@ -75,11 +75,13 @@ extra_css:
 
 nav:
   - Home: index.md
+  - What's New: WHAT-S-NEW.md
   - Getting Started:
     - Tutorial: TUTORIAL.md
     - Visual Features: tutorials/visual-features.md
     - Demos: DEMOS.md
     - Quick Reference: REFCARD.md
+    - Cheatsheet: CHEATSHEET.md
     - Installation: getting-started/installation.md
   - User Guide:
     - Workflows: WORKFLOWS.md
@@ -95,5 +97,6 @@ nav:
     - Integrations: INTEGRATIONS.md
   - Developer:
     - API Guide: API-GUIDE.md
+    - API Recipes: API-RECIPES.md
     - MCP Server: MCP-SERVER.md
     - Roadmap: ROADMAP.md
