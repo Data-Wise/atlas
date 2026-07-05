@@ -1,11 +1,48 @@
 #!/bin/bash
 # sync-research-board.sh
-# Weekly research sync + board render (runs via launchd Monday ~09:15)
+# Weekly research sync + board render (runs via launchd Monday 09:15)
 #
-# Chain position:
-#   08:07  pmed-extensions-weekly-advance (writes .STATUS)
-#   09:15  THIS SCRIPT (atlas sync --research + obs research board)
-#   09:38  research-action-board-weekly (reads fresh data)
+# PURPOSE:
+#   Refreshes research registry metadata from .STATUS files, then renders
+#   the research board to the Obsidian vault for the action board to read.
+#
+# SCHEDULE:
+#   Monday 09:15 via com.data-wise.atlas-sync.plist
+#   Chain position:
+#     08:07  pmed-extensions-weekly-advance (writes .STATUS)
+#     09:15  THIS SCRIPT (atlas sync --research + obs research board)
+#     09:38  research-action-board-weekly (reads fresh data)
+#
+# WHAT IT DOES:
+#   1. atlas sync --research     — Refreshes manuscript/program metadata
+#   2. atlas sync -p ~/projects/r-packages/active — Refreshes R package metadata
+#   3. obs research board --out <vault>/Research/00_meta/_RESEARCH-BOARD.md
+#
+# LOGS:
+#   ~/.atlas/research-board.log      — stdout (successful runs)
+#   ~/.atlas/research-board.err.log  — stderr (errors)
+#
+# HOW TO STOP/KILL:
+#   # Unload the job (stops future runs)
+#   launchctl unload ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist
+#
+#   # Reload after edits
+#   launchctl load ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist
+#
+#   # Check if loaded
+#   launchctl list | grep atlas
+#
+# HOW TO DIAGNOSE:
+#   # View logs
+#   cat ~/.atlas/research-board.log
+#   cat ~/.atlas/research-board.err.log
+#
+#   # Run manually to test
+#   /Users/dt/projects/dev-tools/atlas/scripts/sync-research-board.sh
+#
+#   # Dry run (see what would happen)
+#   atlas sync --research --dry-run
+#   obs research board --dry-run
 
 set -euo pipefail
 

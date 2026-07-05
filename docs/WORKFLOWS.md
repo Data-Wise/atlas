@@ -673,6 +673,64 @@ Create `.vscode/tasks.json`:
 
 ---
 
+## Automated Workflows
+
+### Research Board Pipeline (v0.13.0)
+
+**Goal:** Weekly refresh of research registry + board render (automated via launchd)
+
+**Schedule:** Monday 09:15 (after `pmed-extensions-weekly-advance` 08:07, before `research-action-board-weekly` 09:38)
+
+**Components:**
+- `scripts/sync-research-board.sh` — Wrapper script
+- `~/Library/LaunchAgents/com.data-wise.atlas-sync.plist` — launchd job
+
+**What it does:**
+1. `atlas sync --research` — Refreshes manuscript/program metadata from `.STATUS` files
+2. `atlas sync -p ~/projects/r-packages/active` — Refreshes R package metadata
+3. `obs research board --out <vault>/Research/00_meta/_RESEARCH-BOARD.md` — Renders board
+
+**Logs:**
+```bash
+~/.atlas/research-board.log      # stdout (successful runs)
+~/.atlas/research-board.err.log  # stderr (errors)
+```
+
+**Kill/Stop:**
+```bash
+# Unload the job (stops future runs)
+launchctl unload ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist
+
+# Reload after edits
+launchctl load ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist
+
+# Check if loaded (shows PID or - if not running)
+launchctl list | grep atlas
+```
+
+**Diagnose:**
+```bash
+# View logs
+cat ~/.atlas/research-board.log
+cat ~/.atlas/research-board.err.log
+
+# Run manually to test
+/Users/dt/projects/dev-tools/atlas/scripts/sync-research-board.sh
+
+# Dry run (see what would happen)
+atlas sync --research --dry-run
+obs research board --dry-run
+```
+
+**Chain position:**
+```
+08:07  pmed-extensions-weekly-advance (writes .STATUS)
+09:15  sync-research-board.sh (atlas sync --research + obs research board)
+09:38  research-action-board-weekly (reads fresh data)
+```
+
+---
+
 ## Workflow Cheat Sheet
 
 | Situation      | Workflow                                            |
