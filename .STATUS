@@ -8,7 +8,7 @@
 ## Focus: v0.13.0 released — AnalyticsView, StatusBar, Tasks, Schedule, E2E, 12 new docs. All CI green.
 ## Next: Start v0.14.0 planning OR Ecosystem P1 scaffold (atlas catch→obs write-through).
 
-## Research-ops: ATLAS-FIX plan ✅ COMPLETE (shipped v0.11.1–v0.12.2). Scheduling automation queued — #61 (research-board refresh in the Mon pipeline), #62 (dedupe mediationverse-sync), #63 (obs package dashboard). Plan: docs/plans/FUTURE-WORK.md + ATLAS-FIX-PLAN.md.
+## Research-ops: ATLAS-FIX plan ✅ COMPLETE (shipped v0.11.1–v0.12.2). #61 ✅ DONE (research-board refresh in Mon pipeline, scripts/sync-research-board.sh). Remaining: #62 (dedupe mediationverse-sync), #63 (obs package dashboard). Plan: docs/plans/FUTURE-WORK.md + ATLAS-FIX-PLAN.md.
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
