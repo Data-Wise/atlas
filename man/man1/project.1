@@ -1,0 +1,113 @@
+.\" Man page for atlas project command
+.\" Updated: July 2026
+.TH PROJECT 1 "July 2026" "atlas 0.13.0" "User Commands"
+.SH NAME
+atlas\-project \- project registry operations
+.SH SYNOPSIS
+.B atlas project
+\fIcommand\fR [\fIarguments\fR]
+.SH DESCRIPTION
+.B atlas project
+manages the project registry. Projects are discovered by scanning directories
+for marker files (package.json, DESCRIPTION, etc.) or registered manually.
+.PP
+The registry is stored in \fI~/.atlas/projects.json\fR (filesystem) or
+\fI~/.atlas/atlas.db\fR (SQLite).
+.SH COMMANDS
+.TP
+\fBadd\fR [\fIpath\fR]
+Register a project. If no path is given, uses current directory.
+.RS
+Options:
+.TP
+\fB\-t\fR, \fB\-\-tags\fR \fItags\fR
+Comma\-separated tags for the project.
+.TP
+\fB\-s\fR, \fB\-\-status\fR \fIstatus\fR
+Initial status: active, paused, archived (default: active).
+.RE
+.TP
+\fBlist\fR
+List all registered projects.
+.RS
+Options:
+.TP
+\fB\-s\fR, \fB\-\-status\fR \fIstatus\fR
+Filter by status: active, paused, blocked, archived, complete.
+.TP
+\fB\-t\fR, \fB\-\-tag\fR \fItag\fR
+Filter by tag.
+.TP
+\fB\-\-format\fR \fIformat\fR
+Output format: table, json, names (default: table).
+.TP
+\fB\-\-count\fR
+Show project count only.
+.TP
+\fB\-\-suggest\fR
+Suggest project for input (fuzzy match).
+.RE
+.TP
+\fBshow\fR \fIname\fR
+Show detailed information for a project.
+.RS
+Options:
+.TP
+\fB\-\-json\fR
+Output as JSON.
+.RE
+.TP
+\fBremove\fR \fIname\fR
+Unregister a project from the registry.
+.SH EXAMPLES
+Register current directory:
+.RS
+.nf
+atlas project add
+.fi
+.RE
+.PP
+Register with tags:
+.RS
+.nf
+atlas project add ~/projects/myapp \-\-tags "web,node"
+.fi
+.RE
+.PP
+List active projects:
+.RS
+.nf
+atlas project list \-\-status active
+.fi
+.RE
+.PP
+Show project as JSON:
+.RS
+.nf
+atlas project show atlas \-\-json
+.fi
+.RE
+.PP
+Remove a project:
+.RS
+.nf
+atlas project remove old\-project
+.fi
+.RE
+.SH FILES
+.TP
+.I ~/.atlas/projects.json
+Project registry (filesystem backend).
+.TP
+.I ~/.atlas/atlas.db
+Project registry (SQLite backend).
+.SH SEE ALSO
+.BR atlas (1),
+.BR session (1),
+.BR status (1)
+.SH BUGS
+Report bugs at: https://github.com/Data-Wise/atlas/issues
+.SH AUTHOR
+DT
+.SH COPYRIGHT
+MIT License

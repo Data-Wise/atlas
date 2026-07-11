@@ -1,6 +1,19 @@
 # What's New in Atlas
 
-Release highlights for each version.
+Release highlights for each version. See the [full changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md) for complete details.
+
+---
+
+## v0.13.1 — YAML Passthrough & Inbox Flags
+
+!!! success "Bug Fixes & Enhancements"
+    - **YAML passthrough (#65)** — `StatusFileGateway` uses `yaml.stringify()`/`yaml.parse()` instead of hand-rolled template; unknown fields (research metadata, custom fields like `venue`, `tasks`) survive read-write round-trip
+    - **`atlas inbox --type`** — filter captures by type (`idea`, `task`, `bug`, `note`, `question`, `parked`, `win`)
+    - **`atlas inbox --limit`** — cap the number of items returned
+    - **Win capture type** — `'win'` added to `Capture.TYPES` for quick-win tracking
+    - **E2E tests** — 6 new tests covering inbox flags, YAML round-trip, and help output
+    - **Man pages** — 4 man pages: `atlas(1)`, `atlas-session(1)`, `atlas-project(1)`, `atlas-status(1)`
+    - **Zsh completions** — full rewrite with 26 commands, all subcommands, dynamic project/template completion
 
 ---
 

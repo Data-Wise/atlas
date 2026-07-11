@@ -57,6 +57,16 @@ npm install
 npm link  # Makes 'atlas' available globally
 ```
 
+## Verify Installation
+
+```bash
+atlas --version
+# Should output: 0.13.1 (or current version)
+
+atlas --help
+# Shows available commands
+```
+
 ## Shell Completions
 
 Enable tab completion for your shell:
@@ -83,15 +93,22 @@ Enable tab completion for your shell:
     atlas completions fish > ~/.config/fish/completions/atlas.fish
     ```
 
-## Verify Installation
+## Man Pages
+
+Atlas ships with man pages for offline reference:
 
 ```bash
-atlas --version
-# Should output: 0.9.0 (or current version)
+# Add to your MANPATH (add to ~/.zshrc or ~/.bashrc)
+export MANPATH="$HOME/projects/dev-tools/atlas/man:$MANPATH"
 
-atlas --help
-# Shows available commands
+# Then read man pages
+man atlas            # Main man page — all commands, options, files
+man atlas-session    # Session management
+man atlas-project    # Project registry
+man atlas-status     # Status updates and .STATUS format
 ```
+
+If you installed from source into a different location, adjust the path accordingly.
 
 ## Initial Setup
 

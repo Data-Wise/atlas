@@ -249,10 +249,19 @@ sequenceDiagram
 # 1. End your session with notes
 atlas session end "completed login page, OAuth pending"
 
-# 2. See your stats
+# Show your stats
 atlas stats
 
-# 3. Leave a breadcrumb for tomorrow
+# Check velocity trends
+atlas stats --velocity
+
+# Check productivity patterns
+atlas stats --patterns
+
+# Time calibration for a project
+atlas stats --calibrate myapp --minutes 30
+
+# Leave a breadcrumb for tomorrow
 atlas crumb "next: implement OAuth callback handler"
 
 # 4. Optional: Quick triage if you have energy

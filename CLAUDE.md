@@ -31,10 +31,10 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.13.0 |
+| **Version** | 0.13.1 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
-| **Tests** | 1,978 (Jest) |
+| **Tests** | ~2,000 (Jest + Vitest) |
 | **MCP** | `atlas-mcp` server |
 | **Docs** | https://data-wise.github.io/atlas/ |
 
@@ -43,31 +43,36 @@ atlas dash                       # Launch TUI
 ```
 src/
 ├── domain/           # Pure business logic (no dependencies)
-│   ├── entities/     # Project, Session, Capture, Breadcrumb, Task
+│   ├── entities/     # Project, Session, Capture, Breadcrumb, Task, ScheduleRecord
 │   ├── constants/    # BusinessRules (centralized thresholds)
 │   ├── gateways/     # IStatusFileParser (interface)
-│   ├── repositories/ # Interfaces (IProjectRepository, etc.)
+│   ├── repositories/ # Interfaces (IProjectRepository, ITaskRepository, etc.)
 │   └── value-objects/# ProjectType, SessionState, TaskPriority
 ├── use-cases/        # Application logic
-│   ├── session/      # CreateSession, EndSession, GetSessionStats, PlanDay
-│   ├── capture/      # CaptureIdea, TriageInbox
-│   ├── context/      # GetContext, Park/Unpark
-│   ├── project/      # GetStatus, GetRecentProjects
-│   └── registry/     # RegisterProject, SyncRegistry, SyncFromStatus
+│   ├── session/      # CreateSession, EndSession, GetSessionStats, PlanDay, ExportSessions
+│   ├── capture/      # CaptureIdea, TriageInbox, GetInbox
+│   ├── context/      # GetContext, Park/Unpark, LogBreadcrumb, GetTrail
+│   ├── project/      # GetStatus, GetRecentProjects, ScanProjects
+│   ├── registry/     # RegisterProject, SyncRegistry, SyncFromStatus
+│   ├── task/         # AddTask, ListTasks, CompleteTask, RemoveTask, Agenda, ReceiveSchedulePush
+│   └── status/       # UpdateStatus, UpdateStatusFile
 ├── adapters/         # External interfaces
 │   ├── controllers/  # StatusController
-│   ├── presenters/   # ProjectPresenter, TuiPresenter, StatsPresenter
-│   ├── repositories/ # FileSystem*, SQLite* implementations
+│   ├── presenters/   # ProjectPresenter, TuiPresenter, StatsPresenter, FocusScorePresenter, PatternPresenter
+│   ├── repositories/ # FileSystem*, SQLite* implementations (+ Task, ScheduleRecord)
 │   └── gateways/     # GitGateway, StatusFileGateway, StatusFileParser
-├── utils/            # ADHD helpers, config, charts
+├── utils/            # ADHD helpers, config, charts, temporal intelligence
+│   ├── Config.js, StreakCalculator.js, CelebrationHelper.js
+│   ├── VelocityCalculator.js, PatternAnalyzer.js, PredictionEngine.js
+│   └── ...
 ├── mcp/              # MCP server for Claude integration
 │   └── index.js      # Tools: get_context, start_session, capture, etc.
 ├── cli/              # Dashboard TUI
 │   ├── dashboard-blessed.js # Legacy blessed dashboard
 │   ├── dashboard-ink/       # New Ink dashboard (default, v0.9.x)
 │   │   ├── components/      # App.tsx, views/, SidebarPanel, InspectorPanel
-│   │   ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures
-│   │   ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts
+│   │   ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures, useAnalytics
+│   │   ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts, ThemeContext.tsx
 │   │   ├── types.ts         # Shared Project interface
 │   │   └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
 │   └── dashboard/           # Blessed dashboard components

@@ -166,6 +166,15 @@ atlas catch "login fails on Safari" --type bug
 
 # View your inbox
 atlas inbox
+
+# Filter by type (idea, task, bug, note, question, parked, win)
+atlas inbox --type bug
+
+# Show latest 5 items
+atlas inbox --limit 5
+
+# See inbox statistics
+atlas inbox --stats
 ```
 
 **Key insight:** Capture gets it out of your head instantly. Process later.
@@ -743,6 +752,18 @@ atlas trail --limit 5 --days 7
 
 These flags are used by `at` (the flow-cli atlas dispatcher) to embed live atlas state into shell prompts, dashboards, and health-check scripts without parsing human-readable output.
 
+### Man Pages
+
+```bash
+# Read the main man page
+man atlas
+
+# Read specific command docs
+man atlas-session
+man atlas-project
+man atlas-status
+```
+
 ### Shell Completions
 
 ```bash
@@ -848,6 +869,17 @@ atlas status myproject --set active --create
 | `atlas dash`                    | Visual dashboard   |
 | `atlas inbox`                   | See captured items |
 | `atlas trail`                   | Breadcrumb history |
+| `atlas stats`                   | Session analytics  |
+| `atlas plan`                    | Morning planning   |
+| `atlas agenda`                  | Merged task+schedule view |
+| `atlas task add "X"`           | Add a task         |
+| `atlas task list`              | List tasks         |
+| `atlas status [project]`       | Show/update status |
+| `atlas doctor`                  | Audit projects     |
+| `atlas sync`                    | Sync from .STATUS  |
+| `atlas config paths`           | Show scan paths    |
+| `atlas template list`          | List templates     |
+| `atlas completions zsh`        | Generate completions |
 
 ### Quick Setup
 

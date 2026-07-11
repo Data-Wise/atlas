@@ -205,6 +205,7 @@ erDiagram
     PROJECT ||--o{ CAPTURE : receives
     PROJECT ||--o{ BREADCRUMB : logs
     PROJECT ||--o{ TASK : contains
+    PROJECT ||--o{ SCHEDULE_RECORD : schedules
 
     SESSION ||--o{ BREADCRUMB : "logs during"
     SESSION ||--o{ CAPTURE : "may create"
@@ -266,6 +267,16 @@ erDiagram
         datetime dueDate
         string assignee
     }
+
+    SCHEDULE_RECORD {
+        string id PK
+        string project FK
+        string label
+        string date
+        string type
+        string source
+        string priority
+    }
 ```
 
 **Relationships:**
@@ -273,6 +284,7 @@ erDiagram
 - **1:N (Project → Capture):** Each project receives multiple captures
 - **1:N (Project → Breadcrumb):** Each project logs multiple breadcrumbs
 - **1:N (Project → Task):** Each project contains multiple tasks
+- **1:N (Project → ScheduleRecord):** Each project has multiple scheduled records
 - **1:N (Session → Breadcrumb):** Each session logs multiple breadcrumbs
 - **1:N (Session → Capture):** Sessions may trigger captures
 
@@ -344,107 +356,125 @@ stateDiagram-v2
 graph TD
     Atlas["atlas<br/>CLI Root"]
 
-    %% Session Commands
-    Atlas -->|session| Session["session<br/>Work session mgmt"]
-    Session -->|start| SStart["start PROJECT<br/>Start new session"]
-    Session -->|end| SEnd["end [OUTCOME]<br/>End active session"]
-    Session -->|status| SStatus["status<br/>Show active session"]
-    Session -->|pause| SPause["pause<br/>Pause session"]
-    Session -->|resume| SResume["resume<br/>Resume session"]
-    Session -->|list| SList["list [PROJECT]<br/>List sessions"]
-
     %% Project Commands
-    Atlas -->|project| Project["project<br/>Project management"]
-    Project -->|list| PList["list [FILTER]<br/>List projects"]
-    Project -->|status| PStatus["status PROJECT<br/>Show project status"]
-    Project -->|find| PFind["find QUERY<br/>Search projects"]
-    Project -->|recent| PRecent["recent [LIMIT]<br/>Recently accessed"]
-    Project -->|top| PTop["top [LIMIT]<br/>By duration"]
+    Atlas -->|project| Project["project<br/>Project registry"]
+    Project -->|add| PAdd["add [PATH]<br/>Register project<br/>-t tags, -s status"]
+    Project -->|list| PList["list<br/>List projects<br/>-s status, -t tag, --kind<br/>--count, --suggest, --format"]
+    Project -->|show| PShow["show NAME<br/>Project details<br/>--format json|shell"]
+    Project -->|remove| PRm["remove NAME<br/>Unregister project"]
+
+    %% Session Commands
+    Atlas -->|session| Session["session<br/>Session management"]
+    Session -->|start| SStart["start [PROJECT]<br/>Begin session<br/>-t task, -e estimate, --energy"]
+    Session -->|end| SEnd["end [NOTE]<br/>End session"]
+    Session -->|status| SStatus["status<br/>Active session<br/>--format json"]
+    Session -->|export| SExport["export [FILE]<br/>iCal/JSON export<br/>-d days, -p project, --format"]
+
+    %% Status & Focus
+    Atlas -->|status| Status["status [PROJECT]<br/>Get/update status<br/>--set, --progress, --focus<br/>--next, --complete, --then<br/>--increment, --create"]
+    Atlas -->|focus| Focus["focus PROJECT [TEXT]<br/>Get/set focus"]
 
     %% Capture Commands
-    Atlas -->|capture| Capture["capture<br/>Quick capture"]
-    Capture -->|idea| CIdea["idea TEXT<br/>Capture idea"]
-    Capture -->|task| CTask["task TEXT<br/>Capture task"]
-    Capture -->|bug| CBug["bug TEXT<br/>Capture bug"]
-    Capture -->|note| CNote["note TEXT<br/>Capture note"]
-    Capture -->|inbox| CInbox["inbox<br/>Show inbox"]
-    Capture -->|triage| CTriage["triage ID [PROJECT]<br/>Assign to project"]
+    Atlas -->|catch| Catch["catch TEXT<br/>Quick capture<br/>-p project, -t type"]
+    Atlas -->|inbox| Inbox["inbox<br/>View captures<br/>-p project, --type, --limit<br/>--stats, --count, --triage"]
 
     %% Context Commands
-    Atlas -->|context| Context["context<br/>Breadcrumb trail"]
-    Context -->|log| CLog["log TEXT<br/>Log breadcrumb"]
-    Context -->|trail| CTrail["trail [PROJECT]<br/>Show breadcrumb trail"]
-    Context -->|park| CPark["park TEXT<br/>Park context"]
-    Context -->|unpark| CUnpark["unpark ID<br/>Restore context"]
-    Context -->|parked| CParked["parked<br/>List parked contexts"]
-
-    %% Config Commands
-    Atlas -->|config| Config["config<br/>Configuration"]
-    Config -->|show| CShow["show<br/>Show config"]
-    Config -->|set| CSet["set KEY VALUE<br/>Set config value"]
-    Config -->|init| CInit["init<br/>Initialize config"]
-    Config -->|storage| CStorage["storage [TYPE]<br/>Choose storage backend"]
-
-    %% Registry Commands
-    Atlas -->|sync| Sync["sync [PATHS...]<br/>Sync project registry"]
-    Atlas -->|register| Register["register PROJECT PATH<br/>Register project"]
-
-    %% Plan Command
-    Atlas -->|plan| Plan["plan<br/>Morning ritual"]
+    Atlas -->|where| Where["where [PROJECT]<br/>Show context"]
+    Atlas -->|crumb| Crumb["crumb TEXT<br/>Leave breadcrumb<br/>-p project"]
+    Atlas -->|trail| Trail["trail [PROJECT]<br/>Breadcrumb trail<br/>-d days, --limit"]
+    Atlas -->|park| Park["park [NOTE]<br/>Save context<br/>-f force, -k keep-session"]
+    Atlas -->|unpark| Unpark["unpark [ID]<br/>Restore context"]
+    Atlas -->|parked| Parked["parked<br/>List parked contexts"]
 
     %% Task Commands
     Atlas -->|task| TaskCmd["task<br/>Task management"]
-    TaskCmd -->|add| TAdd["add DESC<br/>Add new task"]
-    TaskCmd -->|list| TList["list<br/>List tasks"]
+    TaskCmd -->|add| TAdd["add DESC<br/>Add task<br/>-p priority, --due, --project"]
+    TaskCmd -->|list| TList["list<br/>List tasks<br/>--completed, --incomplete<br/>--overdue, --due-soon<br/>--project, --format"]
     TaskCmd -->|done| TDone["done ID<br/>Complete task"]
     TaskCmd -->|rm| TRm["rm ID<br/>Delete task"]
 
-    %% Schedule Commands
+    %% Schedule & Agenda
     Atlas -->|schedule| ScheduleCmd["schedule<br/>Schedule sync"]
-    ScheduleCmd -->|push| SPush["push<br/>Push schedule data"]
+    ScheduleCmd -->|push| SPush["push<br/>Push records<br/>--data json, --format"]
+    Atlas -->|agenda| Agenda["agenda [DAYS]<br/>Merged view<br/>--format json"]
 
-    %% Agenda Command
-    Atlas -->|agenda| Agenda["agenda [DAYS]<br/>Merged task+schedule view"]
+    %% Analytics
+    Atlas -->|stats| Stats["stats [PERIOD]<br/>Session analytics<br/>-d days, -p project<br/>--format, -e export<br/>--velocity, --patterns<br/>--calibrate, --minutes"]
 
-    %% Stats Command
-    Atlas -->|stats| Stats["stats<br/>Session analytics"]
+    %% Planning
+    Atlas -->|plan| Plan["plan<br/>Morning ritual<br/>--ecosystem, --json"]
 
-    %% Info Commands
-    Atlas -->|status| Info["status<br/>System status"]
-    Atlas -->|dashboard| Dashboard["dashboard<br/>TUI Dashboard"]
-    Atlas -->|version| Version["version<br/>Show version"]
-    Atlas -->|help| Help["help [COMMAND]<br/>Show help"]
+    %% Setup & Diagnostics
+    Atlas -->|init| Init["init<br/>Initialize atlas<br/>-g global, -t template<br/>-n name, --list-templates"]
+    Atlas -->|doctor| Doctor["doctor<br/>Audit projects<br/>--kind, --all, --fix<br/>--write, --format"]
+    Atlas -->|sync| Sync["sync<br/>Sync registry<br/>-d dry-run, -w watch<br/>-p paths, --remove-orphans<br/>--from-status, --research"]
+    Atlas -->|migrate| Migrate["migrate<br/>Storage migration<br/>-f from, -t to, --dry-run"]
+
+    %% Configuration
+    Atlas -->|config| Config["config<br/>Configuration"]
+    Config -->|paths| CPaths["paths<br/>Show scan paths"]
+    Config -->|add-path| CAdd["add-path PATH<br/>Add scan path"]
+    Config -->|remove-path| CRm["remove-path PATH<br/>Remove scan path"]
+    Config -->|show| CShow["show<br/>Show config"]
+    Config -->|setup| CSetup["setup<br/>Interactive wizard"]
+    Config -->|prefs| CPrefs["prefs<br/>Manage preferences<br/>show/get/set/reset/defaults"]
+
+    %% Templates
+    Atlas -->|template| Template["template<br/>Template management"]
+    Template -->|list| TList2["list<br/>List templates"]
+    Template -->|show| TShow["show ID<br/>Template content"]
+    Template -->|create| TCreate["create ID<br/>Create template<br/>-f from, -e extends"]
+    Template -->|export| TExport["export ID<br/>Export built-in"]
+    Template -->|delete| TDelete["delete ID<br/>Delete custom"]
+    Template -->|dir| TDir["dir<br/>Templates directory"]
+
+    %% Dashboard & Completions
+    Atlas -->|dashboard| Dashboard["dashboard / dash<br/>TUI Dashboard"]
+    Atlas -->|completions| Completions["completions [SHELL]<br/>zsh | bash | fish"]
 
     style Atlas fill:#e1f5ff,stroke:#01579b,stroke-width:3px
-    style Session fill:#f3e5f5,stroke:#4a148c
     style Project fill:#f3e5f5,stroke:#4a148c
-    style Capture fill:#f3e5f5,stroke:#4a148c
-    style Context fill:#f3e5f5,stroke:#4a148c
+    style Session fill:#f3e5f5,stroke:#4a148c
+    style Status fill:#f3e5f5,stroke:#4a148c
+    style Focus fill:#f3e5f5,stroke:#4a148c
+    style Catch fill:#f3e5f5,stroke:#4a148c
+    style Inbox fill:#f3e5f5,stroke:#4a148c
+    style Where fill:#f3e5f5,stroke:#4a148c
+    style TaskCmd fill:#f3e5f5,stroke:#4a148c
+    style ScheduleCmd fill:#f3e5f5,stroke:#4a148c
+    style Stats fill:#f3e5f5,stroke:#4a148c
     style Config fill:#f3e5f5,stroke:#4a148c
+    style Template fill:#f3e5f5,stroke:#4a148c
     style SStart fill:#e8f5e9,stroke:#1b5e20
     style SEnd fill:#e8f5e9,stroke:#1b5e20
-    style CIdea fill:#e8f5e9,stroke:#1b5e20
-    style CInbox fill:#e8f5e9,stroke:#1b5e20
-    style CLog fill:#e8f5e9,stroke:#1b5e20
-    style CTrail fill:#e8f5e9,stroke:#1b5e20
+    style PAdd fill:#e8f5e9,stroke:#1b5e20
+    style PList fill:#e8f5e9,stroke:#1b5e20
+    style Catch fill:#e8f5e9,stroke:#1b5e20
+    style Inbox fill:#e8f5e9,stroke:#1b5e20
     style Plan fill:#e8f5e9,stroke:#1b5e20
     style Stats fill:#e8f5e9,stroke:#1b5e20
     style TaskCmd fill:#e8f5e9,stroke:#1b5e20
-    style ScheduleCmd fill:#e8f5e9,stroke:#1b5e20
     style Agenda fill:#e8f5e9,stroke:#1b5e20
     style Sync fill:#fff3e0,stroke:#e65100
-    style Register fill:#fff3e0,stroke:#e65100
+    style Doctor fill:#fff3e0,stroke:#e65100
 ```
 
 **Command Groups:**
 
-1. **Session:** Session lifecycle management (start, end, pause, resume)
-2. **Project:** Project discovery and metadata
-3. **Capture:** Quick capture (inbox system for ideas, tasks, bugs, notes)
-4. **Context:** Breadcrumb trail for tracking work context
-5. **Config:** Configuration management and storage backend selection
-6. **Registry:** Project discovery and registration
-7. **Info:** System information and UI
+1. **Project** (`project add/list/show/remove`) — Project registry management
+2. **Session** (`session start/end/status/export`) — Work session lifecycle
+3. **Status** (`status`, `focus`) — Project status and focus tracking
+4. **Capture** (`catch`, `inbox`) — Quick capture and inbox management
+5. **Context** (`where`, `crumb`, `trail`, `park`, `unpark`, `parked`) — Breadcrumb trail and context switching
+6. **Task** (`task add/list/done/rm`) — Task CRUD with priority, due dates, project filters
+7. **Schedule** (`schedule push`, `agenda`) — External schedule sync and merged chronological view
+8. **Analytics** (`stats`) — Session analytics with velocity, patterns, and calibration
+9. **Planning** (`plan`) — Morning ritual daily planning
+10. **Setup** (`init`, `doctor`, `sync`, `migrate`) — Initialization, audit, registry sync, migration
+11. **Config** (`config paths/add-path/remove-path/show/setup/prefs`) — Configuration management
+12. **Templates** (`template list/show/create/export/delete/dir`) — Project template management
+13. **Dashboard** (`dashboard`/`dash`) — Interactive TUI
+14. **Completions** (`completions`) — Shell completion scripts
 
 ---
 
@@ -457,7 +487,7 @@ graph TB
     end
 
     subgraph "Domain Layer"
-        IRepo["Repository Interfaces<br/>IProjectRepository<br/>ISessionRepository<br/>ICaptureRepository<br/>IBreadcrumbRepository"]
+        IRepo["Repository Interfaces<br/>IProjectRepository<br/>ISessionRepository<br/>ICaptureRepository<br/>IBreadcrumbRepository<br/>ITaskRepository<br/>IScheduleRecordRepository"]
     end
 
     subgraph "Adapter Layer - Filesystem"
@@ -465,6 +495,8 @@ graph TB
         FSSess["FileSystemSessionRepository<br/>~/.atlas/sessions.json"]
         FSCap["FileSystemCaptureRepository<br/>~/.atlas/captures.json"]
         FSBread["FileSystemBreadcrumbRepository<br/>~/.atlas/breadcrumbs.json"]
+        FSTask["FileSystemTaskRepository<br/>~/.atlas/tasks.json"]
+        FSSched["FileSystemScheduleRecordRepository<br/>~/.atlas/schedule-records.json"]
     end
 
     subgraph "Adapter Layer - SQLite"
@@ -472,6 +504,8 @@ graph TB
         SQLSess["SQLiteSessionRepository<br/>~/.atlas/atlas.db<br/>sessions table"]
         SQLCap["SQLiteCaptureRepository<br/>~/.atlas/atlas.db<br/>captures table"]
         SQLBread["SQLiteBreadcrumbRepository<br/>~/.atlas/atlas.db<br/>breadcrumbs table"]
+        SQLTask["SQLiteTaskRepository<br/>~/.atlas/atlas.db<br/>tasks table"]
+        SQLSched["SQLiteScheduleRecordRepository<br/>~/.atlas/atlas.db<br/>schedule_records table"]
     end
 
     subgraph "Infrastructure Layer"
@@ -488,25 +522,37 @@ graph TB
     IRepo -.->|implements| FSSess
     IRepo -.->|implements| FSCap
     IRepo -.->|implements| FSBread
+    IRepo -.->|implements| FSTask
+    IRepo -.->|implements| FSSched
     IRepo -.->|implements| SQLProj
     IRepo -.->|implements| SQLSess
     IRepo -.->|implements| SQLCap
     IRepo -.->|implements| SQLBread
+    IRepo -.->|implements| SQLTask
+    IRepo -.->|implements| SQLSched
 
     FSProj --> FS
     FSSess --> FS
     FSCap --> FS
     FSBread --> FS
+    FSTask --> FS
+    FSSched --> FS
 
     SQLProj --> DB
     SQLSess --> DB
     SQLCap --> DB
     SQLBread --> DB
+    SQLTask --> DB
+    SQLSched --> DB
 
     Container -->|creates| FSProj
     Container -->|creates| FSSess
+    Container -->|creates| FSTask
+    Container -->|creates| FSSched
     Container -->|creates| SQLProj
     Container -->|creates| SQLSess
+    Container -->|creates| SQLTask
+    Container -->|creates| SQLSched
 
     style UC fill:#f3e5f5
     style IRepo fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
@@ -1071,7 +1117,7 @@ flowchart TB
 | 2 | Data Flow | Complete session lifecycle | How data moves through system |
 | 3 | Entity Relationships | Database schema and cardinality | Understanding data model |
 | 4 | Session State Machine | Possible session states | Session lifecycle management |
-| 5 | CLI Command Tree | Command hierarchy | CLI navigation and usage |
+| 5 | CLI Command Tree | Command hierarchy (14 groups) | CLI navigation and usage |
 | 6 | Repository Pattern | Storage abstraction | Understanding backend switching |
 | 7 | Event System | Publish-subscribe pattern | Cross-cutting concerns |
 | 8 | Configuration & ADHD Features | User preferences integration | ADHD-friendly features |
