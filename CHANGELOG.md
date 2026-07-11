@@ -2,6 +2,20 @@
 
 All notable changes to Atlas are documented here.
 
+## [0.13.1] - 2026-07-11
+
+### Fixed
+- **YAML passthrough (#65)** — StatusFileGateway now uses `yaml.stringify()`/`yaml.parse()` instead of hand-rolled template; unknown fields (research metadata, custom fields like `venue`, `tasks`) survive read-write round-trip.
+
+### Added
+- **Inbox --type flag (F6)** — `atlas inbox --type <type>` filters captures by type (`idea`, `task`, `bug`, `note`, `question`, `parked`, `win`).
+- **Inbox --limit flag (F6)** — `atlas inbox --limit <n>` caps the number of items returned.
+- **'win' capture type** — Added `'win'` to `Capture.TYPES` for quick-win tracking.
+- **E2E tests for inbox flags** — 6 new tests covering `--type`, `--limit`, help output, and combined flags.
+- **YAML round-trip unit tests** — 2 new tests verifying unknown fields and research metadata survive write/read cycles.
+- **YAML passthrough dogfood test** — `test/dogfood/dashboard-ink/yaml-passthrough.sh` (5 dual-path verified tests).
+- **CLI testing tools research** — Evaluated vitest-command-line, clet, repterm, tui-test, node-cli-testing. Saved to `docs/internal/CLI-TESTING-TOOLS.md`.
+
 ## [0.13.0] - 2026-07-04
 
 ### Added

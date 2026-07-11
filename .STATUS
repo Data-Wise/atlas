@@ -5,15 +5,18 @@
 ## Priority: 1
 ## Progress: 100
 
-## Focus: v0.13.0 released — AnalyticsView, StatusBar, Tasks, Schedule, E2E, 12 new docs. All CI green.
-## Next: Start v0.14.0 planning OR Ecosystem P1 scaffold (atlas catch→obs write-through).
+## Focus: Quick wins complete — #65 YAML passthrough, F6 inbox --type/--limit, CLI audit, testing tools research.
+## Next: Implement #63 obs side (package renderer) | Open GitHub issue on obsidian-cli-ops | Plan `.context/` migration strategy | FW-31 CLI testing infrastructure
 
-## Research-ops: ATLAS-FIX plan ✅ COMPLETE (shipped v0.11.1–v0.12.2). #61 ✅ DONE (research-board refresh in Mon pipeline, scripts/sync-research-board.sh). Remaining: #62 (dedupe mediationverse-sync), #63 (obs package dashboard). Plan: docs/plans/FUTURE-WORK.md + ATLAS-FIX-PLAN.md.
+## Research-ops: ATLAS-FIX plan ✅ COMPLETE. #61 ✅ DONE (research-board refresh via launchd). #62 ✅ DONE (dedupe mediationverse-sync — launchd only). #63 🔵 PLANNED (obs package renderer). Dev tool audit: `docs/internal/PROJECT-SETUP-AUDIT.md`.
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
 Clean Architecture-based state management for developer workflows. Designed
 with ADHD-friendly features like streak tracking and celebration helpers.
+
+## Resume Context (2026-07-04 Session 2)
+Closed #61/#62, planned #63. Research board pipeline live (Monday 09:15 launchd: atlas sync --research + obs research board render). MediationVerse deduped (launchd only, cloud task disabled). Added `kind: package` to 7 R package .STATUS files. Completed dev tool audit (PROJECT-SETUP-AUDIT.md) recommending `.context/` as unified project config folder. Next: #63 obs package renderer spec+issue, `.context/` migration strategy, or v0.14.0 planning.
 
 ## Features
 - **Project Registry**: Track projects, status, metadata
@@ -31,16 +34,32 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 1,978 passing (Jest, 93 suites) — green on Node 18/22
+- Total: 1,984 passing (Jest, 93 suites) — green on Node 18/22
 - Ink: 277 passing (10 suites)
-- Dogfood: 183 (shell test suite)
-- E2E: 5 passing (Vitest + ink-testing-library + Playwright)
+- Dogfood: 188 (shell test suite + YAML passthrough)
+- E2E: 87 passing (Vitest + ink-testing-library + Playwright)
 
 ## Links
 - **Docs**: https://data-wise.github.io/atlas/
 - GitHub: https://github.com/Data-Wise/atlas
 - Homebrew: `brew install data-wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
+
+## ✅ Just Completed (2026-07-11 Session 1)
+- **Quick wins from spec audit** — #65 YAML passthrough, #22 already fixed, F6 inbox --type/--limit
+- **#65 YAML passthrough** — StatusFileGateway now uses `yaml.stringify()`/`yaml.parse()` instead of hand-rolled template; unknown fields (research metadata, custom fields) survive round-trip
+- **F6 inbox --type/--limit** — Added `'win'` to `Capture.TYPES`, added `--type` and `--limit` options to `atlas inbox` CLI command
+- **CLI audit** — All 30+ commands verified working; 81/81 E2E tests pass; 1 flaky unit test (MainView.test.tsx, test interference only)
+- **CLI testing tools research** — Evaluated vitest-command-line, clet, repterm, tui-test, node-cli-testing; saved to `docs/internal/CLI-TESTING-TOOLS.md`
+- **New tests** — 6 E2E tests for inbox flags, 2 YAML round-trip unit tests, 5 dogfood tests (dual-path verified)
+
+## ✅ Just Completed (2026-07-04 Session 2)
+- **Closed #61 (research-board automation)** — Created `scripts/sync-research-board.sh` (atlas sync --research + obs research board), updated `com.data-wise.atlas-sync.plist` (Monday 09:15), tested and verified
+- **Closed #62 (dedupe mediationverse sync)** — Kept launchd job, disabled cloud scheduled task (`SKILL.md` → `.disabled`)
+- **Planned #63 (obs package dashboard)** — Added `kind: package` to 7 R package `.STATUS` files; verified via `atlas sync --research`
+- **Dev tool audit** — Compared atlas, craft, flow-cli, obsidian-cli-ops, scholar, savant setup patterns; saved to `docs/internal/PROJECT-SETUP-AUDIT.md`
+- **Config pattern research** — Analyzed VS Code `.vscode/`, industry patterns; recommended `.context/` as unified project config folder
+- **Fixed stale code comments** — `FileSystemProjectRepository.js` and `FileSystemSessionRepository.js`: `~/.flow-cli/` → `~/.atlas/` in header comments
 
 ## ✅ Just Completed (2026-07-04)
 - **Released v0.13.0** — Tasks & Schedule Records, AnalyticsView, StatusBar, E2E infra, 12 docs, 1978 tests. PR #68 + #69 merged, tag v0.13.0, docs deployed.
@@ -101,5 +120,6 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 - (none)
 
 ## 🎯 Next Action
-A) **Start v0.14.0** — Ecosystem P1 scaffold (`feature/catch-obs-bridge` worktree): `ObsidianGateway.js`, `FlushCapturesUseCase.js`, `atlas flush` CLI. Or: Research Board Dashboard (PR #61).
-B) **flow-cli obs-bridge (P2)** — read-only `obs-bridge.zsh` dispatcher scaffold; uses obs v4.1.0's 45 read commands; unblocked today.
+A) **#63 obs package renderer** — `obs research board --kind package` render target; open GitHub issue on obsidian-cli-ops with spec
+B) **`.context/` migration** — Phase 1 backward compat, Phase 2 create `.context/`, Phase 3 migrate `.STATUS`/`.claude.md` into it
+C) **Start v0.14.0** — Ecosystem P1 scaffold (`feature/catch-obs-bridge` worktree): `ObsidianGateway.js`, `FlushCapturesUseCase.js`, `atlas flush` CLI

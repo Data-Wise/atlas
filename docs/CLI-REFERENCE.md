@@ -503,6 +503,8 @@ atlas inbox [options]
 
 Options:
   -p, --project <name>    Filter by project
+  --type <type>           Filter by capture type (idea, task, bug, note, question, parked, win)
+  --limit <n>             Maximum items to return
   --stats                 Show inbox statistics
   --count                 Print only the pending inbox count
   --triage                Interactive triage mode
@@ -515,6 +517,15 @@ atlas inbox
 
 # Show items for specific project
 atlas inbox --project myproject
+
+# Show only win captures
+atlas inbox --type win
+
+# Show latest 5 items
+atlas inbox --limit 5
+
+# Show only tasks, limited to 10
+atlas inbox --type task --limit 10
 
 # Show statistics
 atlas inbox --stats

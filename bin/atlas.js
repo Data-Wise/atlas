@@ -9,6 +9,7 @@ import { Atlas } from '../src/index.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { Capture } from '../src/domain/entities/Capture.js';
 import { CelebrationHelper } from '../src/utils/CelebrationHelper.js';
 import { ContextRestorationHelper } from '../src/utils/ContextRestorationHelper.js';
 
@@ -554,6 +555,8 @@ program
   .command('inbox')
   .description('Show captured items')
   .option('-p, --project <project>', 'Filter by project')
+  .option('--type <type>', `Filter by capture type (${Capture.TYPES.join(', ')})`)
+  .option('--limit <n>', 'Maximum items to return', parseInt)
   .option('--triage', 'Interactive triage mode')
   .option('--stats', 'Show inbox statistics')
   .option('--count', 'Print only the pending inbox count')

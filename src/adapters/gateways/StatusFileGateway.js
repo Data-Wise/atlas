@@ -8,6 +8,7 @@
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { parse, stringify } from 'yaml'
 
 export class StatusFileGateway {
   /**
@@ -51,79 +52,27 @@ export class StatusFileGateway {
     const frontmatter = frontmatterMatch[1]
     const body = content.slice(frontmatterMatch[0].length).trim()
 
-    // Simple YAML parser for our specific format
-    const data = {}
-    let currentSection = null
-    let currentArray = null
-
-    for (const line of frontmatter.split('\n')) {
-      const trimmed = line.trim()
-
-      // Skip comments and empty lines
-      if (!trimmed || trimmed.startsWith('#')) continue
-
-      // Calculate indent level
-      const currentIndent = line.search(/\S/)
-
-      // Detect sections (next:, metrics:) at indent level 0
-      if (currentIndent === 0 && trimmed.endsWith(':') && !trimmed.startsWith('-')) {
-        currentSection = trimmed.slice(0, -1)
-        if (currentSection === 'next') {
-          data[currentSection] = []
-          currentArray = data[currentSection]
-        } else {
-          data[currentSection] = {}
-          currentArray = null // Reset array context
-        }
-        continue
-      }
-
-      // Parse array items for 'next' section
-      if (currentSection === 'next' && trimmed.startsWith('- ')) {
-        const item = {}
-        currentArray.push(item)
-
-        // Parse action line
-        const actionMatch = trimmed.match(/- action: "(.+)"/)
-        if (actionMatch) {
-          item.action = actionMatch[1]
-        }
-        continue
-      }
-
-      // Parse nested properties (indented)
-      if (currentIndent > 0 && trimmed.includes(':')) {
-        const colonIndex = trimmed.indexOf(':')
-        const key = trimmed.substring(0, colonIndex).trim()
-        const value = trimmed.substring(colonIndex + 1).trim()
-
-        if (currentArray && currentArray.length > 0) {
-          // Add to last array item
-          const lastItem = currentArray[currentArray.length - 1]
-          lastItem[key] = this._parseValue(value)
-        } else if (currentSection) {
-          // Add to current section object
-          data[currentSection][key] = this._parseValue(value)
-        }
-        continue
-      }
-
-      // Top-level key-value pairs (indent 0, no current section)
-      if (currentIndent === 0 && trimmed.includes(':') && !currentSection) {
-        const colonIndex = trimmed.indexOf(':')
-        const key = trimmed.substring(0, colonIndex).trim()
-        const value = trimmed.substring(colonIndex + 1).trim()
-        data[key] = this._parseValue(value)
-      }
+    let parsed
+    try {
+      parsed = parse(frontmatter)
+    } catch {
+      return this._parseLegacyFormat(content)
+    }
+    if (!parsed || typeof parsed !== 'object') {
+      return this._parseLegacyFormat(content)
     }
 
+    const cleanData = Object.fromEntries(
+      Object.entries(parsed).filter(([_, v]) => v !== undefined && v !== null)
+    )
     return {
       format: 'yaml',
-      status: data.status || 'unknown',
-      progress: data.progress || 0,
-      type: data.type || 'generic',
-      next: data.next || [],
-      metrics: data.metrics || {},
+      status: 'unknown',
+      progress: 0,
+      type: 'generic',
+      ...cleanData,
+      next: cleanData.next || [],
+      metrics: cleanData.metrics || {},
       body
     }
   }
@@ -224,49 +173,28 @@ export class StatusFileGateway {
    * @private
    */
   _generateYAMLFormat(data) {
-    const lines = ['---']
+    const KNOWN_ORDER = ['status', 'progress', 'type', 'kind', 'priority',
+      'phase', 'focus', 'version', 'updated', 'target', 'checkpoint']
 
-    // Required fields
-    if (data.status) lines.push(`status: ${data.status}`)
-    if (data.progress !== undefined) lines.push(`progress: ${data.progress}`)
-    if (data.type) lines.push(`type: ${data.type}`)
-
-    // Next actions
-    if (data.next && Array.isArray(data.next) && data.next.length > 0) {
-      lines.push('')
-      lines.push('next:')
-      for (const action of data.next) {
-        lines.push(`  - action: "${action.action}"`)
-        if (action.estimate) lines.push(`    estimate: "${action.estimate}"`)
-        if (action.priority) lines.push(`    priority: ${action.priority}`)
-        if (action.blockers && action.blockers.length > 0) {
-          lines.push(`    blockers:`)
-          for (const blocker of action.blockers) {
-            lines.push(`      - "${blocker}"`)
-          }
-        }
-      }
+    const fm = {}
+    for (const key of KNOWN_ORDER) {
+      if (data[key] !== undefined && data[key] !== null) fm[key] = data[key]
     }
-
-    // Metrics (auto-updated)
+    if (data.next?.length) fm.next = data.next
+    if (data.tasks?.length) fm.tasks = data.tasks
     if (data.metrics && Object.keys(data.metrics).length > 0) {
-      lines.push('')
-      lines.push('# Auto-updated fields (do not edit manually)')
-      lines.push('metrics:')
-      for (const [key, value] of Object.entries(data.metrics)) {
-        lines.push(`  ${key}: ${value}`)
+      fm.metrics = data.metrics
+    }
+
+    for (const [key, value] of Object.entries(data)) {
+      if (!(key in fm) && key !== 'body' && key !== 'format') {
+        fm[key] = value
       }
     }
 
-    lines.push('---')
-
-    // Body content
-    if (data.body) {
-      lines.push('')
-      lines.push(data.body.trim())
-    }
-
-    return lines.join('\n') + '\n'
+    const yaml = stringify(fm).trimEnd()
+    const body = data.body ? '\n' + data.body.trim() + '\n' : ''
+    return `---\n${yaml}\n---\n${body}`
   }
 
   /**

@@ -111,6 +111,7 @@ New projects satisfy the contract automatically; existing gaps backfilled.
 | FW-21 | docs-standards `research-ops/overview.md` — cross-cutting front-door + pipeline diagram | docs-standards | **M** | — | one canonical overview linked from each repo + website |
 | FW-22 | savant skills index — list the 4 new skills (collider/cran/s7/longitudinal) in the docs site | savant | **S** | — | skills discoverable in savant docs |
 | FW-23 | Public **Research-Ops page** on data-wise.github.io (beyond the software-list blurb) | website | **M** | FW-21 | a public platform showcase page |
+| FW-31 | **CLI testing infrastructure** — evaluate + adopt vitest-command-line or clet for structured E2E (sandbox isolation, timeout handling, stdout/stderr matching); see `docs/internal/CLI-TESTING-TOOLS.md` | atlas | **M** | — | E2E tests use structured CLI testing framework; sandbox isolation per test |
 
 ## E5 — Release & ops
 
