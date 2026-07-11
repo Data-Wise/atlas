@@ -68,9 +68,9 @@ export class StatusFileGateway {
     return {
       format: 'yaml',
       status: 'unknown',
-      progress: 0,
       type: 'generic',
       ...cleanData,
+      progress: typeof cleanData.progress === 'string' ? (parseInt(cleanData.progress, 10) || 0) : (cleanData.progress ?? 0),
       next: cleanData.next || [],
       metrics: cleanData.metrics || {},
       body

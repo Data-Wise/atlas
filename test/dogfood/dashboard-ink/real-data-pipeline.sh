@@ -66,7 +66,7 @@ run_node() {
 
 # Extract a KEY:VALUE from NODE_OUTPUT
 get_val() {
-    echo "$NODE_OUTPUT" | grep "^$1:" | head -1 | cut -d: -f2-
+    echo "$NODE_OUTPUT" | grep "^$1:" | head -1 | cut -d: -f2- || true
 }
 
 # ─── Test 1: Container creates all required repositories ─────────────────────
