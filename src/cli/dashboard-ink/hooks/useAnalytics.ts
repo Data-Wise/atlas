@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAtlas } from '../lib/AtlasContext.js';
 import type { AnalyticsData, WeekSummary, DeadZone } from '../types.js';
-import { buildPatternGrid } from '../../adapters/presenters/PatternPresenter.js';
+import { buildPatternGrid } from '../../../adapters/presenters/PatternPresenter.js';
 
 const POLL_INTERVAL = 60000;
 
