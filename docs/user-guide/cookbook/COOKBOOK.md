@@ -335,3 +335,290 @@ atlas sync --from-status --dry-run               # preview changes
 ```
 
 **Notes.** `--from-status` (or its `--research` alias) is the authority for research metadata. Plain `atlas sync` preserves existing `kind`/`target`/`tasks` but does not re-parse them. See Recipe 2 for full research sync workflow.
+
+---
+
+## Recipe 21 — Set up shell completions
+
+**You want** tab-completion for atlas commands in your shell.
+
+```bash
+# Zsh (recommended)
+atlas completions zsh > ~/.config/zsh/completions/_atlas
+# Ensure fpath includes the directory — add to ~/.zshrc:
+# fpath=(~/.config/zsh/completions $fpath)
+# autoload -Uz compinit && compinit
+
+# Bash
+atlas completions bash > ~/.bash_completion.d/atlas
+# Source it: source ~/.bash_completion.d/atlas
+
+# Fish
+atlas completions fish > ~/.config/fish/completions/atlas.fish
+```
+
+**Notes.** Restart your shell after installing. Completions work for commands, subcommands, flags, and project names.
+
+---
+
+## Recipe 22 — Configure atlas (scan paths, preferences)
+
+**You want** to customize what atlas tracks and how it behaves.
+
+```bash
+atlas config show                    # show all current settings
+atlas config paths                   # show configured scan paths
+
+# Add/remove scan paths
+atlas config add-path ~/projects/research
+atlas config remove-path ~/old-location
+
+# Interactive wizard (walks through all settings)
+atlas config setup
+
+# ADHD preferences
+atlas config prefs                   # show preferences
+```
+
+**Key preferences:**
+
+| Setting | Default | Purpose |
+|---------|---------|---------|
+| `adhd.showStreak` | `true` | Show consecutive day streak |
+| `adhd.celebrationLevel` | `medium` | Intensity of completion celebrations |
+| `adhd.timeCues` | `true` | Gentle time awareness nudges |
+| `session.defaultDuration` | `25` | Pomodoro length in minutes |
+| `session.breakDuration` | `5` | Break length in minutes |
+
+**Notes.** Config lives at `~/.atlas/config.json`. Edit directly if you prefer, but `atlas config setup` validates inputs.
+
+---
+
+## Recipe 23 — Create custom project templates
+
+**You want** reusable scaffolding for new projects.
+
+```bash
+# List available templates
+atlas template list
+
+# See what a template contains
+atlas template show node
+
+# Export built-in template for customization
+atlas template export node
+# → creates ~/.atlas/templates/node.json — edit it
+
+# Create a new template from scratch
+atlas template create r-package
+# → opens ~/.atlas/templates/r-package.json for editing
+
+# Use a template
+atlas init --template r-package --name my-new-package
+
+# Delete a custom template
+atlas template delete r-package
+```
+
+**Template structure:**
+
+```json
+{
+  "id": "r-package",
+  "name": "R Package",
+  "description": "CRAN-ready R package scaffold",
+  "files": {
+    "DESCRIPTION": "Package: {{name}}\nVersion: 0.1.0",
+    ".STATUS": "## Status: active\n## Progress: 0"
+  },
+  "commands": ["R CMD build .", "R CMD check --as-cran *.tar.gz"]
+}
+```
+
+**Notes.** Custom templates live in `~/.atlas/templates/`. Use `{{name}}` as a placeholder for the project name.
+
+---
+
+## Recipe 24 — Migrate from filesystem to SQLite
+
+**You want** faster queries on a large registry, or want to share data across tools.
+
+```bash
+# Preview what would move
+atlas migrate --from filesystem --to sqlite --dry-run
+
+# Run the migration
+atlas migrate --from filesystem --to sqlite
+
+# Switch your config to use sqlite
+atlas config setup  # select storage: sqlite
+```
+
+**Notes.** Migration is non-destructive — your `~/.atlas/projects/` JSON files remain untouched. The SQLite database is created at `~/.atlas/atlas.db`. You can switch back with `atlas migrate --from sqlite --to filesystem`.
+
+---
+
+## Recipe 25 — Multi-project weekly review
+
+**You want** a structured review of all your projects every week.
+
+```bash
+# 1. See everything at a glance
+atlas project list
+
+# 2. Check which projects need attention
+atlas project list --status active
+atlas doctor --kind manuscript    # research audit
+
+# 3. Review your week's output
+atlas stats week
+atlas stats --velocity
+
+# 4. Check overdue tasks
+atlas task list --overdue
+atlas task list --due-soon
+
+# 5. Review captured ideas
+atlas inbox --stats
+atlas inbox --triage              # process if time allows
+
+# 6. Set next week's focus
+atlas plan
+```
+
+**Notes.** Do this Friday afternoon or Monday morning. The `atlas plan` command guides you through the whole ritual interactively.
+
+---
+
+## Recipe 26 — Export and analyze session data
+
+**You want** to visualize or analyze your work patterns outside atlas.
+
+```bash
+# Export to iCal (for calendar visualization)
+atlas session export sessions.ics
+# Import into Google Calendar, Apple Calendar, or Outlook
+
+# Export to JSON (for custom analysis)
+atlas session export --format json > sessions.json
+
+# Filter by project
+atlas session export --project atlas atlas-sessions.ics
+
+# Quick stats on the command line
+atlas stats week                  # this week
+atlas stats month                 # this month
+atlas stats 90                    # last 90 days
+
+# Pattern analysis
+atlas stats --patterns            # 90-day flow patterns
+atlas stats --calibrate           # prediction accuracy
+```
+
+**JSON export structure:**
+
+```json
+[
+  {
+    "project": "atlas",
+    "startedAt": "2026-07-10T09:15:00Z",
+    "endedAt": "2026-07-10T11:45:00Z",
+    "duration": 150,
+    "note": "refactored parsers"
+  }
+]
+```
+
+**Notes.** The iCal export creates standard `.ics` files that work with any calendar app. Great for seeing focus blocks alongside meetings.
+
+---
+
+## Recipe 27 — Set up automated research pipeline
+
+**You want** weekly refresh of research metadata + board render, fully automated.
+
+```bash
+# The pipeline script
+cat > ~/scripts/sync-research-board.sh << 'EOF'
+#!/bin/bash
+atlas sync --research 2>&1 | tee -a ~/.atlas/research-board.log
+obs research board --out ~/vault/Research/00_meta/_RESEARCH-BOARD.md
+EOF
+chmod +x ~/scripts/sync-research-board.sh
+
+# Create launchd job
+cat > ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "...">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.data-wise.atlas-sync</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/dt/scripts/sync-research-board.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key><integer>1</integer>
+        <key>Hour</key><integer>9</integer>
+        <key>Minute</key><integer>15</integer>
+    </dict>
+</dict>
+</plist>
+EOF
+
+# Load the job
+launchctl load ~/Library/LaunchAgents/com.data-wise.atlas-sync.plist
+
+# Verify
+launchctl list | grep atlas
+```
+
+**Logs:**
+```bash
+cat ~/.atlas/research-board.log       # successful runs
+cat ~/.atlas/research-board.err.log   # errors
+```
+
+**Notes.** Schedule timing matters: run after any upstream data producers (e.g., `pmed-extensions-weekly-advance`) and before consumers (e.g., `research-action-board-weekly`).
+
+---
+
+## Recipe 28 — Use Atlas MCP server with Claude
+
+**You want** Claude to read your atlas data for context-aware assistance.
+
+```bash
+# MCP server is built-in — start it with:
+atlas mcp
+
+# In Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json):
+{
+  "mcpServers": {
+    "atlas": {
+      "command": "atlas",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+**Available tools in Claude:**
+
+| Tool | Purpose |
+|------|---------|
+| `atlas_get_context` | Current project context, sessions, streaks |
+| `atlas_get_projects` | List/filter projects (supports `kind` filter) |
+| `atlas_start_session` | Start a session from Claude |
+| `atlas_capture` | Quick-capture an idea |
+| `atlas_get_inbox` | Show pending captures |
+
+**Example conversation:**
+```
+You: What was I working on last?
+Claude: [uses atlas_get_context] You were working on atlas — refactoring parsers.
+        Your last breadcrumb was "stuck on OAuth callback". 3-day streak active.
+```
+
+**Notes.** Claude needs the MCP server running to access atlas data. The server reads from `~/.atlas/` — no additional config needed.
