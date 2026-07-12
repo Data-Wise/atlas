@@ -148,7 +148,7 @@ atlas dash
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
 | [Quick Reference](REFCARD.md) | Printable command cheat sheet |
 | [Cheatsheet](CHEATSHEET.md) | Compact command reference |
-| [Workflows](WORKFLOWS.md) | ADHD-friendly workflow patterns |
+| [Workflows](user-guide/workflows/WORKFLOWS.md) | ADHD-friendly workflow patterns |
 | [Visual Guide](VISUAL-GUIDE.md) | Themes, focus score, sparklines, heatmap |
 | [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
 | [Configuration](CONFIGURATION.md) | All settings and preferences |
