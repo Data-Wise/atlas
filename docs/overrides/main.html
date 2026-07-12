@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+  <!-- Preconnect for font performance -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <!-- Fonts loaded via fonts.css @font-face -->
+{% endblock %}
+
+{% block content %}
+  <div class="md-content" data-md-component="content">
+    <article class="md-content__inner md-typeset">
+      <!-- Reading time indicator -->
+      <div class="md-article-meta" data-md-component="article-meta">
+        <div class="md-article-meta__container">
+          {% if page.meta.reading_time is not none %}
+            <span class="md-article-reading-time">
+              <span class="md-icon">{{ icons.clock }}</span>
+              <span>{{ page.meta.reading_time }} min read</span>
+            </span>
+          {% endif %}
+          {% if page.date %}
+            <span class="md-article-date">
+              <span class="md-icon">{{ icons.calendar }}</span>
+              <span>{{ page.date.strftime('%b %d, %Y') }}</span>
+            </span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="md-content__body">
+        {{ page.content }}
+      </div>
+    </article>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <footer class="md-footer" data-md-component="footer">
+    <div class="md-footer__inner md-grid">
+      <div class="md-footer__left">
+        <div class="md-footer__title">
+          <span>{{ config.site_name }}</span>
+        </div>
+        <div class="md-footer__copyright">
+          {% if config.copyright %}
+            {{ config.copyright }}
+          {% else %}
+            Copyright &copy; {{ now().year }} {{ config.site_name }}
+          {% endif %}
+        </div>
+      </div>
+      <div class="md-footer__right">
+        <div class="md-footer__links">
+          <a href="{{ config.repo_url }}" target="_blank" rel="noopener">
+            <span class="md-icon">{{ icons.github }}</span> GitHub
+          </a>
+          <a href="{{ config.site_url }}/CHANGELOG.md" target="_blank" rel="noopener">
+            Changelog
+          </a>
+          <a href="{{ config.site_url }}/CONTRIBUTING.md" target="_blank" rel="noopener">
+            Contribute
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+{% endblock %}
