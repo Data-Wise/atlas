@@ -2,7 +2,7 @@
 
 > Task-oriented recipes for research-ops and dev workflows. Each recipe is **problem → do this → notes**.
 > New here? Start with the [Research Registry tutorial](../tutorials/research-registry.md); for the big picture
-> see [RESEARCH-REGISTRY.md](../../RESEARCH-REGISTRY.md) and the cross-tool
+> see the [Research Registry tutorial](../tutorials/research-registry.md) and the cross-tool
 > [research-ops overview](https://github.com/Data-Wise/docs-standards/blob/main/research-ops/overview.md).
 
 ---

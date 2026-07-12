@@ -67,5 +67,5 @@ obs research board --out ~/vault/00_meta/_RESEARCH-BOARD.md
 
 `.STATUS` → **atlas** (registry + `doctor`) → **`obs research board`** → vault dashboard.
 
-See also: [Research Registry](../../RESEARCH-REGISTRY.md) · docs-standards `adr/ADR-001` ·
+See also: [Research Registry](research-registry.md) · docs-standards `adr/ADR-001` ·
 atlas `docs/plans/PHASE-3-research-registry-plan.md`.

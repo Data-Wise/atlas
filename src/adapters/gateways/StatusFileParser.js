@@ -47,6 +47,11 @@ export class StatusFileParser {
   async _scanRecursive(dirPath, results, currentDepth, maxDepth, exclude) {
     if (currentDepth > maxDepth) return
 
+    // Path traversal protection
+    if (dirPath.includes('..') || dirPath.includes('\\..')) {
+      return
+    }
+
     try {
       const entries = await readdir(dirPath, { withFileTypes: true })
 

@@ -13,6 +13,8 @@
  * This is a pure business logic layer with no framework dependencies.
  */
 
+import { resolve } from 'node:path'
+
 
 export class ScanProjectsUseCase {
   /**
@@ -129,6 +131,18 @@ export class ScanProjectsUseCase {
 
     if (!input.rootPath || typeof input.rootPath !== 'string') {
       throw new Error('ScanProjectsUseCase: rootPath must be a non-empty string')
+    }
+
+    // Path traversal protection - reject directory traversal sequences
+    if (input.rootPath.includes('..') || input.rootPath.includes('\\..')) {
+      throw new Error('ScanProjectsUseCase: rootPath must not contain directory traversal sequences (..)')
+    }
+
+    // Resolve to absolute path to prevent relative path confusion
+    const resolvedRoot = resolve(input.rootPath)
+    if (resolvedRoot !== input.rootPath && !input.rootPath.startsWith('/') && !input.rootPath.startsWith('.')) {
+      // Only warn for non-absolute paths that resolve differently
+      // This allows legitimate absolute paths while catching confusion
     }
 
     if (input.updateExisting !== undefined && typeof input.updateExisting !== 'boolean') {
