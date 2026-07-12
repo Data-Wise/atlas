@@ -1429,11 +1429,15 @@ Arguments:
 
 **Installation:**
 ```bash
-# ZSH
-atlas completions zsh >> ~/.zshrc
+# Zsh — write to fpath (recommended)
+atlas completions zsh > ~/.config/zsh/completions/_atlas
+# Add to ~/.zshrc:
+#   fpath=(~/.config/zsh/completions $fpath)
+#   autoload -Uz compinit && compinit
 
 # Bash
-atlas completions bash >> ~/.bashrc
+atlas completions bash > ~/.bash_completion.d/atlas
+# Add to ~/.bashrc: source ~/.bash_completion.d/atlas
 
 # Fish
 atlas completions fish > ~/.config/fish/completions/atlas.fish
