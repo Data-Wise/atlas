@@ -95,8 +95,8 @@ nav:
     - Cheatsheet: CHEATSHEET.md
     - Quick Reference Card: REFCARD.md
     - Visual Features: user-guide/tutorials/visual-features.md
-    - Cookbook: COOKBOOK.md
-    - Workflows: WORKFLOWS.md
+    - Cookbook: user-guide/cookbook/COOKBOOK.md
+    - Workflows: user-guide/workflows/WORKFLOWS.md
     - CLI Reference: CLI-REFERENCE.md
     - Configuration: CONFIGURATION.md
     - Research Registry: user-guide/tutorials/research-registry.md

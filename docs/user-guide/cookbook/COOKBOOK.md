@@ -1,8 +1,8 @@
 # Atlas Cookbook
 
 > Task-oriented recipes for research-ops and dev workflows. Each recipe is **problem → do this → notes**.
-> New here? Start with the [Research Registry tutorial](user-guide/tutorials/research-registry.md); for the big picture
-> see [RESEARCH-REGISTRY.md](RESEARCH-REGISTRY.md) and the cross-tool
+> New here? Start with the [Research Registry tutorial](../tutorials/research-registry.md); for the big picture
+> see [RESEARCH-REGISTRY.md](../../RESEARCH-REGISTRY.md) and the cross-tool
 > [research-ops overview](https://github.com/Data-Wise/docs-standards/blob/main/research-ops/overview.md).
 
 ---
@@ -162,7 +162,7 @@ atlas_get_projects({ kind: 'program' })
 // → pmed-modern  Kind: program  Venue: Epidemiology  Tasks: 5  Progress: 80%
 ```
 
-See [MCP-SERVER.md](MCP-SERVER.md) for setup and the full tool list.
+See [MCP-SERVER.md](../../MCP-SERVER.md) for setup and the full tool list.
 
 ---
 
