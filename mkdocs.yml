@@ -92,18 +92,14 @@ nav:
     - Tutorial: TUTORIAL.md
     - Demos: DEMOS.md
   - User Guide:
-    - Quick Reference:
-      - Cheatsheet: CHEATSHEET.md
-      - Quick Reference Card: REFCARD.md
-    - Tutorials:
-      - Visual Features: tutorials/visual-features.md
-      - Research Registry: tutorials/research-registry.md
+    - Cheatsheet: CHEATSHEET.md
+    - Quick Reference Card: REFCARD.md
+    - Visual Features: tutorials/visual-features.md
     - Cookbook: COOKBOOK.md
     - Workflows: WORKFLOWS.md
-    - CLI Reference:
-      - CLI Reference: CLI-REFERENCE.md
-      - Configuration: CONFIGURATION.md
-    - Research Registry: RESEARCH-REGISTRY.md
+    - CLI Reference: CLI-REFERENCE.md
+    - Configuration: CONFIGURATION.md
+    - Research Registry: tutorials/research-registry.md
     - Visual Guide: VISUAL-GUIDE.md
   - Architecture:
     - Overview: ARCHITECTURE.md
