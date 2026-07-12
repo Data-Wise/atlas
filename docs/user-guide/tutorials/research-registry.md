@@ -31,7 +31,7 @@ atlas sync --research        # shorthand; = --from-status --paths ~/projects/res
 ```
 
 > `--from-status` / `--research` is the **authority** for research metadata. A plain `atlas sync` preserves it
-> but does not re-parse it, and warns you to re-run this — see the [Cookbook](../COOKBOOK.md) (Recipe 7) and ADR-002.
+> but does not re-parse it, and warns you to re-run this — see the [Cookbook](../../COOKBOOK.md) (Recipe 7) and ADR-002.
 
 ## 3. Query
 
@@ -67,5 +67,5 @@ obs research board --out ~/vault/00_meta/_RESEARCH-BOARD.md
 
 `.STATUS` → **atlas** (registry + `doctor`) → **`obs research board`** → vault dashboard.
 
-See also: [Research Registry](../RESEARCH-REGISTRY.md) · docs-standards `adr/ADR-001` ·
+See also: [Research Registry](../../RESEARCH-REGISTRY.md) · docs-standards `adr/ADR-001` ·
 atlas `docs/plans/PHASE-3-research-registry-plan.md`.
