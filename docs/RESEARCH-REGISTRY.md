@@ -129,6 +129,4 @@ $ atlas project list --kind program --format json
 - **Parser:** `StatusFileParser` reads the research keys and the `tasks:` block; `summarize()` groups
   projects `byKind`.
 
-See [`specs/SPEC-atlas-research-registry.md`](specs/SPEC-atlas-research-registry.md) for the design
-and [`specs/GAP-ANALYSIS-research-registry.md`](specs/GAP-ANALYSIS-research-registry.md) for coverage
-and the Phase-3 roadmap.
+Design and gap analysis specs are available in the repository's `docs/specs/` directory.

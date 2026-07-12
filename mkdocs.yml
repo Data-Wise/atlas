@@ -38,6 +38,17 @@ theme:
 plugins:
   - search
 
+exclude_docs: |
+  internal/
+  specs/
+  planning/
+  plans/
+  reviews/
+  prompts/
+  superpowers/
+  SPEC-*.md
+  grill-*.md
+
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true

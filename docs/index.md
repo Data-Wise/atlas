@@ -167,7 +167,7 @@ atlas dash
     - **E2E tests** — 6 new tests covering inbox flags, YAML round-trip, and help output
 
 !!! info "Previous Releases"
-    See the [full changelog](../CHANGELOG.md) for details on all releases.
+    See the [full changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md) for details on all releases.
 
 ## :heart: ADHD-Friendly Design
 

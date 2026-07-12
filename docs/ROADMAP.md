@@ -18,7 +18,7 @@ Task CLI & Schedule Push/Agenda — native task CRUD, merged agenda view, analyt
 - [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
 - [ ] Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
 
-See [`docs/specs/SPEC-atlas-task-agenda-2026-07-02.md`](specs/SPEC-atlas-task-agenda-2026-07-02.md).
+See `docs/specs/SPEC-atlas-task-agenda-2026-07-02.md` in the repository for the full spec.
 
 ---
 
