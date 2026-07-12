@@ -55,11 +55,22 @@
     rgba(156, 39, 176, 0.08) 0%,
     transparent 100%
   );
+  cursor: pointer;
 }
 
-/* Hide the default chevron on section headers */
+/* Foldable arrow — rotate when expanded */
 .md-nav__item--nested > .md-nav__link::before {
-  display: none;
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-size: 0.7em;
+  transition: transform 0.2s ease;
+  color: var(--atlas-active);
+}
+
+/* Rotate arrow when section is open */
+.md-nav__item--nested > input.md-toggle:checked ~ .md-nav__link::before {
+  transform: rotate(90deg);
 }
 
 /* All nav items — breathing room */
