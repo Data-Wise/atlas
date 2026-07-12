@@ -10,11 +10,20 @@
   --atlas-build: #e65100;
   --atlas-code: #1565c0;
 
-  /* Functional */
+  /* Functional — purple kept as a single, sparing brand accent */
   --atlas-active: #9c27b0;
   --atlas-focus-ring: rgba(156, 39, 176, 0.3);
-  --atlas-breathing: 1.25rem;
   --atlas-sidebar-width: 18rem;
+
+  /* One spacing scale (8px base) */
+  --atlas-space-05: 0.25rem;
+  --atlas-space-1: 0.5rem;
+  --atlas-space-2: 1rem;
+  --atlas-space-3: 1.5rem;
+  --atlas-space-4: 2rem;
+
+  /* One consistent radius */
+  --atlas-radius: 0.5rem;
 }
 
 [data-md-color-scheme="slate"] {
@@ -39,22 +48,17 @@
  *       page items look like LINKS.
  */
 
-/* Section headers — label treatment */
+/* Section headers — quiet label treatment (purple reserved for active state) */
 .md-nav__item--nested > .md-nav__link {
   font-weight: 700;
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--atlas-active);
-  padding: 0.55rem 0.65rem;
+  color: var(--md-default-fg-color--light);
+  padding: var(--atlas-space-1) var(--atlas-space-2);
   margin-top: 0.75rem;
   margin-bottom: 0.15rem;
-  border-bottom: 2px solid var(--atlas-active);
-  background: linear-gradient(
-    to right,
-    rgba(156, 39, 176, 0.08) 0%,
-    transparent 100%
-  );
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
   cursor: pointer;
 }
 
@@ -65,7 +69,7 @@
   margin-right: 0.35rem;
   font-size: 0.7em;
   transition: transform 0.2s ease;
-  color: var(--atlas-active);
+  color: var(--md-default-fg-color--light);
 }
 
 /* Rotate arrow when section is open */
@@ -82,8 +86,8 @@
 .md-nav__link {
   font-size: 0.88rem;
   font-weight: 400;
-  padding: 0.4rem 0.6rem 0.4rem 1rem;
-  border-radius: 0.3rem;
+  padding: var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-2);
+  border-radius: var(--atlas-radius);
   transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease;
   border-left: 3px solid transparent;
   color: var(--md-default-fg-color);
@@ -133,6 +137,7 @@
 
 /* ── Search Bar — Prominent ────────────────────────────────── */
 .md-search__form {
+  /* Pill is the one intentional exception to --atlas-radius (standard search affordance) */
   border-radius: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1.5px solid var(--md-default-fg-color--lightest);
@@ -217,12 +222,12 @@
 /* ── Code Blocks — Readability ─────────────────────────────── */
 .md-typeset code {
   font-size: 0.84em;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
   padding: 0.15em 0.35em;
 }
 
 .md-typeset pre > code {
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   padding: 1rem 1.25rem;
   line-height: 1.6;
 }
@@ -230,7 +235,7 @@
 /* ── Tables — Scannable ────────────────────────────────────── */
 .md-typeset table:not([class]) {
   font-size: 0.84em;
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   overflow: hidden;
 }
 
@@ -262,7 +267,7 @@
 .md-search__input:focus-visible {
   outline: 2px solid var(--atlas-active);
   outline-offset: 2px;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
 }
 
 /* ── Header — Clean ────────────────────────────────────────── */
@@ -304,32 +309,35 @@
 
 /* ── Hero Section (Home Page) ──────────────────────────────── */
 .md-typeset .hero {
-  text-align: center;
-  padding: 2rem 0;
+  text-align: left;
+  padding: var(--atlas-space-4) 0;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  margin-bottom: var(--atlas-space-3);
 }
 
 .md-typeset .hero h1 {
   font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--atlas-space-1);
 }
 
 .md-typeset .hero p {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   opacity: 0.8;
+  max-width: 42rem;
 }
 
 /* ── Feature Grid ──────────────────────────────────────────── */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
+  gap: var(--atlas-space-2);
+  margin: var(--atlas-space-3) 0;
 }
 
 .md-typeset .feature-card {
-  padding: 1.5rem;
+  padding: var(--atlas-space-3);
   border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -348,8 +356,8 @@
   padding: 0.25em 0.5em;
   font-size: 0.75em;
   font-weight: 600;
-  border-radius: 0.25rem;
-  margin-right: 0.25em;
+  border-radius: var(--atlas-radius);
+  margin-right: var(--atlas-space-05);
 }
 
 .md-typeset .badge-new {
