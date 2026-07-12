@@ -1,0 +1,122 @@
+.\" Man page for atlas status command
+.\" Updated: July 2026
+.TH STATUS 1 "July 2026" "atlas 0.13.0" "User Commands"
+.SH NAME
+atlas\-status \- project status management
+.SH SYNOPSIS
+.B atlas status
+[\fIproject\fR] [\fIoptions\fR]
+.SH DESCRIPTION
+.B atlas status
+views or updates the .STATUS file for a project. The .STATUS file is a
+YAML-format file tracking project state, progress, next actions, and
+milestones.
+.PP
+When called without arguments, shows the status of the current directory's
+project.
+.SH OPTIONS
+.TP
+\fB\-\-set\fR \fIstatus\fR
+Set project status: active, paused, blocked, archived, complete.
+.TP
+\fB\-\-progress\fR \fIpercent\fR
+Set progress percentage (0\-100).
+.TP
+\fB\-\-focus\fR \fItext\fR
+Set current focus area.
+.TP
+\fB\-\-next\fR \fIaction\fR
+Set next action.
+.TP
+\fB\-\-complete\fR
+Mark current next action as done.
+.TP
+\fB\-\-then\fR \fIaction\fR
+After completing, add this as next action.
+.TP
+\fB\-\-increment\fR \fIamount\fR
+Increment progress by amount.
+.TP
+\fB\-\-create\fR
+Create .STATUS file if missing.
+.TP
+\fB\-\-json\fR
+Output as JSON.
+.SH .STATUS FORMAT
+The .STATUS file uses YAML format with these fields:
+.PP
+.RS
+.nf
+---
+project: my-project
+version: 1.0.0
+status: active
+last_session: 2026-07-11
+branch: dev
+type: node-package
+priority: 1
+progress: 75
+next:
+  - "Implement feature X"
+  - "Write tests"
+milestones:
+  - "MVP released"
+---
+.fi
+.RE
+.SH EXAMPLES
+Show status of current project:
+.RS
+.nf
+atlas status
+.fi
+.RE
+.PP
+Show status of specific project:
+.RS
+.nf
+atlas status atlas
+.fi
+.RE
+.PP
+Set status to active:
+.RS
+.nf
+atlas status \-\-set active
+.fi
+.RE
+.PP
+Update progress:
+.RS
+.nf
+atlas status \-\-progress 80
+.fi
+.RE
+.PP
+Set next action:
+.RS
+.nf
+atlas status \-\-next "Release v0.14.0"
+.fi
+.RE
+.PP
+Create .STATUS if missing:
+.RS
+.nf
+atlas status \-\-create
+.fi
+.RE
+.SH FILES
+.TP
+.I .STATUS
+Per\-project status file (YAML format).
+.SH SEE ALSO
+.BR atlas (1),
+.BR session (1),
+.BR project (1)
+.SH BUGS
+Report bugs at: https://github.com/Data-Wise/atlas/issues
+.SH AUTHOR
+DT
+.SH COPYRIGHT
+MIT License

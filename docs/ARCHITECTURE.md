@@ -90,7 +90,8 @@ src/
 │   │   ├── Session.js          # Work session entity
 │   │   ├── Capture.js          # Quick capture entity
 │   │   ├── Breadcrumb.js       # Context marker entity
-│   │   └── Task.js             # Task entity
+│   │   ├── Task.js             # Task entity
+│   │   └── ScheduleRecord.js   # Scheduled record entity
 │   ├── value-objects/          # Immutable value types
 │   │   ├── ProjectType.js      # Project type classification
 │   │   ├── SessionState.js     # Session lifecycle states
@@ -99,7 +100,9 @@ src/
 │   │   ├── IProjectRepository.js
 │   │   ├── ISessionRepository.js
 │   │   ├── ICaptureRepository.js
-│   │   └── IBreadcrumbRepository.js
+│   │   ├── IBreadcrumbRepository.js
+│   │   ├── ITaskRepository.js
+│   │   └── IScheduleRecordRepository.js
 │   ├── constants/              # Centralized domain constants
 │   │   ├── BusinessRules.js   # Session thresholds, focus score weights/tiers, defaults
 │   │   └── index.js           # Re-exports
@@ -135,6 +138,13 @@ src/
 │   │   ├── SyncRegistryUseCase.js
 │   │   ├── SyncFromStatusUseCase.js  # v0.8.0: sync --from-status
 │   │   └── RegisterProjectUseCase.js
+│   ├── task/                   # Task management (v0.13.0)
+│   │   ├── AddTaskUseCase.js
+│   │   ├── ListTasksUseCase.js
+│   │   ├── CompleteTaskUseCase.js
+│   │   ├── RemoveTaskUseCase.js
+│   │   ├── AgendaUseCase.js
+│   │   └── ReceiveSchedulePushUseCase.js
 │   └── status/                 # Status updates
 │       ├── UpdateStatusUseCase.js
 │       └── UpdateStatusFileUseCase.js
@@ -145,10 +155,15 @@ src/
 │   │   ├── FileSystemSessionRepository.js
 │   │   ├── FileSystemCaptureRepository.js
 │   │   ├── FileSystemBreadcrumbRepository.js
+│   │   ├── FileSystemTaskRepository.js
+│   │   ├── FileSystemScheduleRecordRepository.js
 │   │   ├── SQLiteProjectRepository.js
 │   │   ├── SQLiteSessionRepository.js
 │   │   ├── SQLiteCaptureRepository.js
-│   │   └── SQLiteBreadcrumbRepository.js
+│   │   ├── SQLiteBreadcrumbRepository.js
+│   │   ├── SQLiteTaskRepository.js
+│   │   ├── SQLiteScheduleRecordRepository.js
+│   │   └── SQLiteDatabase.js
 │   ├── gateways/               # External system interfaces
 │   │   ├── StatusFileGateway.js
 │   │   └── StatusFileParser.js # .STATUS file YAML parser (v0.8.0)
@@ -157,6 +172,7 @@ src/
 │   │   ├── TuiPresenter.js     # blessed-specific formatters
 │   │   ├── StatsPresenter.js   # Analytics, sparklines, heatmap grid
 │   │   ├── FocusScorePresenter.js  # Focus tier icons, labels, colors (v0.9.1)
+│   │   ├── PatternPresenter.js # Pattern/analytics formatting (v0.10.0)
 │   │   └── index.js            # Re-exports
 │   ├── controllers/            # Presentation controllers
 │   │   └── StatusController.js
@@ -217,6 +233,9 @@ src/
 │   ├── MRUTracker.js           # Most recently used
 │   ├── ProjectFilters.js       # Filtering
 │   ├── ascii-charts.js         # ASCII visualizations
+│   ├── VelocityCalculator.js   # 4-week rolling velocity (v0.10.0)
+│   ├── PatternAnalyzer.js      # 90-day productivity patterns (v0.10.0)
+│   ├── PredictionEngine.js     # Bayesian time calibration (v0.10.0)
 │   └── migrate.js              # Storage migration
 │
 ├── templates/                   # Project templates
@@ -429,6 +448,7 @@ classDiagram
         note
         question
         parked
+        win
     }
 
     class CaptureStatus {
@@ -438,6 +458,38 @@ classDiagram
         archived
         parked
     }
+```
+
+### Task Entity
+
+```mermaid
+classDiagram
+    class Task {
+        +String id
+        +String project
+        +String description
+        +String status
+        +TaskPriority priority
+        +Date dueDate
+        +String assignee
+        +Date createdAt
+        +Date completedAt
+
+        +complete() void
+        +isOverdue() Boolean
+        +isDueSoon(days) Boolean
+        +toJSON() Object
+        +fromJSON(data) Task
+    }
+
+    class TaskPriority {
+        <<enumeration>>
+        low
+        medium
+        high
+    }
+
+    Task --> TaskPriority
 ```
 
 ## Domain Constants (v0.8.0)
@@ -492,6 +544,21 @@ classDiagram
         +delete(id) void
     }
 
+    class ITaskRepository {
+        <<interface>>
+        +findAll(options) Task[]
+        +findById(id) Task
+        +save(task) void
+        +delete(id) void
+    }
+
+    class IScheduleRecordRepository {
+        <<interface>>
+        +findAll(options) ScheduleRecord[]
+        +save(record) void
+        +delete(id) void
+    }
+
     class FileSystemProjectRepository {
         -String filePath
         -Object _projectCache
@@ -504,6 +571,14 @@ classDiagram
         +save(project) void
     }
 
+    class FileSystemTaskRepository {
+        -String filePath
+        +findAll(options) Task[]
+        +findById(id) Task
+        +save(task) void
+        +delete(id) void
+    }
+
     class SQLiteProjectRepository {
         -Database db
         +findById(id) Project
@@ -514,8 +589,18 @@ classDiagram
         +getStats() Object
     }
 
+    class SQLiteTaskRepository {
+        -Database db
+        +findAll(options) Task[]
+        +findById(id) Task
+        +save(task) void
+        +delete(id) void
+    }
+
     IProjectRepository <|.. FileSystemProjectRepository
     IProjectRepository <|.. SQLiteProjectRepository
+    ITaskRepository <|.. FileSystemTaskRepository
+    ITaskRepository <|.. SQLiteTaskRepository
 ```
 
 ## Presenter Pattern
@@ -561,6 +646,8 @@ classDiagram
 ├── sessions.json        # Session history
 ├── captures.json        # Captured items
 ├── breadcrumbs.json     # Breadcrumb trail
+├── tasks.json           # Task records
+├── schedule-records.json # Schedule records
 ├── config.json          # Configuration
 └── templates/           # Custom templates
     └── *.md             # Template files
@@ -574,7 +661,9 @@ classDiagram
     ├── projects         # Projects table
     ├── sessions         # Sessions table
     ├── captures         # Captures table
-    └── breadcrumbs      # Breadcrumbs table
+    ├── breadcrumbs      # Breadcrumbs table
+    ├── tasks            # Tasks table
+    └── schedule_records # Schedule records table
 ```
 
 ## Dependency Injection
@@ -896,7 +985,7 @@ test/
 
 **Test Commands:**
 ```bash
-npm test                  # All 1,978 tests
+npm test                  # All tests
 npm run test:debug        # With --detectOpenHandles
 npm run test:unit         # Unit tests only
 npm run test:coverage     # With coverage report
@@ -916,7 +1005,8 @@ test/integration/dashboard-ink/
 ```
 test/dogfood/dashboard-ink/
 ├── basic-functionality.sh     # 10 tests — file structure, deps, no mock data
-├── real-data-pipeline.sh      # 15 tests — dual-path cross-validated pipeline
+├── real-data-pipeline.sh      # 16 tests — dual-path cross-validated pipeline
+├── yaml-passthrough.sh        # 5 tests — YAML round-trip verification
 └── interactive.sh             # 7-section guided manual walkthrough
 ```
 

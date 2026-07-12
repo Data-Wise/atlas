@@ -1,0 +1,99 @@
+.\" Man page for atlas session command
+.\" Updated: July 2026
+.TH SESSION 1 "July 2026" "atlas 0.13.0" "User Commands"
+.SH NAME
+atlas\-session \- session management for atlas
+.SH SYNOPSIS
+.B atlas session
+\fIcommand\fR [\fIarguments\fR]
+.SH DESCRIPTION
+.B atlas session
+manages work sessions with automatic time tracking, context capture, and
+ADHD-friendly features like celebration helpers and streak tracking.
+.PP
+Sessions are stored in \fI~/.atlas/sessions.json\fR (filesystem) or
+\fI~/.atlas/atlas.db\fR (SQLite).
+.SH COMMANDS
+.TP
+\fBstart\fR [\fIproject\fR] [\fInote\fR]
+Start a work session on the specified project. If no project is given,
+uses the current directory. Optionally records an initial note.
+.TP
+\fBend\fR [\fInote\fR]
+End the current active session. Records the end time and calculates
+duration. Optionally records a completion note.
+.TP
+\fBstatus\fR
+Show the current active session (or "No active session").
+.RS
+Options:
+.TP
+\fB\-\-format\fR \fIformat\fR
+Output format: table, json, text (default: table).
+.TP
+\fB\-\-json\fR
+Output as JSON (alias for \-\-format json).
+.RE
+.TP
+\fBexport\fR [\fIfile\fR]
+Export sessions to iCal/ICS format for calendar apps.
+.RS
+Options:
+.TP
+\fB\-f\fR, \fB\-\-file\fR \fIfile\fR
+Output file path. Auto\-names if not given.
+.TP
+\fB\-\-format\fR \fIformat\fR
+Export format: ical, ics, json (default: ical).
+.TP
+\fB\-\-days\fR \fIdays\fR
+Number of days to export (default: 30).
+.TP
+\fB\-\-project\fR \fIproject\fR
+Filter by project name.
+.RE
+.SH EXAMPLES
+Start a session on the atlas project:
+.RS
+.nf
+atlas session start atlas
+.fi
+.RE
+.PP
+End session with a note:
+.RS
+.nf
+atlas session end "Completed man page docs"
+.fi
+.RE
+.PP
+Show current session status:
+.RS
+.nf
+atlas session status
+.fi
+.RE
+.PP
+Export last 7 days to iCal:
+.RS
+.nf
+atlas session export \-\-days 7 sessions.ics
+.fi
+.RE
+.SH FILES
+.TP
+.I ~/.atlas/sessions.json
+Session history (filesystem backend).
+.TP
+.I ~/.atlas/atlas.db
+Session history (SQLite backend).
+.SH SEE ALSO
+.BR atlas (1),
+.BR project (1),
+.BR status (1)
+.SH BUGS
+Report bugs at: https://github.com/Data-Wise/atlas/issues
+.SH AUTHOR
+DT
+.SH COPYRIGHT
+MIT License

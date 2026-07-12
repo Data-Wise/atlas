@@ -1,0 +1,260 @@
+.\" Man page for atlas command
+.\" Updated: July 2026
+.TH ATLAS 1 "July 2026" "atlas 0.13.0" "User Commands"
+.SH NAME
+atlas \- project state engine for ADHD-friendly workflow management
+.SH SYNOPSIS
+.B atlas
+[\fIoptions\fR] [\fIcommand\fR] [\fIarguments\fR]
+.SH DESCRIPTION
+.B atlas
+is a standalone Node.js CLI providing Clean Architecture-based state management
+for developer workflows. It tracks projects, sessions, captures, and context
+with ADHD-friendly features like streak tracking, celebration helpers, and
+time blindness awareness.
+.PP
+Atlas stores data in \fI~/.atlas/\fR and supports both filesystem and SQLite
+backends. It integrates with .STATUS files for project state tracking.
+.SH OPTIONS
+.TP
+\fB\-\-storage\fR \fItype\fR
+Storage backend: filesystem or sqlite (default: filesystem).
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Show version number.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show help for command.
+.SH COMMANDS
+.SS Project Management
+.TP
+\fBproject add\fR [\fIpath\fR]
+Register a project. Options: \fB\-\-tags\fR, \fB\-\-status\fR.
+.TP
+\fBproject list\fR
+List all projects. Options: \fB\-\-status\fR, \fB\-\-tag\fR, \fB\-\-format\fR, \fB\-\-count\fR, \fB\-\-suggest\fR.
+.TP
+\fBproject show\fR \fIname\fR
+Show project details. Options: \fB\-\-json\fR.
+.TP
+\fBproject remove\fR \fIname\fR
+Unregister a project.
+.SS Session Management
+.TP
+\fBsession start\fR [\fIproject\fR]
+Start a work session on the specified project.
+.TP
+\fBsession end\fR [\fInote\fR]
+End current session with optional note.
+.TP
+\fBsession status\fR
+Show current session. Options: \fB\-\-format\fR, \fB\-\-json\fR.
+.TP
+\fBsession export\fR [\fIfile\fR]
+Export sessions to iCal/ICS format. Options: \fB\-\-format\fR, \fB\-\-days\fR, \fB\-\-project\fR.
+.SS Context & Focus
+.TP
+\fBfocus\fR \fIproject\fR [\fItext\fR]
+Get or set project focus.
+.TP
+\fBwhere\fR [\fIproject\fR]
+Show current context \(em "Where was I?"
+.TP
+\fBpark\fR [\fInote\fR]
+Park current context for later. Options: \fB\-\-force\fR, \fB\-\-keep\-session\fR.
+.TP
+\fBunpark\fR \fIid\fR
+Restore a parked context.
+.TP
+\fBparked\fR
+List parked contexts.
+.SS Capture & Track
+.TP
+\fBcatch\fR \fItext\fR
+Quick capture an idea or task. Options: \fB\-p\fR (project), \fB\-t\fR (type).
+.TP
+\fBinbox\fR
+Show captured items. Options: \fB\-p\fR, \fB\-\-type\fR, \fB\-\-limit\fR, \fB\-\-triage\fR, \fB\-\-stats\fR, \fB\-\-count\fR.
+.TP
+\fBcrumb\fR \fItext\fR
+Leave a breadcrumb trail marker. Options: \fB\-p\fR (project).
+.TP
+\fBtrail\fR [\fIproject\fR]
+Show breadcrumb trail. Options: \fB\-d\fR (days), \fB\-\-limit\fR.
+.SS Task Management
+.TP
+\fBtask add\fR \fIdescription\fR
+Add a new task. Options: \fB\-p\fR (project), \fB\-\-due\fR, \fB\-\-priority\fR.
+.TP
+\fBtask list\fR
+List tasks. Options: \fB\-\-completed\fR, \fB\-\-incomplete\fR, \fB\-\-overdue\fR, \fB\-\-due\-soon\fR, \fB\-\-project\fR, \fB\-\-format\fR.
+.TP
+\fBtask done\fR \fIid\fR
+Mark task as completed.
+.TP
+\fBtask rm\fR \fIid\fR
+Delete a task.
+.SS Status & Analytics
+.TP
+\fBstatus\fR [\fIproject\fR]
+Get or update project status. Options: \fB\-\-set\fR, \fB\-\-progress\fR, \fB\-\-focus\fR, \fB\-\-next\fR, \fB\-\-complete\fR, \fB\-\-then\fR, \fB\-\-increment\fR, \fB\-\-create\fR, \fB\-\-json\fR.
+.TP
+\fBstats\fR [\fIperiod\fR]
+Show session analytics. Options: \fB\-d\fR (days), \fB\-p\fR (project), \fB\-\-format\fR, \fB\-e\fR (export), \fB\-\-velocity\fR, \fB\-\-patterns\fR, \fB\-\-calibrate\fR.
+.TP
+\fBplan\fR
+Morning planning ritual. Options: \fB\-\-ecosystem\fR, \fB\-\-json\fR.
+.TP
+\fBagenda\fR [\fIwindow\-days\fR]
+Show tasks and schedule items. Options: \fB\-\-format\fR.
+.SS Setup & Diagnostics
+.TP
+\fBinit\fR
+Initialize atlas in current directory. Options: \fB\-g\fR (global), \fB\-t\fR (template), \fB\-n\fR (name), \fB\-\-list\-templates\fR.
+.TP
+\fBdoctor\fR
+Audit projects for settings contract. Options: \fB\-\-kind\fR, \fB\-\-all\fR, \fB\-\-fix\fR, \fB\-\-write\fR, \fB\-\-format\fR.
+.TP
+\fBsync\fR
+Sync registry from .STATUS files. Options: \fB\-d\fR (dry\-run), \fB\-w\fR (watch), \fB\-p\fR (paths), \fB\-\-remove\-orphans\fR, \fB\-\-from\-status\fR, \fB\-\-research\fR.
+.TP
+\fBmigrate\fR
+Migrate data between storage backends. Options: \fB\-f\fR (from), \fB\-t\fR (to), \fB\-\-dry\-run\fR.
+.SS Configuration
+.TP
+\fBconfig paths\fR
+Show configured scan paths.
+.TP
+\fBconfig add\-path\fR \fIpath\fR
+Add a scan path.
+.TP
+\fBconfig remove\-path\fR \fIpath\fR
+Remove a scan path.
+.TP
+\fBconfig show\fR
+Show all configuration.
+.TP
+\fBconfig setup\fR
+Interactive configuration wizard.
+.TP
+\fBconfig prefs\fR
+Manage preferences.
+.SS Templates
+.TP
+\fBtemplate list\fR
+List all available templates.
+.TP
+\fBtemplate show\fR \fIid\fR
+Show template content.
+.TP
+\fBtemplate create\fR \fIid\fR
+Create a new custom template. Options: \fB\-t\fR (type).
+.TP
+\fBtemplate export\fR \fIid\fR
+Export a built\-in template for customization.
+.TP
+\fBtemplate delete\fR \fIid\fR
+Delete a custom template.
+.TP
+\fBtemplate dir\fR
+Show custom templates directory.
+.SS Dashboard
+.TP
+\fBdashboard\fR, \fBdash\fR
+Launch interactive dashboard TUI (Ink\-powered).
+.SS Completions
+.TP
+\fBcompletions\fR [\fIshell\fR]
+Generate shell completions (zsh|bash|fish).
+.SH ENVIRONMENT
+.TP
+\fBATLAS_DATA_DIR\fR
+Override default data directory (~/.atlas/).
+.TP
+\fBATLAS_STORAGE\fR
+Override storage backend (filesystem|sqlite).
+.SH FILES
+.TP
+.I ~/.atlas/
+Default data directory.
+.TP
+.I ~/.atlas/config.json
+User preferences and scan paths.
+.TP
+.I ~/.atlas/projects.json
+Project registry (filesystem backend).
+.TP
+.I ~/.atlas/sessions.json
+Session history.
+.TP
+.I ~/.atlas/captures.json
+Quick captures (inbox).
+.TP
+.I ~/.atlas/breadcrumbs.json
+Context trail markers.
+.TP
+.I ~/.atlas/tasks.json
+Task records.
+.TP
+.I .STATUS
+Per\-project status file (YAML format).
+.SH EXAMPLES
+Start working on a project:
+.RS
+.nf
+atlas session start atlas
+.fi
+.RE
+.PP
+Quick capture an idea:
+.RS
+.nf
+atlas catch "Add dark mode toggle" \-p atlas \-t idea
+.fi
+.RE
+.PP
+Show project status:
+.RS
+.nf
+atlas status atlas
+.fi
+.RE
+.PP
+Check session analytics:
+.RS
+.nf
+atlas stats week
+.fi
+.RE
+.PP
+Run morning planning:
+.RS
+.nf
+atlas plan
+.fi
+.RE
+.PP
+Audit all projects:
+.RS
+.nf
+atlas doctor \-\-all
+.fi
+.RE
+.SH SEE ALSO
+.BR session (1),
+.BR project (1),
+.BR status (1)
+.PP
+Documentation:
+.RS
+.nf
+https://data-wise.github.io/atlas/
+https://github.com/Data-Wise/atlas
+.fi
+.RE
+.SH BUGS
+Report bugs at: https://github.com/Data-Wise/atlas/issues
+.SH AUTHOR
+DT
+.SH COPYRIGHT
+MIT License

@@ -40,7 +40,17 @@ Leave context markers for "where was I?" moments. Never lose your place again.
 
 <div class="feature-card" markdown>
 ### :chart_with_upwards_trend: Session Analytics
-Track productivity with `atlas stats`. Weekly/monthly summaries, streaks, and flow metrics.
+Track productivity with `atlas stats`. Weekly/monthly summaries, streaks, velocity, and flow patterns.
+</div>
+
+<div class="feature-card" markdown>
+### :heavy_check_mark: Task Management
+CRUD tasks with `atlas task add/list/done/rm`. Filter by priority, due date, and project.
+</div>
+
+<div class="feature-card" markdown>
+### :calendar: Agenda & Schedule
+Merged chronological view of tasks and schedule records with `atlas agenda`.
 </div>
 
 <div class="feature-card" markdown>
@@ -60,7 +70,7 @@ Streak tracking, time blindness helpers, celebrations, and anti-perfectionism fe
 
 <div class="feature-card" markdown>
 ### :desktop_computer: Multi-Panel Dashboard
-Ink-powered TUI with SINGLE/SPLIT/TRIPLE layouts. Sidebar, inspector, and Pomodoro timer.
+Ink-powered TUI with SINGLE/SPLIT/TRIPLE layouts. Sidebar, inspector, Pomodoro timer, and analytics view.
 </div>
 
 <div class="feature-card" markdown>
@@ -134,6 +144,7 @@ atlas dash
 | Guide | Description |
 |-------|-------------|
 | [What's New](WHAT-S-NEW.md) | Release highlights |
+| [Changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md) | Full version history (Keep a Changelog) |
 | [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
 | [Quick Reference](REFCARD.md) | Printable command cheat sheet |
 | [Cheatsheet](CHEATSHEET.md) | Compact command reference |
@@ -146,99 +157,17 @@ atlas dash
 | [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
 | [Integrations](INTEGRATIONS.md) | Dev-tools ecosystem map |
 
-## :sparkles: What's New
+## :sparkles: What's New (v0.13.1)
 
-!!! success "Task CLI, Schedule Push & Agenda"
-    Two major additions: a native task CLI for CRUD operations, and a full-screen analytics view in the dashboard.
+!!! success "YAML Passthrough + Inbox Flags"
+    - **YAML passthrough (#65)** — `StatusFileGateway` uses `yaml.stringify()`/`yaml.parse()` instead of hand-rolled template; unknown fields (research metadata, custom fields like `venue`, `tasks`) survive read-write round-trip
+    - **`atlas inbox --type`** — filter captures by type (`idea`, `task`, `bug`, `note`, `question`, `parked`, `win`)
+    - **`atlas inbox --limit`** — cap the number of items returned
+    - **Win capture type** — `'win'` added to `Capture.TYPES` for quick-win tracking
+    - **E2E tests** — 6 new tests covering inbox flags, YAML round-trip, and help output
 
-    - **Task CLI** — `atlas task add/list/done/rm` with `--due`/`--priority`/`--project` filters
-    - **`atlas agenda`** — merged chronological view of tasks + pushed schedule records
-    - **`atlas schedule push`** — receive pre-normalized dated records from external tools
-    - **AnalyticsView** (`a` key) — full-screen velocity sparkline + flow-pattern heatmap
-    - **StatusBar** — unified 3-zone status bar (session, key hints, layout)
-    - **CLI project remove fix** — case-insensitive name resolution with duplicate collision handling
-    - **Testing infrastructure** — Vitest + ink-testing-library + Playwright E2E
-
-!!! success "Patch: Node 26 + Stability"
-    - **Node 26 support** — `better-sqlite3` bumped to `^12.11.1`; SQLite suite green on Node 18/20/22/26
-    - **FW-30 id convergence** — plain `atlas sync` resolves by path, so it updates the `sync --from-status` entry instead of duplicating
-    - **PatternAnalyzer crash fix** — unparseable `startTime` strings skipped instead of crashing `analyze()`
-    - **+42 edge tests** across research-sync and temporal-intelligence modules (1947 passing, 89 suites)
-    - **Research-ops Cookbook** — 10 recipes in `docs/COOKBOOK.md`
-
-!!! success "Research-Safe Sync"
-    - **`atlas sync --research`** — research-aware alias (defaults to `~/projects/research`)
-    - **Plain-sync warning** — names research projects it preserved-but-skipped, with the remedy
-    - **`.atlas-scan-children` marker** — opt-in umbrella scanning for monorepo layouts
-    - **Venue comment strip** — `CSDA # was JASA` → `CSDA` (inline comments stripped from target/venue fields)
-
-!!! success "Research Registry + Doctor"
-    - **Research registry** — `sync --from-status` parses `kind:`, `target:`/`venue:`, `tasks:` from research `.STATUS` files; manuscripts and programs appear in the project registry
-    - **`atlas project list --kind manuscript|program|package`** — filter by project type
-    - **`atlas doctor`** — read-only audit of the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`) with `--fix`
-    - **`project list --json`** — now also returns `progress`, `next`, `priority`
-
-!!! success "Temporal Intelligence"
-    Three new read-only analytics utilities mine your existing session history — no new data collection:
-
-    - **`atlas stats --velocity`** — 4-week rolling velocity: sessions/week, focus hours, consistency bar, trend arrow (↑/↓/→)
-    - **`atlas stats --patterns`** — Productivity patterns from 90 days: best day, best hour, dead zones (slots with 0 flow)
-    - **`atlas stats --calibrate <project> --minutes <n>`** — Bayesian time calibration: how much you historically over/under-run a project, with confidence level
-    - **3 pure utility classes** in `src/utils/`: `VelocityCalculator`, `PatternAnalyzer`, `PredictionEngine` (31 unit tests)
-
-!!! success "flow-cli Integration"
-    atlas now honors the CLI flags flow-cli already calls — closing contract drift between the two tools:
-
-    - **`session status --format json`** — structured output (`{project, durationMinutes, state, task, startedAt}`) for shell conflict-detection
-    - **`project list --count` / `--suggest`** — bare count, and the most-recently-touched active project
-    - **`inbox --count`** — pending inbox count for shell badges
-    - **`trail --limit <n>`** — cap breadcrumbs to the N most recent
-    - **Fix:** `project list --status` now resolves status from project metadata (previously matched nothing)
-
-    See [Integrations](INTEGRATIONS.md) for the full flow-cli ↔ atlas contract.
-
-!!! success "Real Data Pipeline"
-    The dashboard now displays **live data** from `~/.atlas` — all mock data removed:
-
-    - **4 React Hooks**: `useProjects`, `useActiveSession`, `useProjectStats`, `usePendingCaptures`
-    - **AtlasContext**: DI Container injected via React Context for clean data access
-    - **Smart Filtering**: Removes tmp.* junk, archived projects, and duplicates (196 raw → ~59 displayed)
-    - **Polling**: Projects 5s, Session 5s + 1s tick, Stats/Captures 10s
-
-!!! tip "Focus Score & Tiers"
-    Understand your work quality at a glance:
-
-    - **● Deep** (80-100): Sustained, flow-rich sessions
-    - **◕ Strong** (60-79): Good balance of duration and flow
-    - **◑ Steady** (40-59): Regular engagement
-    - **◔ Warming** (20-39): Building momentum
-    - **○ Drift** (0-19): Getting started
-
-    See [Visual Guide](VISUAL-GUIDE.md) for the full calculation formula.
-
-!!! info "Activity Heatmap"
-    13-week activity overview with two display modes:
-
-    - **Full mode** (InspectorPanel): 7 rows — all days of the week
-    - **Compact mode** (EcosystemView): 4 rows — Mon/Wed/Fri/Sat
-    - Shows streak, total sessions, and best day summary
-
-!!! note "Theme System (v0.9.1)"
-    Five color themes optimized for terminal readability:
-
-    - `default` — Purple accents, warm grays
-    - `nord` — Arctic blue palette
-    - `solarized` — Ethan Schoonover's classic
-    - `mono` — Pure grayscale
-    - `high-contrast` — Maximum readability
-
-!!! note "Previous Releases"
-    - **v0.8.0**: Ecosystem Hub, Morning Ritual, MCP Server, Time Estimation
-    - **v0.7.0**: Task-Based Focus, Calendar Export, Timeline View
-    - **v0.6.x**: Session analytics, stats export
-    - **v0.5.x**: Park/unpark, templates, configuration wizard
-    - **v0.4.x**: ADHD utilities, dashboard redesign
-    - **v0.3.x**: Dashboard themes, Pomodoro
+!!! info "Previous Releases"
+    See the [full changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md) for details on all releases.
 
 ## :heart: ADHD-Friendly Design
 

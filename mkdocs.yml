@@ -38,6 +38,17 @@ theme:
 plugins:
   - search
 
+exclude_docs: |
+  internal/
+  specs/
+  planning/
+  plans/
+  reviews/
+  prompts/
+  superpowers/
+  SPEC-*.md
+  grill-*.md
+
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -77,20 +88,23 @@ nav:
   - Home: index.md
   - What's New: WHAT-S-NEW.md
   - Getting Started:
-    - Tutorial: TUTORIAL.md
-    - Visual Features: tutorials/visual-features.md
-    - Demos: DEMOS.md
-    - Quick Reference: REFCARD.md
-    - Cheatsheet: CHEATSHEET.md
     - Installation: getting-started/installation.md
+    - Tutorial: TUTORIAL.md
+    - Demos: DEMOS.md
   - User Guide:
-    - Workflows: WORKFLOWS.md
+    - Quick Reference:
+      - Cheatsheet: CHEATSHEET.md
+      - Quick Reference Card: REFCARD.md
+    - Tutorials:
+      - Visual Features: tutorials/visual-features.md
+      - Research Registry: tutorials/research-registry.md
     - Cookbook: COOKBOOK.md
-    - Visual Guide: VISUAL-GUIDE.md
-    - CLI Reference: CLI-REFERENCE.md
+    - Workflows: WORKFLOWS.md
+    - CLI Reference:
+      - CLI Reference: CLI-REFERENCE.md
+      - Configuration: CONFIGURATION.md
     - Research Registry: RESEARCH-REGISTRY.md
-    - Research Registry Tutorial: tutorials/research-registry.md
-    - Configuration: CONFIGURATION.md
+    - Visual Guide: VISUAL-GUIDE.md
   - Architecture:
     - Overview: ARCHITECTURE.md
     - Diagrams: DIAGRAMS.md

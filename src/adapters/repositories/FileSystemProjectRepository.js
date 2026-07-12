@@ -163,6 +163,10 @@ export class FileSystemProjectRepository extends IProjectRepository {
    * @private
    */
   _deserializeProject(data) {
+    const metadata = { ...(data.metadata || {}) }
+    if (typeof metadata.progress === 'string') {
+      metadata.progress = parseInt(metadata.progress, 10) || 0
+    }
     return new Project(data.id, data.name, {
       type: data.type,
       path: data.path,
@@ -171,7 +175,7 @@ export class FileSystemProjectRepository extends IProjectRepository {
           ? data.description.substring(0, 500)
           : data.description,
       tags: data.tags,
-      metadata: data.metadata,
+      metadata,
       createdAt: new Date(data.createdAt),
       lastAccessedAt: new Date(data.lastAccessedAt),
       totalSessions: data.totalSessions,

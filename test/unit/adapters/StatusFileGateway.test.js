@@ -272,5 +272,67 @@ Progress: 50%
       expect(readBack.next[1].action).toBe('Second task')
       expect(readBack.next[2].action).toBe('Third task')
     })
+
+    test('YAML round-trip preserves unknown fields via yaml.stringify', async () => {
+      const yamlContent = `---
+status: active
+progress: 80
+type: research
+venue: "JASA"
+review_deadline: "2026-09-01"
+custom_list:
+  - one
+  - two
+nested:
+  deep: true
+  count: 42
+---
+
+# Research Notes
+`
+      await writeFile(join(testDir, '.STATUS'), yamlContent)
+
+      const status = await gateway.read(testDir)
+      expect(status.status).toBe('active')
+      expect(status.venue).toBe('JASA')
+      expect(status.review_deadline).toBe('2026-09-01')
+      expect(status.custom_list).toEqual(['one', 'two'])
+      expect(status.nested).toEqual({ deep: true, count: 42 })
+
+      // Write back with same data — unknown fields must survive
+      await gateway.write(testDir, status)
+
+      const roundTripped = await gateway.read(testDir)
+      expect(roundTripped.status).toBe('active')
+      expect(roundTripped.venue).toBe('JASA')
+      expect(roundTripped.review_deadline).toBe('2026-09-01')
+      expect(roundTripped.custom_list).toEqual(['one', 'two'])
+      expect(roundTripped.nested).toEqual({ deep: true, count: 42 })
+      expect(roundTripped.body).toContain('# Research Notes')
+    })
+
+    test('YAML round-trip preserves fields added by sync --from-status', async () => {
+      const yamlContent = `---
+status: active
+progress: 60
+type: r-package
+research_venue: "Biometrika"
+research_stage: "revision"
+research_authors:
+  - name: "Smith"
+    role: "lead"
+---
+`
+      await writeFile(join(testDir, '.STATUS'), yamlContent)
+
+      const status = await gateway.read(testDir)
+      await gateway.write(testDir, status)
+
+      const roundTripped = await gateway.read(testDir)
+      expect(roundTripped.research_venue).toBe('Biometrika')
+      expect(roundTripped.research_stage).toBe('revision')
+      expect(roundTripped.research_authors).toHaveLength(1)
+      expect(roundTripped.research_authors[0].name).toBe('Smith')
+    })
   })
 })

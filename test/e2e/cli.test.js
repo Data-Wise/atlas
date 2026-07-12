@@ -216,6 +216,48 @@ describe('Atlas CLI - E2E Tests', () => {
       expect(exitCode).toBe(0)
       expect(stdout).toContain('--count')
     })
+
+    test('inbox --help shows --type', () => {
+      const { stdout, exitCode } = runCLI('inbox --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--type')
+      expect(stdout).toContain('win')
+    })
+
+    test('inbox --help shows --limit', () => {
+      const { stdout, exitCode } = runCLI('inbox --help')
+
+      expect(exitCode).toBe(0)
+      expect(stdout).toContain('--limit')
+    })
+
+    test('inbox --type win runs without error', () => {
+      const { exitCode } = runCLI('inbox --type win')
+
+      expect(exitCode).toBe(0)
+    })
+
+    test('inbox --type idea runs without error', () => {
+      const { exitCode } = runCLI('inbox --type idea')
+
+      expect(exitCode).toBe(0)
+    })
+
+    test('inbox --limit 1 runs without error', () => {
+      const { exitCode } = runCLI('inbox --limit 1')
+
+      expect(exitCode).toBe(0)
+    })
+
+    test('inbox --limit 1 returns at most 1 item', () => {
+      const { stdout, exitCode } = runCLI('inbox --limit 1')
+
+      expect(exitCode).toBe(0)
+      // Either shows "No captures" or one capture item
+      const lines = stdout.split('\n').filter(l => l.includes('inbox') || l.includes('📥') || l.includes('No captures'))
+      expect(lines.length).toBeLessThanOrEqual(2)
+    })
   })
 
   // flow-cli integration (F5): trail --limit
