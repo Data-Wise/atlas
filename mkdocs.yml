@@ -96,7 +96,11 @@ nav:
     - Quick Reference Card: REFCARD.md
     - Visual Features: user-guide/tutorials/visual-features.md
     - Cookbook: user-guide/cookbook/COOKBOOK.md
-    - Workflows: user-guide/workflows/WORKFLOWS.md
+    - Workflows:
+      - Core Workflows: user-guide/workflows/WORKFLOWS.md
+      - Weekly Review: user-guide/workflows/WEEKLY-REVIEW.md
+      - Multi-Project: user-guide/workflows/MULTI-PROJECT.md
+      - Automation: user-guide/workflows/AUTOMATION.md
     - CLI Reference: CLI-REFERENCE.md
     - Configuration: CONFIGURATION.md
     - Research Registry: user-guide/tutorials/research-registry.md

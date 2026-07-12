@@ -34,6 +34,7 @@ atlas session end       # Done for now
 |---------|-------------|---------|
 | `catch` | Capture idea | `atlas catch "try redis cache"` |
 | `inbox` | View items | `atlas inbox` |
+| `inbox --stats` | Count pending | `atlas inbox --stats` |
 | `inbox --triage` | Process inbox | `atlas inbox --triage` |
 
 ### Context
@@ -52,27 +53,16 @@ atlas session end       # Done for now
 | `parked` | List saved | `atlas parked` |
 | `unpark` | Restore | `atlas unpark` |
 
-### Tasks (v0.13.0)
+### Tasks
 
 | Command | What it does | Example |
 |---------|-------------|---------|
-| `task add` | Add task | `atlas task add "Write docs" --priority high` |
-| `task list` | List tasks | `atlas task list --incomplete --project myapp` |
+| `task add` | Add task | `atlas task add "Write docs" --priority=P1 --due=friday` |
+| `task list` | List tasks | `atlas task list --overdue` |
 | `task done` | Complete task | `atlas task done <id>` |
 | `task rm` | Delete task | `atlas task rm <id>` |
 | `agenda` | Merged view | `atlas agenda 14 --format json` |
 | `schedule push` | Push records | `atlas schedule push --data '<json>'` |
-
-### Analytics
-
-| Command | What it does | Example |
-|---------|-------------|---------|
-| `stats` | Weekly summary | `atlas stats` |
-| `stats month` | Monthly summary | `atlas stats month` |
-| `stats --project` | Project-specific | `atlas stats --project atlas` |
-| `stats --velocity` | 4-week velocity | `atlas stats --velocity` |
-| `stats --patterns` | Best day/hour | `atlas stats --patterns` |
-| `stats --calibrate` | Time calibration | `atlas stats --calibrate myapp --minutes 30` |
 
 ### Projects
 
@@ -81,8 +71,33 @@ atlas session end       # Done for now
 | `project add` | Register | `atlas project add ~/myapp` |
 | `project list` | List all | `atlas project list` |
 | `project list --kind` | By type | `atlas project list --kind program` |
-| `sync` | Sync from .STATUS | `atlas sync` |
+| `focus` | Set focus | `atlas focus myproject "implement auth"` |
+| `sync` | Sync registry | `atlas sync` |
+| `sync --research` | Sync research | `atlas sync --research` |
 | `doctor` | Audit contract | `atlas doctor` |
+
+### Analytics
+
+| Command | What it does | Example |
+|---------|-------------|---------|
+| `stats` | Quick overview | `atlas stats` |
+| `stats week` | This week | `atlas stats week` |
+| `stats month` | This month | `atlas stats month` |
+| `stats --velocity` | 4-week velocity | `atlas stats --velocity` |
+| `stats --patterns` | Best day/hour | `atlas stats --patterns` |
+| `stats --calibrate` | Time calibration | `atlas stats --calibrate myapp --minutes 30` |
+
+### Setup & Config
+
+| Command | What it does | Example |
+|---------|-------------|---------|
+| `init` | Initialize project | `atlas init --template node --name myapp` |
+| `config show` | Show settings | `atlas config show` |
+| `config setup` | Interactive wizard | `atlas config setup` |
+| `config add-path` | Add scan path | `atlas config add-path ~/projects` |
+| `template list` | List templates | `atlas template list` |
+| `completions` | Shell completions | `atlas completions zsh > ~/.config/zsh/completions/_atlas` |
+| `migrate` | Switch storage | `atlas migrate --from filesystem --to sqlite` |
 
 ---
 
@@ -152,10 +167,12 @@ Start: `atlas dash`
 | Projects | `~/.atlas/projects/` |
 | Sessions | `~/.atlas/sessions/` |
 | Captures | `~/.atlas/captures/` |
+| Breadcrumbs | `~/.atlas/breadcrumbs/` |
+| Tasks | `~/.atlas/tasks.json` (filesystem) or `atlas.db` (SQLite) |
 | Templates | `~/.atlas/templates/` |
 
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.13.0 | Made for ADHD brains</em>
+<em>Atlas v0.13.1 | Made for ADHD brains</em>
 </div>
