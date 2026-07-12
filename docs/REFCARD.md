@@ -88,7 +88,7 @@ flowchart LR
 | `stats --velocity` | 4-week velocity | `atlas stats --velocity`         |
 | `stats --patterns` | Best day/hour   | `atlas stats --patterns`         |
 
-### Tasks (v0.13.0)
+### Tasks (v0.13.1)
 
 | Command      | What it does        | Example                                 |
 | ------------ | ------------------- | --------------------------------------- |
@@ -133,7 +133,7 @@ Start dashboard: `atlas dash`
 | ----------- | ------------------------------------------------ |
 | `j` / `k`   | Navigate up/down                                 |
 | `Enter`     | Select project                                   |
-| `a`         | Analytics view (v0.13.0)                         |
+| `a`         | Analytics view (v0.13.1)                         |
 | `f`         | Focus mode (Pomodoro)                            |
 | `z`         | Zen mode                                         |
 | `T`         | Timeline view                                    |
@@ -148,7 +148,7 @@ Start dashboard: `atlas dash`
 | `?`         | Show help                                        |
 | `q`         | Quit                                             |
 
-**v0.13.0 — Task CLI (`atlas task add/list/done/rm`) · `atlas schedule push` · `atlas agenda` · AnalyticsView (`a` key) · StatusBar · CLI project remove fix · Vitest + Playwright E2E**
+**v0.13.1 — Task CLI (`atlas task add/list/done/rm`) · `atlas schedule push` · `atlas agenda` · AnalyticsView (`a` key) · StatusBar · CLI project remove fix · Vitest + Playwright E2E · Man pages · Zsh completions · ADHD nav design**
 
 **v0.12.2 — ESLint adoption: flat config, CI lint gate, 0 warnings across all sources**
 
