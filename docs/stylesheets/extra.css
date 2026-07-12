@@ -320,13 +320,14 @@
   background-color: var(--md-default-fg-color--lightest);
 }
 
-/* Current section in view (Material toggles --active on scroll) */
+/* Current section in view (Material toggles --active on scroll) —
+   amber marks "you are here", echoing the active-tab underline. */
 .md-nav--secondary .md-nav__link--active,
 .md-nav--secondary .md-nav__item--active > .md-nav__link {
-  color: var(--atlas-active);
+  color: var(--atlas-accent);
   font-weight: 600;
-  border-left-color: var(--atlas-active);
-  background-color: rgba(156, 39, 176, 0.06);
+  border-left-color: var(--atlas-accent);
+  background-color: rgba(255, 152, 0, 0.08);
 }
 
 /* Nested (sub-heading) entries — gentle indent */
@@ -337,7 +338,7 @@
 
 [data-md-color-scheme="slate"] .md-nav--secondary .md-nav__link--active,
 [data-md-color-scheme="slate"] .md-nav--secondary .md-nav__item--active > .md-nav__link {
-  background-color: rgba(206, 147, 216, 0.1);
+  background-color: rgba(255, 179, 71, 0.12);
 }
 
 /* ── Header & Tabs — ADHD-Friendly, Readable ─────────────────── */
@@ -477,6 +478,30 @@
 
 .md-typeset .feature-card h3 {
   margin-top: 0;
+}
+
+/* ── Intro Callout (guide leads) ───────────────────────────── */
+/* Signature purple box for guide opening lines — matches the
+   ADHD-tip admonition accent. */
+.md-typeset .atlas-intro {
+  border: 1px solid var(--atlas-active);
+  border-left-width: 4px;
+  border-radius: var(--atlas-radius);
+  background-color: rgba(156, 39, 176, 0.06);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--md-default-fg-color);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.md-typeset .atlas-intro strong {
+  color: var(--atlas-active);
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .atlas-intro {
+  background-color: rgba(206, 147, 216, 0.1);
 }
 
 /* ── Badge Styling ─────────────────────────────────────────── */

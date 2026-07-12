@@ -1,6 +1,8 @@
 # ADHD Guide
 
-> **Atlas is built for ADHD brains.** This guide explains the principles, patterns, and practical workflows that make Atlas work *with* your brain instead of against it.
+<div class="atlas-intro">
+<strong>Atlas is built for ADHD brains.</strong> This guide explains the principles, patterns, and practical workflows that make Atlas work <em>with</em> your brain instead of against it.
+</div>
 
 ---
 
