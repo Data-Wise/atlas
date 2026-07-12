@@ -6,11 +6,11 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 
 function atlas(args: string): string {
   try {
-    return execSync(`node bin/atlas.js ${args}`, {
+    return execFileSync('node', ['bin/atlas.js', ...args.split(' ').filter(Boolean)], {
       encoding: 'utf8',
       timeout: 10000,
     }).trim()

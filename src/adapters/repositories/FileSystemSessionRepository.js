@@ -19,28 +19,74 @@ import { Session } from '../../domain/entities/Session.js'
 import { SessionState } from '../../domain/value-objects/SessionState.js'
 import { ISessionRepository } from '../../domain/repositories/ISessionRepository.js'
 
+/**
+ * Simple in-memory cache with TTL
+ * @private
+ */
+class SessionCache {
+  constructor(ttl = 30000) { // 30 seconds default TTL
+    this._cache = null
+    this._cacheTime = 0
+    this._ttl = ttl
+  }
+
+  get() {
+    if (this._cache !== null && (Date.now() - this._cacheTime) < this._ttl) {
+      return this._cache
+    }
+    return null
+  }
+
+  set(data) {
+    this._cache = data
+    this._cacheTime = Date.now()
+  }
+
+  invalidate() {
+    this._cache = null
+    this._cacheTime = 0
+  }
+}
+
 export class FileSystemSessionRepository extends ISessionRepository {
   /**
    * @param {string} filePath - Path to sessions.json file
+   * @param {Object} [cacheOptions] - Cache configuration
+   * @param {number} [cacheOptions.ttl=30000] - Cache TTL in milliseconds
    */
-  constructor(filePath) {
+  constructor(filePath, cacheOptions = {}) {
     super()
     this.filePath = filePath
+
+    // Initialize cache with configurable TTL
+    this._cache = new SessionCache(cacheOptions.ttl)
   }
 
   /**
-   * Load all sessions from file
+   * Load all sessions from file (with caching)
    * @private
    */
   async _loadSessions() {
+    // Return cached sessions if valid
+    const cached = this._cache.get()
+    if (cached !== null) {
+      return cached
+    }
+
     try {
       const data = await fs.readFile(this.filePath, 'utf-8')
       const sessionsData = JSON.parse(data)
 
-      return sessionsData.map(data => this._deserializeSession(data))
+      const sessions = sessionsData.map(data => this._deserializeSession(data))
+
+      // Update cache
+      this._cache.set(sessions)
+
+      return sessions
     } catch (error) {
       if (error.code === 'ENOENT') {
         // File doesn't exist yet - return empty array
+        this._cache.set([])
         return []
       }
       throw new Error(`Failed to load sessions: ${error.message}`)
@@ -63,6 +109,9 @@ export class FileSystemSessionRepository extends ISessionRepository {
       const tempFile = `${this.filePath}.tmp`
       await fs.writeFile(tempFile, JSON.stringify(sessionsData, null, 2), 'utf-8')
       await fs.rename(tempFile, this.filePath)
+
+      // Invalidate cache after successful write
+      this._cache.invalidate()
     } catch (error) {
       throw new Error(`Failed to save sessions: ${error.message}`)
     }

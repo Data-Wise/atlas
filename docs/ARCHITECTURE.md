@@ -326,7 +326,7 @@ flowchart LR
     MCP --> Board["obs research board → vault"]
 ```
 
-See [`RESEARCH-REGISTRY.md`](RESEARCH-REGISTRY.md) and [`MCP-SERVER.md`](MCP-SERVER.md).
+See [`user-guide/tutorials/research-registry.md`](user-guide/tutorials/research-registry.md) and [`MCP-SERVER.md`](MCP-SERVER.md).
 
 **Scanner & identity.** A project directory is a scan leaf by default; a `.atlas-scan-children` marker lets an
 umbrella expose its child repos (ADR-003). The plain sync resolves an existing project by **path** when its id

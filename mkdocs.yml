@@ -50,6 +50,7 @@ exclude_docs: |
   superpowers/
   SPEC-*.md
   grill-*.md
+  RESEARCH-REGISTRY.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -94,9 +95,12 @@ nav:
     - Tutorial: TUTORIAL.md
     - Demos: DEMOS.md
   - User Guide:
-    - Cheatsheet: CHEATSHEET.md
-    - Quick Reference Card: REFCARD.md
-    - Visual Features: user-guide/tutorials/visual-features.md
+    - Quick Reference:
+      - Cheatsheet: CHEATSHEET.md
+      - Quick Reference Card: REFCARD.md
+    - Tutorials:
+      - Visual Features: user-guide/tutorials/visual-features.md
+      - Research Registry: user-guide/tutorials/research-registry.md
     - Cookbook: user-guide/cookbook/COOKBOOK.md
     - Workflows:
       - Core Workflows: user-guide/workflows/WORKFLOWS.md
@@ -105,7 +109,6 @@ nav:
       - Automation: user-guide/workflows/AUTOMATION.md
     - CLI Reference: CLI-REFERENCE.md
     - Configuration: CONFIGURATION.md
-    - Research Registry: user-guide/tutorials/research-registry.md
     - Visual Guide: VISUAL-GUIDE.md
   - Architecture:
     - Overview: ARCHITECTURE.md

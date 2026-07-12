@@ -70,7 +70,7 @@ See `docs/specs/SPEC-atlas-task-agenda-2026-07-02.md` in the repository for the 
 
 ---
 
-## v0.13.0 - Analytics + Calendar (Planned)
+## v0.13.0 - Analytics + Calendar ✅ COMPLETE
 
 ### Dashboard
 - [ ] AnalyticsView in Ink dashboard (key `a`) — deferred from v0.10.0

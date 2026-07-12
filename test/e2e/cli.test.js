@@ -5,7 +5,7 @@
  */
 
 import { describe, test, expect } from '@jest/globals'
-import { execSync } from 'child_process'
+import { execFileSync } from 'child_process'
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -21,7 +21,7 @@ const CLI_PATH = join(__dirname, '../../bin/atlas.js')
  */
 function runCLI(args = '', options = {}) {
   try {
-    const output = execSync(`node ${CLI_PATH} ${args}`, {
+    const output = execFileSync('node', [CLI_PATH, ...args.split(' ').filter(Boolean)], {
       encoding: 'utf8',
       env: { ...process.env, NODE_ENV: 'test' },
       ...options
@@ -614,9 +614,9 @@ describe('Atlas CLI - E2E Tests', () => {
       writeFileSync(join(proj, 'manu', '.STATUS'), 'status: active\nkind: manuscript\ntarget: JASA\n')
 
       // Real-world order: plain sync registers (path id) → from-status sets kind → plain sync warns.
-      runCLI(`sync --paths "${proj}"`, { env })
-      runCLI(`sync --from-status --paths "${proj}"`, { env })
-      const { stdout, exitCode } = runCLI(`sync --paths "${proj}"`, { env })
+      runCLI(`sync --paths ${proj}`, { env })
+      runCLI(`sync --from-status --paths ${proj}`, { env })
+      const { stdout, exitCode } = runCLI(`sync --paths ${proj}`, { env })
 
       expect(exitCode).toBe(0)
       expect(stdout).toContain('not refreshed by plain sync')

@@ -15,14 +15,14 @@
 
 import { promises as fs } from 'node:fs'
 import { join, dirname } from 'node:path'
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
 import { promisify } from 'util'
 import { Project } from '../../domain/entities/Project.js'
 import { ProjectType } from '../../domain/value-objects/ProjectType.js'
 import { IProjectRepository } from '../../domain/repositories/IProjectRepository.js'
 import { ProjectScanCache } from '../../utils/ProjectScanCache.js'
 
-const execAsync = promisify(exec)
+const execFileAsync = promisify(execFile)
 
 export class FileSystemProjectRepository extends IProjectRepository {
   /**
@@ -318,10 +318,21 @@ export class FileSystemProjectRepository extends IProjectRepository {
     const useCache = options.useCache !== false
     const forceRefresh = options.forceRefresh === true
 
-    // Check cache first (unless force refresh)
+    // Path traversal protection - reject directory traversal sequences
+    if (rootPath.includes('..') || rootPath.includes('\\..')) {
+      throw new Error('Scan rejected: rootPath must not contain directory traversal sequences (..)')
+    }
+
+    // Resolve to absolute path for safety and consistent cache keys
+    const { resolve } = await import('node:path')
+    const resolvedRoot = resolve(rootPath)
+    console.error(`[DEBUG scan] rootPath: ${rootPath}, resolvedRoot: ${resolvedRoot}`)
+
+    // Check cache first (unless force refresh) - use resolved path as key
     if (useCache && !forceRefresh) {
-      const cached = this.scanCache.get(rootPath)
+      const cached = this.scanCache.get(resolvedRoot)
       if (cached) {
+        console.error(`[DEBUG scan] Cache hit for ${resolvedRoot}`)
         return cached
       }
     }
@@ -329,14 +340,15 @@ export class FileSystemProjectRepository extends IProjectRepository {
     // Perform actual scan
     let projects
     if (this.detectorScriptPath) {
-      projects = await this._scanWithScript(rootPath)
+      projects = await this._scanWithScript(resolvedRoot)
     } else {
-      projects = await this._scanBasic(rootPath, options.progressCallback)
+      projects = await this._scanBasic(resolvedRoot, options.progressCallback)
     }
+    console.error(`[DEBUG scan] Found ${projects.length} projects`)
 
-    // Cache the results
+    // Cache the results - use resolved path as key
     if (useCache) {
-      this.scanCache.set(rootPath, projects)
+      this.scanCache.set(resolvedRoot, projects)
     }
 
     return projects
@@ -386,8 +398,16 @@ export class FileSystemProjectRepository extends IProjectRepository {
    * @private
    */
   async _scanWithScript(rootPath) {
+    // Path traversal protection
+    if (rootPath.includes('..') || rootPath.includes('\\..')) {
+      throw new Error('Scan rejected: rootPath must not contain directory traversal sequences (..)')
+    }
+    if (!this.detectorScriptPath) {
+      throw new Error('No detector script configured')
+    }
+
     try {
-      const { stdout } = await execAsync(`bash "${this.detectorScriptPath}" "${rootPath}"`)
+      const { stdout } = await execFileAsync('bash', [this.detectorScriptPath, rootPath])
 
       // Parse script output (assumes JSON format)
       const projectsData = JSON.parse(stdout)
@@ -429,6 +449,11 @@ export class FileSystemProjectRepository extends IProjectRepository {
   async _scanRecursive(dirPath, projects, progressCallback, currentDepth, maxDepth) {
     if (currentDepth >= maxDepth) return
 
+    // Path traversal protection - reject directory traversal sequences
+    if (dirPath.includes('..') || dirPath.includes('\\..')) {
+      return
+    }
+
     try {
       const entries = await fs.readdir(dirPath, { withFileTypes: true })
       const directories = entries.filter(entry =>
@@ -437,6 +462,11 @@ export class FileSystemProjectRepository extends IProjectRepository {
 
       for (const entry of directories) {
         const projectPath = join(dirPath, entry.name)
+
+        // Path traversal protection for project path
+        if (projectPath.includes('..') || projectPath.includes('\\..')) {
+          continue
+        }
 
         // Try to detect if this is a project
         const type = await this._withTimeout(
