@@ -1,5 +1,3 @@
-# Atlas
-
 <div class="hero" markdown>
 
 # :rocket: Atlas
@@ -49,6 +47,10 @@ Expose Atlas to Claude via the Model Context Protocol — 10 tools for sessions,
 </div>
 
 </div>
+
+## :sparkles: Also Included
+
+Beyond the core, Atlas ships with **Task Management**, **Agenda & Schedule**, a **Breadcrumb Trail**, **Task-Based Focus** (Pomodoro), **Calendar Export** (iCal), and built-in **ADHD-Friendly** cues — streaks, gentle time awareness, celebrations, and anti-perfectionism.
 
 ## :zap: Install
 

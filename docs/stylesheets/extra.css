@@ -16,6 +16,7 @@
   --atlas-sidebar-width: 18rem;
 
   /* One spacing scale (8px base) */
+  --atlas-space-05: 0.25rem;
   --atlas-space-1: 0.5rem;
   --atlas-space-2: 1rem;
   --atlas-space-3: 1.5rem;
@@ -54,7 +55,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--md-default-fg-color--light);
-  padding: 0.55rem 0.65rem;
+  padding: var(--atlas-space-1) var(--atlas-space-2);
   margin-top: 0.75rem;
   margin-bottom: 0.15rem;
   border-bottom: 1px solid var(--md-default-fg-color--lightest);
@@ -85,8 +86,8 @@
 .md-nav__link {
   font-size: 0.88rem;
   font-weight: 400;
-  padding: 0.4rem 0.6rem 0.4rem 1rem;
-  border-radius: 0.3rem;
+  padding: var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-2);
+  border-radius: var(--atlas-radius);
   transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease;
   border-left: 3px solid transparent;
   color: var(--md-default-fg-color);
@@ -136,6 +137,7 @@
 
 /* ── Search Bar — Prominent ────────────────────────────────── */
 .md-search__form {
+  /* Pill is the one intentional exception to --atlas-radius (standard search affordance) */
   border-radius: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1.5px solid var(--md-default-fg-color--lightest);
@@ -220,12 +222,12 @@
 /* ── Code Blocks — Readability ─────────────────────────────── */
 .md-typeset code {
   font-size: 0.84em;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
   padding: 0.15em 0.35em;
 }
 
 .md-typeset pre > code {
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   padding: 1rem 1.25rem;
   line-height: 1.6;
 }
@@ -233,7 +235,7 @@
 /* ── Tables — Scannable ────────────────────────────────────── */
 .md-typeset table:not([class]) {
   font-size: 0.84em;
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   overflow: hidden;
 }
 
@@ -265,7 +267,7 @@
 .md-search__input:focus-visible {
   outline: 2px solid var(--atlas-active);
   outline-offset: 2px;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
 }
 
 /* ── Header — Clean ────────────────────────────────────────── */
@@ -354,8 +356,8 @@
   padding: 0.25em 0.5em;
   font-size: 0.75em;
   font-weight: 600;
-  border-radius: 0.25rem;
-  margin-right: 0.25em;
+  border-radius: var(--atlas-radius);
+  margin-right: var(--atlas-space-05);
 }
 
 .md-typeset .badge-new {

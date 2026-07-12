@@ -98,16 +98,17 @@ nav:
     - Installation: getting-started/installation.md
     - Tutorial: TUTORIAL.md
     - Demos: DEMOS.md
-    - Quick Reference:
-      - Cheatsheet: CHEATSHEET.md
-      - Quick Reference Card: REFCARD.md
   - Guides:
     - ADHD Guide:
+      - Introduction: user-guide/adhd-guide/index.md
       - Core Principles: user-guide/adhd-guide/core-principles.md
       - Quick Wins: user-guide/adhd-guide/quick-wins.md
       - Time Blindness: user-guide/adhd-guide/time-blindness.md
       - Hyperfocus Management: user-guide/adhd-guide/hyperfocus.md
       - Accessibility: user-guide/adhd-guide/accessibility.md
+    - Tutorials:
+      - Visual Features: user-guide/tutorials/visual-features.md
+      - Research Registry: user-guide/tutorials/research-registry.md
     - Workflows:
       - Core Workflows: user-guide/workflows/WORKFLOWS.md
       - Weekly Review: user-guide/workflows/WEEKLY-REVIEW.md
@@ -120,6 +121,9 @@ nav:
     - Troubleshooting: user-guide/TROUBLESHOOTING.md
   - Reference:
     - CLI Reference: CLI-REFERENCE.md
+    - Quick Reference:
+      - Cheatsheet: CHEATSHEET.md
+      - Quick Reference Card: REFCARD.md
     - API Guide: API-GUIDE.md
     - API Recipes: API-RECIPES.md
     - MCP Server: MCP-SERVER.md
@@ -130,4 +134,5 @@ nav:
   - Project:
     - What's New: WHAT-S-NEW.md
     - Roadmap: ROADMAP.md
+    - Design Proposal: WEB-DESIGN-PROPOSAL.md
     - Contributing: CONTRIBUTING.md
