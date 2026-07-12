@@ -6,7 +6,7 @@
 
 ---
 
-## Current Version: v0.13.0
+## Current Version: v0.13.1
 
 Task CLI & Schedule Push/Agenda — native task CRUD, merged agenda view, analytics dashboard, and E2E testing infrastructure.
 

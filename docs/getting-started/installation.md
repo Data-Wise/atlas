@@ -74,17 +74,22 @@ Enable tab completion for your shell:
 === "Zsh"
 
     ```bash
-    # Add to ~/.zshrc
-    atlas completions zsh >> ~/.zshrc
-    source ~/.zshrc
+    # Write completions to fpath
+    atlas completions zsh > ~/.config/zsh/completions/_atlas
+
+    # Add to ~/.zshrc (if not already present):
+    fpath=(~/.config/zsh/completions $fpath)
+    autoload -Uz compinit && compinit
     ```
 
 === "Bash"
 
     ```bash
-    # Add to ~/.bashrc
-    atlas completions bash >> ~/.bashrc
-    source ~/.bashrc
+    # Write completions file
+    atlas completions bash > ~/.bash_completion.d/atlas
+
+    # Add to ~/.bashrc (if not already present):
+    source ~/.bash_completion.d/atlas
     ```
 
 === "Fish"
