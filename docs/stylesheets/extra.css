@@ -28,38 +28,64 @@
 
 /* ── Sidebar: Visual Hierarchy ─────────────────────────────── */
 
-/* Section headers — uppercase, color-coded */
+/*
+ * Material renders nav as:
+ *   .md-nav__item--nested  → section/group (e.g., "User Guide")
+ *     .md-nav__link        → the section header itself
+ *   .md-nav__item          → individual page link
+ *     .md-nav__link        → the page title
+ *
+ * Goal: section headers look like LABELS.
+ *       page items look like LINKS.
+ */
+
+/* Section headers — label treatment */
 .md-nav__item--nested > .md-nav__link {
   font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--atlas-active);
-  padding: 0.6rem 0;
-  margin-top: 0.5rem;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding: 0.55rem 0.65rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.15rem;
+  border-bottom: 2px solid var(--atlas-active);
+  background: linear-gradient(
+    to right,
+    rgba(156, 39, 176, 0.08) 0%,
+    transparent 100%
+  );
+}
+
+/* Hide the default chevron on section headers */
+.md-nav__item--nested > .md-nav__link::before {
+  display: none;
 }
 
 /* All nav items — breathing room */
 .md-nav__item {
-  margin: 0.1rem 0;
+  margin: 0.05rem 0;
 }
 
+/* Page links — clear clickable treatment */
 .md-nav__link {
   font-size: 0.88rem;
-  padding: 0.35rem 0.5rem;
+  font-weight: 400;
+  padding: 0.4rem 0.6rem 0.4rem 1rem;
   border-radius: 0.3rem;
-  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+  transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease;
   border-left: 3px solid transparent;
+  color: var(--md-default-fg-color);
 }
 
-/* Hover — subtle left accent */
+/* Hover — visible left accent */
 .md-nav__link:hover {
   background-color: var(--md-default-fg-color--lightest);
   border-left-color: var(--atlas-active);
+  color: var(--atlas-active);
 }
 
-/* Active page — strong left border + bold */
+/* Active page — strong signal */
 .md-nav__item--active > .md-nav__link {
   border-left-color: var(--atlas-active);
   font-weight: 600;
@@ -71,9 +97,11 @@
   background-color: rgba(206, 147, 216, 0.08);
 }
 
-/* Nested active items — inherit left border */
-.md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-active);
+/* Nested page items — extra indent for depth */
+.md-nav__item--nested .md-nav__item .md-nav__link {
+  padding-left: 1.5rem;
+  font-size: 0.84rem;
+  color: var(--md-default-fg-color--light);
 }
 
 /* ── Breadcrumb / Navigation Path ──────────────────────────── */
