@@ -275,9 +275,24 @@
   max-width: 100rem;
 }
 
-.md-sidebar--secondary {
-  width: 15rem;
-  padding-right: 0;
+/* Pin the TOC to the SCREEN's right edge (not the centered grid).
+   At Material's TOC breakpoint the rail leaves flow and is fixed to
+   the viewport; the body reserves matching space so text never slides
+   underneath it. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--secondary {
+    position: fixed;
+    top: 4.5rem;
+    right: 0;
+    width: 15rem;
+    max-height: calc(100vh - 4.5rem);
+    padding-right: 1.25rem;
+    z-index: 2;
+  }
+
+  .md-content__inner {
+    padding-right: 17rem;
+  }
 }
 
 /* ── Right-Rail Table of Contents ──────────────────────────── */
