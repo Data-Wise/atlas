@@ -1,6 +1,254 @@
-/* Atlas Documentation Custom Styles */
+/* ============================================================
+   Atlas Documentation — ADHD-Friendly Design System
+   ============================================================ */
 
-/* Prevent Mermaid overflow */
+/* ── Color Tokens ─────────────────────────────────────────── */
+:root {
+  /* Section colors (light mode) */
+  --atlas-learn: #2e7d32;
+  --atlas-do: #7b1fa2;
+  --atlas-build: #e65100;
+  --atlas-code: #1565c0;
+
+  /* Functional */
+  --atlas-active: #9c27b0;
+  --atlas-focus-ring: rgba(156, 39, 176, 0.3);
+  --atlas-breathing: 1.25rem;
+  --atlas-sidebar-width: 18rem;
+}
+
+[data-md-color-scheme="slate"] {
+  --atlas-learn: #66bb6a;
+  --atlas-do: #ce93d8;
+  --atlas-build: #ffb74d;
+  --atlas-code: #64b5f6;
+  --atlas-active: #ce93d8;
+  --atlas-focus-ring: rgba(206, 147, 216, 0.3);
+}
+
+/* ── Sidebar: Visual Hierarchy ─────────────────────────────── */
+
+/* Section headers — uppercase, color-coded */
+.md-nav__item--nested > .md-nav__link {
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--atlas-active);
+  padding: 0.6rem 0;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+/* All nav items — breathing room */
+.md-nav__item {
+  margin: 0.1rem 0;
+}
+
+.md-nav__link {
+  font-size: 0.88rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.3rem;
+  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+/* Hover — subtle left accent */
+.md-nav__link:hover {
+  background-color: var(--md-default-fg-color--lightest);
+  border-left-color: var(--atlas-active);
+}
+
+/* Active page — strong left border + bold */
+.md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-active);
+  font-weight: 600;
+  color: var(--atlas-active);
+  background-color: rgba(156, 39, 176, 0.06);
+}
+
+[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
+  background-color: rgba(206, 147, 216, 0.08);
+}
+
+/* Nested active items — inherit left border */
+.md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-active);
+}
+
+/* ── Breadcrumb / Navigation Path ──────────────────────────── */
+.md-path__inner {
+  font-size: 0.78rem;
+  opacity: 0.65;
+  margin-bottom: 0.25rem;
+}
+
+.md-path__inner a {
+  color: var(--atlas-active);
+  text-decoration: none;
+}
+
+.md-path__inner a:hover {
+  text-decoration: underline;
+}
+
+/* ── Search Bar — Prominent ────────────────────────────────── */
+.md-search__form {
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1.5px solid var(--md-default-fg-color--lightest);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-search__form:focus-within {
+  border-color: var(--atlas-active);
+  box-shadow: 0 2px 12px var(--atlas-focus-ring);
+}
+
+[data-md-color-scheme="slate"] .md-search__form {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Search hint — keyboard shortcut */
+.md-search__icon--keyboard {
+  opacity: 0.5;
+}
+
+/* ── Admonitions — ADHD Personality ────────────────────────── */
+
+/* Tip (green) — encouragement */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #4caf50;
+  border-left-width: 4px;
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+/* Warning (amber) — gentle nudge */
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: #ff9800;
+  border-left-width: 4px;
+}
+
+.md-typeset .warning > .admonition-title,
+.md-typeset .warning > summary {
+  background-color: rgba(255, 152, 0, 0.08);
+}
+
+/* Note (blue) — information */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: #2196f3;
+  border-left-width: 4px;
+}
+
+.md-typeset .note > .admonition-title,
+.md-typeset .note > summary {
+  background-color: rgba(33, 150, 243, 0.08);
+}
+
+/* Danger (red) — stop and think */
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-color: #f44336;
+  border-left-width: 4px;
+}
+
+.md-typeset .danger > .admonition-title,
+.md-typeset .danger > summary {
+  background-color: rgba(244, 67, 54, 0.08);
+}
+
+/* ADHD tip — purple accent (signature) */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: var(--atlas-active);
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(156, 39, 176, 0.08);
+}
+
+/* ── Code Blocks — Readability ─────────────────────────────── */
+.md-typeset code {
+  font-size: 0.84em;
+  border-radius: 0.25rem;
+  padding: 0.15em 0.35em;
+}
+
+.md-typeset pre > code {
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  line-height: 1.6;
+}
+
+/* ── Tables — Scannable ────────────────────────────────────── */
+.md-typeset table:not([class]) {
+  font-size: 0.84em;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-default-fg-color--lightest);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.78em;
+  letter-spacing: 0.03em;
+  padding: 0.7rem 0.8rem;
+}
+
+.md-typeset table:not([class]) td {
+  padding: 0.6rem 0.8rem;
+}
+
+/* Zebra striping for readability */
+.md-typeset table:not([class]) tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Keyboard Focus — Visible ──────────────────────────────── */
+.md-nav__link:focus-visible,
+.md-tabs__link:focus-visible,
+.md-search__input:focus-visible {
+  outline: 2px solid var(--atlas-active);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* ── Header — Clean ────────────────────────────────────────── */
+.md-header {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Content Area — Breathing Room ─────────────────────────── */
+.md-typeset .md-content__inner {
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+/* Horizontal rule — section divider */
+.md-typeset hr {
+  border: none;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  margin: 2rem 0;
+}
+
+/* ── Mermaid Diagrams ──────────────────────────────────────── */
 .mermaid {
   overflow-x: auto;
   text-align: center;
@@ -15,53 +263,7 @@
   font-size: 12px !important;
 }
 
-/* Code block styling */
-.md-typeset code {
-  font-size: 0.85em;
-}
-
-/* Table improvements */
-.md-typeset table:not([class]) {
-  font-size: 0.85em;
-}
-
-/* Admonition icons for ADHD features */
-.md-typeset .admonition.tip,
-.md-typeset details.tip {
-  border-color: #9c27b0;
-}
-
-.md-typeset .tip > .admonition-title,
-.md-typeset .tip > summary {
-  background-color: rgba(156, 39, 176, 0.1);
-}
-
-/* Custom badge styling */
-.md-typeset .badge {
-  display: inline-block;
-  padding: 0.25em 0.5em;
-  font-size: 0.75em;
-  font-weight: 600;
-  border-radius: 0.25rem;
-  margin-right: 0.25em;
-}
-
-.md-typeset .badge-new {
-  background-color: #4caf50;
-  color: white;
-}
-
-.md-typeset .badge-adhd {
-  background-color: #9c27b0;
-  color: white;
-}
-
-/* Navigation improvements */
-.md-nav__link {
-  font-size: 0.9rem;
-}
-
-/* Hero section on home page */
+/* ── Hero Section (Home Page) ──────────────────────────────── */
 .md-typeset .hero {
   text-align: center;
   padding: 2rem 0;
@@ -77,7 +279,7 @@
   opacity: 0.8;
 }
 
-/* Feature grid */
+/* ── Feature Grid ──────────────────────────────────────────── */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -89,8 +291,56 @@
   padding: 1.5rem;
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .feature-card:hover {
+  border-color: var(--atlas-active);
+  box-shadow: 0 2px 8px var(--atlas-focus-ring);
 }
 
 .md-typeset .feature-card h3 {
   margin-top: 0;
+}
+
+/* ── Badge Styling ─────────────────────────────────────────── */
+.md-typeset .badge {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  font-size: 0.75em;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  margin-right: 0.25em;
+}
+
+.md-typeset .badge-new {
+  background-color: #4caf50;
+  color: white;
+}
+
+.md-typeset .badge-adhd {
+  background-color: var(--atlas-active);
+  color: white;
+}
+
+/* ── Reduced Motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .md-nav__link,
+  .md-search__form,
+  .md-typeset .feature-card {
+    transition: none;
+  }
+}
+
+/* ── Print — Clean Output ──────────────────────────────────── */
+@media print {
+  .md-sidebar,
+  .md-header,
+  .md-footer {
+    display: none;
+  }
+
+  .md-content {
+    max-width: 100%;
+  }
 }
