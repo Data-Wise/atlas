@@ -270,13 +270,121 @@
   border-radius: var(--atlas-radius);
 }
 
-/* ── Header — Clean ────────────────────────────────────────── */
-.md-header {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+/* ── Layout — use the viewport width (fixes "squished in middle") ── */
+.md-grid {
+  max-width: 100rem;
 }
 
-[data-md-color-scheme="slate"] .md-header {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+/* Pin the TOC to the SCREEN's right edge (not the centered grid).
+   At Material's TOC breakpoint the rail leaves flow and is fixed to
+   the viewport; the body reserves matching space so text never slides
+   underneath it. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--secondary {
+    position: fixed;
+    top: 4.5rem;
+    right: 0;
+    width: 15rem;
+    max-height: calc(100vh - 4.5rem);
+    padding-right: 1.25rem;
+    z-index: 2;
+  }
+
+  .md-content__inner {
+    padding-right: 17rem;
+  }
+}
+
+/* ── Right-Rail Table of Contents ──────────────────────────── */
+/* Use Material's known/default TOC formatting; only condense spacing
+   (no custom colors or fonts) so it reads as the standard TOC. */
+
+.md-nav--secondary .md-nav__title {
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.md-nav--secondary .md-nav__item {
+  margin: 0.04rem 0;
+}
+
+.md-nav--secondary .md-nav__link {
+  padding-top: 0.12rem;
+  padding-bottom: 0.12rem;
+  line-height: 1.2;
+}
+
+/* Nested (sub-heading) entries — tighter indent */
+.md-nav--secondary .md-nav__item .md-nav__item .md-nav__link {
+  padding-left: 1rem;
+}
+
+/* ── Header & Tabs — ADHD-Friendly, Readable ─────────────────── */
+/* Brand-colored top bar with large, high-contrast type */
+.md-header {
+  background-color: var(--atlas-primary);
+  color: #ffffff;
+  box-shadow: var(--atlas-shadow-md);
+}
+
+.md-header__title {
+  font-family: var(--atlas-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* Tabs bar */
+.md-tabs {
+  background-color: var(--atlas-primary);
+  color: #ffffff;
+}
+
+.md-tabs__link {
+  font-family: var(--atlas-font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.82);
+  opacity: 1; /* Material dims inactive tabs; keep full contrast */
+  margin-top: 0.7rem;
+  padding-bottom: 0.6rem;
+  transition: color 0.15s ease;
+}
+
+.md-tabs__link:hover,
+.md-tabs__link:focus {
+  color: #ffffff;
+  opacity: 1;
+}
+
+/* Clear "you are here" indicator — amber underline on purple */
+.md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+  opacity: 1;
+  box-shadow: inset 0 -3px 0 var(--atlas-accent);
+}
+
+/* Search input — readable on the colored bar */
+.md-header .md-search__input {
+  font-size: 0.95rem;
+}
+
+/* Dark mode — lighter brand purple, still high contrast */
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: var(--atlas-primary-light);
+  color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-tabs__link {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+[data-md-color-scheme="slate"] .md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 var(--atlas-accent);
 }
 
 /* ── Content Area — Breathing Room ─────────────────────────── */
@@ -348,6 +456,30 @@
 
 .md-typeset .feature-card h3 {
   margin-top: 0;
+}
+
+/* ── Intro Callout (guide leads) ───────────────────────────── */
+/* Signature purple box for guide opening lines — matches the
+   ADHD-tip admonition accent. */
+.md-typeset .atlas-intro {
+  border: 1px solid var(--atlas-active);
+  border-left-width: 4px;
+  border-radius: var(--atlas-radius);
+  background-color: rgba(156, 39, 176, 0.06);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--md-default-fg-color);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.md-typeset .atlas-intro strong {
+  color: var(--atlas-active);
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .atlas-intro {
+  background-color: rgba(206, 147, 216, 0.1);
 }
 
 /* ── Badge Styling ─────────────────────────────────────────── */

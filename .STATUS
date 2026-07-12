@@ -18,6 +18,9 @@ with ADHD-friendly features like streak tracking and celebration helpers.
 ## Resume Context (2026-07-04 Session 2)
 Closed #61/#62, planned #63. Research board pipeline live (Monday 09:15 launchd: atlas sync --research + obs research board render). MediationVerse deduped (launchd only, cloud task disabled). Added `kind: package` to 7 R package .STATUS files. Completed dev tool audit (PROJECT-SETUP-AUDIT.md) recommending `.context/` as unified project config folder. Next: #63 obs package renderer spec+issue, `.context/` migration strategy, or v0.14.0 planning.
 
+## Resume Context (2026-07-11 Session)
+Docs-site TOC + header theming wrapped on `feature/header-theme` (PR #85 → dev). Removed the intrusive custom "On this page" top-of-body TOC (deleted `section-toc.js`; the native Material right-rail TOC now carries navigation). Themed header/tabs (brand purple, amber active-tab underline), widened grid 88→100rem, then pinned the TOC rail to the viewport's right edge via fixed positioning with the body reserving 17rem. Converted the ADHD-guide intro blockquote into a themed `.atlas-intro` callout. After user feedback, reverted the TOC to Material's default look and condensed its spacing (line-height 1.2). All commits pushed; `mkdocs build --strict` green. Next: await review/merge of PR #85; optionally cap the reading column on very wide screens.
+
 ## Features
 - **Project Registry**: Track projects, status, metadata
 - **Session Tracking**: Work sessions with duration and notes
@@ -86,6 +89,10 @@ Closed #61/#62, planned #63. Research board pipeline live (Monday 09:15 launchd:
 - Wrote **SPEC-ecosystem-integration-gaps** (docs/specs/, committed `a92f4e3`) — cross-repo map for atlas↔nexus + flow-cli↔obsidian-cli-ops; 7 locked decisions; RFC#35-verified; corrected a stale "atlas↔nexus done" claim (real state = a 5-month-stale text-parsing MCP shim in `statistical-research`)
 - Verified v0.10.0 release integrity — "dev N ahead of main" is a benign **squash-merge artifact** (zero code diff vs main), not an unreleased gap; project memory updated
 - Cross-repo (research-domain): built the **MediationVerse dashboard sync** as a local launchd job (replacing a documented-but-nonexistent sync); fixed 3 false auto-sync claims; regenerated dashboard from `.STATUS`; restructured medfit/medsim `.STATUS` (next:/done: convention). Script committed in new `r-packages/scripts` repo
+
+## ✅ Just Completed (2026-07-11)
+- Docs-site TOC + header theming on `feature/header-theme` (PR #85, open → dev): removed custom top-of-body "On this page" (deleted `section-toc.js`; native Material right-rail TOC now handles nav); themed header/tabs (brand purple, amber active-tab underline); widened grid 88→100rem; pinned TOC rail to viewport right edge (fixed) with 17rem body reserve; converted ADHD-guide intro to `.atlas-intro` callout; reverted TOC to Material default look + condensed spacing (line-height 1.2)
+- `mkdocs build --strict` green; all commits pushed; PR #85 current
 
 ## ✅ Just Completed (2026-06-19)
 - **Released v0.10.0** — PR #19 (feature→dev) + PR #20 (dev→main) merged; tag v0.10.0 + GitHub release published; Homebrew auto-update triggered
