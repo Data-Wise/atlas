@@ -275,9 +275,9 @@ atlas dash
 
 ## What's Next?
 
-- **[Visual Guide](../VISUAL-GUIDE.md)** — Deep dive into theme architecture, focus score formula, and heatmap internals
-- **[CLI Reference](../CLI-REFERENCE.md)** — Full `atlas stats` documentation with focus score details
-- **[Main Tutorial](../TUTORIAL.md)** — If you haven't done the Getting Started tutorial yet
+- **[Visual Guide](../../VISUAL-GUIDE.md)** — Deep dive into theme architecture, focus score formula, and heatmap internals
+- **[CLI Reference](../../CLI-REFERENCE.md)** — Full `atlas stats` documentation with focus score details
+- **[Main Tutorial](../../TUTORIAL.md)** — If you haven't done the Getting Started tutorial yet
 
 ---
 
