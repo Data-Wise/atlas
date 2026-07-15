@@ -37,7 +37,7 @@ function runMkdocs(args = '') {
 
 function getAllNavFiles() {
   const yml = readFileSync(MKDOCS_YML, 'utf8')
-  const files: string[] = []
+  const files = []
   const lines = yml.split('\n')
   let inNav = false
 
@@ -61,7 +61,7 @@ function getAllNavFiles() {
 }
 
 describe('Documentation Build E2E', () => {
-  let buildResult: { stdout: string; exitCode: number }
+  let buildResult
 
   beforeAll(() => {
     buildResult = runMkdocs('--strict')
