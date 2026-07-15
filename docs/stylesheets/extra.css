@@ -502,6 +502,66 @@
   color: white;
 }
 
+/* ── Mobile TOC (inline, < 76.25em) ───────────────────────── */
+/* Shown only below Material's sidebar breakpoint; hidden at desktop where
+   the secondary sidebar handles TOC natively. */
+.atlas-mobile-toc {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--atlas-radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.atlas-mobile-toc summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--atlas-active);
+  list-style: none;
+  user-select: none;
+}
+
+.atlas-mobile-toc summary::before {
+  content: '▶ ';
+  font-size: 0.7em;
+}
+
+details[open].atlas-mobile-toc summary::before {
+  content: '▼ ';
+}
+
+.atlas-mobile-toc nav {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.atlas-mobile-toc__link {
+  color: var(--md-default-fg-color--light);
+  text-decoration: none;
+  padding: 0.1rem 0;
+}
+
+.atlas-mobile-toc__link:hover {
+  color: var(--atlas-active);
+}
+
+.atlas-mobile-toc__link--h3 {
+  padding-left: 1rem;
+  font-size: 0.825rem;
+}
+
+[data-md-color-scheme="slate"] .atlas-mobile-toc {
+  border-color: var(--md-default-fg-color--lightest);
+}
+
+@media screen and (min-width: 76.25em) {
+  .atlas-mobile-toc {
+    display: none;
+  }
+}
+
 /* ── Reduced Motion ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .md-nav__link,

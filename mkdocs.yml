@@ -86,6 +86,7 @@ extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
   - assets/javascripts/scroll-progress.js
   - assets/javascripts/reading-time.js
+  - assets/javascripts/section-toc.js
 
 extra_css:
   - stylesheets/fonts.css
