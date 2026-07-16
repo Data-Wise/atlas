@@ -3,12 +3,18 @@
  *
  * Audit (and optionally fix) the born-ready Project Settings Contract
  * (docs-standards ADR-001 — research-ops ecosystem ownership):
- *   - .STATUS    (atlas registry header)            [required]
- *   - CLAUDE.md  (project rules / Claude context)   [required: warn]
- *   - .obs/sync.yml | .flow/obsidian-sync.yml       [info — `obs link` owns it]
+ *   - .STATUS                    (atlas registry header)            [required]
+ *   - CLAUDE.md                  (project rules / Claude context)   [required: warn]
+ *   - .flow/obsidian-sync.yml    (vault↔repo mirror map)            [info — obs `flow_init.py`/savant `/obs:sync` owns it]
+ *
+ * `.obs/sync.yml` (the pre-v4.3.1 obsidian-cli-ops schema/`obs link` command) is
+ * checked only for backward compatibility with existing repos that predate the
+ * migration — obs removed `obs link` and that schema in v4.3.1 (2026-07-12); do
+ * not treat `.obs/sync.yml` as current or write new instructions that reference it.
  *
  * Audit is read-only. `fix()` previews by default and only writes CLAUDE.md when
- * `write` is set — it never creates `.obs/sync.yml` (that schema belongs to `obs link`).
+ * `write` is set — it never creates `.flow/obsidian-sync.yml` (that's obs/savant's
+ * to scaffold, not atlas's).
  * By default the audit excludes registry cruft (worktrees, /tmp, node_modules);
  * pass `allRegistered` to include everything.
  */
@@ -53,8 +59,10 @@ export class DoctorUseCase {
           status: this.fileExists(join(path, '.STATUS')),
           claude: this.fileExists(join(path, 'CLAUDE.md')),
           obsSync:
-            this.fileExists(join(path, '.obs', 'sync.yml')) ||
-            this.fileExists(join(path, '.flow', 'obsidian-sync.yml'))
+            this.fileExists(join(path, '.flow', 'obsidian-sync.yml')) ||
+            // pre-v4.3.1 legacy path — obs removed `obs link`/this schema; kept for
+            // backward compatibility with repos that haven't migrated yet
+            this.fileExists(join(path, '.obs', 'sync.yml'))
         }
         const missingRequired = []
         if (!has.status) missingRequired.push('.STATUS')
@@ -101,7 +109,7 @@ export class DoctorUseCase {
 
   /**
    * Create missing CLAUDE.md (preview unless options.write). Never creates
-   * .obs/sync.yml — that belongs to `obs link` (ADR-001).
+   * .flow/obsidian-sync.yml — that's obs/savant's to scaffold (ADR-001).
    * @returns {Promise<{actions: Array, wrote: boolean}>}
    */
   async fix(options = {}) {
@@ -126,7 +134,7 @@ export class DoctorUseCase {
       '',
       '## Conventions',
       '- Branch workflow: `main` ← `feature/*` (PR only). See `~/.claude/CLAUDE.md`.',
-      '- Settings contract (`atlas doctor`): `.STATUS` + `CLAUDE.md` + `.obs/sync.yml`. See docs-standards ADR-001.',
+      '- Settings contract (`atlas doctor`): `.STATUS` + `CLAUDE.md` + `.flow/obsidian-sync.yml`. See docs-standards ADR-001.',
       ''
     ].join('\n')
   }
