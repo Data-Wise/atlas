@@ -15,13 +15,17 @@ progress: 75
 next: advance the data-fusion proposal
 type: research
 target: Epidemiology / JASA      # publication venue (alias: venue:)
-kind: program                    # manuscript | program
+kind: program                    # manuscript | program | package
 tasks:                           # a program's proposals (optional)
   - text: "01 incremental — promote code"; priority: P1; done: false
   - text: "02 Sobol — run the grid"; priority: P2; done: false
 ```
 
 `kind` and `tasks` are optional and additive — package `.STATUS` files are unaffected.
+
+Package-kind (`kind: package`) projects can also set `cran_state:` (e.g. `dev`, `planned`, `hold`,
+`submitted`, `accepted`, `on_cran`) to track CRAN release-cycle position — surfaced as `cranState`
+via `--format json` and rendered as a badge column by `obs research board`.
 
 ## 2. Sync into the registry
 
@@ -32,13 +36,18 @@ atlas sync --research        # shorthand; = --from-status --paths ~/projects/res
 
 > `--from-status` / `--research` is the **authority** for research metadata. A plain `atlas sync` preserves it
 > but does not re-parse it, and warns you to re-run this — see the [Cookbook](../cookbook/COOKBOOK.md) (Recipe 7) and ADR-002.
+>
+> Sync never rejects a malformed `.STATUS` field — it warns instead. A non-numeric `progress:` parses
+> as `0` (bad value quoted); a duplicate top-level key uses the last occurrence (both line numbers
+> named). The latter is common when a stale "preserved original content" block sits below an active
+> header — check `atlas doctor`'s output if a project's data looks wrong after sync.
 
 ## 3. Query
 
 ```bash
 atlas project list --kind program
 atlas project list --kind manuscript --format json
-# JSON carries kind/target/taskCount/progress/next/priority
+# JSON carries kind/target/cranState/taskCount/progress/next/priority
 ```
 
 Via MCP, `atlas_get_projects({ kind: 'program' })` returns the same fields for Claude or the obs board.
@@ -46,7 +55,7 @@ Via MCP, `atlas_get_projects({ kind: 'program' })` returns the same fields for C
 ## 4. Audit the settings contract
 
 ```bash
-atlas doctor                 # which projects miss .STATUS / CLAUDE.md / .obs/sync.yml
+atlas doctor                 # which projects miss .STATUS / CLAUDE.md / .flow/obsidian-sync.yml
 atlas doctor --fix           # preview missing CLAUDE.md
 atlas doctor --fix --write   # create them
 ```

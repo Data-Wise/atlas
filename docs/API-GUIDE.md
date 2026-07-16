@@ -235,12 +235,12 @@ await atlas.projects.unregister(name);
 
 ## Doctor API
 
-Audit projects against the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.obs/sync.yml`).
+Audit projects against the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.flow/obsidian-sync.yml`).
 
 ```javascript
 // Read-only audit
 const report = await atlas.doctor({ kind: 'manuscript' });
-// → { summary: { total, ok, missingStatus, missingClaude, missingObsSync }, rows: [...] }
+// → { summary: { total, ok, missingStatus, missingClaude, missingObsSync, parseWarnings }, rows: [...] }
 
 // Create missing CLAUDE.md (preview unless write: true)
 const fixed = await atlas.doctorFix({ write: true });
@@ -248,10 +248,15 @@ const fixed = await atlas.doctorFix({ write: true });
 
 **`doctor(options)`** — `options.kind` restricts to a kind; `options.allRegistered` includes worktrees/tmp.
 Returns `{ summary, rows }`, where each row is
-`{ name, path, kind, has: { status, claude, obsSync }, missingRequired, ok }`.
+`{ name, path, kind, has: { status, claude, obsSync }, missingRequired, ok, parseWarnings }`.
+`row.parseWarnings` surfaces `.STATUS` parse issues for that project (non-numeric `progress:`,
+duplicate top-level keys) without blocking the audit; `summary.parseWarnings` is the total count
+across all rows.
 
-**`doctorFix(options)`** — with `write: true`, creates missing `CLAUDE.md` stubs; otherwise previews.
-`.obs/sync.yml` is left to `obs link`.
+**`doctorFix(options)`** — with `write: true`, creates missing `CLAUDE.md` stubs (referencing
+`.flow/obsidian-sync.yml`, the current vault-mirror schema); otherwise previews.
+`.flow/obsidian-sync.yml` itself is left to savant's `/obs:sync` / `research-scaffold` — `obs link`
+was removed upstream (obsidian-cli-ops v4.3.1) and is no longer a valid target.
 
 ---
 
