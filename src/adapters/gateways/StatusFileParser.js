@@ -23,6 +23,53 @@ function stripInlineComment(value) {
   return String(value == null ? '' : value).replace(/\s+#.*$/, '').trim()
 }
 
+/**
+ * Parse a `progress:` value as a leading integer (optionally `%`-suffixed),
+ * same extraction `parseInt` already did — "75 (note)" still parses to 75,
+ * unchanged from prior behavior. What changes: this makes both failure modes
+ * VISIBLE via `warnings` instead of silent:
+ *   - no leading digit at all (pure prose, e.g. "manuscript prep ON HOLD")
+ *     — was already silently coerced to 0 by `parseInt(...) || 0`; still 0,
+ *     now with a warning naming the bad value.
+ *   - a leading digit followed by non-empty trailing text (e.g. "75 (note)")
+ *     — value is preserved (75), but flagged so the note can be moved to
+ *     `next:` where it won't be mistaken for a machine-readable field.
+ * @param {string} raw
+ * @param {string[]} warnings - collector for human-readable parse warnings
+ * @returns {number} 0-100
+ */
+function parseProgress(raw, warnings) {
+  const trimmed = String(raw == null ? '' : raw).trim()
+  const match = trimmed.match(/^(\d{1,3})\s*%?/)
+  if (!match) {
+    warnings.push(`progress: non-numeric value "${trimmed}" — parsed as 0, needs a plain integer 0-100`)
+    return 0
+  }
+  const value = Math.min(100, Math.max(0, Number(match[1])))
+  const rest = trimmed.slice(match[0].length).trim()
+  if (rest) {
+    warnings.push(`progress: trailing text after the number in "${trimmed}" — parsed as ${value}, consider moving the note to next:`)
+  }
+  return value
+}
+
+/**
+ * Record a key assignment, warning on a second occurrence of the same key.
+ * Last-occurrence-wins behavior is unchanged — this only makes a silent
+ * collision visible (e.g. a stale "preserved original content" block below
+ * an active header, duplicating status:/progress:/target:).
+ * @param {Record<string, number>} seenAt - key -> first-seen line number
+ * @param {string} key
+ * @param {number} lineNum
+ * @param {string[]} warnings
+ */
+function trackDuplicateKey(seenAt, key, lineNum, warnings) {
+  if (seenAt[key] !== undefined) {
+    warnings.push(`duplicate key "${key}" at line ${lineNum} (first seen line ${seenAt[key]}) — using the last occurrence`)
+  }
+  seenAt[key] = lineNum
+}
+
 export class StatusFileParser {
   /**
    * Scan a directory tree for all .STATUS files
@@ -137,12 +184,14 @@ export class StatusFileParser {
       updated: null,
       kind: null,
       target: null,
-      tasks: []
+      tasks: [],
+      _parseWarnings: []
     }
+    const seenAt = {}
 
     const lines = content.split('\n')
 
-    for (const line of lines) {
+    lines.forEach((line, index) => {
       const trimmed = line.trim()
 
       // Match ## Key: Value pattern
@@ -150,6 +199,10 @@ export class StatusFileParser {
       if (match) {
         const [, key, value] = match
         const lowerKey = key.toLowerCase()
+
+        if (['status', 'progress', 'priority', 'target', 'type', 'kind'].includes(lowerKey)) {
+          trackDuplicateKey(seenAt, lowerKey, index + 1, data._parseWarnings)
+        }
 
         switch (lowerKey) {
           case 'project':
@@ -159,7 +212,7 @@ export class StatusFileParser {
             data.status = value.trim().toLowerCase()
             break
           case 'progress':
-            data.progress = parseInt(value, 10) || 0
+            data.progress = parseProgress(value, data._parseWarnings)
             break
           case 'priority':
             data.priority = parseInt(value, 10) || 3
@@ -189,7 +242,7 @@ export class StatusFileParser {
       if (trimmed.toLowerCase().startsWith('next:')) {
         data.next = trimmed.substring(5).trim()
       }
-    }
+    })
 
     return data
   }
@@ -215,13 +268,15 @@ export class StatusFileParser {
       updated: null,
       kind: null,
       target: null,
-      tasks: []
+      tasks: [],
+      _parseWarnings: []
     }
+    const seenAt = {}
 
     const lines = content.split('\n')
     let inTasks = false
 
-    for (const line of lines) {
+    for (const [index, line] of lines.entries()) {
       const trimmed = line.trim()
 
       // Skip comments and empty lines
@@ -255,6 +310,10 @@ export class StatusFileParser {
         if (!value) continue
         const cleanValue = this._cleanValue(value)
 
+        if (['status', 'progress', 'priority', 'target', 'type', 'kind', 'next'].includes(lowerKey)) {
+          trackDuplicateKey(seenAt, lowerKey, index + 1, data._parseWarnings)
+        }
+
         switch (lowerKey) {
           case 'project':
           case 'name':
@@ -264,7 +323,7 @@ export class StatusFileParser {
             data.status = cleanValue.toLowerCase()
             break
           case 'progress':
-            data.progress = parseInt(cleanValue, 10) || 0
+            data.progress = parseProgress(cleanValue, data._parseWarnings)
             break
           case 'priority':
             data.priority = parseInt(cleanValue, 10) || 3

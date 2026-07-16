@@ -1050,8 +1050,12 @@ program
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
-    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)\n`);
-    const show = options.all ? rows : rows.filter(r => !r.ok);
+    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)`);
+    if (summary.parseWarnings > 0) {
+      console.log(`   .STATUS parse warnings: ${summary.parseWarnings}`);
+    }
+    console.log('');
+    const show = options.all ? rows : rows.filter(r => !r.ok || (r.parseWarnings && r.parseWarnings.length > 0));
     if (show.length === 0) {
       console.log('   ✅ all projects satisfy the required contract (.STATUS + CLAUDE.md)');
     } else {
@@ -1061,8 +1065,11 @@ program
           r.has.claude ? '' : 'CLAUDE.md',
           r.has.obsSync ? '' : '.obs/sync.yml'
         ].filter(Boolean).join(', ');
-        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : '🟢');
+        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : (r.parseWarnings?.length ? '🟠' : '🟢'));
         console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
+        if (r.parseWarnings?.length) {
+          r.parseWarnings.forEach(w => console.log(`      ⚠️  ${w}`));
+        }
       }
     }
     process.exit(summary.missingStatus > 0 ? 1 : 0);
@@ -1149,6 +1156,11 @@ program
         if (result.skipped.length > 0 && options.dryRun) {
           console.log(`\n⏭️  Unchanged: ${result.skipped.length} projects`);
         }
+      }
+
+      if (result.warnings && result.warnings.length > 0) {
+        console.log(`\n⚠️  Parse warnings: ${result.warnings.length}`);
+        result.warnings.forEach(w => console.log(`   ${w.name} (${w.path}): ${w.message}`));
       }
 
       if (result.errors.length > 0) {

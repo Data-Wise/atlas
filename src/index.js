@@ -444,7 +444,8 @@ class ProjectsAPI {
   async doctor(options = {}) {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
-    const uc = new DoctorUseCase({ projectRepository });
+    const statusFileParser = this.container.resolve('StatusFileParser');
+    const uc = new DoctorUseCase({ projectRepository, statusFileParser });
     return uc.execute(options);
   }
 

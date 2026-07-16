@@ -28,7 +28,7 @@ describe('DoctorUseCase — audit edge cases', () => {
     const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: () => false })
     const { summary, rows } = await uc.execute()
     expect(rows).toHaveLength(0)
-    expect(summary).toEqual({ total: 0, ok: 0, missingStatus: 0, missingClaude: 0, missingObsSync: 0 })
+    expect(summary).toEqual({ total: 0, ok: 0, missingStatus: 0, missingClaude: 0, missingObsSync: 0, parseWarnings: 0 })
   })
 
   test('a project missing BOTH .STATUS and CLAUDE.md is not ok and counts in both gaps', async () => {
@@ -39,6 +39,31 @@ describe('DoctorUseCase — audit edge cases', () => {
     expect(rows[0].missingRequired).toEqual(expect.arrayContaining(['.STATUS', 'CLAUDE.md']))
     expect(summary.missingStatus).toBe(1)
     expect(summary.missingClaude).toBe(1)
+  })
+
+  test('surfaces .STATUS parse warnings when a statusFileParser is injected', async () => {
+    const projects = [{ name: 'bad-progress', path: '/p/bad-progress' }]
+    const fakeParser = {
+      parse: async () => ({ _parseWarnings: ['progress: non-numeric value "prose" — parsed as 0, needs a plain integer 0-100'] })
+    }
+    const uc = new DoctorUseCase({
+      projectRepository: repoOf(projects),
+      fileExists: () => true,
+      statusFileParser: fakeParser
+    })
+    const { summary, rows } = await uc.execute()
+    expect(summary.parseWarnings).toBe(1)
+    expect(rows[0].parseWarnings).toEqual(
+      expect.arrayContaining([expect.stringContaining('non-numeric value')])
+    )
+  })
+
+  test('parseWarnings stays absent/empty when no statusFileParser is injected (backward compatible)', async () => {
+    const projects = [{ name: 'a', path: '/p/a' }]
+    const uc = new DoctorUseCase({ projectRepository: repoOf(projects), fileExists: () => true })
+    const { summary, rows } = await uc.execute()
+    expect(summary.parseWarnings).toBe(0)
+    expect(rows[0].parseWarnings).toBeUndefined()
   })
 })
 
