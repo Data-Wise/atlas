@@ -61,12 +61,23 @@ export class SyncFromStatusUseCase {
       updated: [],
       skipped: [],
       errors: [],
+      warnings: [],
       summary: null
     }
 
     // Scan for .STATUS files
     const scanResults = await this.statusFileParser.scanDirectory(rootPath, options)
     result.scanned = scanResults.length
+
+    // Surface any parse-time warnings (non-numeric progress, duplicate keys) —
+    // advisory only, never blocks the sync.
+    for (const { path, parsed } of scanResults) {
+      if (parsed?._parseWarnings && parsed._parseWarnings.length > 0) {
+        for (const message of parsed._parseWarnings) {
+          result.warnings.push({ path, name: parsed.name, message })
+        }
+      }
+    }
 
     // Generate summary
     result.summary = this.statusFileParser.summarize(scanResults)

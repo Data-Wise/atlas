@@ -21,12 +21,15 @@ export class DoctorUseCase {
    * @param {IProjectRepository} deps.projectRepository
    * @param {(p:string)=>boolean} [deps.fileExists] - injectable for tests
    * @param {(p:string,c:string)=>void} [deps.writeFile] - injectable for tests
+   * @param {StatusFileParser} [deps.statusFileParser] - optional; when provided,
+   *   .STATUS parse warnings (non-numeric progress, duplicate keys) surface as findings
    */
-  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync }) {
+  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync, statusFileParser = null }) {
     if (!projectRepository) throw new Error('projectRepository is required')
     this.projectRepository = projectRepository
     this.fileExists = fileExists
     this.writeFile = writeFile
+    this.statusFileParser = statusFileParser
   }
 
   /** Skip registry cruft so the audit reflects real projects. */
@@ -67,14 +70,31 @@ export class DoctorUseCase {
       })
   }
 
+  /**
+   * Attach `.STATUS` parse warnings (non-numeric progress, duplicate keys) to
+   * each row that has a `.STATUS` file. Requires `statusFileParser` to have
+   * been injected; no-op otherwise (keeps `execute()` backward compatible).
+   * @private
+   */
+  async _attachParseWarnings(rows) {
+    if (!this.statusFileParser) return rows
+    for (const row of rows) {
+      if (!row.has.status) continue
+      const parsed = await this.statusFileParser.parse(join(row.path, '.STATUS'))
+      row.parseWarnings = parsed?._parseWarnings || []
+    }
+    return rows
+  }
+
   async execute(options = {}) {
-    const rows = await this._rows(options)
+    const rows = await this._attachParseWarnings(await this._rows(options))
     const summary = {
       total: rows.length,
       ok: rows.filter(r => r.ok).length,
       missingStatus: rows.filter(r => !r.has.status).length,
       missingClaude: rows.filter(r => !r.has.claude).length,
-      missingObsSync: rows.filter(r => !r.has.obsSync).length
+      missingObsSync: rows.filter(r => !r.has.obsSync).length,
+      parseWarnings: rows.reduce((n, r) => n + (r.parseWarnings?.length || 0), 0)
     }
     return { summary, rows }
   }
