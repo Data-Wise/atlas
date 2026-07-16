@@ -184,6 +184,7 @@ export class StatusFileParser {
       updated: null,
       kind: null,
       target: null,
+      cranState: null,
       tasks: [],
       _parseWarnings: []
     }
@@ -200,7 +201,7 @@ export class StatusFileParser {
         const [, key, value] = match
         const lowerKey = key.toLowerCase()
 
-        if (['status', 'progress', 'priority', 'target', 'type', 'kind'].includes(lowerKey)) {
+        if (['status', 'progress', 'priority', 'target', 'type', 'kind', 'cran_state'].includes(lowerKey)) {
           trackDuplicateKey(seenAt, lowerKey, index + 1, data._parseWarnings)
         }
 
@@ -225,6 +226,9 @@ export class StatusFileParser {
             break
           case 'target':
             data.target = stripInlineComment(value)
+            break
+          case 'cran_state':
+            data.cranState = value.trim().toLowerCase()
             break
           case 'phase':
             data.phase = value.trim()
@@ -268,6 +272,7 @@ export class StatusFileParser {
       updated: null,
       kind: null,
       target: null,
+      cranState: null,
       tasks: [],
       _parseWarnings: []
     }
@@ -310,7 +315,7 @@ export class StatusFileParser {
         if (!value) continue
         const cleanValue = this._cleanValue(value)
 
-        if (['status', 'progress', 'priority', 'target', 'type', 'kind', 'next'].includes(lowerKey)) {
+        if (['status', 'progress', 'priority', 'target', 'type', 'kind', 'next', 'cran_state'].includes(lowerKey)) {
           trackDuplicateKey(seenAt, lowerKey, index + 1, data._parseWarnings)
         }
 
@@ -339,6 +344,9 @@ export class StatusFileParser {
           case 'venue':
           case 'journal':
             data.target = stripInlineComment(cleanValue)
+            break
+          case 'cran_state':
+            data.cranState = cleanValue.toLowerCase()
             break
           case 'phase':
             data.phase = cleanValue

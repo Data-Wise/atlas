@@ -162,6 +162,7 @@ export class SyncFromStatusUseCase {
       version: parsed.version,
       kind: parsed.kind || null,
       target: parsed.target || null,
+      cranState: parsed.cranState || null,
       tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
@@ -215,6 +216,7 @@ export class SyncFromStatusUseCase {
       version: parsed.version,
       kind: parsed.kind || null,
       target: parsed.target || null,
+      cranState: parsed.cranState || null,
       tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
@@ -249,6 +251,7 @@ export class SyncFromStatusUseCase {
       oldMeta.next !== newMeta.next ||
       (oldMeta.kind || null) !== (newMeta.kind || null) ||
       (oldMeta.target || null) !== (newMeta.target || null) ||
+      (oldMeta.cranState || null) !== (newMeta.cranState || null) ||
       (oldMeta.priorityLabel || null) !== (newMeta.priorityLabel || null) ||
       JSON.stringify(oldMeta.tasks || []) !== JSON.stringify(newMeta.tasks || [])
     )
@@ -277,6 +280,9 @@ export class SyncFromStatusUseCase {
     }
     if ((oldMeta.kind || null) !== (newMeta.kind || null)) {
       changes.push(`kind: ${oldMeta.kind || 'none'} → ${newMeta.kind || 'none'}`)
+    }
+    if ((oldMeta.cranState || null) !== (newMeta.cranState || null)) {
+      changes.push(`cranState: ${oldMeta.cranState || 'none'} → ${newMeta.cranState || 'none'}`)
     }
     const oldTaskCount = (oldMeta.tasks || []).length
     const newTaskCount = (newMeta.tasks || []).length

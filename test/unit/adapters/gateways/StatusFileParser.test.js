@@ -602,4 +602,37 @@ priority: invalid
       expect(result._parseWarnings).toEqual([])
     })
   })
+
+  describe('cran_state (package kind)', () => {
+    test('yaml: cran_state is parsed and lowercased', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 100\nkind: package\ncran_state: HOLD\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('hold')
+    })
+
+    test('markdown: cran_state is parsed and lowercased', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: active\n## Progress: 100\n## Kind: package\n## Cran_state: Planned\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('planned')
+    })
+
+    test('absent cran_state defaults to null (not "unspecified" or empty string)', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 50\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBeNull()
+    })
+
+    test('yaml: duplicate cran_state warns and last occurrence wins', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'cran_state: dev\ncran_state: submitted\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('submitted')
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('duplicate key "cran_state"')])
+      )
+    })
+  })
 })
