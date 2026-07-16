@@ -5,10 +5,10 @@
 ## Priority: 1
 ## Progress: 100
 
-## Focus: Quick wins complete — #65 YAML passthrough, F6 inbox --type/--limit, CLI audit, testing tools research.
-## Next: Implement #63 obs side (package renderer) | Open GitHub issue on obsidian-cli-ops | Plan `.context/` migration strategy | FW-31 CLI testing infrastructure
+## Focus: PR #85 post-audit fixes shipped (Material pin, mobile TOC, dark-mode clean); issue backlog groomed against live repo/system state.
+## Next: Observe next Monday 09:00 mediationverse-status-sync launchd run (verify exit 0 + real log — currently shows stale/unconfirmed exit 1) | Implement #63 obs side (package renderer) | Delete stale local branch feature/mcp-doctor-spec
 
-## Research-ops: ATLAS-FIX plan ✅ COMPLETE. #61 ✅ DONE (research-board refresh via launchd). #62 ✅ DONE (dedupe mediationverse-sync — launchd only). #63 🔵 PLANNED (obs package renderer). Dev tool audit: `docs/internal/PROJECT-SETUP-AUDIT.md`.
+## Research-ops: #61 ✅ DONE (research-board refresh via launchd, different impl than original spec — see docs/specs/SPEC-research-scheduling-pipeline.md). #62 ✅ DONE but reversed the original decision (kept launchd, disabled cloud task) — **unverified**: launchd job currently shows last exit code 1, no corroborating log; needs an observed live run before trusting it. #63 🔵 OPEN (obs package renderer), blocked on that verification. Dev tool audit: `docs/internal/PROJECT-SETUP-AUDIT.md`.
 
 ## Quick Context
 Atlas is the project state engine - a standalone Node.js package providing
@@ -20,6 +20,9 @@ Closed #61/#62, planned #63. Research board pipeline live (Monday 09:15 launchd:
 
 ## Resume Context (2026-07-11 Session)
 Docs-site TOC + header theming wrapped on `feature/header-theme` (PR #85 → dev). Removed the intrusive custom "On this page" top-of-body TOC (deleted `section-toc.js`; the native Material right-rail TOC now carries navigation). Themed header/tabs (brand purple, amber active-tab underline), widened grid 88→100rem, then pinned the TOC rail to the viewport's right edge via fixed positioning with the body reserving 17rem. Converted the ADHD-guide intro blockquote into a themed `.atlas-intro` callout. After user feedback, reverted the TOC to Material's default look and condensed its spacing (line-height 1.2). All commits pushed; `mkdocs build --strict` green. Next: await review/merge of PR #85; optionally cap the reading column on very wide screens.
+
+## Resume Context (2026-07-15 Session)
+Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearance verified) and implemented the 3 real fixes on PR #86: Material version pin (`docs/requirements.txt`), mobile TOC restored (`section-toc.js` + `.atlas-mobile-toc` CSS, <76.25em), dark-mode audit (clean). Also fixed 3 pre-existing CI failures blocking the PR (Lint: TS type annotations in a `.js` test file; E2E: missing mkdocs install in that CI job; flaky benchmark: 5x→1.5x cache-speedup threshold). PR #86 merged to dev. Closed #22 (already fixed upstream in 7ec096e, verified with existing tests). Grounded all 12 open issues against live repo/system state via parallel agents: closed #65/#66/#67/#31 (confirmed shipped), progress-commented #27/#28/#29 (partially shipped), left #70/#71/#30/#32/#63 open (still valid/parked). Deleted 2 stale specs (project-remove-by-name, yaml-field-passthrough — both already shipped). Adverse-reviewed SPEC-research-scheduling-pipeline.md against live `launchctl` state: found #61/#62 shipped with different (and in #62's case, reversed) implementations than the spec described, and surfaced an unresolved live finding — `com.data-wise.mediationverse-status-sync` currently shows exit code 1 with no corroborating log, needs an observed Monday-morning run to confirm real vs. stale. Removed the `mcp-doctor-spec` worktree (branch still needs manual `git branch -D` — blocked by branch-guard's self-approval prevention). Next: observe next Monday's launchd run, or pick up #63/#30/#32 (all unblocked but low-priority).
 
 ## Features
 - **Project Registry**: Track projects, status, metadata
