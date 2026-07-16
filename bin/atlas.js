@@ -1027,11 +1027,11 @@ templateCmd
 
 program
   .command('doctor')
-  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .obs/sync.yml)')
+  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .flow/obsidian-sync.yml)')
   .option('--kind <kind>', 'Only audit a given kind (manuscript|program|package)')
   .option('--all', 'List all audited projects, not just those with gaps')
   .option('--all-registered', 'Include worktrees / tmp / non-project registry entries')
-  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .obs/sync.yml is left to `obs link`')
+  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .flow/obsidian-sync.yml is left to obs/savant')
   .option('--write', 'With --fix, actually write the files')
   .option('--format <format>', 'Output format (table|json)', 'table')
   .action(async (options) => {
@@ -1050,7 +1050,7 @@ program
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
-    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)`);
+    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .flow/obsidian-sync.yml ${summary.missingObsSync} (info)`);
     if (summary.parseWarnings > 0) {
       console.log(`   .STATUS parse warnings: ${summary.parseWarnings}`);
     }
@@ -1063,7 +1063,7 @@ program
         const miss = [
           r.has.status ? '' : '.STATUS',
           r.has.claude ? '' : 'CLAUDE.md',
-          r.has.obsSync ? '' : '.obs/sync.yml'
+          r.has.obsSync ? '' : '.flow/obsidian-sync.yml'
         ].filter(Boolean).join(', ');
         const icon = !r.has.status ? '🔴' : (miss ? '🟡' : (r.parseWarnings?.length ? '🟠' : '🟢'));
         console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
