@@ -2,19 +2,38 @@
 
 All notable changes to Atlas are documented here.
 
-## [0.13.1] - 2026-07-11
+## [0.13.1] - 2026-07-17
+
+Code for this release was substantially complete by 2026-07-11 but the version
+bump/tag/GitHub-release step was missed at the time — this entry now covers
+everything actually merged to `main` in the v0.13.0..v0.13.1 range, not just
+the original 2026-07-11 subset.
 
 ### Fixed
 - **YAML passthrough (#65)** — StatusFileGateway now uses `yaml.stringify()`/`yaml.parse()` instead of hand-rolled template; unknown fields (research metadata, custom fields like `venue`, `tasks`) survive read-write round-trip.
+- **.STATUS parser hardening (#87)** — `atlas sync --from-status`/`--research` and `atlas doctor` now warn (never silently swallow) on a non-numeric `progress:` value or a duplicate top-level key, instead of a stale/wrong value winning silently.
+- **Dead `.obs/sync.yml` path references removed (#88)** — `DoctorUseCase` and related code no longer propagate references to obsidian-cli-ops's removed `obs link`/`.obs/sync.yml` schema (superseded by `.flow/obsidian-sync.yml`, v4.3.1).
+- **Doctor/sync orphan & duplicate-name detection (#90, #91)** — a registered project whose path no longer exists on disk is now flagged `orphaned` (distinct from "missing CLAUDE.md") instead of silently shadowing a same-named real project in `atlas doctor` output; `atlas sync --remove-orphans` now checks real filesystem existence instead of "discovered by this scan," so a narrow `--paths` scope can no longer false-positive orphan unrelated registered projects.
+- **PatternPresenter import path** in `useAnalytics.ts` corrected.
+- **StatusBar dogfood tests** updated to match the current `LayoutStateMachine` implementation.
+- **CHANGELOG link** in generated output now points to GitHub instead of a missing `docs/CHANGELOG` path.
+- **Progress coercion** — `.STATUS` progress values are coerced to a number consistently; `get_val` fixed under `set -euo pipefail`.
 
 ### Added
 - **Inbox --type flag (F6)** — `atlas inbox --type <type>` filters captures by type (`idea`, `task`, `bug`, `note`, `question`, `parked`, `win`).
 - **Inbox --limit flag (F6)** — `atlas inbox --limit <n>` caps the number of items returned.
 - **'win' capture type** — Added `'win'` to `Capture.TYPES` for quick-win tracking.
+- **`cran_state:`/`cranState` field (#89)** — parsed from package-kind `.STATUS` files and exposed via `project list --kind`, `--format json`, and MCP `atlas_get_projects`.
 - **E2E tests for inbox flags** — 6 new tests covering `--type`, `--limit`, help output, and combined flags.
 - **YAML round-trip unit tests** — 2 new tests verifying unknown fields and research metadata survive write/read cycles.
 - **YAML passthrough dogfood test** — `test/dogfood/dashboard-ink/yaml-passthrough.sh` (5 dual-path verified tests).
 - **CLI testing tools research** — Evaluated vitest-command-line, clet, repterm, tui-test, node-cli-testing. Saved to `docs/internal/CLI-TESTING-TOOLS.md`.
+- **Research sync + board render wrapper script (FW-12)** — new automation for the research-board pipeline.
+
+### Changed
+- **Documentation site redesign** — nav restructure (Getting Started / User Guide / Reference), ADHD-friendly design system (color-coded nav, foldable sidebar sections, prominent search), cookbook/workflow docs reorganized into `user-guide/` subfolders, internal specs/planning docs excluded from the published site.
+- **CI: Node 20 → 22** — Node 20 was deprecated on GitHub Actions runners.
+- Man pages and zsh completions regenerated to match current commands.
 
 ## [0.13.0] - 2026-07-04
 
