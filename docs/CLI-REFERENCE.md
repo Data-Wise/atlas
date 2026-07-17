@@ -1250,6 +1250,8 @@ atlas sync --research
 > **Ownership:** `--from-status` (or its `--research` alias) is the **authority** for research metadata — a plain `atlas sync` is packages-only and *preserves* existing `kind`/`target`/`cranState`/`tasks` but does not re-parse them, and now **warns**, naming the research projects it did not refresh, with the remedy. Re-run `--from-status` after editing a manuscript's `.STATUS`. *(Plain sync previously stripped these — fixed in 0.11.1, issue #36; ownership contract: docs-standards ADR-002.)*
 >
 > **Parse warnings:** `--from-status` surfaces (never blocks on) two classes of `.STATUS` issue: a non-numeric `progress:` value (parsed as `0`, with the bad value quoted) and a duplicate top-level key (last occurrence wins, both line numbers named — common in files with a stale "preserved original content" block below an active header). Warnings print under the sync summary; also available via `atlas doctor` (below).
+>
+> **Orphaned entries:** `--remove-orphans` deletes registry entries whose `path` no longer exists on disk — checked against the real filesystem, not against what the current scan happened to discover, so a narrow `--paths` scope never orphans unrelated registered projects. With `--dry-run`, orphaned entries are reported (name + path) but not deleted.
 
 ### `atlas doctor`
 
@@ -1281,6 +1283,13 @@ atlas doctor --fix --write                # actually create them
 > skill (`--mode repo` auto-scaffolds it) or the `/obs:sync` command, not by atlas. Rows also carry
 > `parseWarnings` (`.STATUS` non-numeric progress / duplicate-key issues) when present. See
 > [Research Registry](user-guide/tutorials/research-registry.md).
+>
+> **Orphaned & duplicate-named entries:** a registered project whose `path` no longer exists on
+> disk is flagged 💀 orphaned (distinct from "missing CLAUDE.md" — its contract checks are all
+> skipped, not failed) and excluded from `--fix`. Two or more entries sharing the same `name` (most
+> often a stale duplicate left behind by a repo move or monorepo archival) print their `path` in
+> brackets so the real project is never mistaken for the dead one. Run `atlas sync --remove-orphans`
+> to clean up orphaned entries.
 
 ---
 

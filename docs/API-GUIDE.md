@@ -240,7 +240,7 @@ Audit projects against the Project Settings Contract (`.STATUS`, `CLAUDE.md`, `.
 ```javascript
 // Read-only audit
 const report = await atlas.doctor({ kind: 'manuscript' });
-// → { summary: { total, ok, missingStatus, missingClaude, missingObsSync, parseWarnings }, rows: [...] }
+// → { summary: { total, ok, missingStatus, missingClaude, missingObsSync, orphaned, parseWarnings }, rows: [...] }
 
 // Create missing CLAUDE.md (preview unless write: true)
 const fixed = await atlas.doctorFix({ write: true });
@@ -248,15 +248,23 @@ const fixed = await atlas.doctorFix({ write: true });
 
 **`doctor(options)`** — `options.kind` restricts to a kind; `options.allRegistered` includes worktrees/tmp.
 Returns `{ summary, rows }`, where each row is
-`{ name, path, kind, has: { status, claude, obsSync }, missingRequired, ok, parseWarnings }`.
+`{ name, path, kind, has: { status, claude, obsSync }, missingRequired, orphaned, duplicateName, ok, parseWarnings }`.
 `row.parseWarnings` surfaces `.STATUS` parse issues for that project (non-numeric `progress:`,
 duplicate top-level keys) without blocking the audit; `summary.parseWarnings` is the total count
 across all rows.
 
+**`row.orphaned`** is `true` when the registered `path` no longer exists on disk — distinct from
+a project whose directory exists but is missing `.STATUS`/`CLAUDE.md`. An orphaned row's `has.*`
+fields are all `false` and it's never `ok`. **`row.duplicateName`** is `true` when two or more
+registered entries share the same `name` (e.g. a stale record left behind by a repo move/archival
+shadowing the real project) — `row.path` disambiguates which entry is which. `summary.orphaned` is
+the total orphaned-row count. Run `atlas sync --remove-orphans` to clean up orphaned entries (see
+below); `doctorFix` never writes into an orphaned path.
+
 **`doctorFix(options)`** — with `write: true`, creates missing `CLAUDE.md` stubs (referencing
-`.flow/obsidian-sync.yml`, the current vault-mirror schema); otherwise previews.
-`.flow/obsidian-sync.yml` itself is left to savant's `/obs:sync` / `research-scaffold` — `obs link`
-was removed upstream (obsidian-cli-ops v4.3.1) and is no longer a valid target.
+`.flow/obsidian-sync.yml`, the current vault-mirror schema); otherwise previews. Orphaned rows are
+skipped. `.flow/obsidian-sync.yml` itself is left to savant's `/obs:sync` / `research-scaffold` —
+`obs link` was removed upstream (obsidian-cli-ops v4.3.1) and is no longer a valid target.
 
 ---
 
@@ -653,7 +661,10 @@ const result = await atlas.sync(options);
 **Options:**
 - `paths` (string[]): Directories to scan
 - `dryRun` (boolean): Preview without changes
-- `removeOrphans` (boolean): Remove missing projects
+- `removeOrphans` (boolean): Remove registry entries whose `path` no longer exists on disk —
+  checked against the real filesystem, not against what this particular scan discovered, so a
+  narrow `paths` scope never orphans unrelated registered projects. Removed entries are reported
+  in `result.orphaned`.
 
 **Returns:**
 ```javascript
