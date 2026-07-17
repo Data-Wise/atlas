@@ -491,4 +491,148 @@ priority: invalid
       expect(summary.byProgress.complete).toHaveLength(2)   // 100% and 101%
     })
   })
+
+  describe('progress-field parse hardening', () => {
+    test('markdown: numeric progress parses cleanly, no warnings', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: active\n## Progress: 45\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(45)
+      expect(result._parseWarnings).toEqual([])
+    })
+
+    test('markdown: prose progress parses as 0 with a warning', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: in-development\n## Progress: manuscript submission prep ON HOLD\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(0)
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('non-numeric value')])
+      )
+    })
+
+    test('markdown: "Phase 3 of 5" does not silently become progress 3', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: active\n## Progress: Phase 3 of 5, ~60%\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(0)
+      expect(result._parseWarnings.length).toBeGreaterThan(0)
+    })
+
+    test('yaml: a leading number with a trailing parenthetical note preserves the value (no regression from parseInt)', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: developing\nprogress: 75  (§1–§6 complete & verified, only §7 remains)\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(75)
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('trailing text after the number')])
+      )
+    })
+
+    test('yaml: numeric and %-suffixed progress both parse cleanly', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 95%\ntype: research\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(95)
+      expect(result._parseWarnings).toEqual([])
+    })
+
+    test('yaml: prose progress parses as 0 with a warning', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: manuscript submission prep ON HOLD\ntype: research\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(0)
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('non-numeric value')])
+      )
+    })
+  })
+
+  describe('duplicate-key detection', () => {
+    test('markdown: duplicate key warns but keeps last-occurrence value (unchanged behavior)', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: active\n## Progress: 45\n## Progress: 90\n')
+      const result = await parser.parse(statusPath)
+      expect(result.progress).toBe(90)
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('duplicate key "progress"')])
+      )
+    })
+
+    test('yaml: stale duplicate block (real "preserved original content" shape) warns per duplicated key', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, [
+        'status: active',
+        'progress: 45',
+        'target: Biostatistics',
+        '',
+        '# preserved original content below',
+        'status: Planning',
+        'progress: 5',
+        'target: TBD'
+      ].join('\n'))
+      const result = await parser.parse(statusPath)
+      expect(result.status).toBe('planning')
+      expect(result.progress).toBe(5)
+      expect(result.target).toBe('TBD')
+      const messages = result._parseWarnings.join(' | ')
+      expect(messages).toContain('duplicate key "status"')
+      expect(messages).toContain('duplicate key "progress"')
+      expect(messages).toContain('duplicate key "target"')
+    })
+
+    test('yaml: commented-out duplicate keys do not trigger warnings', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, [
+        'status: active',
+        'progress: 45',
+        '# status: Planning        (stale duplicate — do not parse)',
+        '# progress: 5             (stale duplicate — do not parse)'
+      ].join('\n'))
+      const result = await parser.parse(statusPath)
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(45)
+      expect(result._parseWarnings).toEqual([])
+    })
+
+    test('no duplicates: single occurrence of each key produces zero warnings', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 45\ntarget: Biostatistics\n')
+      const result = await parser.parse(statusPath)
+      expect(result._parseWarnings).toEqual([])
+    })
+  })
+
+  describe('cran_state (package kind)', () => {
+    test('yaml: cran_state is parsed and lowercased', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 100\nkind: package\ncran_state: HOLD\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('hold')
+    })
+
+    test('markdown: cran_state is parsed and lowercased', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, '## Status: active\n## Progress: 100\n## Kind: package\n## Cran_state: Planned\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('planned')
+    })
+
+    test('absent cran_state defaults to null (not "unspecified" or empty string)', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'status: active\nprogress: 50\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBeNull()
+    })
+
+    test('yaml: duplicate cran_state warns and last occurrence wins', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, 'cran_state: dev\ncran_state: submitted\n')
+      const result = await parser.parse(statusPath)
+      expect(result.cranState).toBe('submitted')
+      expect(result._parseWarnings).toEqual(
+        expect.arrayContaining([expect.stringContaining('duplicate key "cran_state"')])
+      )
+    })
+  })
 })

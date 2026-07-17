@@ -61,12 +61,23 @@ export class SyncFromStatusUseCase {
       updated: [],
       skipped: [],
       errors: [],
+      warnings: [],
       summary: null
     }
 
     // Scan for .STATUS files
     const scanResults = await this.statusFileParser.scanDirectory(rootPath, options)
     result.scanned = scanResults.length
+
+    // Surface any parse-time warnings (non-numeric progress, duplicate keys) —
+    // advisory only, never blocks the sync.
+    for (const { path, parsed } of scanResults) {
+      if (parsed?._parseWarnings && parsed._parseWarnings.length > 0) {
+        for (const message of parsed._parseWarnings) {
+          result.warnings.push({ path, name: parsed.name, message })
+        }
+      }
+    }
 
     // Generate summary
     result.summary = this.statusFileParser.summarize(scanResults)
@@ -151,6 +162,7 @@ export class SyncFromStatusUseCase {
       version: parsed.version,
       kind: parsed.kind || null,
       target: parsed.target || null,
+      cranState: parsed.cranState || null,
       tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
@@ -204,6 +216,7 @@ export class SyncFromStatusUseCase {
       version: parsed.version,
       kind: parsed.kind || null,
       target: parsed.target || null,
+      cranState: parsed.cranState || null,
       tasks: parsed.tasks || [],
       sourceFormat: parsed.format,
       syncedAt: new Date().toISOString()
@@ -238,6 +251,7 @@ export class SyncFromStatusUseCase {
       oldMeta.next !== newMeta.next ||
       (oldMeta.kind || null) !== (newMeta.kind || null) ||
       (oldMeta.target || null) !== (newMeta.target || null) ||
+      (oldMeta.cranState || null) !== (newMeta.cranState || null) ||
       (oldMeta.priorityLabel || null) !== (newMeta.priorityLabel || null) ||
       JSON.stringify(oldMeta.tasks || []) !== JSON.stringify(newMeta.tasks || [])
     )
@@ -266,6 +280,9 @@ export class SyncFromStatusUseCase {
     }
     if ((oldMeta.kind || null) !== (newMeta.kind || null)) {
       changes.push(`kind: ${oldMeta.kind || 'none'} → ${newMeta.kind || 'none'}`)
+    }
+    if ((oldMeta.cranState || null) !== (newMeta.cranState || null)) {
+      changes.push(`cranState: ${oldMeta.cranState || 'none'} → ${newMeta.cranState || 'none'}`)
     }
     const oldTaskCount = (oldMeta.tasks || []).length
     const newTaskCount = (newMeta.tasks || []).length

@@ -311,7 +311,9 @@ Two use-cases sit over the same `.STATUS` surface, with different authority over
 - **`SyncRegistryUseCase`** (plain `atlas sync`) — packages-only registry refresh. Preserves existing
   research metadata but does not parse it (`_preserveResearchMetadata`).
 - **`SyncFromStatusUseCase`** (`atlas sync --from-status`) — the research-aware path. `StatusFileParser`
-  reads `kind`/`target`/`tasks` (two `.STATUS` formats) into `project.metadata`; `summarize()` groups `byKind`.
+  reads `kind`/`target`/`cranState`/`tasks` (two `.STATUS` formats) into `project.metadata`;
+  `summarize()` groups `byKind`. Also tracks duplicate top-level keys and validates `progress:`
+  leniently, surfacing both as non-blocking warnings.
 - **`DoctorUseCase`** (`atlas doctor`) — read-only audit of the Project Settings Contract, with `--fix`/`--write`.
 
 ```mermaid

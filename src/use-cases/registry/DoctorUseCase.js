@@ -3,12 +3,18 @@
  *
  * Audit (and optionally fix) the born-ready Project Settings Contract
  * (docs-standards ADR-001 — research-ops ecosystem ownership):
- *   - .STATUS    (atlas registry header)            [required]
- *   - CLAUDE.md  (project rules / Claude context)   [required: warn]
- *   - .obs/sync.yml | .flow/obsidian-sync.yml       [info — `obs link` owns it]
+ *   - .STATUS                    (atlas registry header)            [required]
+ *   - CLAUDE.md                  (project rules / Claude context)   [required: warn]
+ *   - .flow/obsidian-sync.yml    (vault↔repo mirror map)            [info — obs `flow_init.py`/savant `/obs:sync` owns it]
+ *
+ * `.obs/sync.yml` (the pre-v4.3.1 obsidian-cli-ops schema/`obs link` command) is
+ * checked only for backward compatibility with existing repos that predate the
+ * migration — obs removed `obs link` and that schema in v4.3.1 (2026-07-12); do
+ * not treat `.obs/sync.yml` as current or write new instructions that reference it.
  *
  * Audit is read-only. `fix()` previews by default and only writes CLAUDE.md when
- * `write` is set — it never creates `.obs/sync.yml` (that schema belongs to `obs link`).
+ * `write` is set — it never creates `.flow/obsidian-sync.yml` (that's obs/savant's
+ * to scaffold, not atlas's).
  * By default the audit excludes registry cruft (worktrees, /tmp, node_modules);
  * pass `allRegistered` to include everything.
  */
@@ -21,12 +27,15 @@ export class DoctorUseCase {
    * @param {IProjectRepository} deps.projectRepository
    * @param {(p:string)=>boolean} [deps.fileExists] - injectable for tests
    * @param {(p:string,c:string)=>void} [deps.writeFile] - injectable for tests
+   * @param {StatusFileParser} [deps.statusFileParser] - optional; when provided,
+   *   .STATUS parse warnings (non-numeric progress, duplicate keys) surface as findings
    */
-  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync }) {
+  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync, statusFileParser = null }) {
     if (!projectRepository) throw new Error('projectRepository is required')
     this.projectRepository = projectRepository
     this.fileExists = fileExists
     this.writeFile = writeFile
+    this.statusFileParser = statusFileParser
   }
 
   /** Skip registry cruft so the audit reflects real projects. */
@@ -41,47 +50,79 @@ export class DoctorUseCase {
   async _rows(options = {}) {
     const { kind = null, allRegistered = false } = options
     const projects = await this.projectRepository.findAll()
-    return projects
+    const filtered = projects
       .filter(p => allRegistered || this._isAuditable(p.path || p.id))
       .filter(p => !kind || (p.metadata?.kind || p.kind) === kind)
-      .map(p => {
-        const path = p.path || p.id
-        const has = {
-          status: this.fileExists(join(path, '.STATUS')),
-          claude: this.fileExists(join(path, 'CLAUDE.md')),
-          obsSync:
-            this.fileExists(join(path, '.obs', 'sync.yml')) ||
-            this.fileExists(join(path, '.flow', 'obsidian-sync.yml'))
-        }
-        const missingRequired = []
-        if (!has.status) missingRequired.push('.STATUS')
-        if (!has.claude) missingRequired.push('CLAUDE.md')
-        return {
-          name: p.name,
-          path,
-          kind: p.metadata?.kind || p.kind || null,
-          has,
-          missingRequired,
-          ok: missingRequired.length === 0
-        }
-      })
+
+    // Two+ registered entries sharing a name (e.g. a stale duplicate left
+    // over from a repo move/archival) can otherwise shadow each other in
+    // name-only output — surface the path so it's unambiguous which entry
+    // a given audit row describes.
+    const nameCounts = new Map()
+    for (const p of filtered) nameCounts.set(p.name, (nameCounts.get(p.name) || 0) + 1)
+
+    return filtered.map(p => {
+      const path = p.path || p.id
+      const orphaned = !this.fileExists(path)
+      const has = {
+        status: !orphaned && this.fileExists(join(path, '.STATUS')),
+        claude: !orphaned && this.fileExists(join(path, 'CLAUDE.md')),
+        obsSync:
+          !orphaned &&
+          (this.fileExists(join(path, '.flow', 'obsidian-sync.yml')) ||
+            // pre-v4.3.1 legacy path — obs removed `obs link`/this schema; kept for
+            // backward compatibility with repos that haven't migrated yet
+            this.fileExists(join(path, '.obs', 'sync.yml')))
+      }
+      const missingRequired = []
+      if (!has.status) missingRequired.push('.STATUS')
+      if (!has.claude) missingRequired.push('CLAUDE.md')
+      return {
+        name: p.name,
+        path,
+        kind: p.metadata?.kind || p.kind || null,
+        has,
+        missingRequired,
+        orphaned,
+        duplicateName: nameCounts.get(p.name) > 1,
+        ok: !orphaned && missingRequired.length === 0
+      }
+    })
+  }
+
+  /**
+   * Attach `.STATUS` parse warnings (non-numeric progress, duplicate keys) to
+   * each row that has a `.STATUS` file. Requires `statusFileParser` to have
+   * been injected; no-op otherwise (keeps `execute()` backward compatible).
+   * @private
+   */
+  async _attachParseWarnings(rows) {
+    if (!this.statusFileParser) return rows
+    for (const row of rows) {
+      if (!row.has.status) continue
+      const parsed = await this.statusFileParser.parse(join(row.path, '.STATUS'))
+      row.parseWarnings = parsed?._parseWarnings || []
+    }
+    return rows
   }
 
   async execute(options = {}) {
-    const rows = await this._rows(options)
+    const rows = await this._attachParseWarnings(await this._rows(options))
     const summary = {
       total: rows.length,
       ok: rows.filter(r => r.ok).length,
       missingStatus: rows.filter(r => !r.has.status).length,
       missingClaude: rows.filter(r => !r.has.claude).length,
-      missingObsSync: rows.filter(r => !r.has.obsSync).length
+      missingObsSync: rows.filter(r => !r.has.obsSync).length,
+      orphaned: rows.filter(r => r.orphaned).length,
+      parseWarnings: rows.reduce((n, r) => n + (r.parseWarnings?.length || 0), 0)
     }
     return { summary, rows }
   }
 
   /**
    * Create missing CLAUDE.md (preview unless options.write). Never creates
-   * .obs/sync.yml — that belongs to `obs link` (ADR-001).
+   * .flow/obsidian-sync.yml — that's obs/savant's to scaffold (ADR-001).
    * @returns {Promise<{actions: Array, wrote: boolean}>}
    */
   async fix(options = {}) {
@@ -89,6 +130,7 @@ export class DoctorUseCase {
     const rows = await this._rows(options)
     const actions = []
     for (const r of rows) {
+      if (r.orphaned) continue
       if (!r.has.claude) {
         const path = join(r.path, 'CLAUDE.md')
         if (write) this.writeFile(path, this._claudeStub(r))
@@ -106,7 +148,7 @@ export class DoctorUseCase {
       '',
       '## Conventions',
       '- Branch workflow: `main` ← `feature/*` (PR only). See `~/.claude/CLAUDE.md`.',
-      '- Settings contract (`atlas doctor`): `.STATUS` + `CLAUDE.md` + `.obs/sync.yml`. See docs-standards ADR-001.',
+      '- Settings contract (`atlas doctor`): `.STATUS` + `CLAUDE.md` + `.flow/obsidian-sync.yml`. See docs-standards ADR-001.',
       ''
     ].join('\n')
   }

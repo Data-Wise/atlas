@@ -30,6 +30,12 @@ function seededScan() {
         path: '/x/medfit',
         type: 'r-package',
         metadata: { status: 'active' } // no research metadata
+      },
+      {
+        name: 'medrobust',
+        path: '/x/medrobust',
+        type: 'r-package',
+        metadata: { status: 'active', kind: 'package', progress: 65, cranState: 'hold' }
       }
     ],
     updated: []
@@ -52,7 +58,7 @@ function makeProjectsApi() {
 describe('ProjectsAPI.list() — research fields + --kind filter (FW-16)', () => {
   test('maps kind/target/taskCount/progress/next/priority for research projects', async () => {
     const all = await makeProjectsApi().list({})
-    expect(all).toHaveLength(3)
+    expect(all).toHaveLength(4)
 
     const collider = all.find(p => p.name === 'collider')
     expect(collider).toMatchObject({
@@ -70,17 +76,23 @@ describe('ProjectsAPI.list() — research fields + --kind filter (FW-16)', () =>
     expect(pmed.target).toBe('Epidemiology')
   })
 
-  test('non-research projects map kind/target to null (no crash)', async () => {
+  test('non-research projects map kind/target/cranState to null (no crash)', async () => {
     const medfit = (await makeProjectsApi().list({})).find(p => p.name === 'medfit')
     expect(medfit.kind).toBeNull()
     expect(medfit.target).toBeNull()
+    expect(medfit.cranState).toBeNull()
     expect(medfit.taskCount).toBe(0)
   })
 
   test('--kind narrows by manuscript / program / package', async () => {
     expect((await makeProjectsApi().list({ kind: 'manuscript' })).map(p => p.name)).toEqual(['collider'])
     expect((await makeProjectsApi().list({ kind: 'program' })).map(p => p.name)).toEqual(['pmed-modern'])
-    // none of the seeded projects declare kind 'package'
-    expect(await makeProjectsApi().list({ kind: 'package' })).toHaveLength(0)
+    expect((await makeProjectsApi().list({ kind: 'package' })).map(p => p.name)).toEqual(['medrobust'])
+  })
+
+  test('maps cranState for package-kind projects', async () => {
+    const medrobust = (await makeProjectsApi().list({ kind: 'package' })).find(p => p.name === 'medrobust')
+    expect(medrobust.cranState).toBe('hold')
+    expect(medrobust.progress).toBe(65)
   })
 })

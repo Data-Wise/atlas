@@ -5,7 +5,7 @@
  * Combines project discovery with status file parsing to maintain
  * a comprehensive registry of all known projects.
  */
-
+import { existsSync } from 'node:fs'
 
 export class SyncRegistryUseCase {
   /**
@@ -13,11 +13,13 @@ export class SyncRegistryUseCase {
    * @param {IProjectRepository} dependencies.projectRepository - Project storage
    * @param {StatusFileGateway} dependencies.statusFileGateway - .STATUS file reader
    * @param {FileSystemProjectRepository} dependencies.fileSystemProjectRepository - For scanning
+   * @param {(p:string)=>boolean} [dependencies.fileExists] - injectable for tests
    */
-  constructor({ projectRepository, statusFileGateway, fileSystemProjectRepository }) {
+  constructor({ projectRepository, statusFileGateway, fileSystemProjectRepository, fileExists = existsSync }) {
     this.projectRepository = projectRepository
     this.statusFileGateway = statusFileGateway
     this.fsProjectRepository = fileSystemProjectRepository
+    this.fileExists = fileExists
   }
 
   /**
@@ -150,13 +152,15 @@ export class SyncRegistryUseCase {
       }
     }
 
-    // Check for orphaned projects (exist in registry but not on disk)
+    // Check for orphaned projects (registered path no longer exists on disk).
+    // Checked against the real filesystem, not "discovered in this particular
+    // scan" — a narrow --paths scope must never orphan unrelated projects
+    // that simply weren't scanned this run.
     if (removeOrphans) {
       const allRegistered = await this.projectRepository.findAll()
-      const currentPaths = new Set(allProjects.map(p => p.path))
 
       for (const registered of allRegistered) {
-        if (!currentPaths.has(registered.path)) {
+        if (registered.path && !this.fileExists(registered.path)) {
           result.orphaned.push(registered)
           if (!dryRun) {
             await this.projectRepository.delete(registered.id)

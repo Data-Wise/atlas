@@ -444,7 +444,8 @@ class ProjectsAPI {
   async doctor(options = {}) {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
-    const uc = new DoctorUseCase({ projectRepository });
+    const statusFileParser = this.container.resolve('StatusFileParser');
+    const uc = new DoctorUseCase({ projectRepository, statusFileParser });
     return uc.execute(options);
   }
 
@@ -508,6 +509,7 @@ class ProjectsAPI {
       type: p.type,
       kind: p.kind || p.metadata?.kind || null,
       target: p.target || p.metadata?.target || null,
+      cranState: p.metadata?.cranState || null,
       taskCount: p.metadata?.tasks?.length || 0,
       progress: p.progress ?? p.metadata?.progress ?? null,
       next: p.next || p.metadata?.next || null,

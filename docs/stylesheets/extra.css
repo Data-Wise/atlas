@@ -10,11 +10,20 @@
   --atlas-build: #e65100;
   --atlas-code: #1565c0;
 
-  /* Functional */
+  /* Functional — purple kept as a single, sparing brand accent */
   --atlas-active: #9c27b0;
   --atlas-focus-ring: rgba(156, 39, 176, 0.3);
-  --atlas-breathing: 1.25rem;
   --atlas-sidebar-width: 18rem;
+
+  /* One spacing scale (8px base) */
+  --atlas-space-05: 0.25rem;
+  --atlas-space-1: 0.5rem;
+  --atlas-space-2: 1rem;
+  --atlas-space-3: 1.5rem;
+  --atlas-space-4: 2rem;
+
+  /* One consistent radius */
+  --atlas-radius: 0.5rem;
 }
 
 [data-md-color-scheme="slate"] {
@@ -39,22 +48,17 @@
  *       page items look like LINKS.
  */
 
-/* Section headers — label treatment */
+/* Section headers — quiet label treatment (purple reserved for active state) */
 .md-nav__item--nested > .md-nav__link {
   font-weight: 700;
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--atlas-active);
-  padding: 0.55rem 0.65rem;
+  color: var(--md-default-fg-color--light);
+  padding: var(--atlas-space-1) var(--atlas-space-2);
   margin-top: 0.75rem;
   margin-bottom: 0.15rem;
-  border-bottom: 2px solid var(--atlas-active);
-  background: linear-gradient(
-    to right,
-    rgba(156, 39, 176, 0.08) 0%,
-    transparent 100%
-  );
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
   cursor: pointer;
 }
 
@@ -65,7 +69,7 @@
   margin-right: 0.35rem;
   font-size: 0.7em;
   transition: transform 0.2s ease;
-  color: var(--atlas-active);
+  color: var(--md-default-fg-color--light);
 }
 
 /* Rotate arrow when section is open */
@@ -82,8 +86,8 @@
 .md-nav__link {
   font-size: 0.88rem;
   font-weight: 400;
-  padding: 0.4rem 0.6rem 0.4rem 1rem;
-  border-radius: 0.3rem;
+  padding: var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-2);
+  border-radius: var(--atlas-radius);
   transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease;
   border-left: 3px solid transparent;
   color: var(--md-default-fg-color);
@@ -133,6 +137,7 @@
 
 /* ── Search Bar — Prominent ────────────────────────────────── */
 .md-search__form {
+  /* Pill is the one intentional exception to --atlas-radius (standard search affordance) */
   border-radius: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1.5px solid var(--md-default-fg-color--lightest);
@@ -217,12 +222,12 @@
 /* ── Code Blocks — Readability ─────────────────────────────── */
 .md-typeset code {
   font-size: 0.84em;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
   padding: 0.15em 0.35em;
 }
 
 .md-typeset pre > code {
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   padding: 1rem 1.25rem;
   line-height: 1.6;
 }
@@ -230,7 +235,7 @@
 /* ── Tables — Scannable ────────────────────────────────────── */
 .md-typeset table:not([class]) {
   font-size: 0.84em;
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   overflow: hidden;
 }
 
@@ -262,16 +267,124 @@
 .md-search__input:focus-visible {
   outline: 2px solid var(--atlas-active);
   outline-offset: 2px;
-  border-radius: 0.25rem;
+  border-radius: var(--atlas-radius);
 }
 
-/* ── Header — Clean ────────────────────────────────────────── */
+/* ── Layout — use the viewport width (fixes "squished in middle") ── */
+.md-grid {
+  max-width: 100rem;
+}
+
+/* Pin the TOC to the SCREEN's right edge (not the centered grid).
+   At Material's TOC breakpoint the rail leaves flow and is fixed to
+   the viewport; the body reserves matching space so text never slides
+   underneath it. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--secondary {
+    position: fixed;
+    top: 4.5rem;
+    right: 0;
+    width: 15rem;
+    max-height: calc(100vh - 4.5rem);
+    padding-right: 1.25rem;
+    z-index: 2;
+  }
+
+  .md-content__inner {
+    padding-right: 17rem;
+  }
+}
+
+/* ── Right-Rail Table of Contents ──────────────────────────── */
+/* Use Material's known/default TOC formatting; only condense spacing
+   (no custom colors or fonts) so it reads as the standard TOC. */
+
+.md-nav--secondary .md-nav__title {
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.md-nav--secondary .md-nav__item {
+  margin: 0.04rem 0;
+}
+
+.md-nav--secondary .md-nav__link {
+  padding-top: 0.12rem;
+  padding-bottom: 0.12rem;
+  line-height: 1.2;
+}
+
+/* Nested (sub-heading) entries — tighter indent */
+.md-nav--secondary .md-nav__item .md-nav__item .md-nav__link {
+  padding-left: 1rem;
+}
+
+/* ── Header & Tabs — ADHD-Friendly, Readable ─────────────────── */
+/* Brand-colored top bar with large, high-contrast type */
 .md-header {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  background-color: var(--atlas-primary);
+  color: #ffffff;
+  box-shadow: var(--atlas-shadow-md);
 }
 
-[data-md-color-scheme="slate"] .md-header {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+.md-header__title {
+  font-family: var(--atlas-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* Tabs bar */
+.md-tabs {
+  background-color: var(--atlas-primary);
+  color: #ffffff;
+}
+
+.md-tabs__link {
+  font-family: var(--atlas-font-ui);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.82);
+  opacity: 1; /* Material dims inactive tabs; keep full contrast */
+  margin-top: 0.7rem;
+  padding-bottom: 0.6rem;
+  transition: color 0.15s ease;
+}
+
+.md-tabs__link:hover,
+.md-tabs__link:focus {
+  color: #ffffff;
+  opacity: 1;
+}
+
+/* Clear "you are here" indicator — amber underline on purple */
+.md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+  opacity: 1;
+  box-shadow: inset 0 -3px 0 var(--atlas-accent);
+}
+
+/* Search input — readable on the colored bar */
+.md-header .md-search__input {
+  font-size: 0.95rem;
+}
+
+/* Dark mode — lighter brand purple, still high contrast */
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: var(--atlas-primary-light);
+  color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-tabs__link {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+[data-md-color-scheme="slate"] .md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 var(--atlas-accent);
 }
 
 /* ── Content Area — Breathing Room ─────────────────────────── */
@@ -304,32 +417,35 @@
 
 /* ── Hero Section (Home Page) ──────────────────────────────── */
 .md-typeset .hero {
-  text-align: center;
-  padding: 2rem 0;
+  text-align: left;
+  padding: var(--atlas-space-4) 0;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  margin-bottom: var(--atlas-space-3);
 }
 
 .md-typeset .hero h1 {
   font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--atlas-space-1);
 }
 
 .md-typeset .hero p {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   opacity: 0.8;
+  max-width: 42rem;
 }
 
 /* ── Feature Grid ──────────────────────────────────────────── */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
+  gap: var(--atlas-space-2);
+  margin: var(--atlas-space-3) 0;
 }
 
 .md-typeset .feature-card {
-  padding: 1.5rem;
+  padding: var(--atlas-space-3);
   border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: 0.5rem;
+  border-radius: var(--atlas-radius);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -342,14 +458,38 @@
   margin-top: 0;
 }
 
+/* ── Intro Callout (guide leads) ───────────────────────────── */
+/* Signature purple box for guide opening lines — matches the
+   ADHD-tip admonition accent. */
+.md-typeset .atlas-intro {
+  border: 1px solid var(--atlas-active);
+  border-left-width: 4px;
+  border-radius: var(--atlas-radius);
+  background-color: rgba(156, 39, 176, 0.06);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--md-default-fg-color);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.md-typeset .atlas-intro strong {
+  color: var(--atlas-active);
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .atlas-intro {
+  background-color: rgba(206, 147, 216, 0.1);
+}
+
 /* ── Badge Styling ─────────────────────────────────────────── */
 .md-typeset .badge {
   display: inline-block;
   padding: 0.25em 0.5em;
   font-size: 0.75em;
   font-weight: 600;
-  border-radius: 0.25rem;
-  margin-right: 0.25em;
+  border-radius: var(--atlas-radius);
+  margin-right: var(--atlas-space-05);
 }
 
 .md-typeset .badge-new {
@@ -360,6 +500,66 @@
 .md-typeset .badge-adhd {
   background-color: var(--atlas-active);
   color: white;
+}
+
+/* ── Mobile TOC (inline, < 76.25em) ───────────────────────── */
+/* Shown only below Material's sidebar breakpoint; hidden at desktop where
+   the secondary sidebar handles TOC natively. */
+.atlas-mobile-toc {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--atlas-radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.atlas-mobile-toc summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--atlas-active);
+  list-style: none;
+  user-select: none;
+}
+
+.atlas-mobile-toc summary::before {
+  content: '▶ ';
+  font-size: 0.7em;
+}
+
+details[open].atlas-mobile-toc summary::before {
+  content: '▼ ';
+}
+
+.atlas-mobile-toc nav {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.atlas-mobile-toc__link {
+  color: var(--md-default-fg-color--light);
+  text-decoration: none;
+  padding: 0.1rem 0;
+}
+
+.atlas-mobile-toc__link:hover {
+  color: var(--atlas-active);
+}
+
+.atlas-mobile-toc__link--h3 {
+  padding-left: 1rem;
+  font-size: 0.825rem;
+}
+
+[data-md-color-scheme="slate"] .atlas-mobile-toc {
+  border-color: var(--md-default-fg-color--lightest);
+}
+
+@media screen and (min-width: 76.25em) {
+  .atlas-mobile-toc {
+    display: none;
+  }
 }
 
 /* ── Reduced Motion ────────────────────────────────────────── */

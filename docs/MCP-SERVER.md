@@ -92,14 +92,20 @@ List registered projects.
   limit?: number  // Default: 20
 }
 
-// Returns
-[
-  { name, path, type, status, kind, target, taskCount, progress, next, priority },
-  ...
-]
-// kind/target/taskCount are populated for research .STATUS projects
-// (manuscripts/programs); null/0 for ordinary packages.
-// progress/next/priority give the obs research board parity with `project list --json`.
+// Returns (as formatted text — one block per project)
+// === Projects ===
+//
+// 🟢 medrobust
+//    Type: r-package | Status: active | Kind: package
+//    Progress: 65%
+//    Next: Complete vignettes, prepare for CRAN submission
+//    Path: /Users/you/projects/r-packages/active/medrobust
+//
+// kind/target/taskCount/progress/next are rendered when present. cranState is NOT
+// currently rendered by this tool's text formatter (a known gap — the underlying
+// `atlas.projects.list()` data carries it, same as `atlas project list --format json`,
+// but `formatProjects()` doesn't surface it yet). Use `atlas project list --kind package
+// --format json` directly for cranState until that's added.
 ```
 
 ### atlas_get_sessions

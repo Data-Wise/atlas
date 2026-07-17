@@ -28,7 +28,7 @@ describe('DoctorUseCase — audit edge cases', () => {
     const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: () => false })
     const { summary, rows } = await uc.execute()
     expect(rows).toHaveLength(0)
-    expect(summary).toEqual({ total: 0, ok: 0, missingStatus: 0, missingClaude: 0, missingObsSync: 0 })
+    expect(summary).toEqual({ total: 0, ok: 0, missingStatus: 0, missingClaude: 0, missingObsSync: 0, orphaned: 0, parseWarnings: 0 })
   })
 
   test('a project missing BOTH .STATUS and CLAUDE.md is not ok and counts in both gaps', async () => {
@@ -39,6 +39,69 @@ describe('DoctorUseCase — audit edge cases', () => {
     expect(rows[0].missingRequired).toEqual(expect.arrayContaining(['.STATUS', 'CLAUDE.md']))
     expect(summary.missingStatus).toBe(1)
     expect(summary.missingClaude).toBe(1)
+  })
+
+  test('surfaces .STATUS parse warnings when a statusFileParser is injected', async () => {
+    const projects = [{ name: 'bad-progress', path: '/p/bad-progress' }]
+    const fakeParser = {
+      parse: async () => ({ _parseWarnings: ['progress: non-numeric value "prose" — parsed as 0, needs a plain integer 0-100'] })
+    }
+    const uc = new DoctorUseCase({
+      projectRepository: repoOf(projects),
+      fileExists: () => true,
+      statusFileParser: fakeParser
+    })
+    const { summary, rows } = await uc.execute()
+    expect(summary.parseWarnings).toBe(1)
+    expect(rows[0].parseWarnings).toEqual(
+      expect.arrayContaining([expect.stringContaining('non-numeric value')])
+    )
+  })
+
+  test('parseWarnings stays absent/empty when no statusFileParser is injected (backward compatible)', async () => {
+    const projects = [{ name: 'a', path: '/p/a' }]
+    const uc = new DoctorUseCase({ projectRepository: repoOf(projects), fileExists: () => true })
+    const { summary, rows } = await uc.execute()
+    expect(summary.parseWarnings).toBe(0)
+    expect(rows[0].parseWarnings).toBeUndefined()
+  })
+})
+
+describe('DoctorUseCase — duplicate names and orphaned entries (atlas#90)', () => {
+  test('a registered entry whose path no longer exists is flagged orphaned, not "missing CLAUDE.md"', async () => {
+    const projects = [{ name: 'craft', path: '/gone/craft' }]
+    const uc = new DoctorUseCase({ projectRepository: repoOf(projects), fileExists: () => false })
+    const { summary, rows } = await uc.execute()
+    expect(rows[0].orphaned).toBe(true)
+    expect(summary.orphaned).toBe(1)
+  })
+
+  test('two entries sharing a name are both marked duplicateName with their path surfaced', async () => {
+    const projects = [
+      { name: 'craft', path: '/Users/dt/projects/dev-tools/craft' },
+      { name: 'craft', path: '/Users/dt/projects/dev-tools/claude-plugins/craft' }
+    ]
+    const present = new Set(['/Users/dt/projects/dev-tools/craft', '/Users/dt/projects/dev-tools/craft/.STATUS', '/Users/dt/projects/dev-tools/craft/CLAUDE.md'])
+    const uc = new DoctorUseCase({ projectRepository: repoOf(projects), fileExists: (p) => present.has(p) })
+    const { rows } = await uc.execute()
+    expect(rows.every(r => r.duplicateName)).toBe(true)
+    const real = rows.find(r => r.path === '/Users/dt/projects/dev-tools/craft')
+    const dead = rows.find(r => r.path === '/Users/dt/projects/dev-tools/claude-plugins/craft')
+    expect(real.ok).toBe(true)
+    expect(dead.orphaned).toBe(true) // the stale duplicate, not the real project, is the broken one
+  })
+
+  test('fix() never writes CLAUDE.md into an orphaned (nonexistent) path', async () => {
+    const projects = [{ name: 'dead', path: '/gone/dead' }]
+    const writes = []
+    const uc = new DoctorUseCase({
+      projectRepository: repoOf(projects),
+      fileExists: () => false,
+      writeFile: (p) => writes.push(p)
+    })
+    const { actions } = await uc.fix({ write: true })
+    expect(actions).toHaveLength(0)
+    expect(writes).toHaveLength(0)
   })
 })
 
@@ -66,7 +129,7 @@ describe('DoctorUseCase — fix edge cases', () => {
     const writes = []
     const uc = new DoctorUseCase({
       projectRepository: repoOf(projects),
-      fileExists: () => false, // both .STATUS and CLAUDE.md missing
+      fileExists: (p) => p === '/p/bare', // dir exists on disk; both .STATUS and CLAUDE.md missing
       writeFile: (p, c) => writes.push([p, c])
     })
     const { actions } = await uc.fix({ write: true })

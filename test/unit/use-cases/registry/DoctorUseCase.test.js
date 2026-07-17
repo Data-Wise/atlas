@@ -15,7 +15,8 @@ describe('DoctorUseCase — audit', () => {
       { name: 'no-claude', path: '/p/no-claude' }
     ]
     const present = new Set([
-      '/p/good/.STATUS', '/p/good/CLAUDE.md', '/p/good/.obs/sync.yml',
+      '/p/good', '/p/no-status', '/p/no-claude',
+      '/p/good/.STATUS', '/p/good/CLAUDE.md', '/p/good/.flow/obsidian-sync.yml',
       '/p/no-status/CLAUDE.md',
       '/p/no-claude/.STATUS'
     ])
@@ -31,9 +32,9 @@ describe('DoctorUseCase — audit', () => {
     expect(rows.find(r => r.name === 'no-claude').missingRequired).toContain('CLAUDE.md')
   })
 
-  test('recognizes legacy .flow/obsidian-sync.yml as the mirror map', async () => {
+  test('recognizes legacy .obs/sync.yml (pre-v4.3.1 obs schema) as satisfying the contract for backward compatibility', async () => {
     const projects = [{ name: 'legacy', path: '/p/legacy' }]
-    const present = new Set(['/p/legacy/.STATUS', '/p/legacy/CLAUDE.md', '/p/legacy/.flow/obsidian-sync.yml'])
+    const present = new Set(['/p/legacy', '/p/legacy/.STATUS', '/p/legacy/CLAUDE.md', '/p/legacy/.obs/sync.yml'])
     const uc = new DoctorUseCase({ projectRepository: repoOf(projects), fileExists: (p) => present.has(p) })
     const { rows } = await uc.execute()
     expect(rows[0].has.obsSync).toBe(true)
@@ -71,7 +72,7 @@ describe('DoctorUseCase — fix', () => {
     { name: 'has-claude', path: '/p/has' },
     { name: 'no-claude', path: '/p/no' }
   ]
-  const present = new Set(['/p/has/CLAUDE.md', '/p/has/.STATUS', '/p/no/.STATUS'])
+  const present = new Set(['/p/has', '/p/no', '/p/has/CLAUDE.md', '/p/has/.STATUS', '/p/no/.STATUS'])
 
   test('preview lists CLAUDE.md to create, writes nothing', async () => {
     const writes = []
@@ -99,6 +100,8 @@ describe('DoctorUseCase — fix', () => {
     expect(writes).toHaveLength(1)
     expect(writes[0][0]).toBe('/p/no/CLAUDE.md')
     expect(writes[0][1]).toContain('# no-claude — Claude context')
+    expect(writes[0][1]).toContain('.flow/obsidian-sync.yml')
+    expect(writes[0][1]).not.toContain('.obs/sync.yml')
     expect(actions[0].written).toBe(true)
   })
 })

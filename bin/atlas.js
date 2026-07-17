@@ -1027,11 +1027,11 @@ templateCmd
 
 program
   .command('doctor')
-  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .obs/sync.yml)')
+  .description('Audit projects for the settings contract (.STATUS, CLAUDE.md, .flow/obsidian-sync.yml)')
   .option('--kind <kind>', 'Only audit a given kind (manuscript|program|package)')
   .option('--all', 'List all audited projects, not just those with gaps')
   .option('--all-registered', 'Include worktrees / tmp / non-project registry entries')
-  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .obs/sync.yml is left to `obs link`')
+  .option('--fix', 'Create missing CLAUDE.md (preview unless --write); .flow/obsidian-sync.yml is left to obs/savant')
   .option('--write', 'With --fix, actually write the files')
   .option('--format <format>', 'Output format (table|json)', 'table')
   .action(async (options) => {
@@ -1050,8 +1050,15 @@ program
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
-    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .obs/sync.yml ${summary.missingObsSync} (info)\n`);
-    const show = options.all ? rows : rows.filter(r => !r.ok);
+    console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .flow/obsidian-sync.yml ${summary.missingObsSync} (info)`);
+    if (summary.orphaned > 0) {
+      console.log(`   ⚠️  orphaned registry entries (path no longer on disk): ${summary.orphaned} — run 'atlas sync --remove-orphans' to clean up`);
+    }
+    if (summary.parseWarnings > 0) {
+      console.log(`   .STATUS parse warnings: ${summary.parseWarnings}`);
+    }
+    console.log('');
+    const show = options.all ? rows : rows.filter(r => !r.ok || (r.parseWarnings && r.parseWarnings.length > 0));
     if (show.length === 0) {
       console.log('   ✅ all projects satisfy the required contract (.STATUS + CLAUDE.md)');
     } else {
@@ -1059,10 +1066,19 @@ program
         const miss = [
           r.has.status ? '' : '.STATUS',
           r.has.claude ? '' : 'CLAUDE.md',
-          r.has.obsSync ? '' : '.obs/sync.yml'
+          r.has.obsSync ? '' : '.flow/obsidian-sync.yml'
         ].filter(Boolean).join(', ');
-        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : '🟢');
-        console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
+        const icon = r.orphaned ? '💀' : (!r.has.status ? '🔴' : (miss ? '🟡' : (r.parseWarnings?.length ? '🟠' : '🟢')));
+        // Duplicate names or orphaned entries can otherwise look like the one
+        // real project is broken — show the path so it's unambiguous.
+        const suffix = r.orphaned
+          ? '  — orphaned (path not found): ' + r.path
+          : (miss ? '  — missing: ' + miss : '');
+        const pathTag = !r.orphaned && r.duplicateName ? ` [${r.path}]` : '';
+        console.log(`   ${icon} ${r.name}${pathTag}${suffix}`);
+        if (r.parseWarnings?.length) {
+          r.parseWarnings.forEach(w => console.log(`      ⚠️  ${w}`));
+        }
       }
     }
     process.exit(summary.missingStatus > 0 ? 1 : 0);
@@ -1151,6 +1167,11 @@ program
         }
       }
 
+      if (result.warnings && result.warnings.length > 0) {
+        console.log(`\n⚠️  Parse warnings: ${result.warnings.length}`);
+        result.warnings.forEach(w => console.log(`   ${w.name} (${w.path}): ${w.message}`));
+      }
+
       if (result.errors.length > 0) {
         console.log('\n⚠️  Errors:');
         result.errors.forEach(e => console.log(`   ${e.path}: ${e.error}`));
@@ -1197,6 +1218,11 @@ program
       const result = await getAtlas().sync(syncOptions);
       console.log(result.message);
       showSyncStats(result.stats);
+
+      if (result.orphaned && result.orphaned.length > 0) {
+        console.log(`\n${options.dryRun ? '🔍 Would remove' : '🗑️  Removed'} ${result.orphaned.length} orphaned registry entr${result.orphaned.length === 1 ? 'y' : 'ies'} (path no longer on disk):`);
+        result.orphaned.forEach(p => console.log(`   - ${p.name} (${p.path})`));
+      }
 
       if (result.warnings && result.warnings.length > 0) {
         for (const w of result.warnings) {
