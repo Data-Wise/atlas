@@ -50,32 +50,44 @@ export class DoctorUseCase {
   async _rows(options = {}) {
     const { kind = null, allRegistered = false } = options
     const projects = await this.projectRepository.findAll()
-    return projects
+    const filtered = projects
       .filter(p => allRegistered || this._isAuditable(p.path || p.id))
       .filter(p => !kind || (p.metadata?.kind || p.kind) === kind)
-      .map(p => {
-        const path = p.path || p.id
-        const has = {
-          status: this.fileExists(join(path, '.STATUS')),
-          claude: this.fileExists(join(path, 'CLAUDE.md')),
-          obsSync:
-            this.fileExists(join(path, '.flow', 'obsidian-sync.yml')) ||
+
+    // Two+ registered entries sharing a name (e.g. a stale duplicate left
+    // over from a repo move/archival) can otherwise shadow each other in
+    // name-only output — surface the path so it's unambiguous which entry
+    // a given audit row describes.
+    const nameCounts = new Map()
+    for (const p of filtered) nameCounts.set(p.name, (nameCounts.get(p.name) || 0) + 1)
+
+    return filtered.map(p => {
+      const path = p.path || p.id
+      const orphaned = !this.fileExists(path)
+      const has = {
+        status: !orphaned && this.fileExists(join(path, '.STATUS')),
+        claude: !orphaned && this.fileExists(join(path, 'CLAUDE.md')),
+        obsSync:
+          !orphaned &&
+          (this.fileExists(join(path, '.flow', 'obsidian-sync.yml')) ||
             // pre-v4.3.1 legacy path — obs removed `obs link`/this schema; kept for
             // backward compatibility with repos that haven't migrated yet
-            this.fileExists(join(path, '.obs', 'sync.yml'))
-        }
-        const missingRequired = []
-        if (!has.status) missingRequired.push('.STATUS')
-        if (!has.claude) missingRequired.push('CLAUDE.md')
-        return {
-          name: p.name,
-          path,
-          kind: p.metadata?.kind || p.kind || null,
-          has,
-          missingRequired,
-          ok: missingRequired.length === 0
-        }
-      })
+            this.fileExists(join(path, '.obs', 'sync.yml')))
+      }
+      const missingRequired = []
+      if (!has.status) missingRequired.push('.STATUS')
+      if (!has.claude) missingRequired.push('CLAUDE.md')
+      return {
+        name: p.name,
+        path,
+        kind: p.metadata?.kind || p.kind || null,
+        has,
+        missingRequired,
+        orphaned,
+        duplicateName: nameCounts.get(p.name) > 1,
+        ok: !orphaned && missingRequired.length === 0
+      }
+    })
   }
 
   /**
@@ -102,6 +114,7 @@ export class DoctorUseCase {
       missingStatus: rows.filter(r => !r.has.status).length,
       missingClaude: rows.filter(r => !r.has.claude).length,
       missingObsSync: rows.filter(r => !r.has.obsSync).length,
+      orphaned: rows.filter(r => r.orphaned).length,
       parseWarnings: rows.reduce((n, r) => n + (r.parseWarnings?.length || 0), 0)
     }
     return { summary, rows }
@@ -117,6 +130,7 @@ export class DoctorUseCase {
     const rows = await this._rows(options)
     const actions = []
     for (const r of rows) {
+      if (r.orphaned) continue
       if (!r.has.claude) {
         const path = join(r.path, 'CLAUDE.md')
         if (write) this.writeFile(path, this._claudeStub(r))

@@ -1051,6 +1051,9 @@ program
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
     console.log(`   gaps: .STATUS ${summary.missingStatus} · CLAUDE.md ${summary.missingClaude} · .flow/obsidian-sync.yml ${summary.missingObsSync} (info)`);
+    if (summary.orphaned > 0) {
+      console.log(`   ⚠️  orphaned registry entries (path no longer on disk): ${summary.orphaned} — run 'atlas sync --remove-orphans' to clean up`);
+    }
     if (summary.parseWarnings > 0) {
       console.log(`   .STATUS parse warnings: ${summary.parseWarnings}`);
     }
@@ -1065,8 +1068,14 @@ program
           r.has.claude ? '' : 'CLAUDE.md',
           r.has.obsSync ? '' : '.flow/obsidian-sync.yml'
         ].filter(Boolean).join(', ');
-        const icon = !r.has.status ? '🔴' : (miss ? '🟡' : (r.parseWarnings?.length ? '🟠' : '🟢'));
-        console.log(`   ${icon} ${r.name}${miss ? '  — missing: ' + miss : ''}`);
+        const icon = r.orphaned ? '💀' : (!r.has.status ? '🔴' : (miss ? '🟡' : (r.parseWarnings?.length ? '🟠' : '🟢')));
+        // Duplicate names or orphaned entries can otherwise look like the one
+        // real project is broken — show the path so it's unambiguous.
+        const suffix = r.orphaned
+          ? '  — orphaned (path not found): ' + r.path
+          : (miss ? '  — missing: ' + miss : '');
+        const pathTag = !r.orphaned && r.duplicateName ? ` [${r.path}]` : '';
+        console.log(`   ${icon} ${r.name}${pathTag}${suffix}`);
         if (r.parseWarnings?.length) {
           r.parseWarnings.forEach(w => console.log(`      ⚠️  ${w}`));
         }
@@ -1209,6 +1218,11 @@ program
       const result = await getAtlas().sync(syncOptions);
       console.log(result.message);
       showSyncStats(result.stats);
+
+      if (result.orphaned && result.orphaned.length > 0) {
+        console.log(`\n${options.dryRun ? '🔍 Would remove' : '🗑️  Removed'} ${result.orphaned.length} orphaned registry entr${result.orphaned.length === 1 ? 'y' : 'ies'} (path no longer on disk):`);
+        result.orphaned.forEach(p => console.log(`   - ${p.name} (${p.path})`));
+      }
 
       if (result.warnings && result.warnings.length > 0) {
         for (const w of result.warnings) {
