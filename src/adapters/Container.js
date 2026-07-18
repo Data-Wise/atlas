@@ -258,6 +258,12 @@ export class Container {
 
   getCaptureIdeaUseCase() {
     return this._resolve('captureIdeaUseCase', () => {
+      // obsidianGateway intentionally NOT injected here yet — D5: this use
+      // case is write-through-*capable*, but wiring it live waits on obs
+      // shipping `write` (P0, still unshipped as of obs v4.3.0). Injecting
+      // it now would route every capture to pending-flush permanently,
+      // vanishing them from atlas inbox/plan/dashboard with no fallback.
+      // See SPEC-ecosystem-integration-gaps-2026-06-20.md D2/D4/D5.
       return new CaptureIdeaUseCase({
         captureRepository: this.getCaptureRepository(),
         eventPublisher: this.getEventPublisher()

@@ -95,6 +95,21 @@ export class FileSystemCaptureRepository {
   }
 
   /**
+   * Update a capture's status in place
+   */
+  async updateStatus(id, status) {
+    const data = await this._read();
+    const existing = data.captures.find(c => c.id === id);
+    if (!existing) {
+      throw new Error(`Capture not found: ${id}`);
+    }
+    const capture = Capture.fromJSON(existing);
+    capture.status = status;
+    await this.save(capture);
+    return capture;
+  }
+
+  /**
    * Delete a capture
    */
   async delete(id) {

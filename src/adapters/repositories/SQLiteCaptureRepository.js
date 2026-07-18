@@ -146,6 +146,17 @@ export class SQLiteCaptureRepository {
     return capture
   }
 
+  async updateStatus(captureId, status) {
+    const result = this.db.execute(
+      'UPDATE captures SET status = ? WHERE id = ?',
+      [status, captureId]
+    )
+    if (result.changes === 0) {
+      throw new Error(`Capture not found: ${captureId}`)
+    }
+    return this.findById(captureId)
+  }
+
   async delete(captureId) {
     const result = this.db.execute(
       'DELETE FROM captures WHERE id = ?',
