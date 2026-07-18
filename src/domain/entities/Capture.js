@@ -9,7 +9,7 @@
 
 export class Capture {
   static TYPES = ['idea', 'task', 'bug', 'note', 'question', 'parked', 'win'];
-  static STATUSES = ['inbox', 'triaged', 'archived', 'parked'];
+  static STATUSES = ['inbox', 'triaged', 'archived', 'parked', 'pending-flush', 'flushed'];
 
   constructor({
     id,
@@ -74,6 +74,22 @@ export class Capture {
    */
   archive() {
     this.status = 'archived';
+    return this;
+  }
+
+  /**
+   * Mark as queued for vault write-through (obs unreachable at capture time)
+   */
+  markPendingFlush() {
+    this.status = 'pending-flush';
+    return this;
+  }
+
+  /**
+   * Mark as successfully written to the vault
+   */
+  markFlushed() {
+    this.status = 'flushed';
     return this;
   }
 
