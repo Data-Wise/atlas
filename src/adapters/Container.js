@@ -37,6 +37,7 @@ import { GetRecentProjectsUseCase } from '../use-cases/project/GetRecentProjects
 import { CaptureIdeaUseCase } from '../use-cases/capture/CaptureIdeaUseCase.js'
 import { GetInboxUseCase } from '../use-cases/capture/GetInboxUseCase.js'
 import { TriageInboxUseCase } from '../use-cases/capture/TriageInboxUseCase.js'
+import { FlushCapturesUseCase } from '../use-cases/capture/FlushCapturesUseCase.js'
 import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
@@ -56,6 +57,7 @@ import { AgendaUseCase } from '../use-cases/task/AgendaUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
+import { ObsidianGateway } from './gateways/ObsidianGateway.js'
 
 export class Container {
   /**
@@ -281,6 +283,16 @@ export class Container {
     })
   }
 
+  getFlushCapturesUseCase() {
+    return this._resolve('flushCapturesUseCase', () => {
+      return new FlushCapturesUseCase({
+        captureRepository: this.getCaptureRepository(),
+        obsidianGateway: this.getObsidianGateway(),
+        eventPublisher: this.getEventPublisher()
+      })
+    })
+  }
+
   // ============================================================================
   // USE CASES - Task
   // ============================================================================
@@ -432,6 +444,12 @@ export class Container {
     })
   }
 
+  getObsidianGateway() {
+    return this._resolve('obsidianGateway', () => {
+      return new ObsidianGateway()
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -484,6 +502,7 @@ export class Container {
       'CaptureIdeaUseCase': () => this.getCaptureIdeaUseCase(),
       'GetInboxUseCase': () => this.getGetInboxUseCase(),
       'TriageInboxUseCase': () => this.getTriageInboxUseCase(),
+      'FlushCapturesUseCase': () => this.getFlushCapturesUseCase(),
 
       // Task use cases
       'AddTaskUseCase': () => this.getAddTaskUseCase(),
@@ -509,6 +528,7 @@ export class Container {
       // Gateways
       'StatusFileGateway': () => this.getStatusFileGateway(),
       'StatusFileParser': () => this.getStatusFileParser(),
+      'ObsidianGateway': () => this.getObsidianGateway(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),

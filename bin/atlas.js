@@ -598,6 +598,27 @@ program
     a.formatInbox(items);
   });
 
+program
+  .command('flush')
+  .description('Drain captures queued for the Obsidian vault (write-through fallback)')
+  .option('--vault <id>', 'Vault id to pass to obs (defaults to obs\'s own default vault)')
+  .action(async (options) => {
+    const a = getAtlas();
+    const flushCapturesUseCase = a.container.resolve('FlushCapturesUseCase');
+    const result = await flushCapturesUseCase.execute({ vault: options.vault });
+
+    if (result.flushed === 0 && result.remaining === 0) {
+      console.log('📭 Nothing to flush.');
+      return;
+    }
+
+    console.log(`✅ Flushed: ${result.flushed}`);
+    if (result.remaining > 0) {
+      console.log(`⏳ Still pending: ${result.remaining}`);
+      result.errors.forEach(({ id, error }) => console.log(`   ${id}: ${error}`));
+    }
+  });
+
 /**
  * Interactive triage mode
  */
