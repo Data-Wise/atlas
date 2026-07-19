@@ -55,7 +55,7 @@ class MockProjectRepository {
   constructor() {
     this.projects = []
   }
-  async list() {
+  async findAll() {
     return this.projects
   }
 }
@@ -557,7 +557,7 @@ describe('PlanDayUseCase', () => {
 
   describe('execute() - Active projects edge cases', () => {
     test('handles repository errors gracefully', async () => {
-      projectRepo.list = async () => {
+      projectRepo.findAll = async () => {
         throw new Error('Database error')
       }
 

@@ -195,7 +195,7 @@ export class PlanDayUseCase {
    */
   async _getActiveProjects() {
     try {
-      const projects = await this.projectRepository.list()
+      const projects = await this.projectRepository.findAll()
 
       return projects
         .filter(p => {
