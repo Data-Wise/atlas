@@ -706,8 +706,10 @@ describe('Atlas CLI - E2E Tests', () => {
 
       expect(exitCode).toBe(0)
       expect(stdout).toContain('Minimal')
-      expect(stdout).toContain('Project:')
-      expect(stdout).toContain('Status: active')
+      // schema atlas/v1: canonical templates emit YAML frontmatter, not
+      // markdown "## Key:" headers.
+      expect(stdout).toContain('schema: atlas/v1')
+      expect(stdout).toContain('status: active')
     })
 
     test('template show returns error for unknown template', () => {

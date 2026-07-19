@@ -110,13 +110,13 @@ describe('StatusFileValidator', () => {
       expect(result.errors).toContain('Missing required field: progress')
     })
 
-    test('requires type field', () => {
+    // schema atlas/v1: type is optional (minimal template omits it)
+    test('type is optional', () => {
       const data = { status: 'active', progress: 50 }
 
       const result = validator.validate(data)
 
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Missing required field: type')
+      expect(result.valid).toBe(true)
     })
   })
 
