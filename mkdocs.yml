@@ -94,13 +94,13 @@ extra_css:
 
 nav:
   - Home: index.md
-  - Getting Started:
+  - Get Started:
     - Installation: getting-started/installation.md
     - Tutorial: TUTORIAL.md
     - Demos:
       - Gallery: DEMOS.md
       - Recording: demos/README.md
-  - Guides:
+  - Guide:
     - ADHD Guide:
       - Introduction: user-guide/adhd-guide/index.md
       - Core Principles: user-guide/adhd-guide/core-principles.md
@@ -130,12 +130,12 @@ nav:
     - API Guide: API-GUIDE.md
     - API Recipes: API-RECIPES.md
     - MCP Server: MCP-SERVER.md
-    - Architecture:
-      - Overview: ARCHITECTURE.md
-      - Diagrams: DIAGRAMS.md
-      - Integrations: INTEGRATIONS.md
     - Analytics View Spec: ANALYTICS-VIEW-UI-SPEC.md
-  - Project:
+  - Architecture:
+    - Overview: ARCHITECTURE.md
+    - Diagrams: DIAGRAMS.md
+  - Integrations: INTEGRATIONS.md
+  - Changelog:
     - What's New: WHAT-S-NEW.md
     - Roadmap: ROADMAP.md
     - Design Proposal: WEB-DESIGN-PROPOSAL.md

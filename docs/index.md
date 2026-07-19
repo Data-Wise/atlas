@@ -8,130 +8,107 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
 
-Atlas is a project state management engine that helps developers track projects, sessions, and context. Designed with ADHD-friendly features like streak tracking, gentle time awareness, and celebration helpers.
+Atlas tracks your projects, sessions, and context — so you never lose the thread. Streaks, gentle time cues, and "good enough" endings, built in.
 
 </div>
 
-## :sparkles: Core Features
-
-<div class="feature-grid" markdown>
-
-<div class="feature-card" markdown>
-### :file_folder: Project Registry
-Track every project with status, tags, and metadata. Sync from `.STATUS` files or register manually.
-</div>
-
-<div class="feature-card" markdown>
-### :clock3: Session Tracking
-Start work sessions, measure flow, and restore context automatically when you return.
-</div>
-
-<div class="feature-card" markdown>
-### :bulb: Quick Capture
-Capture ideas, tasks, and bugs without breaking flow — then triage your inbox later.
-</div>
-
-<div class="feature-card" markdown>
-### :chart_with_upwards_trend: Analytics
-`atlas stats` for streaks, velocity, and flow patterns. Spot trends before they slip.
-</div>
-
-<div class="feature-card" markdown>
-### :desktop_computer: Dashboard
-Ink-powered TUI with SINGLE/SPLIT/TRIPLE layouts, a Pomodoro timer, and an analytics view.
-</div>
-
-<div class="feature-card" markdown>
-### :robot: MCP Server
-Expose Atlas to Claude via the Model Context Protocol — 10 tools for sessions, captures, and context.
-</div>
-
-</div>
-
-## :sparkles: Also Included
-
-Beyond the core, Atlas ships with **Task Management**, **Agenda & Schedule**, a **Breadcrumb Trail**, **Task-Based Focus** (Pomodoro), **Calendar Export** (iCal), and built-in **ADHD-Friendly** cues — streaks, gentle time awareness, celebrations, and anti-perfectionism.
-
-## :zap: Install
-
-=== "Homebrew"
-
-    ```bash
-    brew tap data-wise/tap
-    brew install atlas
-    ```
-
-=== "curl"
-
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
-    ```
-
-=== "npm"
-
-    ```bash
-    npm install -g @data-wise/atlas
-    ```
-
-=== "From Source"
-
-    ```bash
-    git clone https://github.com/Data-Wise/atlas.git
-    cd atlas && npm install && npm link
-    ```
-
-## :movie_camera: See It In Action
-
-![Getting Started Demo](demos/getting-started.gif)
-
-[:material-play-circle: View all demos](DEMOS.md){ .md-button }
-
-## :computer: Basic Usage
+## :zap: Start in 3 commands
 
 ```bash
-# Initialize atlas
-atlas init
-
-# Start a work session
-atlas session start myproject
-
-# Quick capture an idea
-atlas catch "check VanderWeele 2015 appendix"
-
-# Show context
-atlas where
-
-# View analytics
-atlas stats
-
-# End session with celebration
-atlas session end "Completed initial implementation"
-
-# Launch dashboard
-atlas dash
+brew tap data-wise/tap && brew install atlas   # 1. install
+atlas init                                     # 2. set up ~/.atlas
+atlas session start myproject                  # 3. start working
 ```
 
-## :books: Where to Next
+!!! tip "That's it"
+    Atlas is now tracking your session. Run `atlas catch "an idea"` any time to capture
+    without breaking flow, and `atlas session end` when you're done.
 
-| Guide | Description |
-|-------|-------------|
-| [Getting Started](getting-started/installation.md) | Install and configure Atlas |
-| [Tutorial](TUTORIAL.md) | Step-by-step introduction (15 min) |
-| [Guides](user-guide/adhd-guide/core-principles.md) | ADHD-friendly workflows and principles |
-| [CLI Reference](CLI-REFERENCE.md) | Complete command documentation |
-| [MCP Server](MCP-SERVER.md) | Claude integration via MCP |
-| [What's New](WHAT-S-NEW.md) | Latest release highlights |
+<div class="grid cards" markdown>
 
-## :heart: Built for ADHD Minds
+-   :material-rocket-launch:{ .lg .middle } **Get Started**
 
-- **Streak Tracking** — visual motivation through consecutive-day tracking
-- **Time Blindness Helper** — gentle time cues without breaking flow
-- **Celebration Helper** — positive reinforcement on achievements
-- **Context Restoration** — "Last time you were…" on session start
-- **Anti-Perfectionism** — "good enough" session endings that actually ship
+    ---
+
+    Install, configure, and run the 15-minute tutorial.
+
+    [:octicons-arrow-right-24: Get Started](getting-started/installation.md)
+
+-   :material-book-open-variant:{ .lg .middle } **CLI Reference**
+
+    ---
+
+    Every command — Core 5 first, power and legacy tiers collapsed.
+
+    [:octicons-arrow-right-24: CLI Reference](CLI-REFERENCE.md)
+
+-   :material-sitemap:{ .lg .middle } **Architecture**
+
+    ---
+
+    Clean Architecture layers, data flow, and system diagrams.
+
+    [:octicons-arrow-right-24: Architecture](ARCHITECTURE.md)
+
+-   :material-link-variant:{ .lg .middle } **Integrations**
+
+    ---
+
+    MCP server, flow-cli contract, and ecosystem hooks.
+
+    [:octicons-arrow-right-24: Integrations](INTEGRATIONS.md)
+
+</div>
+
+## :heart: Why Atlas (ADHD-first)
+
+| Feature | What it does |
+|---------|---------------|
+| **Streak Tracking** | Visual motivation through consecutive-day tracking |
+| **Time Blindness Helper** | Gentle time cues without breaking flow |
+| **Celebration Helper** | Positive reinforcement on real progress |
+| **Context Restoration** | "Last time you were…" on session start |
+| **Anti-Perfectionism** | "Good enough" session endings that actually ship |
+
+??? note "See it in action (demo GIF)"
+    ![Getting Started Demo](demos/getting-started.gif)
+
+    [:material-play-circle: View all demos](DEMOS.md){ .md-button }
+
+??? note "All install methods (Homebrew / curl / npm / source)"
+
+    === "Homebrew"
+
+        ```bash
+        brew tap data-wise/tap
+        brew install atlas
+        ```
+
+    === "curl"
+
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
+        ```
+
+    === "npm"
+
+        ```bash
+        npm install -g @data-wise/atlas
+        ```
+
+    === "From Source"
+
+        ```bash
+        git clone https://github.com/Data-Wise/atlas.git
+        cd atlas && npm install && npm link
+        ```
 
 ## :link: Links
 
 - [GitHub Repository](https://github.com/Data-Wise/atlas)
 - [Issue Tracker](https://github.com/Data-Wise/atlas/issues)
 - [Changelog](https://github.com/Data-Wise/atlas/blob/main/CHANGELOG.md)
+
+---
+
+**Now what?** → [Get Started: Installation](getting-started/installation.md)

@@ -499,3 +499,8 @@ brew reinstall data-wise/tap/<formula>
 **Maintained by:** Atlas (source of truth for relationships)
 **Last Audit:** 2026-07-04
 **Next Review:** Q3 2026
+
+
+---
+
+**Now what?** → [MCP Server](./MCP-SERVER.md)

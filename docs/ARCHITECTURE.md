@@ -1057,3 +1057,8 @@ const projects = await repo.findAll({
 - [CLI Reference](./CLI-REFERENCE.md)
 - [API Guide](./API-GUIDE.md)
 - [Configuration](./CONFIGURATION.md)
+
+
+---
+
+**Now what?** → [Diagrams](./DIAGRAMS.md)
