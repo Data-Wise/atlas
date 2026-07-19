@@ -2,6 +2,21 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Added
+- **Canonical `.STATUS` schema `atlas/v1` (SPEC-status-schema-yaml-canonical-2026-07-19)** — one normative schema, documented in the new [docs/STATUS-SCHEMA.md](docs/STATUS-SCHEMA.md).
+- **`atlas migrate --status [path]`** — converts a legacy `.STATUS` (markdown `## Key:` or bare `key: value`) to canonical YAML frontmatter. Dry-run by default (prints a field-level diff); `--apply` writes; `--all-scanned` batches a directory tree.
+- **Unified read path** — `StatusFileGateway.read()` now delegates to `StatusFileParser.parseContent()`/`.normalize()`, so canonical frontmatter, legacy markdown, and legacy bare-yaml all produce the same normalized object, with the PR#87 duplicate-key / non-numeric-progress warning machinery now covering all three formats (previously markdown+yaml only).
+
+### Fixed
+- **Data-loss on write (audit finding)** — `StatusFileGateway.write()` previously silently dropped `kind`/`target`/`cran_state`/`tasks` when rewriting a markdown-format `.STATUS`. The writer now **refuses** to overwrite a legacy-format file (`LegacyStatusFileError`, naming `atlas migrate`) unless the caller explicitly opts in via `{ migrate: true }` — and when it does migrate, unknown keys and the markdown body are preserved.
+- **`{{user}}` template placeholder never substituted by `atlas init -t <template>`** — `init` only passed `{name}`; `{{user}}` now resolves via `templateVariables.user` → `git config user.name` → `$USER` → `'user'`.
+- **Validator/parser/template drift** — `StatusFileValidator.VALID_STATUSES` extended with `planning`/`blocked`/`stable` (the `research` template already shipped `status: planning`); `type` is now optional (the `minimal` template omits it); `next` is normalized to an array everywhere (was a bare string on the markdown/bare-yaml read paths).
+
+### Changed
+- All 6 builtin templates (`node`, `r-package`, `python`, `quarto`, `research`, `minimal`) now emit canonical YAML frontmatter instead of `## Key:` markdown headers.
+
 ## [0.13.1] - 2026-07-17
 
 Code for this release was substantially complete by 2026-07-11 but the version

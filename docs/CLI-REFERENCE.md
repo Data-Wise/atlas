@@ -1416,6 +1416,40 @@ atlas migrate --to filesystem
 atlas migrate --to sqlite --dry-run
 ```
 
+### `atlas migrate --status` (v0.14.0+)
+
+Convert a legacy `.STATUS` file (markdown `## Key:` headers or bare `key: value` lines) to
+canonical YAML frontmatter (schema `atlas/v1` — see [STATUS-SCHEMA.md](STATUS-SCHEMA.md)).
+Dry-run by default; nothing is written until `--apply` is passed.
+
+```bash
+atlas migrate --status [path] [options]
+
+Options:
+  --status         Migrate a .STATUS file (or directory of them, with --all-scanned)
+  --apply          Write the migration (default is dry-run: prints a field-level diff)
+  --all-scanned    Batch-migrate every .STATUS found under [path]
+```
+
+**Examples:**
+```bash
+# Dry-run against the current directory's .STATUS — prints a diff, writes nothing
+atlas migrate --status
+
+# Dry-run against a specific project
+atlas migrate --status ~/projects/research/pmed-modern
+
+# Apply the migration
+atlas migrate --status ~/projects/research/pmed-modern --apply
+
+# Batch-migrate every .STATUS under a research root
+atlas migrate --status ~/projects/research --all-scanned --apply
+```
+
+An already-canonical file is skipped (reported, not touched). Writing a legacy file directly via
+`StatusFileGateway.write()` (e.g. from `sync`) refuses with an error naming this command unless
+the caller opts in via `{ migrate: true }`.
+
 ### Using SQLite Backend
 
 ```bash

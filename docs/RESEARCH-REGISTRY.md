@@ -11,25 +11,55 @@ It is **additive**: ordinary package `.STATUS` files are unaffected, and every f
 
 ## The research `.STATUS` schema
 
-A research project's `.STATUS` is the same key/value header used everywhere, plus a few optional
-research fields. Keys are free-text `key: value` lines at the top of the file; prose may follow.
+As of schema `atlas/v1` (see [STATUS-SCHEMA.md](STATUS-SCHEMA.md) for the full normative
+reference), a research project's `.STATUS` is canonical **YAML frontmatter** plus a few optional
+research fields. Legacy bare `key: value` headers (shown further below for historical repos) still
+read correctly — atlas normalizes both to the same object — but every project's `.STATUS` is
+written back in frontmatter form once touched by `atlas migrate` or any atlas write.
 
 ```yaml
-status: active                 # free text: active | draft | paused | planning | "revise & resubmit"
-priority: P1                   # free text: high | -- | P0 | P1 ...
+---
+schema: atlas/v1
+status: active                 # active | paused | blocked | planning | stable | complete | archived
+priority: high                 # low | medium | high
 progress: 75                   # 0–100
-next: advance 05 data-fusion   # one-line next action
+next:                          # ordered list; first = next action
+  - advance 05 data-fusion
 type: research                 # atlas project type
-target: Epidemiology / JASA    # publication venue (alias: `venue:`)
+target: Epidemiology / JASA    # publication venue (alias: `venue:`/`journal:` accepted on read)
 kind: program                  # manuscript | program | package  (research only)
 cran_state: dev                # package-kind only — see CRAN state, below
 program: pmed-modern           # program id (proposals reference their parent)
 updated: 2026-06-25
 tasks:                         # a program's proposals, as task entries
-  - text: "01 incremental-elasticity — promote code to probmed/R"; priority: P1; done: false
-  - text: "02 Sobol — run the full grid"; priority: P2; done: false
-  - text: "05 data-fusion — copula kill-test"; priority: P2; done: true
+  - text: "01 incremental-elasticity — promote code to probmed/R"
+    priority: P1
+    done: false
+  - text: "02 Sobol — run the full grid"
+    priority: P2
+    done: false
+  - text: "05 data-fusion — copula kill-test"
+    priority: P2
+    done: true
+---
+Free markdown body — notes, links, prose. Never parsed, always preserved.
 ```
+
+<details>
+<summary>Legacy bare-yaml form (still readable, no longer written)</summary>
+
+```yaml
+status: active
+priority: P1
+progress: 75
+next: advance 05 data-fusion
+type: research
+target: Epidemiology / JASA
+kind: program
+cran_state: dev
+```
+
+</details>
 
 ### Field notes
 - **`kind`** — `manuscript` (a single paper), `program` (a multi-paper effort), or `package` (an R
