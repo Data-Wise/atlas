@@ -2,6 +2,17 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Docs
+- **Docs site ADHD-first redesign** — landing page (`docs/index.md`) rebuilt with a 3-command
+  quickstart above the fold and a Material `grid cards` pillar nav; `mkdocs.yml` nav regrouped
+  to 7 top-level sections (Home / Get Started / Guide / Reference / Architecture / Integrations /
+  Changelog), no page dropped from nav; `CLI-REFERENCE.md` gets a "Core 5" quick-start table up
+  top with the rest tiered (legacy `atlas migrate` collapsed behind a `??? note`); every top-level
+  nav landing page ends with a single "Now what?" next-step link. See
+  `docs/specs/SPEC-docs-adhd-redesign-2026-07-19.md`.
+
 ## [0.13.1] - 2026-07-17
 
 Code for this release was substantially complete by 2026-07-11 but the version
