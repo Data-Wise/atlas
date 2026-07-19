@@ -2,6 +2,10 @@
 
 > **ADHD-Friendly Patterns** - These workflows are designed for brains that context-switch, lose track of time, and have brilliant ideas at inconvenient moments.
 
+This page is **narrative**: why each pattern exists and when to reach for it. For copy-paste
+commands, see the [Cookbook](../cookbook/COOKBOOK.md) — it's the recipe-only counterpart to
+this page. Five short "moment in your day" walkthroughs live in [Scenarios](SCENARIOS.md).
+
 ---
 
 ## The Core Loop
@@ -273,60 +277,32 @@ atlas inbox --triage
 
 ---
 
-### Timeline View (v0.7.0)
+### Seeing Where Your Time Went
 
-**Goal:** Visualize your work patterns
+**Goal:** Beat time blindness — see your day, not just remember it
 
 ```bash
-atlas dash
-# Press 'T' (Shift+T) for timeline view
-```
-
-**The timeline shows:**
-- Today's sessions as color-coded time blocks
-- Gaps between sessions
-- Total work time
-- Session count
-
-```
- 09:00  ████████████████  atlas (45m)
- 10:00  ░░░░░░░░
- 11:00  ██████████████████████████  research (1h 10m)
- 12:00  ░░░░░░░░
- 13:00  ████████  atlas (25m)
+atlas stats              # Weekly summary with per-day breakdown
+atlas session export     # Export to iCal — see it on your calendar
 ```
 
 !!! tip "ADHD Tip"
-    The timeline helps with time blindness - see where your time actually went!
+    A standalone in-dashboard Timeline view existed pre-v0.14; that time-block
+    visualization now lives in `atlas stats` and calendar export instead.
 
 ---
 
-### Multi-Panel Layout (v0.9.1)
+### Multi-Panel Layout
 
 **Goal:** See your project list and content side-by-side without leaving the dashboard
 
 ```bash
 atlas dash
-# Press Tab to cycle layouts
-# ▣ Single (default) → ▥ Split → ▦ Triple → ▣ Single
+# Press Tab to cycle layouts: ▣ Single → ▥ Split → ▦ Triple → ▣ Single
 ```
 
-**Split workflow — project list + main content:**
-1. Press `Tab` → sidebar appears on the left
-2. `Shift+Tab` → move keyboard focus to sidebar
-3. `j`/`k` to scroll the project list
-4. `Enter` to open project in the main panel
-5. `Shift+Tab` again → back to main panel
-
-**Sidebar rows at a glance:**
-```
-│ ● atlas       75% │  <- green = active
-│ ◐ flow-cli    50% │  <- yellow = paused
-│ ● mcp-server  80% ⏱│  <- ⏱ = active session running
-│ 1–12/25            │  <- scroll indicator when > 12 projects
-```
-
-**Inbox badge:** `📥N` appears in sidebar header when N captures need triage.
+Full key-by-key detail (sidebar rows, inbox badge, focus tiers) lives in
+[REFCARD — Keyboard Shortcuts](../../REFCARD.md#keyboard-shortcuts-dashboard).
 
 !!! tip "Multi-Panel ADHD Tip"
     Use **Split** mode to keep your full project list visible while working in
@@ -552,24 +528,11 @@ atlas session start "feature: user-dashboard"
 atlas session end "PR #42 ready for review"
 ```
 
-### Task Management (v0.13.0)
+### Task Management
 
-**Goal:** Track actionable tasks with deadlines and priorities
+**Goal:** Track actionable tasks with deadlines and priorities, inside the session loop.
 
-```bash
-# Add tasks during session
-atlas task add "Review CRAN submission" --due=2026-07-10 --priority=P1
-atlas task add "Write changelog entry" --project=atlas
-
-# Check what's due
-atlas task list                   # all incomplete
-atlas task list --overdue         # past due
-atlas task list --due-soon        # due within 3 days
-
-# Complete tasks
-atlas task done 3                 # mark task #3 complete
-atlas task rm 5                   # delete task #5
-```
+Commands: [Cookbook Recipe 14](../cookbook/COOKBOOK.md#recipe-14--manage-tasks-with-due-dates-and-priorities).
 
 **Workflow:**
 ```mermaid
@@ -587,20 +550,12 @@ flowchart TD
     H --> I[Plan tomorrow]
 ```
 
-### Agenda View (v0.13.0)
+### Agenda View
 
-**Goal:** See today's combined schedule from multiple sources
+**Goal:** See today's combined schedule from multiple sources — scheduled records, tasks with
+due dates, and session history, merged chronologically.
 
-```bash
-# View merged agenda
-atlas agenda                     # today
-atlas agenda 7                   # next 7 days
-
-# Agenda combines:
-# - Scheduled records (meetings, deadlines)
-# - Tasks with due dates
-# - Session history
-```
+Commands: [Cookbook Recipe 15](../cookbook/COOKBOOK.md#recipe-15--merged-agenda-view).
 
 **Morning planning workflow:**
 ```mermaid
@@ -621,18 +576,12 @@ sequenceDiagram
     Atlas-->>You: Ready to work!
 ```
 
-### Schedule Push (v0.13.0)
+### Schedule Push
 
-**Goal:** Sync scheduled records to agenda
+**Goal:** Automate schedule sync from external sources (Google Calendar, Linear, flow-cli agenda,
+etc.) into `atlas agenda`.
 
-```bash
-# Push schedule to agenda
-atlas schedule push               # default JSON format
-atlas schedule push --format=md   # Markdown table
-atlas schedule push --data '{"title":"Meeting","date":"2026-07-10"}'
-```
-
-**Use case:** Automate schedule sync from external sources (Google Calendar, Linear, etc.)
+Commands: [flow-cli Integration](../../INTEGRATIONS.md), `atlas schedule push --help`.
 
 ### With Zellij/tmux
 
@@ -743,19 +692,10 @@ obs research board --dry-run
 
 ---
 
-## Workflow Cheat Sheet
+## Which Command When?
 
-| Situation      | Workflow                                            |
-| -------------- | --------------------------------------------------- |
-| Starting work  | `where` → `trail` → `session start`                 |
-| Got an idea    | `catch "idea"` (don't stop working)                 |
-| Need to switch | `park` → switch → `session start` → later: `unpark` |
-| Feeling stuck  | `crumb "stuck on X"` → take break                   |
-| End of day     | `session end` → `stats` → `crumb "tomorrow: X"`     |
-| Monday morning | `plan` → `agenda` → `task list --due-soon`          |
-| Track tasks    | `task add "X" --due=today --priority=P1`            |
-| Check agenda   | `agenda` → `task list` → `session start`            |
-| Review patterns| `stats --velocity` → `stats --patterns`             |
+Moved to [Quick Wins — Which Command When?](../adhd-guide/quick-wins.md#which-command-when)
+(catch vs. task vs. crumb vs. park) so it lives with the other 5-minute setup wins.
 
 ---
 
@@ -810,3 +750,7 @@ mindmap
 Use what helps. Ignore what doesn't. Your brain knows best.
 
 </div>
+
+---
+
+**Now what?** → [Cookbook: copy-paste recipes](../cookbook/COOKBOOK.md)
