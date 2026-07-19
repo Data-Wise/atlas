@@ -1,20 +1,39 @@
 /**
  * StatusFileGateway
  *
- * Adapter for reading .STATUS files from project directories.
- * Supports both legacy format and new YAML frontmatter format.
+ * Adapter for reading/writing .STATUS files from project directories.
+ * Read path delegates to StatusFileParser for normalization so canonical
+ * YAML frontmatter, legacy markdown, and legacy bare-yaml all produce the
+ * same normalized object (schema atlas/v1). Write path always emits
+ * canonical frontmatter and refuses to silently rewrite a legacy file
+ * (call site must pass { migrate: true } — see `atlas migrate`).
  */
 
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { parse, stringify } from 'yaml'
+import { stringify } from 'yaml'
+import { StatusFileParser, CANONICAL_FIELD_ORDER } from './StatusFileParser.js'
+
+const parser = new StatusFileParser()
+
+export class LegacyStatusFileError extends Error {
+  constructor(projectPath) {
+    super(
+      `Refusing to overwrite legacy-format .STATUS at ${join(projectPath, '.STATUS')} with canonical frontmatter. ` +
+      `Run "atlas migrate --status ${projectPath}" first (or pass { migrate: true }) to convert it losslessly.`
+    )
+    this.name = 'LegacyStatusFileError'
+    this.projectPath = projectPath
+  }
+}
 
 export class StatusFileGateway {
   /**
-   * Read .STATUS file from project directory
+   * Read .STATUS file from project directory. Normalizes any of the three
+   * accepted formats to the same canonical shape (schema atlas/v1).
    * @param {string} projectPath - Path to project directory
-   * @returns {Promise<Object|null>} Status data or null if not found
+   * @returns {Promise<Object|null>} Normalized status data or null if not found
    */
   async read(projectPath) {
     const statusPath = join(projectPath, '.STATUS')
@@ -25,12 +44,18 @@ export class StatusFileGateway {
 
     try {
       const content = await readFile(statusPath, 'utf-8')
-
-      // Check if it's YAML frontmatter format (starts with ---)
-      if (content.trim().startsWith('---')) {
-        return this._parseYAMLFormat(content)
-      } else {
-        return this._parseLegacyFormat(content)
+      const raw = parser.parseContent(content, undefined)
+      const normalized = parser.normalize(raw)
+      // Spread unknown/extra keys onto the top level too (convenience for
+      // callers that access e.g. status.venue directly) while still
+      // exposing them structurally via normalized.unknownKeys.
+      // `format` keeps its pre-existing public values ('yaml'|'legacy') for
+      // backward compatibility; sourceFormat carries the precise 3-way tag.
+      return {
+        ...normalized.unknownKeys,
+        ...normalized,
+        format: raw.format === 'frontmatter' ? 'yaml' : 'legacy',
+        sourceFormat: raw.format
       }
     } catch (error) {
       console.error(`Warning: Could not read .STATUS file: ${error.message}`)
@@ -39,127 +64,55 @@ export class StatusFileGateway {
   }
 
   /**
-   * Parse YAML frontmatter format (.STATUS v2)
-   * @private
+   * Detect the on-disk format without a full parse (used by write()'s
+   * refusal check and by `atlas migrate`).
+   * @param {string} projectPath
+   * @returns {Promise<'frontmatter'|'markdown'|'yaml'|null>}
    */
-  _parseYAMLFormat(content) {
-    // Extract frontmatter
-    const frontmatterMatch = content.match(/^---\n(.*?)\n---/s)
-    if (!frontmatterMatch) {
-      return this._parseLegacyFormat(content)
-    }
-
-    const frontmatter = frontmatterMatch[1]
-    const body = content.slice(frontmatterMatch[0].length).trim()
-
-    let parsed
-    try {
-      parsed = parse(frontmatter)
-    } catch {
-      return this._parseLegacyFormat(content)
-    }
-    if (!parsed || typeof parsed !== 'object') {
-      return this._parseLegacyFormat(content)
-    }
-
-    const cleanData = Object.fromEntries(
-      Object.entries(parsed).filter(([_, v]) => v !== undefined && v !== null)
-    )
-    return {
-      format: 'yaml',
-      status: 'unknown',
-      type: 'generic',
-      ...cleanData,
-      progress: typeof cleanData.progress === 'string' ? (parseInt(cleanData.progress, 10) || 0) : (cleanData.progress ?? 0),
-      next: cleanData.next || [],
-      metrics: cleanData.metrics || {},
-      body
-    }
+  async detectFormat(projectPath) {
+    const statusPath = join(projectPath, '.STATUS')
+    if (!existsSync(statusPath)) return null
+    const content = await readFile(statusPath, 'utf-8')
+    if (content.trim().startsWith('---')) return 'frontmatter'
+    if (/^##\s+\w+:/m.test(content)) return 'markdown'
+    return 'yaml'
   }
 
   /**
-   * Parse legacy .STATUS format (plain text)
-   * @private
-   */
-  _parseLegacyFormat(content) {
-    const lines = content.split('\n')
-    const data = {
-      format: 'legacy',
-      status: 'unknown',
-      progress: 0,
-      next: [],
-      body: content
-    }
-
-    // Try to extract common patterns
-    for (const line of lines) {
-      const trimmed = line.trim()
-
-      // Look for status indicators
-      if (trimmed.startsWith('status:') || trimmed.startsWith('Status:')) {
-        const statusMatch = trimmed.match(/status:\s*(\w+)/i)
-        if (statusMatch) {
-          data.status = statusMatch[1].toLowerCase()
-        }
-      }
-
-      // Look for progress percentage
-      const progressMatch = trimmed.match(/(\d+)%/)
-      if (progressMatch) {
-        data.progress = parseInt(progressMatch[1], 10)
-      }
-
-      // Look for "next:" or "next action:" lines
-      if (
-        trimmed.toLowerCase().startsWith('next:') ||
-        trimmed.toLowerCase().startsWith('next action:')
-      ) {
-        const actionText = trimmed.split(':').slice(1).join(':').trim()
-        if (actionText) {
-          data.next.push({ action: actionText, priority: 'medium' })
-        }
-      }
-    }
-
-    return data
-  }
-
-  /**
-   * Parse YAML value (string, number, boolean)
-   * @private
-   */
-  _parseValue(value) {
-    // Remove quotes
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      return value.slice(1, -1)
-    }
-
-    // Parse numbers
-    if (/^\d+$/.test(value)) {
-      return parseInt(value, 10)
-    }
-
-    // Parse booleans
-    if (value === 'true') return true
-    if (value === 'false') return false
-
-    return value
-  }
-
-  /**
-   * Write .STATUS file to project directory
+   * Write .STATUS file to project directory as canonical YAML frontmatter.
+   * Refuses to write over an existing legacy-format file unless
+   * `options.migrate` is true — prevents the PR#87 silent-field-drop bug.
+   * Unknown frontmatter keys and the markdown body are preserved verbatim.
    * @param {string} projectPath - Path to project directory
-   * @param {Object} data - Status data to write
+   * @param {Object} data - Status data to write (normalized shape or raw)
+   * @param {Object} [options]
+   * @param {boolean} [options.migrate] - allow overwriting a legacy file
    * @returns {Promise<void>}
    */
-  async write(projectPath, data) {
+  async write(projectPath, data, options = {}) {
     const statusPath = join(projectPath, '.STATUS')
+    const existingFormat = await this.detectFormat(projectPath)
 
-    // Generate YAML frontmatter format
-    const content = this._generateYAMLFormat(data)
+    if (existingFormat && existingFormat !== 'frontmatter' && !options.migrate) {
+      throw new LegacyStatusFileError(projectPath)
+    }
+
+    // If migrating, merge unknown keys + body from the legacy file so
+    // nothing is silently dropped.
+    let mergedData = data
+    if (existingFormat && existingFormat !== 'frontmatter' && options.migrate) {
+      const existingContent = await readFile(statusPath, 'utf-8')
+      const rawExisting = parser.parseContent(existingContent, undefined)
+      const normalizedExisting = parser.normalize(rawExisting)
+      mergedData = {
+        ...normalizedExisting,
+        ...data,
+        unknownKeys: { ...normalizedExisting.unknownKeys, ...(data.unknownKeys || {}) },
+        body: data.body ?? normalizedExisting.body
+      }
+    }
+
+    const content = this._generateCanonicalFormat(mergedData)
 
     try {
       await writeFile(statusPath, content, 'utf-8')
@@ -169,27 +122,46 @@ export class StatusFileGateway {
   }
 
   /**
-   * Generate YAML frontmatter format
+   * Generate canonical YAML frontmatter (.STATUS schema atlas/v1).
+   * Emits known fields in CANONICAL_FIELD_ORDER, then any unknown/extra
+   * keys verbatim (round-trip preservation), then the markdown body
+   * byte-for-byte.
    * @private
    */
-  _generateYAMLFormat(data) {
-    const KNOWN_ORDER = ['status', 'progress', 'type', 'kind', 'priority',
-      'phase', 'focus', 'version', 'updated', 'target', 'checkpoint']
+  _generateCanonicalFormat(data) {
+    const fm = { schema: 'atlas/v1' }
 
-    const fm = {}
-    for (const key of KNOWN_ORDER) {
-      if (data[key] !== undefined && data[key] !== null) fm[key] = data[key]
-    }
-    if (data.next?.length) fm.next = data.next
-    if (data.tasks?.length) fm.tasks = data.tasks
-    if (data.metrics && Object.keys(data.metrics).length > 0) {
-      fm.metrics = data.metrics
+    const FIELD_ALIASES = {
+      cran_state: data.cran_state ?? data.cranState
     }
 
-    for (const [key, value] of Object.entries(data)) {
-      if (!(key in fm) && key !== 'body' && key !== 'format') {
-        fm[key] = value
+    for (const key of CANONICAL_FIELD_ORDER) {
+      if (key === 'schema') continue
+      let value = key in FIELD_ALIASES ? FIELD_ALIASES[key] : data[key]
+      if (value === undefined || value === null) continue
+      if (key === 'next') {
+        const arr = Array.isArray(value) ? value : [value]
+        if (arr.length === 0) continue
+        fm.next = arr
+        continue
       }
+      if (key === 'tasks') {
+        if (!Array.isArray(value) || value.length === 0) continue
+        fm.tasks = value
+        continue
+      }
+      if (key === 'metrics') {
+        if (!value || typeof value !== 'object' || Object.keys(value).length === 0) continue
+        fm.metrics = value
+        continue
+      }
+      fm[key] = value
+    }
+
+    // Preserve unknown/extra keys verbatim (round-trip guarantee)
+    const unknown = data.unknownKeys || {}
+    for (const [key, value] of Object.entries(unknown)) {
+      if (!(key in fm)) fm[key] = value
     }
 
     const yaml = stringify(fm).trimEnd()
