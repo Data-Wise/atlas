@@ -58,6 +58,14 @@ atlas session start myproject                  # 3. start working
 
     [:octicons-arrow-right-24: Integrations](INTEGRATIONS.md)
 
+-   :material-apple-keyboard-command:{ .lg .middle } **SwiftBar**
+
+    ---
+
+    Menu-bar digest — no dashboard required.
+
+    [:octicons-arrow-right-24: SwiftBar](user-guide/swiftbar.md)
+
 </div>
 
 ## :heart: Why Atlas (ADHD-first)
