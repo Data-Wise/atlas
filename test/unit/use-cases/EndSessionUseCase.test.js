@@ -2,9 +2,14 @@
  * Unit tests for EndSessionUseCase
  */
 
+import { execSync } from 'node:child_process'
+import { mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { EndSessionUseCase } from '../../../src/use-cases/session/EndSessionUseCase.js'
 import { Session } from '../../../src/domain/entities/Session.js'
 import { Project } from '../../../src/domain/entities/Project.js'
+import { GitGateway } from '../../../src/adapters/gateways/GitGateway.js'
 
 // Mock repositories
 class MockSessionRepository {
@@ -67,7 +72,7 @@ describe('EndSessionUseCase', () => {
       const session = new Session('session-1', 'rmediation')
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute()
+      const { session: endedSession } = await useCase.execute()
 
       expect(endedSession.state.isEnded()).toBe(true)
       expect(endedSession.outcome).toBe('completed')
@@ -78,7 +83,7 @@ describe('EndSessionUseCase', () => {
       const session = new Session('session-1', 'rmediation')
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute({ outcome: 'cancelled' })
+      const { session: endedSession } = await useCase.execute({ outcome: 'cancelled' })
 
       expect(endedSession.outcome).toBe('cancelled')
     })
@@ -122,7 +127,7 @@ describe('EndSessionUseCase', () => {
       const session = new Session('session-123', 'rmediation')
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute({ sessionId: 'session-123' })
+      const { session: endedSession } = await useCase.execute({ sessionId: 'session-123' })
 
       expect(endedSession.id).toBe('session-123')
       expect(endedSession.state.isEnded()).toBe(true)
@@ -133,7 +138,7 @@ describe('EndSessionUseCase', () => {
       session.pause()
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute({ sessionId: 'session-1' })
+      const { session: endedSession } = await useCase.execute({ sessionId: 'session-1' })
 
       expect(endedSession.state.isEnded()).toBe(true)
     })
@@ -166,7 +171,7 @@ describe('EndSessionUseCase', () => {
         const session = new Session(`session-${outcome}`, 'rmediation')
         sessionRepo.sessions.push(session)
 
-        const endedSession = await useCase.execute({
+        const { session: endedSession } = await useCase.execute({
           sessionId: session.id,
           outcome
         })
@@ -193,7 +198,7 @@ describe('EndSessionUseCase', () => {
       session.startTime = new Date(Date.now() - 45 * 60 * 1000)
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute()
+      const { session: endedSession } = await useCase.execute()
 
       const duration = endedSession.getDuration()
       expect(duration).toBeGreaterThanOrEqual(44)
@@ -208,11 +213,145 @@ describe('EndSessionUseCase', () => {
       session.totalPausedTime = 30 * 60 * 1000
       sessionRepo.sessions.push(session)
 
-      const endedSession = await useCase.execute()
+      const { session: endedSession } = await useCase.execute()
 
       const duration = endedSession.getDuration()
       expect(duration).toBeGreaterThanOrEqual(29)
       expect(duration).toBeLessThanOrEqual(31)
+    })
+  })
+
+  describe('Evidence-linked done (git delta)', () => {
+    let repoDir
+
+    beforeEach(() => {
+      repoDir = mkdtempSync(join(tmpdir(), 'atlas-endsession-fixture-'))
+      execSync('git init -q', { cwd: repoDir })
+      execSync('git config user.email test@example.com', { cwd: repoDir })
+      execSync('git config user.name test', { cwd: repoDir })
+    })
+
+    afterEach(() => {
+      rmSync(repoDir, { recursive: true, force: true })
+    })
+
+    test('delta present: reports commits/files made during the session', async () => {
+      execSync('echo init > f.txt && git add f.txt && git commit -qm init', {
+        cwd: repoDir,
+        shell: '/bin/bash'
+      })
+
+      const session = new Session('session-1', 'fixture')
+      session.startTime = new Date(Date.now() - 60 * 1000) // 1 minute ago
+      sessionRepo.sessions.push(session)
+
+      const project = new Project('fixture', 'fixture')
+      project.path = repoDir
+      projectRepo.projects.push(project)
+
+      // Make a commit that lands after the session start
+      execSync('echo more >> f.txt && git add f.txt && git commit -qm "work done"', {
+        cwd: repoDir,
+        shell: '/bin/bash'
+      })
+
+      const gitUseCase = new EndSessionUseCase(sessionRepo, projectRepo, new GitGateway())
+      const { gitDelta } = await gitUseCase.execute({ sessionId: 'session-1' })
+
+      expect(gitDelta).not.toBeNull()
+      expect(gitDelta.hasActivity).toBe(true)
+      expect(gitDelta.commits.length).toBeGreaterThanOrEqual(1)
+      expect(gitDelta.commits[0].subject).toBe('work done')
+      expect(gitDelta.files).toContain('f.txt')
+    })
+
+    test('delta empty: session with zero git activity degrades to empty commits, not an error', async () => {
+      execSync('echo init > f.txt && git add f.txt && git commit -qm init', {
+        cwd: repoDir,
+        shell: '/bin/bash'
+      })
+
+      const session = new Session('session-1', 'fixture')
+      session.startTime = new Date(Date.now() + 60 * 1000) // 1 minute in the future, no commits since
+      sessionRepo.sessions.push(session)
+
+      const project = new Project('fixture', 'fixture')
+      project.path = repoDir
+      projectRepo.projects.push(project)
+
+      const gitUseCase = new EndSessionUseCase(sessionRepo, projectRepo, new GitGateway())
+      const { gitDelta } = await gitUseCase.execute({ sessionId: 'session-1' })
+
+      expect(gitDelta).not.toBeNull()
+      expect(gitDelta.hasActivity).toBe(false)
+      expect(gitDelta.commits).toEqual([])
+    })
+
+    test('non-git project: degrades gracefully to gitDelta: null, session still ends', async () => {
+      const nonGitDir = mkdtempSync(join(tmpdir(), 'atlas-endsession-nongit-'))
+      try {
+        const session = new Session('session-1', 'plain')
+        sessionRepo.sessions.push(session)
+
+        const project = new Project('plain', 'plain')
+        project.path = nonGitDir
+        projectRepo.projects.push(project)
+
+        const gitUseCase = new EndSessionUseCase(sessionRepo, projectRepo, new GitGateway())
+        const { session: endedSession, gitDelta } = await gitUseCase.execute({ sessionId: 'session-1' })
+
+        expect(gitDelta).toBeNull()
+        expect(endedSession.state.isEnded()).toBe(true)
+      } finally {
+        rmSync(nonGitDir, { recursive: true, force: true })
+      }
+    })
+
+    test('no gitGateway injected: gitDelta stays null (backward-compatible default)', async () => {
+      const session = new Session('session-1', 'fixture')
+      sessionRepo.sessions.push(session)
+
+      const result = await useCase.execute({ sessionId: 'session-1' })
+
+      expect(result.gitDelta).toBeNull()
+      expect(result.synced).toBe(false)
+    })
+  })
+
+  describe('Scoped auto-sync after session end', () => {
+    test('runs sync scoped to the session project when syncFromStatusUseCase is provided', async () => {
+      const session = new Session('session-1', 'fixture')
+      sessionRepo.sessions.push(session)
+
+      const project = new Project('fixture', 'fixture')
+      project.path = '/tmp/does-not-matter'
+      projectRepo.projects.push(project)
+
+      let calledWith = null
+      const fakeSync = { execute: async input => { calledWith = input; return {} } }
+
+      const syncUseCase = new EndSessionUseCase(sessionRepo, projectRepo, null, fakeSync)
+      const { synced } = await syncUseCase.execute({ sessionId: 'session-1' })
+
+      expect(synced).toBe(true)
+      expect(calledWith.rootPath).toBe('/tmp/does-not-matter')
+    })
+
+    test('sync failure does not block session end (best-effort)', async () => {
+      const session = new Session('session-1', 'fixture')
+      sessionRepo.sessions.push(session)
+
+      const project = new Project('fixture', 'fixture')
+      project.path = '/tmp/does-not-matter'
+      projectRepo.projects.push(project)
+
+      const failingSync = { execute: async () => { throw new Error('boom') } }
+
+      const syncUseCase = new EndSessionUseCase(sessionRepo, projectRepo, null, failingSync)
+      const { session: endedSession, synced } = await syncUseCase.execute({ sessionId: 'session-1' })
+
+      expect(synced).toBe(false)
+      expect(endedSession.state.isEnded()).toBe(true)
     })
   })
 })

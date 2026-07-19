@@ -162,7 +162,21 @@ program
 
       // Handle complete action with optional next action
       if (options.complete) {
-        const result = await a.projects.completeNextAction(project, options.then);
+        // Evidence-linked completion: record which session/commit closed the item.
+        const evidence = { sessionId: null, commitSha: null };
+        try {
+          const activeSession = await a.sessions.current();
+          if (activeSession) evidence.sessionId = activeSession.id;
+        } catch (e) { /* ignore */ }
+        try {
+          const projectRecord = await a.container.resolve('ProjectRepository').findById(project) ||
+            await a.container.resolve('ProjectRepository').findByPath(project);
+          const path = projectRecord?.path || project;
+          const gitGateway = a.container.resolve('GitGateway');
+          evidence.commitSha = await gitGateway.getHeadSha(path);
+        } catch (e) { /* ignore - non-git project degrades gracefully */ }
+
+        const result = await a.projects.completeNextAction(project, options.then, evidence);
         console.log(result.message);
         return;
       }
@@ -266,14 +280,48 @@ session
       streakCount = status?.streak?.current || 0;
     } catch (e) { /* ignore */ }
 
+    // Evidence-linked done: ask for the outcome ONLY when stdin is a TTY.
+    // Non-interactive contexts (CI, flow-cli, piped input) keep the prior
+    // default-completed behavior unchanged.
+    let outcome = 'completed';
+    if (process.stdin.isTTY) {
+      try {
+        const readline = await import('readline');
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await new Promise(resolve =>
+          rl.question('Outcome? [completed/cancelled/interrupted] (completed): ', resolve)
+        );
+        rl.close();
+        const trimmed = answer.trim().toLowerCase();
+        if (['completed', 'cancelled', 'interrupted'].includes(trimmed)) {
+          outcome = trimmed;
+        }
+      } catch (e) { /* ignore prompt errors, keep default */ }
+    }
+
     try {
-      const result = await atlasInstance.sessions.end(note);
+      const result = await atlasInstance.sessions.end(note, { outcome });
       console.log(`✓ Session ended (${result.duration})`);
+
+      // Evidence: git delta since session start, so "done" is backed by
+      // commits/files touched rather than an unchecked outcome flag.
+      if (result.gitDelta) {
+        const { branch, commits, files } = result.gitDelta;
+        if (commits.length > 0) {
+          console.log(`\n📌 Evidence (${branch}): ${commits.length} commit(s), ${files.length} file(s) touched`);
+          commits.slice(0, 5).forEach(c => console.log(`   ${c.sha} ${c.subject}`));
+        } else {
+          console.log(`\n📌 Evidence (${branch}): no commits during this session`);
+        }
+      }
+      if (result.synced) {
+        console.log(`🔄 Registry synced`);
+      }
 
       // Show celebration
       const celebration = CelebrationHelper.getCelebration({
         duration,
-        outcome: 'completed',
+        outcome,
         streak: streakCount
       });
       console.log(`\n${celebration.emoji} ${celebration.message}`);
@@ -702,6 +750,7 @@ program
   .description('Leave a breadcrumb trail marker')
   .option('-p, --project <project>', 'Associate with project')
   .action(async (text, options) => {
+    console.error('⚠️  atlas crumb is deprecated — use: atlas session note <text>');
     await getAtlas().context.breadcrumb(text, options.project);
     console.log(`🍞 Breadcrumb: "${text}"`);
   });
@@ -712,6 +761,7 @@ program
   .option('-d, --days <days>', 'Days to show', '7')
   .option('--limit <n>', 'Maximum number of breadcrumbs to show (most recent first)')
   .action(async (project, options) => {
+    console.error('⚠️  atlas trail is deprecated — use: atlas (bare digest) or atlas where');
     // Guard against non-numeric input: fall back to defaults rather than NaN
     // (NaN would flow into slice()/Date and silently yield empty output).
     const parsedDays = parseInt(options.days, 10);
@@ -732,6 +782,7 @@ program
   .option('-f, --force', 'Park even without active session')
   .option('-k, --keep-session', 'Keep session running after parking')
   .action(async (note, options) => {
+    console.error('⚠️  atlas park is deprecated — use: atlas catch --type=note (single parking concept on Capture)');
     const { ParkContextUseCase } = await import('../src/use-cases/context/ParkContextUseCase.js');
     const atlas = getAtlas();
     const parkUseCase = new ParkContextUseCase({
@@ -753,6 +804,7 @@ program
   .command('unpark [id]')
   .description('Restore a parked context')
   .action(async (id) => {
+    console.error('⚠️  atlas unpark is deprecated — use: atlas catch --type=note (single parking concept on Capture)');
     const { UnparkContextUseCase } = await import('../src/use-cases/context/UnparkContextUseCase.js');
     const atlas = getAtlas();
     const unparkUseCase = new UnparkContextUseCase({
@@ -769,6 +821,7 @@ program
   .command('parked')
   .description('List parked contexts')
   .action(async () => {
+    console.error('⚠️  atlas parked is deprecated — use: atlas catch --type=note (single parking concept on Capture)');
     const { UnparkContextUseCase } = await import('../src/use-cases/context/UnparkContextUseCase.js');
     const atlas = getAtlas();
     const unparkUseCase = new UnparkContextUseCase({
@@ -1655,11 +1708,59 @@ program
     }
   });
 
-// Show help if no command was provided (before parsing to avoid Commander errors)
-if (process.argv.length <= 2) {
-  program.outputHelp();
-  process.exit(0);
+// ============================================================================
+// BARE `atlas` (no args) — the digest
+// ============================================================================
+// One glanceable screen: active session, project focus + next, inbox count,
+// streak, top-3 suggestions. Merges the read paths of where/plan/status;
+// additive only — it does not change where/plan/status/inbox/trail output.
+
+function renderDigest(digest) {
+  console.log('\n📋 ATLAS DIGEST');
+  console.log('─'.repeat(40));
+
+  if (digest.activeSession) {
+    console.log(`🎯 Active: ${digest.activeSession.project} (${digest.activeSession.duration})`);
+  } else {
+    console.log('🎯 Active: none');
+  }
+
+  if (digest.project) {
+    console.log(`📁 Project: ${digest.project}`);
+    console.log(`   Focus: ${digest.focus || '(none set)'}`);
+    if (digest.next.length > 0) {
+      console.log(`   Next: ${digest.next[0]}`);
+      digest.next.slice(1).forEach(n => console.log(`         ${n}`));
+    }
+  }
+
+  console.log(`📥 Inbox: ${digest.inboxCount}`);
+
+  if (digest.streak) {
+    console.log(`🔥 Streak: ${digest.streak.display || digest.streak.current}`);
+  }
+
+  if (digest.suggestions.length > 0) {
+    console.log('\n💡 Suggestions:');
+    digest.suggestions.forEach(s => console.log(`   → ${s.message}${s.action ? ` (${s.action})` : ''}`));
+  }
+  console.log('');
 }
 
-// Parse and execute
-program.parse();
+if (process.argv.length <= 2) {
+  (async () => {
+    try {
+      const a = getAtlas();
+      const digestUseCase = a.container.resolve('GetDigestUseCase');
+      const digest = await digestUseCase.execute({});
+      renderDigest(digest);
+    } catch (error) {
+      console.error(`❌ Error generating digest: ${error.message}`);
+      program.outputHelp();
+    }
+    process.exit(0);
+  })();
+} else {
+  // Parse and execute
+  program.parse();
+}

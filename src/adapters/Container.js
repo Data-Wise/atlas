@@ -40,6 +40,7 @@ import { TriageInboxUseCase } from '../use-cases/capture/TriageInboxUseCase.js'
 import { GetContextUseCase } from '../use-cases/context/GetContextUseCase.js'
 import { LogBreadcrumbUseCase } from '../use-cases/context/LogBreadcrumbUseCase.js'
 import { GetTrailUseCase } from '../use-cases/context/GetTrailUseCase.js'
+import { GetDigestUseCase } from '../use-cases/context/GetDigestUseCase.js'
 import { SyncRegistryUseCase } from '../use-cases/registry/SyncRegistryUseCase.js'
 import { SyncFromStatusUseCase } from '../use-cases/registry/SyncFromStatusUseCase.js'
 import { RegisterProjectUseCase } from '../use-cases/registry/RegisterProjectUseCase.js'
@@ -56,6 +57,7 @@ import { AgendaUseCase } from '../use-cases/task/AgendaUseCase.js'
 import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
+import { GitGateway } from './gateways/GitGateway.js'
 
 export class Container {
   /**
@@ -201,7 +203,12 @@ export class Container {
 
   getEndSessionUseCase() {
     return this._resolve('endSessionUseCase', () => {
-      return new EndSessionUseCase(this.getSessionRepository(), this.getProjectRepository())
+      return new EndSessionUseCase(
+        this.getSessionRepository(),
+        this.getProjectRepository(),
+        this.getGitGateway(),
+        this.getSyncFromStatusUseCase()
+      )
     })
   }
 
@@ -371,6 +378,17 @@ export class Container {
     })
   }
 
+  getGetDigestUseCase() {
+    return this._resolve('getDigestUseCase', () => {
+      return new GetDigestUseCase({
+        getContextUseCase: this.getGetContextUseCase(),
+        planDayUseCase: this.getPlanDayUseCase(),
+        statusFileGateway: this.getStatusFileGateway(),
+        projectRepository: this.getProjectRepository()
+      })
+    })
+  }
+
   // ============================================================================
   // USE CASES - Registry
   // ============================================================================
@@ -429,6 +447,12 @@ export class Container {
   getStatusFileParser() {
     return this._resolve('statusFileParser', () => {
       return new StatusFileParser()
+    })
+  }
+
+  getGitGateway() {
+    return this._resolve('gitGateway', () => {
+      return new GitGateway()
     })
   }
 
@@ -497,6 +521,7 @@ export class Container {
       'GetContextUseCase': () => this.getGetContextUseCase(),
       'LogBreadcrumbUseCase': () => this.getLogBreadcrumbUseCase(),
       'GetTrailUseCase': () => this.getGetTrailUseCase(),
+      'GetDigestUseCase': () => this.getGetDigestUseCase(),
 
       // Registry use cases
       'SyncRegistryUseCase': () => this.getSyncRegistryUseCase(),
@@ -509,6 +534,7 @@ export class Container {
       // Gateways
       'StatusFileGateway': () => this.getStatusFileGateway(),
       'StatusFileParser': () => this.getStatusFileParser(),
+      'GitGateway': () => this.getGitGateway(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
