@@ -4,6 +4,43 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.14.0 — TUI Consolidation & Evidence-Linked Workflow
+
+!!! success "3 views, not 8 — plus a status-file schema that won't rot"
+    The dashboard got smaller and the workflow got sharper: one digest command, one canonical `.STATUS` format, one Pomodoro implementation.
+
+### The bare `atlas` digest
+
+```bash
+atlas    # no args — "what am I doing / what's next", right now
+```
+
+`atlas plan` and `atlas where` are now views onto the same digest data instead of separate code paths.
+
+### Evidence-linked session end
+
+`atlas session end` shows the git delta for the session and auto-syncs the registry — no more guessing what actually got done.
+
+### `.STATUS` atlas/v1 frontmatter
+
+Canonical YAML frontmatter schema (see [.STATUS Schema](STATUS-SCHEMA.md)). Legacy `## Status:` / `## Progress:` markdown headers still read correctly — nothing is silently rewritten.
+
+```bash
+atlas migrate --status [path]              # dry-run: field-level diff
+atlas migrate --status [path] --apply      # writes canonical frontmatter
+atlas migrate --status [path] --all-scanned --apply   # batch a directory tree
+```
+
+### 3-view dashboard (Now / Timer / Plan)
+
+8 views collapsed to 3, 8 state-machine states to 3, one Pomodoro implementation (was 3), a single `lib/keymap.ts` source of truth, and a new `?` help overlay. See [Architecture](ARCHITECTURE.md) and [REFCARD](REFCARD.md#keyboard-shortcuts-dashboard) for the full keymap.
+
+### SwiftBar plugin
+
+A menu-bar digest that doesn't need the dashboard open — see [SwiftBar](user-guide/swiftbar.md).
+
+---
+
 ## v0.13.1 — YAML Passthrough & Inbox Flags
 
 !!! success "Bug Fixes & Enhancements"

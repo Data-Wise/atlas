@@ -5,6 +5,26 @@
 !!! tip "ADHD-Friendly Design"
     This tutorial has **"Try This Now"** prompts. Do them! Hands-on learning sticks better than reading.
 
+## Try This Now: Your First Win (2 minutes)
+
+Skip the explanation — get a win first.
+
+```bash
+# Install (macOS shown; see Installation for Linux/curl/source)
+brew tap data-wise/tap && brew install atlas
+atlas init
+
+# Register a project, start a session, end it
+cd ~/projects/my-project   # or wherever
+atlas project add
+atlas session start
+atlas session end "tried out atlas"
+```
+
+**That's it.** You just registered a project, tracked a session, and got a celebration message. Everything below explains *why* — come back to Part 1 for the other install options.
+
+---
+
 ## What Atlas Does (Visual Overview)
 
 ```mermaid
@@ -95,6 +115,8 @@ atlas --help
 
 ### Try This Now #1: Your First Project
 
+> Already did the 2-minute win above? Skip to [Part 2](#part-2-core-workflow-5-minutes).
+
 ```bash
 # Go to any project directory (or create one)
 cd ~/projects/my-project  # or wherever
@@ -152,6 +174,8 @@ atlas session start myproject
 
 ### Try This Now #3: Quick Capture
 
+*Capture = a quick inbox note — jot it and keep working, process it later.*
+
 Imagine you're working and remember something:
 
 ```bash
@@ -181,6 +205,8 @@ atlas inbox --stats
 
 ### Breadcrumbs (ADHD Gold)
 
+*Breadcrumb = a trail marker for where you got stuck — leave one, come back later, follow it home.*
+
 Leave yourself notes about WHERE you are:
 
 ```bash
@@ -209,7 +235,7 @@ atlas focus myproject "implementing user authentication"
 atlas where
 ```
 
-**Note:** For detailed project status with `--set`, `--progress`, etc., your project needs a `.STATUS` file. Create one with:
+Detailed status (`--set`, `--progress`, etc.) needs a `.STATUS` file — create one inline, no need to browse templates yet:
 ```bash
 atlas init --template minimal   # in your project directory
 ```
@@ -325,54 +351,38 @@ atlas dash
 
 ### Try This Now #7: Navigate the Dashboard
 
-| Key     | Action                | Try It                   |
-| ------- | --------------------- | ------------------------ |
-| `↑↓`    | Move between projects | Navigate up/down         |
-| `Enter` | View project details  | Select a project         |
-| `a`     | Analytics view        | Deep productivity insights |
-| `f`     | Focus mode (Pomodoro) | 25-min timer             |
-| `T`     | Timeline view         | Today's time blocks      |
-| `Tab`   | **Cycle layout mode** | Single → Split → Triple  |
-| `d`     | Decision helper       | "What should I work on?" |
-| `/`     | Search                | Find a project           |
-| `*`     | Clear filter          | Show all                 |
-| `q`     | Quit                  | Exit dashboard           |
+**v0.14 — 3 views, not 8** (Now / Timer / Plan). `src/cli/dashboard-ink/lib/keymap.ts` is the single source of truth — press `?` in-app to see this table live (mirrors [REFCARD](REFCARD.md#keyboard-shortcuts-dashboard)):
 
-### Focus Mode (Pomodoro)
+| Key              | Scope   | Action                                        |
+| ---------------- | ------- | ---------------------------------------------- |
+| `1` / `n`        | global  | Switch to **Now**                              |
+| `2` / `t`        | global  | Switch to **Timer**                            |
+| `3` / `p`        | global  | Switch to **Plan**                             |
+| `Tab`            | global  | Cycle layout (Single → Split → Triple)         |
+| `q`              | global  | Quit                                           |
+| `?`              | global  | Toggle help overlay                            |
+| `j`/`k`/`↑↓`     | Now     | Navigate project list                          |
+| `Enter`          | Now     | Select project                                 |
+| `e`              | Now     | Toggle ecosystem-wide stats in the right pane  |
 
-1. Press `f` in the dashboard
-2. **NEW in v0.7.0:** Prompted "What will you focus on?"
-3. Enter your task (or press Esc to skip)
-4. Minimal UI appears with 25-minute timer showing your task
-5. Work without distraction
-6. Press `Space` to pause/resume
-7. When timer ends: `c` (completed), `p` (partial), `n` (pivoted)
+### Timer View (Pomodoro)
 
-**During focus mode:**
-- `+`/`-` - Adjust timer by 5 minutes
-- `r` - Reset timer
-- `c` - Quick capture (without leaving focus)
+Press `2` or `t` to switch. Timer absorbs what used to be three separate implementations (Focus / Zen / Inspector timer):
 
-### Timeline View (v0.7.0)
+1. `Space` — pause/resume
+2. `r` — reset (while paused)
+3. `+`/`-` — adjust duration (while paused)
+4. `z` — toggle zen mode (minimal chrome, distraction-free)
 
-Press `T` (Shift+T) to see today's sessions visualized:
+### Plan View (Morning Ritual)
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│ 📅 Today's Time Blocks                               12/29/2025    │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  09:00  ████████████████  atlas (45m)                               │
-│  10:00  ░░░░░░░░                                                    │
-│  11:00  ██████████████████████████  research-project (1h 10m)       │
-│  12:00  ░░░░░░░░                                                    │
-│  13:00  ████████  atlas (25m)                                       │
-│                                                                     │
-│  Total: 2h 20m across 3 sessions                                    │
-└─────────────────────────────────────────────────────────────────────┘
-```
+Press `3` or `p`. Plan absorbs the old standalone Analytics view:
 
-Press `Esc` to return to the main view.
+- `j`/`k`/`↑↓` — navigate suggestions
+- `Enter` — execute a suggestion
+- `e` — cycle energy level
+- `s` — start a session (jumps to Timer)
+- `a` — toggle the analytics pane
 
 ### Real Data Dashboard (v0.9.2)
 
@@ -446,7 +456,7 @@ When inspector is focused (`Shift+Tab` to reach it):
 
 ### Themes (v0.9.1)
 
-Press `t` in the dashboard to cycle through 5 built-in themes:
+5 built-in themes ship with the dashboard (in-app cycling is retired as of v0.14 — `t` now switches to the Timer view; set a theme via config):
 
 | Theme | Look | Best for |
 |-------|------|----------|
@@ -520,23 +530,25 @@ atlas init --template node --name my-awesome-app
 # - Standard Node.js structure
 ```
 
-**What's in the .STATUS file?**
+**What's in the .STATUS file?** (atlas/v1 frontmatter — see [.STATUS Schema](STATUS-SCHEMA.md))
 ```markdown
-## Project: my-awesome-app
-## Status: active
-## Progress: 0
-## Type: node
+---
+schema: atlas/v1
+status: active
+progress: 0
+type: node
+priority: medium
+focus: Set up project structure
+next:
+  - Initialize npm package
+  - Set up testing framework
+  - Create initial module structure
+  - Add README documentation
+---
 
-## Focus
-Getting started with initial setup
+# my-awesome-app
 
-## Current Tasks
-- [ ] Initialize npm package
-- [ ] Set up testing framework
-- [ ] Create basic structure
-
-## Notes
-Created from node template
+my-awesome-app is a Node.js package, maintained by you.
 ```
 
 ### Try This Now #9: Create a Custom Template
@@ -1028,7 +1040,7 @@ brew install zellij
 | ------------------- | ---------------- | ------------------------------- |
 | Session persistence | Park/unpark      | Full context survival           |
 | Visual keybindings  | ADHD helpers     | Less to remember                |
-| Named sessions      | Project registry | One command restores everything |
+| Named sessions      | Project registry *(atlas's list of every project it knows about)* | One command restores everything |
 
 **The Perfect Layout:**
 ```

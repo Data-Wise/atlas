@@ -396,16 +396,19 @@ cd ~/projects/existing-project
 # Register it
 atlas project add --tags backend,python
 
-# Create a .STATUS file
+# Create a .STATUS file (atlas/v1 frontmatter — see STATUS-SCHEMA.md)
 cat > .STATUS << 'EOF'
-## Project: existing-project
-## Status: active
-## Progress: 30
-## Focus: Initial setup
+---
+schema: atlas/v1
+status: active
+progress: 30
+focus: Initial setup
+next:
+  - Set up CI/CD
+  - Add tests
+---
 
-## Next Actions
-- [ ] Set up CI/CD
-- [ ] Add tests
+# existing-project
 EOF
 
 # Sync to pick up the status
