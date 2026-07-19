@@ -79,3 +79,84 @@ source before applying.
 Legacy formats remain readable indefinitely as of v0.14.0 — no repo is
 rewritten without an explicit `atlas migrate` or `write(..., { migrate: true
 })`. A read-path sunset warning is planned for v0.15.0.
+
+## Research fields (manuscripts, programs, packages)
+
+Research artifacts — manuscripts, multi-paper programs, and their proposals — are first-class
+registry citizens alongside code packages. This is **additive**: ordinary package `.STATUS`
+files are unaffected, and every field below is optional.
+
+```yaml
+---
+schema: atlas/v1
+status: active
+priority: high
+progress: 75
+next:
+  - advance 05 data-fusion
+type: research
+target: Epidemiology / JASA    # publication venue (aliases: venue, journal)
+kind: program                  # manuscript | program | package (research only)
+cran_state: dev                # package-kind only — see CRAN state, below
+program: pmed-modern           # program id (proposals reference their parent)
+tasks:                         # a program's proposals, as task entries
+  - text: "01 incremental-elasticity — promote code to probmed/R"
+    priority: P1
+    done: false
+---
+```
+
+- **`kind`** — `manuscript` (single paper), `program` (multi-paper effort), or `package` (R
+  package under active CRAN work). Always author-set, never inferred. Omitting it leaves it `null`.
+- **`target`** — publication venue (e.g. `JASA`, `Biometrika`). `venue`/`journal` accepted on read.
+- **`tasks`** — a program's proposals, stored as task entries on the program Project (not
+  separate heavyweight projects). Each item: `text`, `priority`, `done` (`est` optional).
+
+### Sync authority
+
+`atlas sync --from-status` (alias `atlas sync --research`) is the **authority** for research
+metadata — it parses and updates `kind`/`target`/`cranState`/`tasks`/`priority`. A plain `atlas
+sync` (packages-only) preserves existing research metadata but does not re-parse it — re-run
+`--from-status` after editing a manuscript's `.STATUS`.
+
+### Querying
+
+```bash
+atlas project list --kind program --format json
+# → [{ "name":"pmed-modern", "kind":"program", "target":"Epidemiology / JASA", "taskCount":5, ... }]
+```
+
+`--format json` items include `name, path, status, type, kind, target, cranState, taskCount,
+progress, next, priority`. Via MCP, `atlas_get_projects({ kind: 'program' })` returns the same
+fields for Claude or the `obs research board`.
+
+### CRAN state (package-kind projects)
+
+Free-text passthrough on `cran_state:` — no enum enforced, but the ecosystem convention:
+
+| Value | Meaning |
+|---|---|
+| `dev` | Actively developed, not yet CRAN-ready |
+| `planned` | CRAN-ready or scheduled, submission not yet sent |
+| `submitted` | Submitted, awaiting CRAN review |
+| `hold` | CRAN-ready but deliberately held |
+| `accepted` | CRAN accepted the submission |
+| `on_cran` | Live on CRAN |
+
+### Validating — `atlas doctor`
+
+```bash
+atlas doctor                      # audit all real projects
+atlas doctor --kind manuscript    # restrict to one kind
+atlas doctor --fix --write        # create missing CLAUDE.md
+```
+
+Audits every registered project against the Project Settings Contract (`.STATUS`, `CLAUDE.md`,
+`.flow/obsidian-sync.yml`) and exits non-zero on a missing `.STATUS` — usable as a CI/launchd
+drift guard.
+
+Full walkthrough: [Tutorial — Research Registry & Doctor](user-guide/tutorials/research-registry.md).
+
+---
+
+**Now what?** → [Tutorial — Research Registry & Doctor](user-guide/tutorials/research-registry.md)

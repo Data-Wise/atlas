@@ -1,8 +1,9 @@
 # Atlas Cookbook
 
-> Task-oriented recipes for research-ops and dev workflows. Each recipe is **problem → do this → notes**.
-> New here? Start with the [Research Registry tutorial](../tutorials/research-registry.md); for the big picture
-> see the [Research Registry tutorial](../tutorials/research-registry.md) and the cross-tool
+> Task-oriented recipes for research-ops and dev workflows. Each recipe is **problem → do this → notes** —
+> commands only, no narrative. For the *why* behind a pattern, see [Workflows](../workflows/WORKFLOWS.md)
+> (the recipe-only counterpart to this page). New here? Start with the
+> [Research Registry tutorial](../tutorials/research-registry.md); for the cross-tool picture see the
 > [research-ops overview](https://github.com/Data-Wise/docs-standards/blob/main/research-ops/overview.md).
 
 ---
@@ -590,15 +591,14 @@ cat ~/.atlas/research-board.err.log   # errors
 **You want** Claude to read your atlas data for context-aware assistance.
 
 ```bash
-# MCP server is built-in — start it with:
-atlas mcp
+# atlas-mcp is a separate binary (not an `atlas mcp` subcommand) — check it's on PATH:
+command -v atlas-mcp
 
 # In Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json):
 {
   "mcpServers": {
     "atlas": {
-      "command": "atlas",
-      "args": ["mcp"]
+      "command": "atlas-mcp"
     }
   }
 }
@@ -622,3 +622,69 @@ Claude: [uses atlas_get_context] You were working on atlas — refactoring parse
 ```
 
 **Notes.** Claude needs the MCP server running to access atlas data. The server reads from `~/.atlas/` — no additional config needed.
+
+---
+
+## Recipe 29 — The evidence-linked done loop (v0.14.0)
+
+**You want** every session end to show what actually changed, not just a celebration message.
+
+```bash
+atlas session start myproject
+# ... do the work, commit as you go ...
+atlas session end "fixed the parser bug"
+# → shows the git delta for the session (files touched, commits) + auto-syncs the registry
+```
+
+**Notes.** No flag needed — evidence-linking is on by default as of v0.14.0. The git delta is
+computed from the repo at the session's project path between session start and end. If the
+project path isn't a git repo, the evidence section is silently skipped.
+
+---
+
+## Recipe 30 — Migrate a real `.STATUS` file to atlas/v1 (dry-run → diff → apply)
+
+**You want** to convert a legacy `.STATUS` file (or a whole tree of them) to canonical atlas/v1
+YAML frontmatter, safely.
+
+```bash
+# 1. Dry-run — see the field-level diff, nothing is written
+atlas migrate --status ~/projects/myapp/.STATUS
+
+# 2. Fix anything the diff flags (duplicate keys, non-numeric progress) in the source first
+
+# 3. Apply — writes canonical frontmatter, preserves unknown keys + the markdown body
+atlas migrate --status ~/projects/myapp/.STATUS --apply
+
+# 4. Batch an entire tree
+atlas migrate --status --all-scanned --apply --paths ~/projects/research
+```
+
+**Notes.** `atlas migrate --status` never writes on a dry-run. Any normal atlas `write()` on a
+legacy-format file also refuses and throws `LegacyStatusFileError` unless you pass `{ migrate:
+true }` — nothing gets silently rewritten. Full schema: [.STATUS Schema](../../STATUS-SCHEMA.md).
+
+---
+
+## Recipe 31 — flow-cli + digest combos
+
+**You want** the bare `atlas` digest and flow-cli's fast wrapper to compose instead of compete.
+
+```bash
+# Morning: flow-cli's quick alias, backed by the same digest data as `atlas plan`/`atlas where`
+fl status                      # flow-cli wrapper — <10ms, calls atlas only when needed
+
+# Scriptable digest for shell prompts / status bars
+atlas session status --format json | jq -r '.project // "idle"'
+
+# flow-cli suggesting the most-recent active project
+atlas project list --suggest
+```
+
+**Notes.** flow-cli is the fast ZSH wrapper; atlas is the state hub it calls into for anything
+beyond a `<10ms` local check. See [Integrations](../../INTEGRATIONS.md) for the full flag
+contract flow-cli depends on.
+
+---
+
+**Now what?** → [Workflows: the narrative behind these recipes](../workflows/WORKFLOWS.md)

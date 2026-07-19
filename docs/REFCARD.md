@@ -95,6 +95,7 @@ flowchart LR
 | `stats --export`  | Export report    | `atlas stats --export weekly.md` |
 | `stats --velocity` | 4-week velocity | `atlas stats --velocity`         |
 | `stats --patterns` | Best day/hour   | `atlas stats --patterns`         |
+| `stats --calibrate` | Time calibration | `atlas stats --calibrate myapp --minutes 30` |
 
 ### Tasks (v0.13.1)
 
@@ -129,7 +130,22 @@ flowchart LR
 | -------------- | ----------------------- | --------------------------- |
 | `project add`  | Register project        | `atlas project add ~/myapp` |
 | `project list` | List all projects       | `atlas project list`        |
+| `project list --kind` | Filter by research kind | `atlas project list --kind program` |
+| `focus`        | Set project focus       | `atlas focus myproject "implement auth"` |
 | `sync`         | Sync from .STATUS files | `atlas sync`                |
+| `sync --research` | Sync preserving research metadata | `atlas sync --research` |
+
+### Setup & Config
+
+| Command | What it does | Example |
+| ------- | ------------- | ------- |
+| `config show` | Show settings | `atlas config show` |
+| `config setup` | Interactive wizard | `atlas config setup` |
+| `config add-path` | Add scan path | `atlas config add-path ~/projects` |
+| `template list` | List templates | `atlas template list` |
+| `completions` | Shell completions | `atlas completions zsh > ~/.config/zsh/completions/_atlas` |
+| `migrate --status` | Migrate a `.STATUS` file to atlas/v1 | `atlas migrate --status --apply` |
+| `migrate` | Switch storage backend | `atlas migrate --from filesystem --to sqlite` |
 
 ---
 
@@ -318,6 +334,8 @@ Flags built for shells/wrappers (used by flow-cli). All print to stdout only and
 | Projects  | `~/.atlas/projects/`   |
 | Sessions  | `~/.atlas/sessions/`   |
 | Captures  | `~/.atlas/captures/`   |
+| Breadcrumbs | `~/.atlas/breadcrumbs/` |
+| Tasks     | `~/.atlas/tasks.json` (filesystem) or `atlas.db` (SQLite) |
 | Templates | `~/.atlas/templates/`  |
 
 ---
@@ -335,5 +353,9 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.13.1 | Made for ADHD brains</em>
+<em>Atlas v0.14.0 | Made for ADHD brains</em>
 </div>
+
+---
+
+**Now what?** → [Try the 15-minute Tutorial](TUTORIAL.md) or jump into [Scenarios](user-guide/workflows/SCENARIOS.md)

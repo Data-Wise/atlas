@@ -51,7 +51,6 @@ exclude_docs: |
   superpowers/
   SPEC-*.md
   grill-*.md
-  RESEARCH-REGISTRY.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -112,25 +111,24 @@ nav:
       - Visual Features: user-guide/tutorials/visual-features.md
       - Research Registry: user-guide/tutorials/research-registry.md
     - Workflows:
+      - Scenarios: user-guide/workflows/SCENARIOS.md
       - Core Workflows: user-guide/workflows/WORKFLOWS.md
       - Weekly Review: user-guide/workflows/WEEKLY-REVIEW.md
       - Multi-Project: user-guide/workflows/MULTI-PROJECT.md
       - Automation: user-guide/workflows/AUTOMATION.md
     - Cookbook: user-guide/cookbook/COOKBOOK.md
     - Visual Guide: VISUAL-GUIDE.md
+    - SwiftBar: user-guide/swiftbar.md
     - .STATUS Schema: STATUS-SCHEMA.md
     - Configuration: CONFIGURATION.md
     - Migration Guide: user-guide/MIGRATION-GUIDE.md
     - Troubleshooting: user-guide/TROUBLESHOOTING.md
   - Reference:
     - CLI Reference: CLI-REFERENCE.md
-    - Quick Reference:
-      - Cheatsheet: CHEATSHEET.md
-      - Quick Reference Card: REFCARD.md
+    - Quick Reference Card: REFCARD.md
     - API Guide: API-GUIDE.md
     - API Recipes: API-RECIPES.md
     - MCP Server: MCP-SERVER.md
-    - Analytics View Spec: ANALYTICS-VIEW-UI-SPEC.md
   - Architecture:
     - Overview: ARCHITECTURE.md
     - Diagrams: DIAGRAMS.md

@@ -22,8 +22,8 @@ atlas plan                       # Guided daily planning
 atlas sync --from-status         # Import from .STATUS files
 
 # Dashboard
-atlas dash                       # Launch TUI
-# Dashboard keys: f=Focus, T=Timeline, z=Zen, e=Ecosystem, p=Plan, ?=Help
+atlas dash                       # Launch TUI (3 views: Now/Timer/Plan)
+# Dashboard keys: 1/n=Now, 2/t=Timer, 3/p=Plan, Tab=layout, ?=Help — src/cli/dashboard-ink/lib/keymap.ts
 ```
 
 ## Project Overview

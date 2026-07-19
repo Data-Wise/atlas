@@ -987,7 +987,7 @@ atlas dash
 key below lives in `src/cli/dashboard-ink/lib/keymap.ts`, the single source
 of truth — press `?` in the dashboard to see the same table live.
 
-**Global keys (work from any view):**
+#### Global keys (work from any view)
 
 | Key           | Action                                        |
 | ------------- | ---------------------------------------------- |
@@ -998,7 +998,9 @@ of truth — press `?` in the dashboard to see the same table live.
 | `q`           | Quit                                           |
 | `?`           | Toggle the help overlay                        |
 
-**Now view (default)** — project list + selected-project detail. Absorbs the
+#### Now view (default)
+
+Project list + selected-project detail. Absorbs the
 former MainView, DetailView, InspectorPanel, and EcosystemView:
 
 | Key                | Action                                             |
@@ -1007,7 +1009,9 @@ former MainView, DetailView, InspectorPanel, and EcosystemView:
 | `Enter`             | Select project                                      |
 | `e`                 | Toggle the right pane between project detail and ecosystem-wide stats |
 
-**Timer view** — the single Pomodoro implementation. Absorbs the former
+#### Timer view
+
+The single Pomodoro implementation. Absorbs the former
 FocusView, ZenView, and the InspectorPanel's embedded timer:
 
 | Key     | Action                                  |
@@ -1017,7 +1021,9 @@ FocusView, ZenView, and the InspectorPanel's embedded timer:
 | `+`/`-` | Adjust duration (while paused)           |
 | `z`     | Toggle zen (minimal chrome) vs full chrome |
 
-**Plan view** — morning ritual. Absorbs the former PlanView and AnalyticsView:
+#### Plan view
+
+Morning ritual. Absorbs the former PlanView and AnalyticsView:
 
 | Key      | Action                                    |
 | -------- | ------------------------------------------ |
@@ -1028,7 +1034,7 @@ FocusView, ZenView, and the InspectorPanel's embedded timer:
 | `a`      | Toggle the analytics pane (focus velocity + flow patterns) |
 | `←`/`→`  | Switch project (while the analytics pane is open) |
 
-**Real Data (v0.9.2):**
+#### Real Data (v0.9.2)
 
 The dashboard displays live data from `~/.atlas` via 4 React hooks with automatic polling:
 
@@ -1041,7 +1047,7 @@ The dashboard displays live data from `~/.atlas` via 4 React hooks with automati
 
 Projects are filtered to remove temporary directories (`tmp.*`), archived entries, and duplicates.
 
-**Multi-Panel Layout (v0.9.1):**
+#### Multi-Panel Layout (v0.9.1)
 
 Press `Tab` to cycle through three layout modes:
 
@@ -1059,7 +1065,7 @@ Press `Tab` to cycle through three layout modes:
 - Layout mode indicator `▣/▥/▦` shown in command bar
 - SINGLE mode is a transparent pass-through (no overhead)
 
-**Sidebar Panel (Split and Triple modes):**
+#### Sidebar Panel (Split and Triple modes)
 
 The sidebar shows a compact project list at 25–28% width:
 
@@ -1087,7 +1093,7 @@ The sidebar shows a compact project list at 25–28% width:
 | Navigation    | `j`/`k` or `↑`/`↓`, only fires when sidebar has focus                       |
 | Select        | `Enter` opens project in main panel                                         |
 
-**Inspector Panel (Triple mode only — right column):**
+#### Inspector Panel (Triple mode only — right column)
 
 Shows the selected project's detail, focus score, Pomodoro timer, and activity heatmap:
 

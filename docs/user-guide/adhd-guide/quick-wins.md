@@ -176,6 +176,25 @@ atlas sync --dry-run
 
 ---
 
+## Which Command When?
+
+The four "note something down" commands overlap on purpose — pick by lifespan, not habit:
+
+| Situation | Command | Why this one |
+| --------- | ------- | ------------- |
+| A fleeting idea, mid-work | `atlas catch "idea"` | Zero friction, processed later from the inbox |
+| An actionable item with a deadline | `atlas task add "..." --due=friday` | Shows up in `agenda`/`task list --due-soon`, survives across sessions |
+| Where you got stuck, right now | `atlas crumb "stuck on X"` | A trail marker on *this* session — read back with `atlas trail` |
+| You need to drop everything and switch | `atlas park "reason"` | Saves full context (project, task, duration) — restore with `atlas unpark` |
+
+Quick heuristic: **catch** if you might forget it, **task** if it has a deadline, **crumb** if
+future-you needs to retrace your steps, **park** if you're leaving mid-thought.
+
+Full command reference: [Quick Reference Card](../../REFCARD.md). More situational patterns:
+[Workflows](../workflows/WORKFLOWS.md) · [Scenarios](../workflows/SCENARIOS.md).
+
+---
+
 ## Next Steps
 
 - [Core Principles](core-principles.md) — Mental models
@@ -183,3 +202,7 @@ atlas sync --dry-run
 - [Hyperfocus](hyperfocus.md) — Ride the wave
 - [Accessibility](accessibility.md) — Keyboard, screen readers, reduced motion
 - [Core Principles](core-principles.md) — The mental models
+
+---
+
+**Now what?** → [Scenarios: five moments in a real day](../workflows/SCENARIOS.md)
