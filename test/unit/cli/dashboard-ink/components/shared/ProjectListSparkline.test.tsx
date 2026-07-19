@@ -1,13 +1,13 @@
 /**
- * Unit tests for SidebarPanel sparklines and focus tier icons
+ * Unit tests for shared/ProjectList sparklines and focus tier icons
  */
 
 import React from 'react';
 import { render } from 'ink-testing-library';
-import { SidebarPanel } from '../../../../../src/cli/dashboard-ink/components/SidebarPanel.js';
-import type { Project } from '../../../../../src/cli/dashboard-ink/types.js';
+import { ProjectList } from '../../../../../../src/cli/dashboard-ink/components/shared/ProjectList.js';
+import type { Project } from '../../../../../../src/cli/dashboard-ink/types.js';
 
-describe('SidebarPanel Sparklines & Focus Tier', () => {
+describe('ProjectList Sparklines & Focus Tier', () => {
   const baseProject: Project = {
     id: '1',
     name: 'atlas',
@@ -27,7 +27,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       }];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -43,7 +43,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       const projects: Project[] = [baseProject];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -65,7 +65,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       }];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -86,7 +86,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       }];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -102,7 +102,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       const projects: Project[] = [baseProject];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -124,7 +124,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       }];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}
@@ -148,7 +148,7 @@ describe('SidebarPanel Sparklines & Focus Tier', () => {
       }];
 
       const { lastFrame } = render(
-        <SidebarPanel
+        <ProjectList
           projects={projects}
           selectedIndex={0}
           onSelect={mockOnSelect}

@@ -1,7 +1,7 @@
 /**
- * Unit tests for AnalyticsView pure functions
+ * Unit tests for PlanView's analytics-pane pure functions
  *
- * The sparkline function and other presentational logic is tested here.
+ * Migrated from AnalyticsView.test.tsx (SPEC-tui-consolidation-2026-07-19.md) —
  * Full component rendering is covered by dogfood tests (real-data-pipeline.sh).
  */
 

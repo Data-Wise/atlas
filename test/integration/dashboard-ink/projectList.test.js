@@ -1,7 +1,7 @@
 /**
- * SidebarPanel Integration Tests
+ * ProjectList Integration Tests
  *
- * Tests pure logic extracted from SidebarPanel.tsx:
+ * Tests pure logic extracted from shared/ProjectList.tsx:
  *   - STATUS_ICON / STATUS_COLOR mappings for all known statuses
  *   - fmtProgress: clamping, padding, formatting
  *   - truncate: exact limit, over limit, under limit
@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-// ─── Mirror pure-logic helpers from SidebarPanel.tsx ─────────────────────────
+// ─── Mirror pure-logic helpers from shared/ProjectList.tsx ─────────────────────────
 // These are extracted here as the CONTRACT the implementation must satisfy.
 // Any change to the source that breaks these tests is a regression.
 
@@ -45,19 +45,19 @@ const STATUS_COLOR = {
   blocked:  'red',
 };
 
-/** Mirror of fmtProgress in SidebarPanel.tsx */
+/** Mirror of fmtProgress in shared/ProjectList.tsx */
 function fmtProgress(p) {
   const clamped = Math.max(0, Math.min(100, p));
   return `${clamped}%`.padStart(4);
 }
 
-/** Mirror of truncate in SidebarPanel.tsx */
+/** Mirror of truncate in shared/ProjectList.tsx */
 function truncate(s, max) {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
 /**
- * Mirror of windowing logic in SidebarPanel.tsx.
+ * Mirror of windowing logic in shared/ProjectList.tsx.
  * Returns { windowStart, visible } for given inputs.
  */
 function calcWindow(projects, selectedIndex, WINDOW = 12) {
@@ -324,18 +324,18 @@ describe('Windowing (calcWindow)', () => {
 
 describe('isActive keyboard guard (contract)', () => {
   /**
-   * SidebarPanel uses: if (!isActive) return;  inside useInput.
+   * ProjectList uses: if (!isActive) return;  inside useInput.
    * We can't invoke useInput in unit tests (needs Ink renderer),
    * so these tests document the EXPECTED behaviour as spec assertions.
    */
 
   it('when isActive=false, j/k keystrokes must NOT fire onSelect', () => {
     // Documented: useInput handler returns early when !isActive
-    // Verified by code inspection of SidebarPanel.tsx lines with "if (!isActive) return"
+    // Verified by code inspection of shared/ProjectList.tsx lines with "if (!isActive) return"
     const src = require('fs').readFileSync(
       require('path').resolve(
         __dirname,
-        '../../../src/cli/dashboard-ink/components/SidebarPanel.tsx'
+        '../../../src/cli/dashboard-ink/components/shared/ProjectList.tsx'
       ),
       'utf-8'
     );
@@ -346,7 +346,7 @@ describe('isActive keyboard guard (contract)', () => {
     const src = require('fs').readFileSync(
       require('path').resolve(
         __dirname,
-        '../../../src/cli/dashboard-ink/components/SidebarPanel.tsx'
+        '../../../src/cli/dashboard-ink/components/shared/ProjectList.tsx'
       ),
       'utf-8'
     );
@@ -357,7 +357,7 @@ describe('isActive keyboard guard (contract)', () => {
     const src = require('fs').readFileSync(
       require('path').resolve(
         __dirname,
-        '../../../src/cli/dashboard-ink/components/SidebarPanel.tsx'
+        '../../../src/cli/dashboard-ink/components/shared/ProjectList.tsx'
       ),
       'utf-8'
     );

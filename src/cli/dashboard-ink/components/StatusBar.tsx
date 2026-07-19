@@ -23,8 +23,6 @@ const ICON_LAYOUT_SPLIT = '\u25a5';   // ▥
 const ICON_LAYOUT_TRIPLE = '\u25a6';  // ▦
 const ICON_SEPARATOR = '\u2502';      // │
 const ICON_CAPTURE = '\u25c6';        // ◆
-const ICON_ARROW_LEFT = '\u2190';     // ←
-const ICON_ARROW_RIGHT = '\u2192';    // →
 
 const LAYOUT_INFO: Record<string, { icon: string; label: string }> = {
   [LAYOUT.SINGLE]: { icon: ICON_LAYOUT_SINGLE, label: 'Single' },
@@ -33,14 +31,9 @@ const LAYOUT_INFO: Record<string, { icon: string; label: string }> = {
 };
 
 const KEY_HINTS: Record<string, string> = {
-  [STATES.BROWSE]:    'j/k:nav Enter:detail f:Focus e:Eco a:Analytics',
-  [STATES.DETAIL]:    'q:back f:Focus a:Analytics',
-  [STATES.FOCUS]:     'Space:pause q:back',
-  [STATES.ZEN]:       'q:back',
-  [STATES.TIMELINE]:  'j/k:scroll q:back',
-  [STATES.ECOSYSTEM]: 'j/k:nav Enter:detail q:back',
-  [STATES.PLAN]:      'j/k:nav Enter:select q:back',
-  [STATES.ANALYTICS]: ICON_ARROW_LEFT + ICON_ARROW_RIGHT + ':project q:back f:Focus',
+  [STATES.NOW]:   'j/k:nav Enter:select e:Eco  1/2/3:views  ?:help',
+  [STATES.TIMER]: 'Space:pause r:reset z:zen  1/2/3:views  ?:help',
+  [STATES.PLAN]:  'j/k:nav e:energy a:analytics  1/2/3:views  ?:help',
 };
 
 function formatElapsed(seconds: number): string {

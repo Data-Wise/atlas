@@ -1,19 +1,18 @@
 /**
- * App.tsx D4 Integration Tests
+ * App.tsx Integration Tests (v0.14 3-view consolidation)
  *
- * Source-contract tests for the wired App.tsx.
- * We can't render Ink components in pure Jest (no TTY), so these tests:
- *   1. Parse source text to verify integration contracts
- *   2. Validate the import graph is correct
- *   3. Verify sidebar↔inspector sync logic via pure-function mirrors
- *   4. Verify MOCK_PROJECTS shape matches SidebarProject + InspectorProject
+ * Source-contract tests for the wired App.tsx. We can't render Ink
+ * components in pure Jest (no TTY), so these tests:
+ *   1. Parse source text to verify the import graph is correct
+ *   2. Verify the 3-view switch (NOW/TIMER/PLAN) is wired
+ *   3. Verify the global keymap dispatch (1/2/3, n/t/p, ?, q)
+ *   4. Verify real data hooks integration
  *
- * Full render tests belong in ink-testing-library E2E (future).
+ * Full render tests belong in ink-testing-library E2E (test/e2e/dashboard-ink/).
  */
 
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
-import { jest } from '@jest/globals';
 const require1 = createRequire(import.meta.url);
 
 const fs   = require1('fs');
@@ -26,8 +25,6 @@ const APP_SRC = path.resolve(
   '../../../src/cli/dashboard-ink/components/App.tsx'
 );
 
-// ─── Source snapshot ──────────────────────────────────────────────────────────
-
 let src;
 beforeAll(() => {
   src = fs.readFileSync(APP_SRC, 'utf-8');
@@ -36,182 +33,80 @@ beforeAll(() => {
 // ─── 1. Import graph ──────────────────────────────────────────────────────────
 
 describe('App.tsx import graph', () => {
-  it('imports useLayout from LayoutManager', () => {
-    expect(src).toContain('useLayout');
-    expect(src).toContain('LayoutManager');
+  it('imports the 3 consolidated views', () => {
+    expect(src).toContain("import { NowView }   from './views/NowView.js'");
+    expect(src).toContain("import { TimerView } from './views/TimerView.js'");
+    expect(src).toContain("import { PlanView }  from './views/PlanView.js'");
   });
 
-  it('imports StatusBar from ./StatusBar.js', () => {
-    expect(src).toContain("import { StatusBar }");
-    expect(src).toContain("'./StatusBar.js'");
-  });
-
-  it('imports LAYOUT constant', () => {
-    expect(src).toContain('LAYOUT');
-  });
-
-  it('imports SidebarPanel', () => {
-    expect(src).toContain("import { SidebarPanel }");
-  });
-
-  it('imports InspectorPanel', () => {
-    expect(src).toContain("import { InspectorPanel }");
-  });
-
-  it('imports all 7 views', () => {
-    const views = ['MainView', 'DetailView', 'FocusView', 'ZenView',
-                   'TimelineView', 'EcosystemView', 'PlanView'];
-    views.forEach(v => {
-      expect(src).toContain(v);
-    });
+  it('imports the HelpOverlay component', () => {
+    expect(src).toContain("import { HelpOverlay } from './HelpOverlay.js'");
   });
 
   it('imports createStateMachine and STATES', () => {
     expect(src).toContain('createStateMachine');
     expect(src).toContain('STATES');
   });
-});
 
-// ─── 2. LayoutManager wiring ──────────────────────────────────────────────────
-
-describe('LayoutManager wiring in App.tsx', () => {
-  it('calls useLayout() with LAYOUT.SINGLE as initial', () => {
+  it('imports useLayout and LayoutManager', () => {
     expect(src).toContain('useLayout');
-    expect(src).toContain('LAYOUT.SINGLE');
+    expect(src).toContain('LayoutManager');
   });
 
-  it('destructures layout and focusPanel from useLayout result', () => {
-    expect(src).toContain('layout');
-    expect(src).toContain('focusPanel');
-  });
-
-  it('uses <LayoutManager> render-prop (children function)', () => {
-    expect(src).toContain('<LayoutManager');
-    expect(src).toContain('layout={layout}');
-    expect(src).toContain('focusPanel={focusPanel}');
-  });
-
-  it('render-prop destructures sidebar, main, inspector', () => {
-    expect(src).toContain('sidebar');
-    expect(src).toContain('main');
-    expect(src).toContain('inspector');
-  });
-
-  it('sidebar panel wrapped in conditional: sidebar &&', () => {
-    expect(src).toContain('sidebar &&');
-  });
-
-  it('inspector panel wrapped in conditional: inspector &&', () => {
-    expect(src).toContain('inspector &&');
-  });
-
-  it('renders StatusBar in command bar', () => {
-    expect(src).toContain('<StatusBar');
-    expect(src).toContain('currentView={currentView}');
-    expect(src).toContain('layout={layout}');
-    expect(src).toContain('focusPanel={focusPanel}');
-    expect(src).toContain('hasActiveSession={hasActiveSession}');
+  it('does not import any of the 8 pre-consolidation view/panel components', () => {
+    const removed = [
+      'MainView', 'DetailView', 'FocusView', 'ZenView',
+      'TimelineView', 'EcosystemView', 'AnalyticsView',
+      'InspectorPanel', 'SidebarPanel',
+    ];
+    removed.forEach(name => {
+      expect(src).not.toContain(`import { ${name} }`);
+    });
   });
 });
 
-// ─── 3. SidebarPanel wiring ───────────────────────────────────────────────────
+// ─── 2. State machine wiring (3 states) ──────────────────────────────────────
 
-describe('SidebarPanel wiring in App.tsx', () => {
-  it('passes isActive from sidebar render props', () => {
-    expect(src).toContain('isActive={sidebar.isActive}');
+describe('3-state machine wiring in App.tsx', () => {
+  it('initializes state machine with STATES.NOW', () => {
+    expect(src).toContain('createStateMachine({ initial: STATES.NOW })');
   });
 
-  it('passes projects prop', () => {
-    expect(src).toContain('projects={projects}');
+  it('defines showNow / showTimer / showPlan transition helpers', () => {
+    expect(src).toContain('showNow');
+    expect(src).toContain('showTimer');
+    expect(src).toContain('showPlan');
   });
 
-  it('passes selectedIndex (controlled)', () => {
-    expect(src).toContain('selectedIndex={sidebarIndex}');
-  });
-
-  it('passes onSelect handler', () => {
-    expect(src).toContain('onSelect={handleSidebarIndexChange}');
-  });
-
-  it('passes onSelectProject handler', () => {
-    expect(src).toContain('onSelectProject={handleSidebarSelect}');
-  });
-
-  it('passes pendingCaptures for inbox badge', () => {
-    expect(src).toContain('pendingCaptures=');
-  });
-
-  it('passes activeProjectId for session indicator', () => {
-    expect(src).toContain('activeProjectId=');
+  it('switches on exactly the 3 states in renderCurrentView', () => {
+    expect(src).toContain('case STATES.TIMER:');
+    expect(src).toContain('case STATES.PLAN:');
+    expect(src).toContain('case STATES.NOW:');
   });
 });
 
-// ─── 4. InspectorPanel wiring ─────────────────────────────────────────────────
+// ─── 3. Global keymap dispatch ────────────────────────────────────────────────
 
-describe('InspectorPanel wiring in App.tsx', () => {
-  it('passes isActive from inspector render props', () => {
-    expect(src).toContain('isActive={inspector.isActive}');
+describe('Global keymap dispatch (lib/keymap.ts scope "global")', () => {
+  it('1/n switches to Now', () => {
+    expect(src).toContain("input === '1' || input === 'n'");
   });
 
-  it('passes project (selectedProject ?? undefined)', () => {
-    expect(src).toContain('project={selectedProject');
+  it('2/t switches to Timer', () => {
+    expect(src).toContain("input === '2' || input === 't'");
   });
 
-  it('passes sessionSeconds for Pomodoro timer', () => {
-    expect(src).toContain('sessionSeconds=');
+  it('3/p switches to Plan', () => {
+    expect(src).toContain("input === '3' || input === 'p'");
   });
 
-  it('passes pomodoroLength', () => {
-    expect(src).toContain('pomodoroLength=');
-  });
-
-  it('passes breadcrumbs array', () => {
-    expect(src).toContain('breadcrumbs=');
+  it('? toggles the help overlay', () => {
+    expect(src).toContain("input === '?'");
+    expect(src).toContain('setShowHelp');
   });
 });
 
-// ─── 5. Sidebar sync logic (pure mirrors) ────────────────────────────────────
-
-describe('Sidebar sync logic', () => {
-  /**
-   * Mirror of handleSidebarSelect logic:
-   * Only calls showDetailView when currentView === STATES.BROWSE
-   */
-  const BROWSE = 'browse';
-  const FOCUS  = 'focus';
-
-  function handleSidebarSelect(project, currentView, showDetailView) {
-    // Sets selectedProject always
-    let selected = project;
-    // Only navigates when in BROWSE
-    if (currentView === BROWSE) {
-      showDetailView(project);
-    }
-    return selected;
-  }
-
-  it('showDetailView fires when currentView is BROWSE', () => {
-    const spy = jest.fn();
-    handleSidebarSelect({ id: '1', name: 'atlas' }, BROWSE, spy);
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith({ id: '1', name: 'atlas' });
-  });
-
-  it('showDetailView does NOT fire when currentView is not BROWSE', () => {
-    const spy = jest.fn();
-    handleSidebarSelect({ id: '1', name: 'atlas' }, FOCUS, spy);
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  it('selectedProject always updates regardless of view', () => {
-    const project = { id: '2', name: 'flow-cli' };
-    const noop = jest.fn();
-    const result = handleSidebarSelect(project, FOCUS, noop);
-    expect(result).toEqual(project);
-  });
-});
-
-// ─── 6. Real data hooks integration ──────────────────────────────────────────
+// ─── 4. Real data hooks integration ──────────────────────────────────────────
 
 describe('Real data hooks integration', () => {
   it('imports useProjects hook', () => {
@@ -220,12 +115,6 @@ describe('Real data hooks integration', () => {
 
   it('calls useProjects() for project data', () => {
     expect(src).toContain('useProjects()');
-  });
-
-  it('destructures projects, loading, error from useProjects', () => {
-    expect(src).toContain('projects');
-    expect(src).toContain('loading');
-    expect(src).toContain('error');
   });
 
   it('uses useProjectStats for real stats data', () => {
@@ -237,39 +126,17 @@ describe('Real data hooks integration', () => {
   });
 });
 
-// ─── 7. Width prop forwarding ─────────────────────────────────────────────────
+// ─── 5. NowView wiring ────────────────────────────────────────────────────────
 
-describe('Width forwarding to column Boxes', () => {
-  it('sidebar width uses sidebar.widthPct template literal', () => {
-    expect(src).toContain('sidebar.widthPct');
+describe('NowView wiring in App.tsx', () => {
+  it('passes projects, selectedProject, and selection handlers', () => {
+    expect(src).toContain('projects={projects}');
+    expect(src).toContain('selectedProject={selectedProject}');
+    expect(src).toContain('onSelectedIndexChange={handleSidebarIndexChange}');
   });
 
-  it('main width uses main.widthPct template literal', () => {
-    expect(src).toContain('main.widthPct');
-  });
-
-  it('inspector width uses inspector.widthPct template literal', () => {
-    expect(src).toContain('inspector.widthPct');
-  });
-});
-
-// ─── 8. All view renders preserved ───────────────────────────────────────────
-
-describe('All 7 views still rendered in center column', () => {
-  const cases = [
-    ['PLAN',      'PlanView'],
-    ['ECOSYSTEM', 'EcosystemView'],
-    ['TIMELINE',  'TimelineView'],
-    ['ZEN',       'ZenView'],
-    ['FOCUS',     'FocusView'],
-    ['DETAIL',    'DetailView'],
-    ['BROWSE',    'MainView'],
-  ];
-
-  cases.forEach(([state, component]) => {
-    it(`${state} → renders <${component}>`, () => {
-      expect(src).toContain(`STATES.${state}`);
-      expect(src).toContain(`<${component}`);
-    });
+  it('passes heatmap + stats data through', () => {
+    expect(src).toContain('heatmapGrid={projectStats.heatmapGrid}');
+    expect(src).toContain('streakDays={projectStats.streakDays}');
   });
 });

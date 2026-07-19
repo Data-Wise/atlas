@@ -1,37 +1,27 @@
 /**
- * App.tsx — Root Component for the Atlas Ink Dashboard (v0.9.1)
+ * App.tsx — Root Component for the Atlas Ink Dashboard
+ *
+ * v0.14 consolidation (SPEC-tui-consolidation-2026-07-19.md): 8 views -> 3.
  *
  * Responsibilities:
- *   1. State machine: manages views (BROWSE / DETAIL / FOCUS / ZEN / TIMELINE / ECOSYSTEM / PLAN)
+ *   1. State machine: manages 3 views (NOW / TIMER / PLAN)
  *   2. Layout engine: wraps views in LayoutManager (SINGLE / SPLIT / TRIPLE)
- *      - Tab    → cycle layout mode
- *      - Shift+Tab → cycle panel focus
- *   3. Data: provides project list + selected project to side panels
- *   4. Sidebar sync: sidebar selection updates the main panel's selected project
- *
- * Component tree (in TRIPLE mode):
- *   App
- *   └─ LayoutManager (row, widths from PANEL_CONFIG)
- *      ├─ SidebarPanel  (25%)  — compact project list
- *      ├─ [current view]  (47%)  — MainView / DetailView / FocusView …
- *      └─ InspectorPanel (28%)  — detail + Pomodoro timer
+ *      - Tab       -> cycle layout mode
+ *      - Shift+Tab -> cycle panel focus
+ *   3. Data: provides project list + selected project to the current view
+ *   4. Global key dispatch (lib/keymap.ts, scope 'global'): 1/2/3 or n/t/p
+ *      switch views, ? toggles the help overlay, q quits.
  */
 
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useInput } from 'ink';
-import { MainView }       from './views/MainView.js';
-import { DetailView }     from './views/DetailView.js';
-import { FocusView }      from './views/FocusView.js';
-import { ZenView }        from './views/ZenView.js';
-import { TimelineView }   from './views/TimelineView.js';
-import { EcosystemView }  from './views/EcosystemView.js';
-import { PlanView }       from './views/PlanView.js';
-import { AnalyticsView }  from './views/AnalyticsView.js';
+import { NowView }   from './views/NowView.js';
+import { TimerView } from './views/TimerView.js';
+import { PlanView }  from './views/PlanView.js';
+import { HelpOverlay } from './HelpOverlay.js';
 import { createStateMachine, STATES } from '../lib/stateMachine.js';
-import { useLayout, LayoutManager, LAYOUT } from '../lib/LayoutManager.js';
+import { useLayout, LayoutManager } from '../lib/LayoutManager.js';
 import { StatusBar } from './StatusBar.js';
-import { SidebarPanel }   from './SidebarPanel.js';
-import { InspectorPanel } from './InspectorPanel.js';
 import type { Project } from '../types.js';
 import { ThemeProvider } from '../lib/ThemeContext.js';
 import { useProjects } from '../hooks/useProjects.js';
@@ -43,230 +33,140 @@ import { usePendingCaptures } from '../hooks/usePendingCaptures.js';
 
 export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   // ── Real data hooks ─────────────────────────────────────────────────────────
-  const { projects, loading, error } = useProjects();
+  const { projects, loading } = useProjects();
   const { projectName: activeProjectName, elapsed: sessionSeconds, isActive: hasActiveSession } = useActiveSession();
 
-  // Derive activeProjectId from the active session's project name
   const activeProjectId = hasActiveSession
     ? projects.find(p => p.name === activeProjectName)?.id ?? null
     : null;
 
-  // ── State machine ──────────────────────────────────────────────────────────
-  const [stateMachine] = useState(() => createStateMachine({ initial: STATES.BROWSE }));
-  const [currentView, setCurrentView] = useState<string>(STATES.BROWSE);
+  // ── State machine (NOW / TIMER / PLAN) ─────────────────────────────────────
+  const [stateMachine] = useState(() => createStateMachine({ initial: STATES.NOW }));
+  const [currentView, setCurrentView] = useState<string>(STATES.NOW);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
-  // Auto-select first project when data loads
   useEffect(() => {
     if (projects.length > 0 && !selectedProject) {
       setSelectedProject(projects[0]);
     }
   }, [projects]);
 
-  // ── Project stats (focus score, heatmap, streak, breadcrumbs) ──────────────
   const projectStats = useProjectStats(selectedProject?.id ?? null);
   const { count: pendingCaptures } = usePendingCaptures();
 
-  // ── Layout hook (Tab cycles modes, Shift+Tab cycles focus) ────────────────
-  const {
-    layout,
-    focusPanel,
-    renderProps,
-  } = useLayout({ initial: LAYOUT.SINGLE, locked: currentView === STATES.ANALYTICS });
+  const { layout, focusPanel, renderProps } = useLayout({ initial: 'single' as const });
 
-  // ── Sidebar controlled selection ──────────────────────────────────────────
   const [sidebarIndex, setSidebarIndex] = useState(0);
 
-  // ── View transitions (state machine is authoritative) ─────────────────────
-  const showMainView = () => {
-    const ok = stateMachine.transition(STATES.BROWSE);
-    if (ok) {
-      setCurrentView(STATES.BROWSE);
-    }
+  const goTo = (state: typeof STATES[keyof typeof STATES]) => {
+    const ok = stateMachine.transition(state);
+    if (ok) setCurrentView(state);
   };
 
-  const showDetailView = (project: Project) => {
-    const ok = stateMachine.transition(STATES.DETAIL, { project });
-    if (ok) {
-      setCurrentView(STATES.DETAIL);
-      setSelectedProject(project);
-    }
-  };
+  const showNow = () => goTo(STATES.NOW);
+  const showTimer = () => goTo(STATES.TIMER);
+  const showPlan = () => goTo(STATES.PLAN);
 
-  const showFocusView = () => {
-    const ok = stateMachine.transition(STATES.FOCUS);
-    if (ok) {
-      setCurrentView(STATES.FOCUS);
-    }
-  };
-
-  const showZenView = () => {
-    const ok = stateMachine.transition(STATES.ZEN);
-    if (ok) {
-      setCurrentView(STATES.ZEN);
-    }
-  };
-
-  const showTimelineView = () => {
-    const ok = stateMachine.transition(STATES.TIMELINE);
-    if (ok) {
-      setCurrentView(STATES.TIMELINE);
-    }
-  };
-
-  const showEcosystemView = () => {
-    const ok = stateMachine.transition(STATES.ECOSYSTEM);
-    if (ok) {
-      setCurrentView(STATES.ECOSYSTEM);
-    }
-  };
-
-  const showPlanView = () => {
-    const ok = stateMachine.transition(STATES.PLAN);
-    if (ok) {
-      setCurrentView(STATES.PLAN);
-    }
-  };
-
-  const showAnalyticsView = () => {
-    const ok = stateMachine.transition(STATES.ANALYTICS);
-    if (ok) {
-      setCurrentView(STATES.ANALYTICS);
-    }
-  };
-
-  const handleAnalyticsSelectProject = (id: string) => {
-    const p = projects.find(x => x.id === id) ?? null;
-    setSelectedProject(p);
-  };
-
-  // ── Global key dispatch ─────────────────────────────────────────────────────
-  useInput((input, _key) => {
-    if (input === 'a' && currentView !== STATES.ANALYTICS) {
-      showAnalyticsView();
-    }
-  });
-
-  // ── Sidebar → main panel sync ──────────────────────────────────────────────
-  const handleSidebarSelect = (project: Project) => {
+  const handleSelectProject = (project: Project) => {
     setSelectedProject(project);
-    // Only navigate to detail if we're currently browsing (don't interrupt focus/timeline etc.)
-    if (currentView === STATES.BROWSE) {
-      showDetailView(project);
-    }
   };
 
   const handleSidebarIndexChange = (idx: number) => {
     setSidebarIndex(idx);
-    // Keep inspector in sync even without Enter
     setSelectedProject(projects[idx] ?? null);
   };
 
-  // ── Current view renderer ─────────────────────────────────────────────────
+  const handleSelectProjectById = (id: string) => {
+    const p = projects.find(x => x.id === id) ?? null;
+    setSelectedProject(p);
+  };
+
+  // ── Global key dispatch (lib/keymap.ts scope 'global') ─────────────────────
+  useInput((input) => {
+    if (input === '?') {
+      setShowHelp(h => !h);
+      return;
+    }
+    if (showHelp) {
+      if (input === 'q') onExit();
+      return; // help overlay swallows all other input until closed
+    }
+    if (input === '1' || input === 'n') {
+      showNow();
+    } else if (input === '2' || input === 't') {
+      showTimer();
+    } else if (input === '3' || input === 'p') {
+      showPlan();
+    }
+  });
+
   const renderCurrentView = () => {
     switch (currentView) {
-      case STATES.PLAN:
-        return <PlanView onBack={showMainView} onQuit={onExit} onStartSession={showFocusView} />;
-
-      case STATES.ECOSYSTEM:
-        return <EcosystemView onBack={showMainView} onQuit={onExit} onSelectProject={showDetailView} onFocus={showFocusView} heatmapGrid={projectStats.heatmapGrid} streakDays={projectStats.streakDays} totalSessions={projectStats.totalSessions} />;
-
-      case STATES.TIMELINE:
-        return <TimelineView onBack={showMainView} onQuit={onExit} onFocus={showFocusView} />;
-
-      case STATES.ZEN:
-        return <ZenView project={selectedProject?.name} task={selectedProject?.focus} onBack={showMainView} />;
-
-      case STATES.FOCUS:
-        return <FocusView project={selectedProject?.name} task={selectedProject?.focus} onBack={showMainView} />;
-
-      case STATES.DETAIL:
-        return selectedProject
-          ? <DetailView project={selectedProject} onBack={showMainView} />
-          : null;
-
-      case STATES.ANALYTICS:
+      case STATES.TIMER:
         return (
-          <AnalyticsView
-            onBack={showMainView}
-            onFocus={showFocusView}
-            projects={projects}
-            selectedProjectId={selectedProject?.id ?? null}
-            onSelectProject={handleAnalyticsSelectProject}
+          <TimerView
+            project={selectedProject?.name}
+            task={selectedProject?.focus}
+            onBack={showNow}
+            isActive={focusPanel === 'main'}
+            streakDays={projectStats.streakDays}
           />
         );
 
-      case STATES.BROWSE:
+      case STATES.PLAN:
+        return (
+          <PlanView
+            onBack={showNow}
+            onQuit={onExit}
+            onStartSession={showTimer}
+            isActive={focusPanel === 'main'}
+            projects={projects}
+            selectedProjectId={selectedProject?.id ?? null}
+            onSelectProject={handleSelectProjectById}
+          />
+        );
+
+      case STATES.NOW:
       default:
         if (loading && projects.length === 0) {
           return <Box padding={1}><Text dimColor>Loading projects...</Text></Box>;
         }
         return (
-          <MainView
+          <NowView
             projects={projects}
             onQuit={onExit}
-            onSelectProject={showDetailView}
-            onFocus={showFocusView}
-            onZen={showZenView}
-            onTimeline={showTimelineView}
-            onEcosystem={showEcosystemView}
-            onPlan={showPlanView}
+            isActive={focusPanel === 'main'}
+            pendingCaptures={pendingCaptures}
+            activeProjectId={activeProjectId}
+            selectedProject={selectedProject}
+            onSelectProject={(p) => { handleSelectProject(p); }}
+            selectedIndex={sidebarIndex}
+            onSelectedIndexChange={handleSidebarIndexChange}
+            heatmapGrid={projectStats.heatmapGrid}
+            streakDays={projectStats.streakDays}
+            totalSessions={projectStats.totalSessions}
+            breadcrumbs={projectStats.breadcrumbs}
           />
         );
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <ThemeProvider>
       <Box flexDirection="column" width="100%" height="100%">
+        {showHelp ? (
+          <Box flexGrow={1} justifyContent="center" alignItems="center">
+            <HelpOverlay scope={currentView as 'now' | 'timer' | 'plan'} />
+          </Box>
+        ) : (
+          <Box flexGrow={1}>
+            <LayoutManager layout={layout} focusPanel={focusPanel}>
+              {() => <Box width="100%" height="100%">{renderCurrentView()}</Box>}
+            </LayoutManager>
+          </Box>
+        )}
 
-        {/* Main content area — LayoutManager handles SINGLE / SPLIT / TRIPLE */}
-        <Box flexGrow={1}>
-          <LayoutManager layout={layout} focusPanel={focusPanel}>
-            {({ sidebar, main, inspector }) => (
-              <>
-                {/* Left panel: project list (SPLIT + TRIPLE only) */}
-                {sidebar && (
-                  <Box width={`${sidebar.widthPct}%`} height="100%">
-                    <SidebarPanel
-                      projects={projects}
-                      selectedIndex={sidebarIndex}
-                      onSelect={handleSidebarIndexChange}
-                      onSelectProject={handleSidebarSelect}
-                      isActive={sidebar.isActive}
-                      pendingCaptures={pendingCaptures}
-                      activeProjectId={activeProjectId}
-                    />
-                  </Box>
-                )}
-
-                {/* Center panel: current view */}
-                <Box width={`${main.widthPct}%`} height="100%">
-                  {renderCurrentView()}
-                </Box>
-
-                {/* Right panel: inspector + Pomodoro (TRIPLE only) */}
-                {inspector && (
-                  <Box width={`${inspector.widthPct}%`} height="100%">
-                    <InspectorPanel
-                      project={selectedProject ?? undefined}
-                      isActive={inspector.isActive}
-                      sessionSeconds={sessionSeconds}
-                      pomodoroLength={25}
-                      breadcrumbs={projectStats.breadcrumbs}
-                      heatmapGrid={projectStats.heatmapGrid}
-                      streakDays={projectStats.streakDays}
-                      totalSessions={projectStats.totalSessions}
-                    />
-                  </Box>
-                )}
-              </>
-            )}
-          </LayoutManager>
-        </Box>
-
-        {/* Status bar — full-width 3-zone bar */}
         <Box paddingX={1} width="100%">
           <StatusBar
             currentView={currentView}
@@ -278,7 +178,6 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             pendingCaptures={pendingCaptures}
           />
         </Box>
-
       </Box>
     </ThemeProvider>
   );
