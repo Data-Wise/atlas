@@ -28,7 +28,7 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ scope }) => {
       borderStyle="double"
       borderColor={theme.panel.borderActive}
       padding={1}
-      width={60}
+      width={66}
     >
       <Text bold color={theme.text.accent}>Keyboard Shortcuts</Text>
 
@@ -36,7 +36,7 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ scope }) => {
         <Text bold color={theme.text.secondary}>Global</Text>
         {GLOBAL_KEYS.map((b, i) => (
           <Box key={i}>
-            <Text color={theme.text.accent}>{b.key.padEnd(10)}</Text>
+            <Text color={theme.text.accent}>{b.key.padEnd(18)}</Text>
             <Text color={theme.text.primary}>{b.description}</Text>
           </Box>
         ))}
@@ -46,7 +46,7 @@ export const HelpOverlay: React.FC<HelpOverlayProps> = ({ scope }) => {
         <Text bold color={theme.text.secondary}>{SCOPE_LABEL[scope] ?? scope}</Text>
         {scopedKeys.map((b, i) => (
           <Box key={i}>
-            <Text color={theme.text.accent}>{b.key.padEnd(10)}</Text>
+            <Text color={theme.text.accent}>{b.key.padEnd(18)}</Text>
             <Text color={theme.text.primary}>{b.description}</Text>
           </Box>
         ))}
