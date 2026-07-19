@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.13.1 |
+| **Version** | 0.14.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | ~2,000 (Jest + Vitest) |
@@ -68,16 +68,12 @@ src/
 ├── mcp/              # MCP server for Claude integration
 │   └── index.js      # Tools: get_context, start_session, capture, etc.
 ├── cli/              # Dashboard TUI
-│   ├── dashboard-blessed.js # Legacy blessed dashboard
-│   ├── dashboard-ink/       # New Ink dashboard (default, v0.9.x)
-│   │   ├── components/      # App.tsx, views/, SidebarPanel, InspectorPanel
-│   │   ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures, useAnalytics
-│   │   ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts, ThemeContext.tsx
-│   │   ├── types.ts         # Shared Project interface
-│   │   └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
-│   └── dashboard/           # Blessed dashboard components
-│       ├── views/           # MainView, DetailView, FocusView, etc.
-│       └── stateMachine.js  # BROWSE, DETAIL, FOCUS, ZEN, TIMELINE
+│   └── dashboard-ink/       # Ink dashboard (default since v0.9.x)
+│       ├── components/      # App.tsx, HelpOverlay.tsx, views/{Now,Timer,Plan}View, shared/{ProjectList,PomodoroTimer}
+│       ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures, useAnalytics
+│       ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts (3 states), ThemeContext.tsx, keymap.ts
+│       ├── types.ts         # Shared Project interface
+│       └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
 └── index.js          # Commander.js CLI entry
 ```
 
@@ -244,8 +240,7 @@ DEBUG=atlas:* atlas status
 ### Add a presenter function
 1. UI-agnostic: Add to `src/adapters/presenters/ProjectPresenter.js`
 2. TUI-specific: Add to `src/adapters/presenters/TuiPresenter.js`
-3. Re-export from `src/cli/dashboard/helpers.js` if used by dashboard
-4. Add tests in `test/unit/adapters/presenters/`
+3. Add tests in `test/unit/adapters/presenters/`
 
 ## CI Workflows
 

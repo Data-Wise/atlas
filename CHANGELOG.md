@@ -2,6 +2,73 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+## [0.14.0] - 2026-07-19
+
+### Added
+- **Bare `atlas` digest** — running `atlas` with no arguments now prints one glanceable screen (active session, project focus + next, inbox count, streak, top-3 suggestions) via the new `GetDigestUseCase`, composing the existing `GetContextUseCase`/`PlanDayUseCase` read paths. Additive only: `where`, `plan`, `session status --format json`, `inbox --count`, and `trail --limit` keep their exact prior output (flow-cli contract).
+- **Evidence-linked `session end`** — computes the git delta (commits/files) since session start via `GitGateway`, prints it as evidence, prompts for the outcome only when stdin is a TTY (non-interactive runs keep the prior default-completed behavior), and auto-runs a registry sync scoped to the session's project. Non-git projects and zero-activity sessions degrade gracefully.
+- **`status --complete` evidence** — records closing evidence (active session id, current git HEAD sha) into the `.STATUS` `metrics.closingEvidence` block when a next action is completed.
+
+### Deprecated
+
+| Command | Replacement | Removal |
+|---|---|---|
+| `atlas crumb` | `atlas session note <text>` | v0.15.0 |
+| `atlas trail` | bare `atlas` (digest) or `atlas where` | v0.15.0 |
+| `atlas park` | `atlas catch --type=note` (single parking concept on Capture) | v0.15.0 |
+| `atlas unpark` | `atlas catch --type=note` | v0.15.0 |
+| `atlas parked` | `atlas catch --type=note` | v0.15.0 |
+
+Each deprecated command prints a one-line stderr pointer to its replacement; stdout output is unchanged in v0.14.0.
+
+### Added — `.STATUS` schema
+- **Canonical `.STATUS` schema `atlas/v1` (SPEC-status-schema-yaml-canonical-2026-07-19)** — one normative schema, documented in the new [docs/STATUS-SCHEMA.md](docs/STATUS-SCHEMA.md).
+- **`atlas migrate --status [path]`** — converts a legacy `.STATUS` (markdown `## Key:` or bare `key: value`) to canonical YAML frontmatter. Dry-run by default (prints a field-level diff); `--apply` writes; `--all-scanned` batches a directory tree.
+- **Unified read path** — `StatusFileGateway.read()` now delegates to `StatusFileParser.parseContent()`/`.normalize()`, so canonical frontmatter, legacy markdown, and legacy bare-yaml all produce the same normalized object, with the PR#87 duplicate-key / non-numeric-progress warning machinery now covering all three formats (previously markdown+yaml only).
+
+### Fixed
+- **Data-loss on write (audit finding)** — `StatusFileGateway.write()` previously silently dropped `kind`/`target`/`cran_state`/`tasks` when rewriting a markdown-format `.STATUS`. The writer now **refuses** to overwrite a legacy-format file (`LegacyStatusFileError`, naming `atlas migrate`) unless the caller explicitly opts in via `{ migrate: true }` — and when it does migrate, unknown keys and the markdown body are preserved.
+- **`{{user}}` template placeholder never substituted by `atlas init -t <template>`** — `init` only passed `{name}`; `{{user}}` now resolves via `templateVariables.user` → `git config user.name` → `$USER` → `'user'`.
+- **Validator/parser/template drift** — `StatusFileValidator.VALID_STATUSES` extended with `planning`/`blocked`/`stable` (the `research` template already shipped `status: planning`); `type` is now optional (the `minimal` template omits it); `next` is normalized to an array everywhere (was a bare string on the markdown/bare-yaml read paths).
+
+### Changed
+- All 6 builtin templates (`node`, `r-package`, `python`, `quarto`, `research`, `minimal`) now emit canonical YAML frontmatter instead of `## Key:` markdown headers.
+
+### Docs
+- **Docs site ADHD-first redesign** — landing page (`docs/index.md`) rebuilt with a 3-command
+  quickstart above the fold and a Material `grid cards` pillar nav; `mkdocs.yml` nav regrouped
+  to 7 top-level sections (Home / Get Started / Guide / Reference / Architecture / Integrations /
+  Changelog), no page dropped from nav; `CLI-REFERENCE.md` gets a "Core 5" quick-start table up
+  top with the rest tiered (legacy `atlas migrate` collapsed behind a `??? note`); every top-level
+  nav landing page ends with a single "Now what?" next-step link. See
+  `docs/specs/SPEC-docs-adhd-redesign-2026-07-19.md`.
+
+### Removed
+- **Legacy blessed dashboards (~5.9k LOC)** — deleted `src/cli/dashboard-blessed.js` (2,765 LOC), `src/cli/dashboard/` (3,125 LOC across `CardPool.js`, `ViewStateManager.js`, `constants.js`, `dialogs.js`, `helpers.js`, `stateMachine.js`, `timerManager.js`, `views/*.js`), and their 6 associated test files under `test/unit/cli/dashboard/` (1,597 LOC). Neither was reachable from `bin/atlas.js` or any live `src/` code — the `atlas dashboard`/`atlas dash` commands have used the Ink dashboard (`src/cli/dashboard-ink-launcher.js`) exclusively since v0.9.0. Confirmed via `grep -r "dashboard-blessed\|cli/dashboard/" src/ bin/ test/` returning zero hits before deletion. The `blessed`/`blessed-contrib` npm dependencies are retained for now because `src/ui/Dashboard.js` (a separate, also-unreferenced legacy component outside this change's scope) still imports them.
+- **`src/ui/Dashboard.js` (425 LOC) + its sole referencer `test/e2e/dashboard.test.js`** — the last remaining `blessed`/`blessed-contrib` importer, confirmed unreachable from `bin/` or any live `src/` code. With this gone, `blessed` and `blessed-contrib` are removed from `package.json` dependencies (`grep -r "blessed" src/ bin/` now returns only comment/doc mentions, zero real imports) and the lockfile refreshed via `npm install`.
+
+### Changed — TUI 3-view consolidation (SPEC-tui-consolidation-2026-07-19.md)
+- **Ink dashboard: 8 views → 3** — `MainView`/`DetailView`/`InspectorPanel`/`EcosystemView` merged into **Now** (default; project list + selected-project detail, `e` toggles an ecosystem-wide stats pane); `FocusView`/`ZenView`/the InspectorPanel timer merged into **Timer** (single `PomodoroTimer` component, `z` toggles zen/dense chrome); `PlanView`/`AnalyticsView` merged into **Plan** (`a` toggles an analytics pane). `TimelineView` (time-block view) is dropped rather than re-homed — it had no natural absorption target in the 3-view design and is not restored elsewhere.
+- **State machine: 8 states → 3** (`NOW`/`TIMER`/`PLAN`, `src/cli/dashboard-ink/lib/stateMachine.ts`).
+- **New `lib/keymap.ts`** — single source of truth for every dashboard keybinding, grouped by scope (`global`/`now`/`timer`/`plan`/`help`); a mechanical test (`test/unit/cli/dashboard-ink/lib/keymap.test.tsx`) asserts no duplicate key within a scope. **New `?` help overlay** (`components/HelpOverlay.tsx`) renders directly from the keymap.
+- **Shared components extracted:** `components/shared/ProjectList.tsx` (moved from `SidebarPanel.tsx`, used by Now's left pane) and `components/shared/PomodoroTimer.tsx` (the one Pomodoro timer implementation, replacing three separate copies in `FocusView`/`ZenView`/`InspectorPanel`).
+- **`src/cli/dashboard-ink` LOC: 4,358 → 3,216 (26% reduction)** this PR; combined with the #94 deletion PR, the TUI layer is well past the spec's ≥55%-reduction target from the original 10,250-line baseline.
+
+#### Keybinding migration (before → after)
+
+| Action | Before | After |
+|---|---|---|
+| Switch view | per-view only (`f`/`z`/`T`/`e`/`p` from Browse) | `1`/`2`/`3` or `n`/`t`/`p` from anywhere |
+| Ecosystem stats | dedicated `ECOSYSTEM` view (`e` from Browse) | `e` toggles ecosystem pane inside **Now** |
+| Zen mode | dedicated `ZEN` view (`z` from Browse) | `z` toggles dense chrome inside **Timer** |
+| Analytics | dedicated `ANALYTICS` view (`a`, any view) | `a` toggles analytics pane inside **Plan** |
+| Help | none | `?` opens the new help overlay |
+| Pause / resume timer | `Space` (3 separate implementations) | `Space` (1 implementation, `shared/PomodoroTimer.tsx`) |
+
+No user-facing CLI change: `atlas dash` keeps working; only internal dashboard navigation changed.
+
 ## [0.13.1] - 2026-07-17
 
 Code for this release was substantially complete by 2026-07-11 but the version

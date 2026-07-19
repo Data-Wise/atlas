@@ -53,11 +53,24 @@ describe('Atlas CLI - E2E Tests', () => {
       expect(stdout).toContain('Usage: atlas')
     })
 
-    test('shows help with no command', () => {
-      const { stdout, exitCode } = runCLI('')
+    test('bare `atlas` (no command) renders the digest, not help — isolated data dir', () => {
+      const home = mkdtempSync(join(tmpdir(), 'atlas-bare-digest-'))
+      const env = {
+        ...process.env,
+        NODE_ENV: 'test',
+        HOME: home,
+        ATLAS_CONFIG: join(home, '.atlas'),
+        ATLAS_DATA_DIR: join(home, '.atlas')
+      }
+
+      const { stdout, exitCode } = runCLI('', { env })
 
       expect(exitCode).toBe(0)
-      expect(stdout).toContain('Usage: atlas')
+      expect(stdout).toContain('ATLAS DIGEST')
+      expect(stdout).toContain('Active: none')
+      expect(stdout).toContain('Inbox: 0')
+
+      rmSync(home, { recursive: true, force: true })
     })
 
     test('shows version with --version', () => {
@@ -706,8 +719,10 @@ describe('Atlas CLI - E2E Tests', () => {
 
       expect(exitCode).toBe(0)
       expect(stdout).toContain('Minimal')
-      expect(stdout).toContain('Project:')
-      expect(stdout).toContain('Status: active')
+      // schema atlas/v1: canonical templates emit YAML frontmatter, not
+      // markdown "## Key:" headers.
+      expect(stdout).toContain('schema: atlas/v1')
+      expect(stdout).toContain('status: active')
     })
 
     test('template show returns error for unknown template', () => {

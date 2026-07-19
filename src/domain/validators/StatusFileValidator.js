@@ -14,7 +14,7 @@ export class StatusFileValidator {
   /**
    * Valid status values
    */
-  static VALID_STATUSES = ['active', 'paused', 'archived', 'complete']
+  static VALID_STATUSES = ['active', 'paused', 'blocked', 'planning', 'stable', 'archived', 'complete']
 
   /**
    * Valid project types
@@ -52,9 +52,7 @@ export class StatusFileValidator {
       errors.push('Missing required field: progress')
     }
 
-    if (!data.type) {
-      errors.push('Missing required field: type')
-    }
+    // type is optional for the minimal template (schema atlas/v1)
 
     // Validate status value
     if (data.status && !StatusFileValidator.VALID_STATUSES.includes(data.status)) {
@@ -110,8 +108,17 @@ export class StatusFileValidator {
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i]
 
+      // schema atlas/v1 canonical form: next is a plain string list.
+      // Legacy {action, priority, estimate, blockers} objects still validate.
+      if (typeof action === 'string') {
+        if (!action.trim()) {
+          errors.push(`next[${i}]: empty string`)
+        }
+        continue
+      }
+
       if (typeof action !== 'object' || Array.isArray(action)) {
-        errors.push(`next[${i}]: must be an object`)
+        errors.push(`next[${i}]: must be a string or an object`)
         continue
       }
 

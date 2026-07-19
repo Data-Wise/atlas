@@ -1,8 +1,10 @@
 # Visual Guide
 
-> Theme system, focus score, sparklines, activity heatmap, and AnalyticsView — everything added in v0.9.1 and v0.13.0.
+> Theme system, focus score, sparklines, activity heatmap, and the Plan view's analytics pane — everything added in v0.9.1, v0.13.0, and the v0.14 3-view consolidation.
 
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-19
+
+> **v0.14 note:** the Ink dashboard was consolidated from 8 views to 3 (**Now** / **Timer** / **Plan** — SPEC-tui-consolidation-2026-07-19.md). `AnalyticsView` described below is no longer a standalone view; its content is now the analytics pane inside **Plan** (toggle with `a`). Keybindings and file paths below are updated for the new layout.
 
 ---
 
@@ -16,7 +18,7 @@ Atlas adds five visual enhancement layers to the dashboard:
 | [Focus Score](#focus-score) | Inspector, `atlas stats` | Weighted quality metric with tier classification |
 | [Sparklines](#sparklines) | Sidebar rows | 5-day inline activity charts |
 | [Activity Heatmap](#activity-heatmap) | Inspector, Ecosystem | 13-week GitHub-style activity grid |
-| [AnalyticsView](#analyticsview-v0130) | Dashboard (`a` key) | Interactive analytics with heatmap, velocity, and patterns |
+| [Plan view analytics pane](#analyticsview-v0130-folded-into-plan-in-v014) | Plan view (`a` key) | Interactive analytics with heatmap, velocity, and patterns |
 
 ---
 
@@ -24,7 +26,7 @@ Atlas adds five visual enhancement layers to the dashboard:
 
 ### Using Themes
 
-Press `t` in the dashboard to cycle through themes. Five built-in themes are available:
+Themes are configured via `ThemeContext`'s `themeName` prop (no in-dashboard cycle key is bound — as of v0.14 `t` switches to the **Timer** view; see `?` help overlay for the full active keymap). Five built-in themes are available:
 
 | Theme | Description | Best for |
 |-------|-------------|----------|
@@ -238,8 +240,8 @@ Sun ░░·····░░▒▓████
 
 | Mode | Rows | Used in | Purpose |
 |------|------|---------|---------|
-| Full | 7 (Mon-Sun) | InspectorPanel | Complete weekly view |
-| Compact | 4 (Mon/Wed/Fri/Sat) | EcosystemView | Space-efficient overview |
+| Full | 7 (Mon-Sun) | NowView detail pane | Complete weekly view |
+| Compact | 4 (Mon/Wed/Fri/Sat) | NowView ecosystem pane (`e` toggle) | Space-efficient overview |
 
 ### Character Levels
 
@@ -347,17 +349,17 @@ Domain value objects (`ProjectType`) are extracted to primitives before renderin
 
 ---
 
-## AnalyticsView (v0.13.0)
+## AnalyticsView (v0.13.0, folded into Plan in v0.14)
 
 ### Overview
 
-AnalyticsView is a dedicated analytics dashboard accessible via the `a` key. It provides interactive exploration of session patterns, velocity, and activity heatmaps.
+As of the v0.14 3-view consolidation, this is no longer a standalone view — it's the analytics pane inside **Plan** (`src/cli/dashboard-ink/components/views/PlanView.tsx`), toggled with `a`. It provides the same interactive exploration of session patterns, velocity, and activity heatmaps as before.
 
 ### Access
 
 ```bash
 atlas dash
-# Press 'a' to open AnalyticsView
+# Press '3' or 'p' to open Plan, then 'a' to toggle the analytics pane
 ```
 
 ### Features
@@ -396,22 +398,21 @@ atlas dash
 
 | Key | Action |
 |-----|--------|
-| `a` | Open AnalyticsView |
-| `←`/`→` | Scroll heatmap weeks |
-| `f` | Start focus session |
-| `Enter` | Select project |
-| `Esc` | Return to main view |
+| `a` | Toggle the analytics pane (inside Plan) |
+| `←`/`→` | Switch project (in the analytics pane) |
+| `s` | Start a session (Plan view) |
+| `Esc`/`p` | Return to the suggestions list / back |
 
 ### Data Source
 
-AnalyticsView reads from `~/.atlas/sessions/` and aggregates:
+The analytics pane reads from `~/.atlas/sessions/` and aggregates:
 - **Heatmap**: Session minutes per day, normalized to 5 levels (·░▒▓█)
 - **Velocity**: Sessions per day over 4-week rolling window
 - **Patterns**: Session start times and durations across 90 days
 
 ### Integration with Stats
 
-AnalyticsView uses the same underlying data as `atlas stats`:
+The analytics pane uses the same underlying data as `atlas stats`:
 
 ```bash
 atlas stats --velocity     # CLI equivalent of velocity panel
@@ -430,10 +431,12 @@ atlas stats --calibrate    # Bayesian calibration analysis
 | `src/adapters/presenters/FocusScorePresenter.js` | Adapter | Tier formatting (icon, color, label) |
 | `src/adapters/presenters/StatsPresenter.js` | Adapter | `projectSparklineData()`, `formatHeatmapGrid()` |
 | `src/cli/dashboard-ink/lib/ThemeContext.tsx` | Presentation | Theme definitions, provider, hook |
+| `src/cli/dashboard-ink/lib/keymap.ts` | Presentation | Single source of truth for all keybindings (v0.14) |
 | `src/cli/dashboard-ink/components/shared/HeatmapComponent.tsx` | Presentation | Heatmap React component |
-| `src/cli/dashboard-ink/components/SidebarPanel.tsx` | Presentation | Sparklines + focus tier icons |
-| `src/cli/dashboard-ink/components/InspectorPanel.tsx` | Presentation | Focus score breakdown + heatmap |
-| `src/cli/dashboard-ink/components/views/AnalyticsView.tsx` | Presentation | Analytics view with heatmap, velocity, patterns |
+| `src/cli/dashboard-ink/components/shared/ProjectList.tsx` | Presentation | Sparklines + focus tier icons (moved from `SidebarPanel.tsx` in v0.14) |
+| `src/cli/dashboard-ink/components/shared/PomodoroTimer.tsx` | Presentation | The single Pomodoro timer implementation (v0.14) |
+| `src/cli/dashboard-ink/components/views/NowView.tsx` | Presentation | Project list + detail + focus score breakdown + heatmap + ecosystem toggle (v0.14) |
+| `src/cli/dashboard-ink/components/views/PlanView.tsx` | Presentation | Morning ritual + analytics pane with heatmap, velocity, patterns (v0.14) |
 | `src/cli/dashboard-ink/types.ts` | Presentation | `focusScore`, `focusTier`, `recentActivity` fields |
 
 ### Test Files
@@ -444,6 +447,6 @@ atlas stats --calibrate    # Bayesian calibration analysis
 | `test/unit/use-cases/session/FocusScore.test.js` | 10 | Score calculation, tier assignment |
 | `test/unit/adapters/presenters/FocusScorePresenter.test.js` | 14 | Formatting, edge cases |
 | `test/unit/adapters/presenters/SparklineData.test.js` | 8 | Data generation, normalization |
-| `test/unit/cli/dashboard-ink/components/SidebarSparkline.test.tsx` | 7 | Sparkline rendering |
+| `test/unit/cli/dashboard-ink/components/shared/ProjectListSparkline.test.tsx` | 7 | Sparkline rendering |
 | `test/unit/adapters/presenters/HeatmapGrid.test.js` | 8 | Grid generation, levels |
 | `test/unit/cli/dashboard-ink/components/HeatmapComponent.test.tsx` | 10 | Component rendering, modes |

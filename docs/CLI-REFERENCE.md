@@ -40,6 +40,59 @@ Options:
 
 ---
 
+## Core 5 (start here)
+
+Five commands cover most day-to-day use. Everything else is a **Power** command (used
+occasionally) or a **Legacy** command (kept for compatibility) — both are collapsed below
+their normal section so this page stays scannable.
+
+| Command | What it does | Full docs |
+|---------|---------------|-----------|
+| `atlas init` | One-time setup of `~/.atlas` | [Initialization & Templates](#initialization-templates) |
+| `atlas session start <project>` | Begin a tracked work session | [Session Management](#session-management) |
+| `atlas catch "idea"` | Capture a thought without breaking flow | [Quick Capture](#quick-capture) |
+| `atlas` (no arguments) | The digest — one glanceable "what am I doing / what's next" screen | [The Digest](#the-digest-atlas-no-arguments) |
+| `atlas session end` | Close the session with a "good enough" summary | [Session Management](#session-management) |
+
+!!! tip "Core loop"
+    ```bash
+    atlas init
+    atlas session start myproject
+    atlas catch "check X later"
+    atlas session end "shipped the thing"
+    ```
+
+!!! note "No `flush` command yet"
+    `atlas flush` (vault write-through queue drain) is scaffolded on a held feature branch and
+    ships when the Obsidian `obs write` dependency lands — see
+    `docs/specs/SPEC-obsidian-captures-scope-2026-07-19.md`.
+
+## The Digest (`atlas` — no arguments)
+
+Running `atlas` with no arguments prints the digest: one glanceable screen answering
+"what am I doing / what's next," merging the read paths of `where`, `plan`, and `status`.
+
+```
+📋 ATLAS DIGEST
+────────────────────────────────────────
+🎯 Active: atlas (12m)
+📁 Project: atlas
+   Focus: WS3 digest implementation
+   Next: ship the digest
+📥 Inbox: 3
+🔥 Streak: 4
+
+💡 Suggestions:
+   → P1 focus: atlas (atlas session start atlas)
+```
+
+`where`, `plan`, `session status --format json`, `inbox --count`, and `trail --limit`
+keep their existing exact output (the flow-cli contract) — the digest is additive.
+
+**Happy path (v0.14.0):** `atlas` → `atlas session start <project>` → `atlas session end`.
+
+---
+
 ## Project Management
 
 ### `atlas project add`
@@ -215,6 +268,14 @@ atlas session end "Completed login flow, needs testing"
 
 **Output includes:**
 - Session duration
+- **Evidence** (v0.14.0): the git delta since session start — commits and files touched,
+  computed via the project's git history. Non-git projects, or sessions with zero commits,
+  degrade gracefully (no evidence block, or an explicit "no commits" line).
+- If stdin is a TTY, one confirm prompt for the outcome (`completed`/`cancelled`/`interrupted`,
+  default `completed`). Non-interactive runs (CI, flow-cli, piped input) keep the prior
+  default-completed behavior unchanged.
+- A registry sync scoped to the session's project runs automatically after the session ends —
+  no more manual `atlas sync --from-status` to keep the registry current.
 - Celebration message
 - Streak update
 
@@ -441,6 +502,11 @@ atlas status myproject --increment
 atlas status myproject --increment 25
 ```
 
+**`--complete` evidence (v0.14.0):** when completing a next action, `--complete` records
+closing evidence into the `.STATUS` `metrics.closingEvidence` block — the active session id
+(if any) and the current git HEAD sha (if the project is a git repo). "Done" backed by
+evidence, not an unchecked claim.
+
 ### `atlas focus`
 
 Get or set project focus.
@@ -564,7 +630,11 @@ atlas where myproject
 - Recent breadcrumbs
 - Recent captures
 
-### `atlas crumb`
+### `atlas crumb` ⚠️ Deprecated
+
+> **Deprecated (v0.14.0), removal planned v0.15.0.** Folds into session notes —
+> use `atlas session note <text>` instead. `crumb` still works and prints a
+> one-line stderr pointer; output is otherwise unchanged.
 
 Leave a breadcrumb marker for later context.
 
@@ -584,7 +654,12 @@ atlas crumb "Stuck on variance estimation"
 atlas crumb "Need to refactor auth module" --project api
 ```
 
-### `atlas trail`
+### `atlas trail` ⚠️ Deprecated
+
+> **Deprecated (v0.14.0), removal planned v0.15.0.** Use bare `atlas` (the digest) or
+> `atlas where` instead. `trail` still works and prints a one-line stderr pointer; its
+> `--limit`/JSON-adjacent output is unchanged (flow-cli contract, `trail --limit`
+> stays byte-compatible until flow-cli releases off it).
 
 View breadcrumb trail.
 
@@ -819,7 +894,11 @@ atlas agenda 14 --format json
 
 ## Context Parking (v0.5.1+)
 
-### `atlas park`
+> **Deprecated (v0.14.0), removal planned v0.15.0.** `park`/`unpark`/`parked` fold into a
+> single parking concept on Capture (session pause stays `session pause`). All three still
+> work and print a one-line stderr pointer; output is otherwise unchanged.
+
+### `atlas park` ⚠️ Deprecated
 
 Park current context for later restoration.
 
@@ -850,7 +929,7 @@ atlas park --force "saving context"
 - Recent breadcrumbs
 - Park note
 
-### `atlas parked`
+### `atlas parked` ⚠️ Deprecated
 
 List all parked contexts.
 
@@ -866,7 +945,7 @@ atlas parked
 - Park note
 - When parked
 
-### `atlas unpark`
+### `atlas unpark` ⚠️ Deprecated
 
 Restore a parked context.
 
@@ -903,84 +982,51 @@ atlas dashboard
 atlas dash
 ```
 
-**Keyboard Shortcuts:**
+**v0.14: 3 views, not 8.** The dashboard was consolidated from 8 views down to
+**Now** / **Timer** / **Plan** (SPEC-tui-consolidation-2026-07-19.md). Every
+key below lives in `src/cli/dashboard-ink/lib/keymap.ts`, the single source
+of truth — press `?` in the dashboard to see the same table live.
 
-| Key         | Action                                    |
-| ----------- | ----------------------------------------- |
-| `↑↓` / `j`/`k` | Navigate projects                     |
-| `Enter`     | Open project detail                       |
-| `Esc`       | Back / Exit current view                  |
-| `a`         | Analytics view (v0.13.0)                  |
-| `f`         | Enter focus mode (Pomodoro)               |
-| `z`         | Zen mode                                  |
-| `T`         | Timeline view (time blocks)               |
-| `e`         | Ecosystem view (multi-project overview)   |
-| `p`         | Plan view (morning ritual)                |
-| `c`         | Quick capture                             |
-| `t`         | Cycle themes                              |
-| `Tab`       | Cycle layout: SINGLE → SPLIT → TRIPLE    |
-| `Shift+Tab` | Cycle panel focus in split/triple layouts |
-| `q`         | Quit                                      |
-| `?`         | Show help                                 |
+**Global keys (work from any view):**
 
-> **Note:** The legacy blessed dashboard (`atlas dash --blessed`) uses different
-> bindings: `e` = End session, `s` = Start session, `p` = Filter paused,
-> `a` = Filter active, `/` = Search.
+| Key           | Action                                        |
+| ------------- | ---------------------------------------------- |
+| `1` / `n`     | Switch to **Now**                              |
+| `2` / `t`     | Switch to **Timer**                            |
+| `3` / `p`     | Switch to **Plan**                             |
+| `Tab`         | Cycle layout: SINGLE → SPLIT → TRIPLE          |
+| `q`           | Quit                                           |
+| `?`           | Toggle the help overlay                        |
 
-**Focus Mode Keys:**
+**Now view (default)** — project list + selected-project detail. Absorbs the
+former MainView, DetailView, InspectorPanel, and EcosystemView:
 
-| Key     | Action             |
-| ------- | ------------------ |
-| `Space` | Pause/Resume timer |
-| `r`     | Reset timer        |
-| `+`     | Add 5 minutes      |
-| `-`     | Subtract 5 minutes |
-| `c`     | Quick capture      |
-| `Esc`   | Exit focus mode    |
+| Key                | Action                                             |
+| ------------------ | --------------------------------------------------- |
+| `j`/`k` / `↑↓`      | Navigate the project list                          |
+| `Enter`             | Select project                                      |
+| `e`                 | Toggle the right pane between project detail and ecosystem-wide stats |
 
-**Task-Based Focus (v0.7.0):**
+**Timer view** — the single Pomodoro implementation. Absorbs the former
+FocusView, ZenView, and the InspectorPanel's embedded timer:
 
-When starting a Pomodoro:
-1. Dashboard prompts "What will you focus on?"
-2. Task is displayed during focus session
-3. After timer completes, asks for completion status:
-   - `c` - Completed
-   - `p` - Partial progress
-   - `n` - Pivoted to something else
+| Key     | Action                                  |
+| ------- | ---------------------------------------- |
+| `Space` | Pause/Resume timer                       |
+| `r`     | Reset timer (while paused)               |
+| `+`/`-` | Adjust duration (while paused)           |
+| `z`     | Toggle zen (minimal chrome) vs full chrome |
 
-**Timeline View (v0.7.0):**
+**Plan view** — morning ritual. Absorbs the former PlanView and AnalyticsView:
 
-Press `T` (Shift+T) to enter the time block view:
-- Visual timeline of today's sessions
-- Color-coded by project
-- Shows session durations and gaps
-- Helps identify work patterns
-
-**Analytics View (v0.13.0):**
-
-Press `a` to enter the full-screen analytics view:
-- **Focus Velocity** — 30-day ASCII sparkline, trend indicator, and 4-week summary table
-- **Flow Patterns** — 7×24 hour-day heatmap for productivity distribution, including best day/hour and dead zone callouts
-- **Navigation** — Tab-locked single-panel layout with project cycling (← →)
-- Quick-links to Focus (`f`) and Detail (`Enter`)
-
-**Ecosystem View (v0.8.0):**
-
-Press `e` to see all projects across your ecosystem:
-- Scans ~/projects/dev-tools for .STATUS files
-- Shows project status, progress, and priority
-- Displays focus/next action for selected project
-- Navigate with arrow keys, `Enter` for detail
-- Useful for managing 10+ projects
-
-**Plan View (v0.8.0):**
-
-Press `p` to enter the morning planning ritual:
-- Yesterday's session summary
-- Current streak display
-- Inbox items pending triage
-- Smart suggestions based on history
-- Helps start the day with intention
+| Key      | Action                                    |
+| -------- | ------------------------------------------ |
+| `j`/`k` / `↑↓` | Navigate suggestions                 |
+| `Enter`  | Execute suggestion                        |
+| `e`      | Cycle energy level                        |
+| `s`      | Start a session (jumps to Timer view)     |
+| `a`      | Toggle the analytics pane (focus velocity + flow patterns) |
+| `←`/`→`  | Switch project (while the analytics pane is open) |
 
 **Real Data (v0.9.2):**
 
@@ -1391,40 +1437,73 @@ atlas config prefs set templateVariables.github_user youruser
 
 ## Storage & Migration
 
-### `atlas migrate`
+??? note "Legacy — `atlas migrate` (rarely needed; most users stay on the default filesystem backend)"
 
-Migrate between storage backends.
+    ### `atlas migrate`
 
-```bash
-atlas migrate [options]
+    Migrate between storage backends.
 
-Options:
-  -f, --from <type>    Source backend (filesystem|sqlite)
-  -t, --to <type>      Target backend (filesystem|sqlite)
-  --dry-run            Preview migration
-```
+    ```bash
+    atlas migrate [options]
 
-**Examples:**
-```bash
-# Migrate to SQLite
-atlas migrate --to sqlite
+    Options:
+      -f, --from <type>    Source backend (filesystem|sqlite)
+      -t, --to <type>      Target backend (filesystem|sqlite)
+      --dry-run            Preview migration
+    ```
 
-# Migrate back to filesystem
-atlas migrate --to filesystem
+    **Examples:**
+    ```bash
+    # Migrate to SQLite
+    atlas migrate --to sqlite
 
-# Preview migration
-atlas migrate --to sqlite --dry-run
-```
+    # Migrate back to filesystem
+    atlas migrate --to filesystem
 
-### Using SQLite Backend
+    # Preview migration
+    atlas migrate --to sqlite --dry-run
+    ```
 
-```bash
-# Use SQLite for single command
-atlas --storage sqlite status
+    ### `atlas migrate --status` (v0.14.0+)
 
-# Set as default in config
-atlas config prefs set storage sqlite
-```
+    Convert a legacy `.STATUS` file (markdown `## Key:` headers or bare `key: value` lines) to
+    canonical YAML frontmatter (schema `atlas/v1` — see [STATUS-SCHEMA.md](STATUS-SCHEMA.md)).
+    Dry-run by default; nothing is written until `--apply` is passed.
+
+    ```bash
+    atlas migrate --status [path] [options]
+
+    Options:
+      --status         Migrate a .STATUS file (or directory of them, with --all-scanned)
+      --apply          Write the migration (default is dry-run: prints a field-level diff)
+      --all-scanned    Batch-migrate every .STATUS found under [path]
+    ```
+
+    **Examples:**
+    ```bash
+    # Dry-run against the current directory's .STATUS — prints a diff, writes nothing
+    atlas migrate --status
+
+    # Apply the migration
+    atlas migrate --status ~/projects/research/pmed-modern --apply
+
+    # Batch-migrate every .STATUS under a research root
+    atlas migrate --status ~/projects/research --all-scanned --apply
+    ```
+
+    An already-canonical file is skipped (reported, not touched). Writing a legacy file directly via
+    `StatusFileGateway.write()` (e.g. from `sync`) refuses with an error naming this command unless
+    the caller opts in via `{ migrate: true }`.
+
+    ### Using SQLite Backend
+
+    ```bash
+    # Use SQLite for single command
+    atlas --storage sqlite status
+
+    # Set as default in config
+    atlas config prefs set storage sqlite
+    ```
 
 ---
 
@@ -1485,3 +1564,8 @@ atlas completions fish > ~/.config/fish/completions/atlas.fish
 - [Architecture Overview](./ARCHITECTURE.md)
 - [Programmatic API Guide](./API-GUIDE.md)
 - [Configuration Reference](./CONFIGURATION.md)
+
+
+---
+
+**Now what?** → [Quick Reference Card](./REFCARD.md)

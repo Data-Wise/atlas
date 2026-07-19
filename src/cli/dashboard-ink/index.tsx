@@ -9,7 +9,7 @@ import { Container } from '../../adapters/Container.js';
  * Ink Dashboard Entry Point
  *
  * React-based terminal UI for Atlas project dashboard.
- * Replaces the blessed-based dashboard with a modern, maintainable alternative.
+ * The sole dashboard implementation (the legacy blessed dashboards were removed in #94).
  *
  * The dashboard creates its own Container since it runs as a child process
  * (spawned via npx tsx). The AtlasProvider makes the container available

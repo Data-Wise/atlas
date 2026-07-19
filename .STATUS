@@ -1,12 +1,12 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.13.1 RELEASED
+## Phase: v0.14.0 RELEASING (PRs #94-#99 merged; release pipeline running 2026-07-19)
 ## Priority: 1
 ## Progress: 100
 
-## Focus: Cross-repo research-ops adversarial review (atlas+obs+savant) → SPEC-cross-repo-research-ops-integration-2026-07-16.md → all 4 items implemented, PR'd, and MERGED across atlas/obs/savant. Docs pass to match: fixed stale obs-link/.obs-sync.yml refs across 6 files, documented cran_state + parse warnings (834e9d6, dev, mkdocs build --strict clean).
-## Next: #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate its cascade/architecture sections onto obs research board vs. leave the two renderers coexisting — see issue comment) before it can close | Follow-up: investigate RMediation missing from atlas package registry despite `kind: package` in its .STATUS (background task dispatched) | Follow-up: surface cranState in MCP atlas_get_projects text output — formatProjects() doesn't render it yet (background task dispatched) | Frontend/backend items deferred from the earlier design review (Inspector stale-data leak, Pomodoro timer wiring, duplicate repo-cache singletons, FS/SQLite coercion drift) — each needs its own spec | Observe next Monday 09:00 mediationverse-status-sync launchd run (verify exit 0 + real log)
+## Focus: v0.13.1 released (registry orphan/dup-name detection #90/#91 + missed version-bump caught and closed) and Homebrew tap fixed (stale node@20 dep). Cross-repo research-ops adversarial review (atlas+obs+savant, 2026-07-16) previously landed — see prior entries. v0.14.0 P1 ecosystem scaffold (`feature/catch-obs-bridge`) started 2026-07-17 — see entry below.
+## Next: v0.14.0 release candidate — dev now carries PRs #94–#97 (TUI dead-code removal, .STATUS schema v1 + migrate, docs redesign, bare-atlas digest + evidence-linked end); remaining before release: TUI 3-view consolidation (SPEC-tui-consolidation phase 2), batch-migrate research repos' .STATUS (`atlas migrate --status --all-scanned`, coordinate with savant), release feature/catch-obs-bridge PR from hold when obs ships `write` | PlanDayUseCase `projectRepository.list()` bug — fix running as separate background task (task_b8860b0c) | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate its cascade/architecture sections onto obs research board vs. leave the two renderers coexisting — see issue comment) before it can close | Follow-up: investigate RMediation missing from atlas package registry despite `kind: package` in its .STATUS (background task dispatched) | Follow-up: surface cranState in MCP atlas_get_projects text output — formatProjects() doesn't render it yet (background task dispatched) | Frontend/backend items deferred from the earlier design review (Inspector stale-data leak, Pomodoro timer wiring, duplicate repo-cache singletons, FS/SQLite coercion drift) — each needs its own spec | Observe next Monday 09:00 mediationverse-status-sync launchd run (verify exit 0 + real log) | Stray worktrees: `compassionate-brahmagupta-5e8344` observed LIVE 2026-07-19 (switched itself to new branch `claude/sleepy-shtern-eea46f` — another active Claude surface, do NOT delete); `frosty-elion-5e491d` still unexplained
 
 ## Research-ops: #61 ✅ DONE. #62 ✅ DONE (unverified pending an observed live run). #63 🔵 OPEN — package-render-target half shipped (atlas#89 + obs#90, merged), golden-match/script-retirement half deferred pending a design decision (see issue #63 comment 2026-07-16). Dev tool audit: `docs/internal/PROJECT-SETUP-AUDIT.md`.
 
@@ -44,16 +44,34 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 1,984 passing (Jest, 93 suites) — green on Node 18/22
-- Ink: 277 passing (10 suites)
-- Dogfood: 188 (shell test suite + YAML passthrough)
-- E2E: 87 passing (Vitest + ink-testing-library + Playwright)
+- Total: 2,026 passing (Jest, 95 suites) — verified this session
+- E2E/Dogfood: covered within the full suite above (Vitest + ink-testing-library + Playwright + shell dogfood)
 
 ## Links
 - **Docs**: https://data-wise.github.io/atlas/
 - GitHub: https://github.com/Data-Wise/atlas
 - Homebrew: `brew install data-wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
+
+## ✅ Just Completed (2026-07-19 Session — autonomous 5-workstream run)
+- **PR #99 MERGED (later same session)** — TUI 3-view consolidation: 8 views → Now/Timer/Plan, one PomodoroTimer (mechanically test-enforced), central keymap.ts + `?` help overlay, `src/ui/Dashboard.js` deleted, `blessed`/`blessed-contrib` deps dropped; dashboard-ink −26% LOC. TimelineView dropped (no absorption target); analytics e2e deleted (unit-covered — noted coverage gap).
+- **PR #98 MERGED (later same session)** — SwiftBar/xbar menu-bar plugin (`contrib/swiftbar/`): ambient session/inbox/streak surface from the TUI-alternatives brainstorm (`docs/specs/PROPOSAL-tui-alternatives-2026-07-19.md`, also on dev). E2E shim tests caught 2 real bugs pre-PR (PATH precedence, UTC parse). TUI investment now FROZEN per proposal — ambient surfaces compete with `atlas dash`.
+- **.STATUS migrate dry-run** — all 15 research repos convert cleanly to atlas/v1, zero warnings; `--apply` awaits coordinated rollout decision.
+- **ADHD audit → grill → 5 specs** (`docs/specs/SPEC-{adhd-workflow-streamline,status-schema-yaml-canonical,tui-consolidation,obsidian-captures-scope,docs-adhd-redesign}-2026-07-19.md`), each with a drivable Execution section. Grilled decisions: TUI → 3 views; Obsidian = captures-only on P0; .STATUS canon = YAML frontmatter (breaking, migrate tool required); evidence-linked done; bare-`atlas`-digest + deprecation tier.
+- **PR #94 MERGED** — deleted ~5.9k LOC unreachable blessed dashboards + 6 dead test files.
+- **PR #95 MERGED** — docs-site ADHD redesign (landing quickstart, 7-item nav, Core-5 tiering, "Now what?" footers).
+- **PR #96 MERGED** — .STATUS schema `atlas/v1`: unified parser, refuse-don't-drop writer, `atlas migrate --status` (dry-run default), templates → frontmatter, `{{user}}` fix, docs/STATUS-SCHEMA.md. One CI-red fixed en route (dogfood template marker updated for frontmatter).
+- **PR #97 MERGED** — bare `atlas` digest (GetDigestUseCase), evidence-linked `session end` (git delta + TTY confirm + scoped auto-sync), `status --complete` closing evidence, deprecation warnings (crumb/trail/park/unpark/parked → v0.15 removal). flow-cli JSON contract snapshot-locked.
+- **feature/catch-obs-bridge advanced (held, no PR)** — pending-flush captures now inbox-visible (blackhole regression guard), `inbox --count` includes them, 100-capture idempotent flush test; commit `4a204ae` pushed.
+- Suite after merges: ~2,049 tests / 97 suites green (per PR #97 run). Note: this `.STATUS` is still legacy markdown — migrate it during the coordinated `atlas migrate --status` rollout, not piecemeal.
+- Process note: two stray "WS3" subagents (recursive delegation) detected and killed; one agent stall recovered by resume; 3 CHANGELOG/CLI-REFERENCE merge conflicts resolved in sequence.
+
+## ✅ Just Completed (2026-07-17 Session)
+- **Fixed atlas#90** — `atlas doctor`/`sync --remove-orphans` keyed off registered `name` (a stale duplicate registry entry could shadow a real project's audit result); now keys off real disk existence (`orphaned`/`duplicateName` row flags) so orphan detection is safe under any `--paths` scan scope. PR #91 merged (dev→main).
+- **Caught and closed a missed release** — `CHANGELOG.md`/`CLAUDE.md` had described v0.13.1 as shipped since 2026-07-11, but `package.json`/`.STATUS` were never bumped and no tag/GitHub release existed. Bumped, tagged, released `v0.13.1` (PR #92); expanded the `[0.13.1]` CHANGELOG entry to cover the full range (parser hardening #87, dead `.obs/sync.yml` refs #88, `cran_state` #89, registry fixes #90/#91, docs redesign, CI Node 22) that was previously undocumented (PR #93).
+- **Fixed Homebrew formula drift (homebrew-tap#146)** — `depends_on "node@20"` was a stale pin nobody had installed (atlas's `#!/usr/bin/env node` shebang is version-agnostic; atlas actually runs on node@26). Changed to unversioned `node`, matching every other Node formula in the tap.
+- **Worktree cleanup** — removed `feature/registry-id-key` (atlas, merged via #91) and `feature/atlas-node-dep`/`-v2` (homebrew-tap, merged via #146). *(Regrounded: homebrew-tap's local branch deletes, initially confirm-gate-blocked, were confirmed resolved on a later check — both branches no longer exist locally.)*
+- **v0.14.0 P1 ecosystem scaffold started** — `feature/catch-obs-bridge` worktree, commit `f7f4f55`, pushed (no PR yet). Scaffolds the capture write-through-to-vault queue against `SPEC-ecosystem-integration-gaps-2026-06-20`'s planned `obs write` contract (D2/D4/D5): `ObsidianGateway` (capability-probed `obs` CLI wrapper, `execFile` not `exec` to avoid shell-interpolating capture text), `FlushCapturesUseCase` (drains `pending-flush` captures, idempotent), `Capture` entity gains `pending-flush`/`flushed` states. 46/46 tests green. Verified live: `obs` is at v4.3.0, `obs write` still returns `Unknown command` — confirms this is genuinely built-but-dark, not premature. Remaining: `atlas flush` CLI wiring, `atlas catch` write-through, docs — PR intentionally held until write-through lands so it reviews as one unit.
 
 ## ✅ Just Completed (2026-07-11 Session 1)
 - **Quick wins from spec audit** — #65 YAML passthrough, #22 already fixed, F6 inbox --type/--limit
@@ -131,7 +149,8 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - None
 
 ## 🔧 Active Worktrees
-- (none)
+- `~/.git-worktrees/atlas/feature-catch-obs-bridge` (`feature/catch-obs-bridge`) — held pending obs `write` (P0)
+- `~/.git-worktrees/atlas/compassionate-brahmagupta-5e8344` + `frosty-elion-5e491d` — external Claude sessions, not this repo's workflow (see Next)
 
 ## 🎯 Next Action
 A) **#63 obs package renderer** — render target shipped (atlas#89 + obs#90, merged); remaining: decide golden-match vs. cascade-migration vs. coexist (see issue comment 2026-07-16), then implement
