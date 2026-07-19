@@ -396,6 +396,18 @@ atlas config prefs set templateVariables.author "John Doe"
 atlas config prefs set templateVariables.github_user johndoe
 ```
 
+**`{{user}}` resolution (v0.14.0+):** `atlas init -t <template>` only passes `{name}`, so
+`{{user}}` is resolved automatically in this order: `preferences.templateVariables.user` →
+`git config user.name` → `$USER` → the literal string `user`. Set
+`templateVariables.user` explicitly if you want a value other than your git identity:
+
+```bash
+atlas config prefs set templateVariables.user "Jane Researcher"
+```
+
+All 6 builtin templates now emit canonical `.STATUS` YAML frontmatter (schema `atlas/v1` — see
+[STATUS-SCHEMA.md](STATUS-SCHEMA.md)), not the old `## Key:` markdown headers.
+
 **Built-in Variables:**
 - `{{name}}` - Project name (from --name option)
 - `{{date}}` - Current date

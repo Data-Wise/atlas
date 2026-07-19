@@ -1252,12 +1252,38 @@ function showSyncStats(stats) {
 }
 
 program
-  .command('migrate')
-  .description('Migrate data between storage backends')
+  .command('migrate [path]')
+  .description('Migrate data between storage backends, or a .STATUS file to canonical schema (--status)')
   .option('-f, --from <type>', 'Source storage type', 'filesystem')
   .option('-t, --to <type>', 'Target storage type', 'sqlite')
-  .option('--dry-run', 'Show what would be migrated')
-  .action(async (options) => {
+  .option('--dry-run', 'Show what would be migrated (default for --status)')
+  .option('--status', 'Migrate a legacy .STATUS file (or directory of them, with --batch) to canonical YAML frontmatter')
+  .option('--apply', 'Write the migration (--status only; default is dry-run)')
+  .option('--all-scanned', 'Batch-migrate every .STATUS found under [path] (--status only)')
+  .action(async (path, options) => {
+    if (options.status) {
+      const { MigrateStatusUseCase } = await import('../src/use-cases/status/MigrateStatusUseCase.js');
+      const target = path || process.cwd();
+      const useCase = new MigrateStatusUseCase();
+      const apply = !!options.apply; // dry-run is the default
+      const { results } = await useCase.execute({ path: target, apply, batch: !!options.allScanned });
+
+      for (const r of results) {
+        if (r.status === 'skipped') {
+          console.log(`⏭  ${r.path}: skipped (${r.reason})`);
+          continue;
+        }
+        console.log(`\n${r.path} (${r.format} → atlas/v1)`);
+        console.log(r.diff || '  (no recognized fields)');
+        if (r.status === 'dry-run') {
+          console.log('  [dry-run — no file written; pass --apply to write]');
+        } else {
+          console.log('  ✓ migrated to canonical frontmatter');
+        }
+      }
+      return;
+    }
+
     const { migrateStorage } = await import('../src/utils/migrate.js');
     const result = await migrateStorage({
       from: options.from,

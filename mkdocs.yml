@@ -118,6 +118,7 @@ nav:
       - Automation: user-guide/workflows/AUTOMATION.md
     - Cookbook: user-guide/cookbook/COOKBOOK.md
     - Visual Guide: VISUAL-GUIDE.md
+    - .STATUS Schema: STATUS-SCHEMA.md
     - Configuration: CONFIGURATION.md
     - Migration Guide: user-guide/MIGRATION-GUIDE.md
     - Troubleshooting: user-guide/TROUBLESHOOTING.md

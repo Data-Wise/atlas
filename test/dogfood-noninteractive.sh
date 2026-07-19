@@ -343,7 +343,7 @@ test_contains "List shows minimal" "$ATLAS template list" "minimal"
 
 # Show template content
 test_succeeds "Template show runs" "$ATLAS template show node"
-test_contains "Show has project marker" "$ATLAS template show node" "Project:"
+test_contains "Show has canonical schema marker" "$ATLAS template show node" "schema: atlas/v1"
 
 # Template dir
 test_contains "Template dir shows path" "$ATLAS template dir" ".atlas/templates"

@@ -57,7 +57,7 @@ describe('Templates', () => {
   describe('applyTemplate()', () => {
     it('replaces {{name}} variable', () => {
       const content = applyTemplate('minimal', { name: 'test-project' });
-      expect(content).toContain('## Project: test-project');
+      expect(content).toContain('# test-project');
     });
 
     it('replaces {{user}} variable', () => {
@@ -65,9 +65,17 @@ describe('Templates', () => {
       expect(content).toContain('github.com/testuser/pkg');
     });
 
+    it('substitutes {{user}} even when only {name} is passed (init call shape)', () => {
+      // Regression: atlas init -t <template> historically passed only
+      // {name}; {{user}} must still resolve (git config user.name / $USER
+      // / 'user'), never leak the literal placeholder into the file.
+      const content = applyTemplate('node', { name: 'pkg' });
+      expect(content).not.toContain('{{user}}');
+    });
+
     it('uses default name if not provided', () => {
       const content = applyTemplate('minimal');
-      expect(content).toContain('## Project: my-project');
+      expect(content).toContain('# my-project');
     });
 
     it('returns null for unknown template', () => {
@@ -75,26 +83,27 @@ describe('Templates', () => {
       expect(content).toBeNull();
     });
 
-    it('node template has expected sections', () => {
+    it('node template has expected sections (schema atlas/v1 frontmatter)', () => {
       const content = applyTemplate('node', { name: 'myapp' });
-      expect(content).toContain('## Type: node-package');
-      expect(content).toContain('## Status: active');
-      expect(content).toContain('## Current Tasks');
+      expect(content).toContain('schema: atlas/v1');
+      expect(content).toContain('type: node');
+      expect(content).toContain('status: active');
       expect(content).toContain('package.json');
     });
 
     it('r-package template has expected sections', () => {
       const content = applyTemplate('r-package', { name: 'mypkg' });
-      expect(content).toContain('## Type: r-package');
+      expect(content).toContain('type: r-package');
       expect(content).toContain('DESCRIPTION');
       expect(content).toContain('testthat');
     });
 
     it('research template has research-specific sections', () => {
       const content = applyTemplate('research', { name: 'study' });
-      expect(content).toContain('## Type: research');
+      expect(content).toContain('type: research');
+      expect(content).toContain('kind: manuscript');
       expect(content).toContain('Research Questions');
-      expect(content).toContain('Target');
+      expect(content).toContain('target:');
     });
   });
 
