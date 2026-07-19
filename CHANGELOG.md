@@ -4,6 +4,15 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+### Docs
+- **Docs site ADHD-first redesign** — landing page (`docs/index.md`) rebuilt with a 3-command
+  quickstart above the fold and a Material `grid cards` pillar nav; `mkdocs.yml` nav regrouped
+  to 7 top-level sections (Home / Get Started / Guide / Reference / Architecture / Integrations /
+  Changelog), no page dropped from nav; `CLI-REFERENCE.md` gets a "Core 5" quick-start table up
+  top with the rest tiered (legacy `atlas migrate` collapsed behind a `??? note`); every top-level
+  nav landing page ends with a single "Now what?" next-step link. See
+  `docs/specs/SPEC-docs-adhd-redesign-2026-07-19.md`.
+
 ### Removed
 - **Legacy blessed dashboards (~5.9k LOC)** — deleted `src/cli/dashboard-blessed.js` (2,765 LOC), `src/cli/dashboard/` (3,125 LOC across `CardPool.js`, `ViewStateManager.js`, `constants.js`, `dialogs.js`, `helpers.js`, `stateMachine.js`, `timerManager.js`, `views/*.js`), and their 6 associated test files under `test/unit/cli/dashboard/` (1,597 LOC). Neither was reachable from `bin/atlas.js` or any live `src/` code — the `atlas dashboard`/`atlas dash` commands have used the Ink dashboard (`src/cli/dashboard-ink-launcher.js`) exclusively since v0.9.0. Confirmed via `grep -r "dashboard-blessed\|cli/dashboard/" src/ bin/ test/` returning zero hits before deletion. The `blessed`/`blessed-contrib` npm dependencies are retained for now because `src/ui/Dashboard.js` (a separate, also-unreferenced legacy component outside this change's scope) still imports them.
 

@@ -145,3 +145,7 @@ atlas init --list-templates
 - [Tutorial](../TUTORIAL.md) - Learn Atlas basics in 15 minutes
 - [CLI Reference](../CLI-REFERENCE.md) - Explore all commands
 - [Configuration](../CONFIGURATION.md) - Customize your setup
+
+---
+
+**Now what?** → [Tutorial: 15-minute walkthrough](../TUTORIAL.md)
