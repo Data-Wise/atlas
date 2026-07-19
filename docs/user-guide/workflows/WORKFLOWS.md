@@ -532,7 +532,7 @@ atlas session end "PR #42 ready for review"
 
 **Goal:** Track actionable tasks with deadlines and priorities, inside the session loop.
 
-Commands: [Cookbook Recipe 14](../cookbook/COOKBOOK.md#recipe-14--manage-tasks-with-due-dates-and-priorities).
+Commands: [Cookbook Recipe 14](../cookbook/COOKBOOK.md#recipe-14-manage-tasks-with-due-dates-and-priorities).
 
 **Workflow:**
 ```mermaid
@@ -555,7 +555,7 @@ flowchart TD
 **Goal:** See today's combined schedule from multiple sources — scheduled records, tasks with
 due dates, and session history, merged chronologically.
 
-Commands: [Cookbook Recipe 15](../cookbook/COOKBOOK.md#recipe-15--merged-agenda-view).
+Commands: [Cookbook Recipe 15](../cookbook/COOKBOOK.md#recipe-15-merged-agenda-view).
 
 **Morning planning workflow:**
 ```mermaid

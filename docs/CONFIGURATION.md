@@ -726,3 +726,7 @@ chmod 644 ~/.atlas/*.json
 - [CLI Reference](./CLI-REFERENCE.md)
 - [Architecture](./ARCHITECTURE.md)
 - [API Guide](./API-GUIDE.md)
+
+---
+
+**Now what?** → [.STATUS Schema](STATUS-SCHEMA.md)

@@ -1212,3 +1212,7 @@ atlas dash  # live here
 **Welcome to Atlas!**
 
 Start with `atlas session start` and build from there. The rest will follow naturally.
+
+---
+
+**Now what?** → [Scenarios: five moments in a real day](user-guide/workflows/SCENARIOS.md)
