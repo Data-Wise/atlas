@@ -70,3 +70,17 @@ Casing: keys lowercase; enum values lowercase. Unknown frontmatter keys are pres
 
 - **v0.14.0:** unified parser, safe writer, migrate tool, templates, docs.
 - **v0.15.0:** legacy-format read warning; evaluate removal for v0.16.
+
+## Execution (drivable by /craft:orch:drive or agent fleet)
+
+**Worktree:** `~/.git-worktrees/atlas/feature-status-schema-v1` · **Branch:** `feature/status-schema-v1` (base `dev`) · **PR title:** `feat(status): canonical YAML frontmatter schema, unified parser, atlas migrate`
+
+| # | Task | Acceptance |
+|---|---|---|
+| 1 | Unified read: StatusFileGateway parses via StatusFileParser normalization (frontmatter + legacy md + legacy yaml → same object, warnings preserved) | golden-file suite: 3 formats × same fixture → identical objects |
+| 2 | Safe writer: canonical frontmatter only; refuses legacy input without `--migrate`; unknown keys + body byte-preserved | data-loss regression test (kind/target/cran_state survive or write refused) |
+| 3 | `atlas migrate --status [path]` with `--dry-run` default + field diff | dry-run on ≥3 real research .STATUS copies, transcript in PR body |
+| 4 | Templates → frontmatter; fix `{{user}}`; validator enum += planning/blocked/stable; `next` always array | template render test; validator tests |
+| 5 | docs/STATUS-SCHEMA.md + RESEARCH-REGISTRY/CLI-REFERENCE/CONFIGURATION updates | `mkdocs build --strict` green |
+
+**Verify gate:** `npm test` green + golden-file round-trip suite + `mkdocs build --strict`.

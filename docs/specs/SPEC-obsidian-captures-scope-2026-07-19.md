@@ -44,5 +44,17 @@ Re-grilled 2026-07-19 against the option space (captures-only / captures+boards 
 ## Release mapping
 
 - **Pre-P0 (v0.14.0):** land the pending-flush-visible-in-inbox regression guard only. Hold the PR for feature/catch-obs-bridge until then per .STATUS plan.
+
+### Execution — pre-P0 slice (drivable now)
+
+**Worktree:** existing `~/.git-worktrees/atlas/feature-catch-obs-bridge` · **Branch:** `feature/catch-obs-bridge` · **PR title (when released from hold):** `feat(capture): obs write-through scaffold + pending-flush inbox guard`
+
+| # | Task | Acceptance |
+|---|---|---|
+| 1 | Inbox-visibility: GetInbox/PlanDay/usePendingCaptures treat `pending-flush` as inbox-visible | blackhole regression test: gateway injected + obs failing → capture still in inbox/plan/digest |
+| 2 | flow-cli semantics: `inbox --count` includes pending-flush | count test |
+| 3 | Idempotent flush loop test (100 catches, obs down, flush drains once) | crash-consistency test green |
+
+**Verify gate:** `npm test` in the worktree, counts in commit message. Remaining Execution rows (wire-through, triggers, TriageInbox retirement) activate only on P0 — do not drive them before obs ships `write`.
 - **P0+1 atlas minor:** wire write-through, flush triggers, deprecation.
 - **P0+2 atlas minor:** remove TriageInbox.

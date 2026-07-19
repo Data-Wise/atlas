@@ -48,3 +48,16 @@ Central keymap in one module (`lib/keymap.ts`): global keys only (`1/2/3` or `n/
 
 - **v0.14.0:** deletion PR (ship early, zero risk).
 - **v0.14.x–v0.15.0:** 3-view consolidation, split into shared-components PR then views PR.
+
+## Execution (drivable by /craft:orch:drive or agent fleet)
+
+**Worktree:** `~/.git-worktrees/atlas/feature-tui-dead-code-removal` · **Branch:** `feature/tui-dead-code-removal` (base `dev`) · **PR title:** `refactor(tui): remove unreachable blessed dashboards (~5.9k LOC)`
+
+| # | Task | Acceptance |
+|---|---|---|
+| 1 | Delete `src/cli/dashboard-blessed.js`, `src/cli/dashboard/`, `test/unit/cli/dashboard/` | paths gone; `grep -r "dashboard-blessed\|cli/dashboard/" src/ bin/ test/` → 0 hits |
+| 2 | Remove `blessed` (+ blessed-only deps) from package.json if nothing else imports them | `grep -r "require('blessed')\|from 'blessed'" src/ bin/` → 0; `npm install` clean |
+| 3 | Full suite | `npm test` green, count reported |
+| 4 | CHANGELOG entry + CLAUDE.md architecture tree updated | files mention removal |
+
+**Verify gate:** `npm test && npx jest --listTests | grep -c dashboard` (only dashboard-ink tests remain). Phase-2 consolidation (3 views) executes as a separate follow-up branch `feature/tui-three-views` after this merges.

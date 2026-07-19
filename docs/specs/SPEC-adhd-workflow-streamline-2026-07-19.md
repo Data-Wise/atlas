@@ -47,3 +47,18 @@
 
 - **v0.14.0:** digest, evidence-linked end, auto-sync, deprecation warnings.
 - **v0.15.0:** remove deprecated commands; fold parking concepts.
+
+## Execution (drivable by /craft:orch:drive or agent fleet)
+
+**Worktree:** `~/.git-worktrees/atlas/feature-adhd-digest` · **Branch:** `feature/adhd-digest` (base `dev`) · **PR title:** `feat(cli): bare atlas digest, evidence-linked session end, deprecation tier`
+
+| # | Task | Acceptance |
+|---|---|---|
+| 1 | `GetDigestUseCase` composing GetContext + PlanDay + .STATUS read | unit tests: session/no-session, empty inbox, missing .STATUS |
+| 2 | Bare `atlas` → digest; `where`/`plan` render sections of same output (JSON paths unchanged) | flow-cli contract outputs byte-compatible (`--format json` snapshots) |
+| 3 | EndSession: git delta (GitGateway) + single confirm + scoped auto-sync | fixture-repo tests: delta present / empty / non-git graceful |
+| 4 | `status --complete` records closing evidence (session id, sha) into metrics | evidence appears in .STATUS after complete |
+| 5 | Deprecation warnings on crumb/trail/park/unpark/parked | warning text test; JSON outputs untouched |
+| 6 | Docs: CLI-REFERENCE, TUTORIAL, REFCARD, CHANGELOG | `mkdocs build --strict` green |
+
+**Verify gate:** `npm test` green + E2E transcript (fresh ATLAS_DATA_DIR: start → real commit → end shows sha → registry synced without manual sync) in PR body. Depends on nothing; coordinate bin/atlas.js merge order with WS1/WS2 at review time.
