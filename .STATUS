@@ -54,6 +54,9 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - npm: `npm install -g @data-wise/atlas`
 
 ## ✅ Just Completed (2026-07-19 Session — autonomous 5-workstream run)
+- **PR #99 MERGED (later same session)** — TUI 3-view consolidation: 8 views → Now/Timer/Plan, one PomodoroTimer (mechanically test-enforced), central keymap.ts + `?` help overlay, `src/ui/Dashboard.js` deleted, `blessed`/`blessed-contrib` deps dropped; dashboard-ink −26% LOC. TimelineView dropped (no absorption target); analytics e2e deleted (unit-covered — noted coverage gap).
+- **PR #98 MERGED (later same session)** — SwiftBar/xbar menu-bar plugin (`contrib/swiftbar/`): ambient session/inbox/streak surface from the TUI-alternatives brainstorm (`docs/specs/PROPOSAL-tui-alternatives-2026-07-19.md`, also on dev). E2E shim tests caught 2 real bugs pre-PR (PATH precedence, UTC parse). TUI investment now FROZEN per proposal — ambient surfaces compete with `atlas dash`.
+- **.STATUS migrate dry-run** — all 15 research repos convert cleanly to atlas/v1, zero warnings; `--apply` awaits coordinated rollout decision.
 - **ADHD audit → grill → 5 specs** (`docs/specs/SPEC-{adhd-workflow-streamline,status-schema-yaml-canonical,tui-consolidation,obsidian-captures-scope,docs-adhd-redesign}-2026-07-19.md`), each with a drivable Execution section. Grilled decisions: TUI → 3 views; Obsidian = captures-only on P0; .STATUS canon = YAML frontmatter (breaking, migrate tool required); evidence-linked done; bare-`atlas`-digest + deprecation tier.
 - **PR #94 MERGED** — deleted ~5.9k LOC unreachable blessed dashboards + 6 dead test files.
 - **PR #95 MERGED** — docs-site ADHD redesign (landing quickstart, 7-item nav, Core-5 tiering, "Now what?" footers).
