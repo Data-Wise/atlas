@@ -580,9 +580,9 @@ class ProjectsAPI {
     return await updateUseCase.incrementProgress(name, amount);
   }
 
-  async completeNextAction(name, newAction = null) {
+  async completeNextAction(name, newAction = null, evidence = null) {
     const updateUseCase = this.container.resolve('UpdateStatusUseCase');
-    return await updateUseCase.completeNextAction(name, newAction);
+    return await updateUseCase.completeNextAction(name, newAction, evidence);
   }
 }
 
@@ -612,12 +612,15 @@ class SessionsAPI {
     };
   }
 
-  async end(note) {
+  async end(note, options = {}) {
     const endSession = this.container.resolve('EndSessionUseCase');
-    const session = await endSession.execute({ note });
+    const result = await endSession.execute({ note, outcome: options.outcome });
+    const session = result.session || result; // tolerate use cases still returning a bare session
     return {
       duration: session.getDuration ? `${session.getDuration()}m` : 'unknown',
-      note
+      note,
+      gitDelta: result.gitDelta || null,
+      synced: result.synced || false
     };
   }
 

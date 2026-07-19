@@ -122,4 +122,81 @@ export class GitGateway {
       return null
     }
   }
+
+  /**
+   * Get the current HEAD commit sha (short form)
+   * @param {string} projectPath - Path to project directory
+   * @returns {Promise<string|null>}
+   */
+  async getHeadSha(projectPath) {
+    if (!(await this.isGitRepository(projectPath))) {
+      return null
+    }
+    try {
+      const { stdout } = await execAsync('git rev-parse --short HEAD', {
+        cwd: projectPath
+      })
+      return stdout.trim() || null
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Compute a git activity delta since a given timestamp — used to back
+   * "session end" with real evidence instead of an unchecked completed flag.
+   *
+   * @param {string} projectPath - Path to project directory
+   * @param {string|Date} since - ISO timestamp (or Date) to diff from
+   * @returns {Promise<Object|null>} { branch, commits: [{sha, subject}], files: string[] } or null if not a git repo
+   */
+  async getDelta(projectPath, since) {
+    if (!existsSync(projectPath) || !(await this.isGitRepository(projectPath))) {
+      return null
+    }
+
+    const sinceIso = since instanceof Date ? since.toISOString() : since
+
+    try {
+      let branch = ''
+      try {
+        const { stdout } = await execAsync('git branch --show-current', { cwd: projectPath })
+        branch = stdout.trim()
+      } catch {
+        branch = 'unknown'
+      }
+
+      const { stdout: logOutput } = await execAsync(
+        `git log --since="${sinceIso}" --pretty=format:%h%x09%s`,
+        { cwd: projectPath }
+      )
+
+      const commits = logOutput
+        .split('\n')
+        .filter(Boolean)
+        .map(line => {
+          const [sha, ...rest] = line.split('\t')
+          return { sha, subject: rest.join('\t') }
+        })
+
+      let files = []
+      if (commits.length > 0) {
+        const { stdout: filesOutput } = await execAsync(
+          `git log --since="${sinceIso}" --name-only --pretty=format:`,
+          { cwd: projectPath }
+        )
+        files = [...new Set(filesOutput.split('\n').map(f => f.trim()).filter(Boolean))]
+      }
+
+      return {
+        branch,
+        commits,
+        files,
+        hasActivity: commits.length > 0
+      }
+    } catch (error) {
+      console.error(`Warning: Could not compute git delta: ${error.message}`)
+      return null
+    }
+  }
 }

@@ -51,7 +51,7 @@ their normal section so this page stays scannable.
 | `atlas init` | One-time setup of `~/.atlas` | [Initialization & Templates](#initialization-templates) |
 | `atlas session start <project>` | Begin a tracked work session | [Session Management](#session-management) |
 | `atlas catch "idea"` | Capture a thought without breaking flow | [Quick Capture](#quick-capture) |
-| `atlas status` / `atlas stats` | See where you are and how you're trending | [Status & Progress](#status-progress) |
+| `atlas` (no arguments) | The digest — one glanceable "what am I doing / what's next" screen | [The Digest](#the-digest-atlas-no-arguments) |
 | `atlas session end` | Close the session with a "good enough" summary | [Session Management](#session-management) |
 
 !!! tip "Core loop"
@@ -62,11 +62,34 @@ their normal section so this page stays scannable.
     atlas session end "shipped the thing"
     ```
 
-!!! note "No `flush` or `digest` command yet"
-    Some external docs reference `atlas flush` / `atlas digest` as planned commands. As of the
-    version in this branch neither exists in `src/index.js` — the closest shipped equivalents
-    are `atlas inbox` / `atlas triage` (flush the capture inbox) and `atlas status` / `atlas stats`
-    (digest of current state). This note will be removed once those commands land.
+!!! note "No `flush` command yet"
+    `atlas flush` (vault write-through queue drain) is scaffolded on a held feature branch and
+    ships when the Obsidian `obs write` dependency lands — see
+    `docs/specs/SPEC-obsidian-captures-scope-2026-07-19.md`.
+
+## The Digest (`atlas` — no arguments)
+
+Running `atlas` with no arguments prints the digest: one glanceable screen answering
+"what am I doing / what's next," merging the read paths of `where`, `plan`, and `status`.
+
+```
+📋 ATLAS DIGEST
+────────────────────────────────────────
+🎯 Active: atlas (12m)
+📁 Project: atlas
+   Focus: WS3 digest implementation
+   Next: ship the digest
+📥 Inbox: 3
+🔥 Streak: 4
+
+💡 Suggestions:
+   → P1 focus: atlas (atlas session start atlas)
+```
+
+`where`, `plan`, `session status --format json`, `inbox --count`, and `trail --limit`
+keep their existing exact output (the flow-cli contract) — the digest is additive.
+
+**Happy path (v0.14.0):** `atlas` → `atlas session start <project>` → `atlas session end`.
 
 ---
 
@@ -245,6 +268,14 @@ atlas session end "Completed login flow, needs testing"
 
 **Output includes:**
 - Session duration
+- **Evidence** (v0.14.0): the git delta since session start — commits and files touched,
+  computed via the project's git history. Non-git projects, or sessions with zero commits,
+  degrade gracefully (no evidence block, or an explicit "no commits" line).
+- If stdin is a TTY, one confirm prompt for the outcome (`completed`/`cancelled`/`interrupted`,
+  default `completed`). Non-interactive runs (CI, flow-cli, piped input) keep the prior
+  default-completed behavior unchanged.
+- A registry sync scoped to the session's project runs automatically after the session ends —
+  no more manual `atlas sync --from-status` to keep the registry current.
 - Celebration message
 - Streak update
 
@@ -471,6 +502,11 @@ atlas status myproject --increment
 atlas status myproject --increment 25
 ```
 
+**`--complete` evidence (v0.14.0):** when completing a next action, `--complete` records
+closing evidence into the `.STATUS` `metrics.closingEvidence` block — the active session id
+(if any) and the current git HEAD sha (if the project is a git repo). "Done" backed by
+evidence, not an unchecked claim.
+
 ### `atlas focus`
 
 Get or set project focus.
@@ -594,7 +630,11 @@ atlas where myproject
 - Recent breadcrumbs
 - Recent captures
 
-### `atlas crumb`
+### `atlas crumb` ⚠️ Deprecated
+
+> **Deprecated (v0.14.0), removal planned v0.15.0.** Folds into session notes —
+> use `atlas session note <text>` instead. `crumb` still works and prints a
+> one-line stderr pointer; output is otherwise unchanged.
 
 Leave a breadcrumb marker for later context.
 
@@ -614,7 +654,12 @@ atlas crumb "Stuck on variance estimation"
 atlas crumb "Need to refactor auth module" --project api
 ```
 
-### `atlas trail`
+### `atlas trail` ⚠️ Deprecated
+
+> **Deprecated (v0.14.0), removal planned v0.15.0.** Use bare `atlas` (the digest) or
+> `atlas where` instead. `trail` still works and prints a one-line stderr pointer; its
+> `--limit`/JSON-adjacent output is unchanged (flow-cli contract, `trail --limit`
+> stays byte-compatible until flow-cli releases off it).
 
 View breadcrumb trail.
 
@@ -849,7 +894,11 @@ atlas agenda 14 --format json
 
 ## Context Parking (v0.5.1+)
 
-### `atlas park`
+> **Deprecated (v0.14.0), removal planned v0.15.0.** `park`/`unpark`/`parked` fold into a
+> single parking concept on Capture (session pause stays `session pause`). All three still
+> work and print a one-line stderr pointer; output is otherwise unchanged.
+
+### `atlas park` ⚠️ Deprecated
 
 Park current context for later restoration.
 
@@ -880,7 +929,7 @@ atlas park --force "saving context"
 - Recent breadcrumbs
 - Park note
 
-### `atlas parked`
+### `atlas parked` ⚠️ Deprecated
 
 List all parked contexts.
 
@@ -896,7 +945,7 @@ atlas parked
 - Park note
 - When parked
 
-### `atlas unpark`
+### `atlas unpark` ⚠️ Deprecated
 
 Restore a parked context.
 

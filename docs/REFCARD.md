@@ -4,15 +4,23 @@
 
 ---
 
+## The Happy Path (v0.14.0) — 3 commands
+
+```bash
+atlas                    # The digest: what am I doing / what's next (bare, no args)
+atlas session start X    # Start working
+atlas session end        # Done — shows git evidence, syncs the registry automatically
+```
+
 ## The 6 Commands You'll Use Daily
 
 ```bash
-atlas plan              # Morning planning (v0.8.0)
+atlas plan              # Morning planning (v0.8.0) — now a view onto the same digest data
 atlas session start     # Start working
 atlas catch "idea"      # Capture thought
-atlas where             # Where was I?
+atlas where             # Where was I? — now a view onto the same digest data
 atlas stats             # How am I doing?
-atlas session end       # Done for now
+atlas session end       # Done for now — evidence-linked (git delta + auto-sync)
 ```
 
 ---

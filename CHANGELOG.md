@@ -5,6 +5,23 @@ All notable changes to Atlas are documented here.
 ## [Unreleased]
 
 ### Added
+- **Bare `atlas` digest** — running `atlas` with no arguments now prints one glanceable screen (active session, project focus + next, inbox count, streak, top-3 suggestions) via the new `GetDigestUseCase`, composing the existing `GetContextUseCase`/`PlanDayUseCase` read paths. Additive only: `where`, `plan`, `session status --format json`, `inbox --count`, and `trail --limit` keep their exact prior output (flow-cli contract).
+- **Evidence-linked `session end`** — computes the git delta (commits/files) since session start via `GitGateway`, prints it as evidence, prompts for the outcome only when stdin is a TTY (non-interactive runs keep the prior default-completed behavior), and auto-runs a registry sync scoped to the session's project. Non-git projects and zero-activity sessions degrade gracefully.
+- **`status --complete` evidence** — records closing evidence (active session id, current git HEAD sha) into the `.STATUS` `metrics.closingEvidence` block when a next action is completed.
+
+### Deprecated
+
+| Command | Replacement | Removal |
+|---|---|---|
+| `atlas crumb` | `atlas session note <text>` | v0.15.0 |
+| `atlas trail` | bare `atlas` (digest) or `atlas where` | v0.15.0 |
+| `atlas park` | `atlas catch --type=note` (single parking concept on Capture) | v0.15.0 |
+| `atlas unpark` | `atlas catch --type=note` | v0.15.0 |
+| `atlas parked` | `atlas catch --type=note` | v0.15.0 |
+
+Each deprecated command prints a one-line stderr pointer to its replacement; stdout output is unchanged in v0.14.0.
+
+### Added — `.STATUS` schema
 - **Canonical `.STATUS` schema `atlas/v1` (SPEC-status-schema-yaml-canonical-2026-07-19)** — one normative schema, documented in the new [docs/STATUS-SCHEMA.md](docs/STATUS-SCHEMA.md).
 - **`atlas migrate --status [path]`** — converts a legacy `.STATUS` (markdown `## Key:` or bare `key: value`) to canonical YAML frontmatter. Dry-run by default (prints a field-level diff); `--apply` writes; `--all-scanned` batches a directory tree.
 - **Unified read path** — `StatusFileGateway.read()` now delegates to `StatusFileParser.parseContent()`/`.normalize()`, so canonical frontmatter, legacy markdown, and legacy bare-yaml all produce the same normalized object, with the PR#87 duplicate-key / non-numeric-progress warning machinery now covering all three formats (previously markdown+yaml only).

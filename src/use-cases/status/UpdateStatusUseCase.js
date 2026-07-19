@@ -193,7 +193,7 @@ export class UpdateStatusUseCase {
    * @param {string} [newAction] - New action to add (optional)
    * @returns {Promise<UpdateResult>}
    */
-  async completeNextAction(projectId, newAction = null) {
+  async completeNextAction(projectId, newAction = null, evidence = null) {
     const project = await this.projectRepository.findById(projectId) ||
                     await this.projectRepository.findByPath(projectId)
 
@@ -211,6 +211,18 @@ export class UpdateStatusUseCase {
     if (newAction) {
       statusData.next = statusData.next || []
       statusData.next.push({ action: newAction, priority: 'medium' })
+    }
+
+    // Record closing evidence — "done" backed by a session id / commit sha,
+    // not an unchecked claim. Only written when there's something to record.
+    if (completedAction && evidence && (evidence.sessionId || evidence.commitSha)) {
+      statusData.metrics = statusData.metrics || {}
+      statusData.metrics.closingEvidence = {
+        action: completedAction.action,
+        sessionId: evidence.sessionId || null,
+        commitSha: evidence.commitSha || null,
+        recordedAt: new Date().toISOString()
+      }
     }
 
     // Write and return
