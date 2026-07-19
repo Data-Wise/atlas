@@ -115,3 +115,7 @@ Don't optimize your system. Use it. Let the patterns emerge.
 - [Cheatsheet](../../CHEATSHEET.md) — Compact command reference
 - [Cookbook](../cookbook/COOKBOOK.md) — Task-oriented recipes
 - [MCP Integration](../../MCP-SERVER.md) — Use Atlas from Claude
+
+---
+
+**Now what?** → [Core Principles](core-principles.md)

@@ -1,0 +1,16 @@
+## Project: widget-pkg
+## Type: r-package
+## Kind: package
+## Status: active
+## Priority: high
+## Progress: 45
+## Focus: Ship the estimator refactor
+## Target: CRAN
+## Cran_state: pending
+## Version: 0.14.0
+
+next: Finish unit tests
+
+# widget-pkg
+
+Body prose preserved verbatim.

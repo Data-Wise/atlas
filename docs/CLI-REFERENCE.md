@@ -40,14 +40,37 @@ Options:
 
 ---
 
+## Core 5 (start here)
+
+Five commands cover most day-to-day use. Everything else is a **Power** command (used
+occasionally) or a **Legacy** command (kept for compatibility) — both are collapsed below
+their normal section so this page stays scannable.
+
+| Command | What it does | Full docs |
+|---------|---------------|-----------|
+| `atlas init` | One-time setup of `~/.atlas` | [Initialization & Templates](#initialization-templates) |
+| `atlas session start <project>` | Begin a tracked work session | [Session Management](#session-management) |
+| `atlas catch "idea"` | Capture a thought without breaking flow | [Quick Capture](#quick-capture) |
+| `atlas` (no arguments) | The digest — one glanceable "what am I doing / what's next" screen | [The Digest](#the-digest-atlas-no-arguments) |
+| `atlas session end` | Close the session with a "good enough" summary | [Session Management](#session-management) |
+
+!!! tip "Core loop"
+    ```bash
+    atlas init
+    atlas session start myproject
+    atlas catch "check X later"
+    atlas session end "shipped the thing"
+    ```
+
+!!! note "No `flush` command yet"
+    `atlas flush` (vault write-through queue drain) is scaffolded on a held feature branch and
+    ships when the Obsidian `obs write` dependency lands — see
+    `docs/specs/SPEC-obsidian-captures-scope-2026-07-19.md`.
+
 ## The Digest (`atlas` — no arguments)
 
 Running `atlas` with no arguments prints the digest: one glanceable screen answering
 "what am I doing / what's next," merging the read paths of `where`, `plan`, and `status`.
-
-```bash
-atlas
-```
 
 ```
 📋 ATLAS DIGEST
@@ -1447,40 +1470,73 @@ atlas config prefs set templateVariables.github_user youruser
 
 ## Storage & Migration
 
-### `atlas migrate`
+??? note "Legacy — `atlas migrate` (rarely needed; most users stay on the default filesystem backend)"
 
-Migrate between storage backends.
+    ### `atlas migrate`
 
-```bash
-atlas migrate [options]
+    Migrate between storage backends.
 
-Options:
-  -f, --from <type>    Source backend (filesystem|sqlite)
-  -t, --to <type>      Target backend (filesystem|sqlite)
-  --dry-run            Preview migration
-```
+    ```bash
+    atlas migrate [options]
 
-**Examples:**
-```bash
-# Migrate to SQLite
-atlas migrate --to sqlite
+    Options:
+      -f, --from <type>    Source backend (filesystem|sqlite)
+      -t, --to <type>      Target backend (filesystem|sqlite)
+      --dry-run            Preview migration
+    ```
 
-# Migrate back to filesystem
-atlas migrate --to filesystem
+    **Examples:**
+    ```bash
+    # Migrate to SQLite
+    atlas migrate --to sqlite
 
-# Preview migration
-atlas migrate --to sqlite --dry-run
-```
+    # Migrate back to filesystem
+    atlas migrate --to filesystem
 
-### Using SQLite Backend
+    # Preview migration
+    atlas migrate --to sqlite --dry-run
+    ```
 
-```bash
-# Use SQLite for single command
-atlas --storage sqlite status
+    ### `atlas migrate --status` (v0.14.0+)
 
-# Set as default in config
-atlas config prefs set storage sqlite
-```
+    Convert a legacy `.STATUS` file (markdown `## Key:` headers or bare `key: value` lines) to
+    canonical YAML frontmatter (schema `atlas/v1` — see [STATUS-SCHEMA.md](STATUS-SCHEMA.md)).
+    Dry-run by default; nothing is written until `--apply` is passed.
+
+    ```bash
+    atlas migrate --status [path] [options]
+
+    Options:
+      --status         Migrate a .STATUS file (or directory of them, with --all-scanned)
+      --apply          Write the migration (default is dry-run: prints a field-level diff)
+      --all-scanned    Batch-migrate every .STATUS found under [path]
+    ```
+
+    **Examples:**
+    ```bash
+    # Dry-run against the current directory's .STATUS — prints a diff, writes nothing
+    atlas migrate --status
+
+    # Apply the migration
+    atlas migrate --status ~/projects/research/pmed-modern --apply
+
+    # Batch-migrate every .STATUS under a research root
+    atlas migrate --status ~/projects/research --all-scanned --apply
+    ```
+
+    An already-canonical file is skipped (reported, not touched). Writing a legacy file directly via
+    `StatusFileGateway.write()` (e.g. from `sync`) refuses with an error naming this command unless
+    the caller opts in via `{ migrate: true }`.
+
+    ### Using SQLite Backend
+
+    ```bash
+    # Use SQLite for single command
+    atlas --storage sqlite status
+
+    # Set as default in config
+    atlas config prefs set storage sqlite
+    ```
 
 ---
 
@@ -1541,3 +1597,8 @@ atlas completions fish > ~/.config/fish/completions/atlas.fish
 - [Architecture Overview](./ARCHITECTURE.md)
 - [Programmatic API Guide](./API-GUIDE.md)
 - [Configuration Reference](./CONFIGURATION.md)
+
+
+---
+
+**Now what?** → [Quick Reference Card](./REFCARD.md)

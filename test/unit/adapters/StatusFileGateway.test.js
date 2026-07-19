@@ -123,8 +123,10 @@ Some additional notes about the project status.
       expect(status.format).toBe('legacy')
       expect(status.status).toBe('active')
       expect(status.progress).toBe(85)
-      expect(status.next).toHaveLength(1)
-      expect(status.next[0].action).toBe('Implement feature X')
+      // schema atlas/v1 unification: bare-yaml `next:` is a plain string,
+      // normalized to a single-element string array (canonical `next` shape
+      // is a plain string list, not {action,priority} objects).
+      expect(status.next).toEqual(['Implement feature X'])
     })
 
     test('extracts status from various formats', async () => {
@@ -294,7 +296,10 @@ nested:
 
       const status = await gateway.read(testDir)
       expect(status.status).toBe('active')
-      expect(status.venue).toBe('JASA')
+      // schema atlas/v1: `venue` is a recognized alias for `target` on read
+      // (see spec canonical schema) — it lands in `target`, not as an
+      // unknown passthrough key.
+      expect(status.target).toBe('JASA')
       expect(status.review_deadline).toBe('2026-09-01')
       expect(status.custom_list).toEqual(['one', 'two'])
       expect(status.nested).toEqual({ deep: true, count: 42 })
@@ -304,7 +309,7 @@ nested:
 
       const roundTripped = await gateway.read(testDir)
       expect(roundTripped.status).toBe('active')
-      expect(roundTripped.venue).toBe('JASA')
+      expect(roundTripped.target).toBe('JASA')
       expect(roundTripped.review_deadline).toBe('2026-09-01')
       expect(roundTripped.custom_list).toEqual(['one', 'two'])
       expect(roundTripped.nested).toEqual({ deep: true, count: 42 })

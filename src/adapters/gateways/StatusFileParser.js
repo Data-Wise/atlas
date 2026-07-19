@@ -11,6 +11,15 @@
 
 import { readFile, readdir, access, constants } from 'node:fs/promises'
 import { join, basename, dirname } from 'node:path'
+import { parse as parseYaml } from 'yaml'
+
+/** schema: atlas/v1 canonical field order for frontmatter emission */
+export const CANONICAL_FIELD_ORDER = [
+  'schema', 'status', 'progress', 'type', 'kind', 'priority', 'focus',
+  'next', 'target', 'cran_state', 'version', 'updated', 'tasks', 'metrics'
+]
+
+export const VALID_STATUSES_V1 = ['active', 'paused', 'blocked', 'planning', 'stable', 'complete', 'archived']
 
 /**
  * Strip a trailing whitespace-anchored inline comment from a .STATUS value,
@@ -141,17 +150,41 @@ export class StatusFileParser {
     try {
       const content = await readFile(filePath, 'utf-8')
       const projectName = basename(dirname(filePath))
-
-      // Detect format and parse
-      if (this._isMarkdownFormat(content)) {
-        return this._parseMarkdownFormat(content, projectName)
-      } else {
-        return this._parseYAMLFormat(content, projectName)
-      }
+      return this.parseContent(content, projectName)
     } catch (error) {
       console.error(`Warning: Could not parse ${filePath}: ${error.message}`)
       return null
     }
+  }
+
+  /**
+   * Parse raw .STATUS content into a normalized object. Detects and
+   * dispatches to one of the three accepted formats:
+   *  - canonical YAML frontmatter (`---\n...\n---`)
+   *  - legacy markdown (`## Key: Value`)
+   *  - legacy bare-yaml lines (`key: value`, no frontmatter delimiters)
+   * All three normalize into the same shape, with warnings for all paths
+   * (PR #87 machinery, extended here to frontmatter).
+   * @param {string} content
+   * @param {string} defaultName
+   * @returns {Object}
+   */
+  parseContent(content, defaultName) {
+    if (this._isFrontmatterFormat(content)) {
+      return this._parseFrontmatterFormat(content, defaultName)
+    } else if (this._isMarkdownFormat(content)) {
+      return this._parseMarkdownFormat(content, defaultName)
+    } else {
+      return this._parseYAMLFormat(content, defaultName)
+    }
+  }
+
+  /**
+   * Check if content is canonical YAML frontmatter (starts with `---`)
+   * @private
+   */
+  _isFrontmatterFormat(content) {
+    return content.trim().startsWith('---')
   }
 
   /**
@@ -160,6 +193,134 @@ export class StatusFileParser {
    */
   _isMarkdownFormat(content) {
     return /^##\s+\w+:/m.test(content)
+  }
+
+  /**
+   * Parse canonical YAML frontmatter (.STATUS schema atlas/v1)
+   * @private
+   */
+  _parseFrontmatterFormat(content, defaultName) {
+    const data = {
+      format: 'frontmatter',
+      name: defaultName,
+      status: 'unknown',
+      progress: 0,
+      priority: null,
+      type: 'generic',
+      phase: null,
+      focus: null,
+      next: [],
+      version: null,
+      updated: null,
+      kind: null,
+      target: null,
+      cranState: null,
+      tasks: [],
+      metrics: {},
+      body: '',
+      _unknownKeys: {},
+      _parseWarnings: []
+    }
+
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
+    if (!match) {
+      data._parseWarnings.push('frontmatter delimiters found but block is malformed — falling back to empty frontmatter')
+      data.body = content.trim()
+      return data
+    }
+
+    const [, fmText, body] = match
+    data.body = body.trim()
+
+    let fm
+    try {
+      fm = parseYaml(fmText)
+    } catch (error) {
+      data._parseWarnings.push(`frontmatter YAML failed to parse: ${error.message}`)
+      return data
+    }
+    if (!fm || typeof fm !== 'object') {
+      data._parseWarnings.push('frontmatter parsed to a non-object — ignoring')
+      return data
+    }
+
+    const KNOWN = new Set([
+      'schema', 'status', 'progress', 'type', 'kind', 'priority', 'focus',
+      'next', 'target', 'venue', 'journal', 'cran_state', 'version',
+      'updated', 'tasks', 'metrics', 'project', 'name', 'phase', 'checkpoint'
+    ])
+
+    for (const [rawKey, rawValue] of Object.entries(fm)) {
+      const key = String(rawKey).toLowerCase()
+      if (!KNOWN.has(key)) {
+        data._unknownKeys[rawKey] = rawValue
+        continue
+      }
+      switch (key) {
+        case 'schema':
+          data.schema = rawValue
+          break
+        case 'project':
+        case 'name':
+          data.name = rawValue
+          break
+        case 'status':
+          data.status = String(rawValue ?? '').toLowerCase()
+          break
+        case 'progress':
+          data.progress = typeof rawValue === 'string'
+            ? parseProgress(rawValue, data._parseWarnings)
+            : (Number(rawValue) || 0)
+          break
+        case 'type':
+          data.type = rawValue
+          break
+        case 'kind':
+          data.kind = String(rawValue ?? '').toLowerCase()
+          break
+        case 'priority':
+          data.priority = rawValue
+          break
+        case 'focus':
+          data.focus = rawValue
+          break
+        case 'phase':
+          data.phase = rawValue
+          break
+        case 'next':
+          data.next = Array.isArray(rawValue) ? rawValue : (rawValue ? [rawValue] : [])
+          break
+        case 'target':
+        case 'venue':
+        case 'journal':
+          data.target = stripInlineComment(String(rawValue ?? ''))
+          break
+        case 'cran_state':
+          data.cranState = String(rawValue ?? '').toLowerCase()
+          break
+        case 'version':
+          data.version = rawValue
+          break
+        case 'updated':
+          data.updated = rawValue
+          break
+        case 'checkpoint':
+          if (!data.focus) data.focus = rawValue
+          break
+        case 'tasks':
+          data.tasks = Array.isArray(rawValue) ? rawValue : []
+          break
+        case 'metrics':
+          data.metrics = (rawValue && typeof rawValue === 'object') ? rawValue : {}
+          break
+      }
+    }
+
+    if (!Array.isArray(data.next)) {
+      data.next = data.next ? [data.next] : []
+    }
+
+    return data
   }
 
   /**
@@ -186,6 +347,9 @@ export class StatusFileParser {
       target: null,
       cranState: null,
       tasks: [],
+      metrics: {},
+      body: content,
+      _unknownKeys: {},
       _parseWarnings: []
     }
     const seenAt = {}
@@ -274,6 +438,9 @@ export class StatusFileParser {
       target: null,
       cranState: null,
       tasks: [],
+      metrics: {},
+      body: content,
+      _unknownKeys: {},
       _parseWarnings: []
     }
     const seenAt = {}
@@ -420,6 +587,43 @@ export class StatusFileParser {
     }
 
     return cleaned
+  }
+
+  /**
+   * Normalize any of the three parse() shapes (frontmatter / markdown /
+   * legacy bare-yaml) into one canonical business-field object, independent
+   * of source format. Used by StatusFileGateway's unified read path and by
+   * the golden-file test suite to assert format-independence.
+   * @param {Object} data - output of parse()/parseContent()
+   * @returns {Object}
+   */
+  normalize(data) {
+    if (!data) return null
+    const next = Array.isArray(data.next)
+      ? data.next
+      : (data.next ? [data.next] : [])
+
+    return {
+      schema: data.schema || 'atlas/v1',
+      name: data.name ?? null,
+      status: data.status || 'unknown',
+      progress: data.progress ?? 0,
+      type: data.type || 'generic',
+      kind: data.kind ?? null,
+      priority: data.priority ?? null,
+      focus: data.focus ?? null,
+      next,
+      target: data.target ?? null,
+      cran_state: data.cranState ?? null,
+      version: data.version ?? null,
+      updated: data.updated ?? null,
+      tasks: data.tasks ?? [],
+      metrics: data.metrics ?? {},
+      body: data.body ?? '',
+      unknownKeys: data._unknownKeys ?? {},
+      warnings: data._parseWarnings ?? [],
+      sourceFormat: data.format || 'unknown'
+    }
   }
 
   /**

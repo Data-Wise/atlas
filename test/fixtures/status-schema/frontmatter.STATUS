@@ -1,0 +1,18 @@
+---
+schema: atlas/v1
+status: active
+progress: 45
+type: r-package
+kind: package
+priority: high
+focus: Ship the estimator refactor
+next:
+  - Finish unit tests
+target: CRAN
+cran_state: pending
+version: 0.14.0
+---
+
+# widget-pkg
+
+Body prose preserved verbatim.
