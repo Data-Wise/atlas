@@ -24,10 +24,6 @@ export default [
       // TypeScript sources need a TS parser we don't depend on.
       '**/*.ts',
       '**/*.tsx',
-      // Legacy blessed dashboard — unimported, superseded by the Ink dashboard
-      // (src/cli/dashboard-ink/**). Its unused widget bindings are side-effecting
-      // constructions; linting dead code we're removing adds only noise.
-      'src/cli/dashboard-blessed.js',
     ],
   },
 
