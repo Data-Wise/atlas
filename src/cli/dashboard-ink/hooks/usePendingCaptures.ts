@@ -23,10 +23,16 @@ export function usePendingCaptures(): PendingCapturesResult {
     async function fetchCount() {
       try {
         const captureRepo = container.getCaptureRepository();
-        const inbox = await captureRepo.getInbox();
+        // pending-flush captures are still awaiting the user (queued for
+        // the Obsidian write-through, not yet triaged) — count them
+        // alongside plain inbox items until a flush marks them flushed.
+        const [inbox, pendingFlush] = await Promise.all([
+          captureRepo.findByStatus('inbox'),
+          captureRepo.findByStatus('pending-flush'),
+        ]);
 
         if (cancelled) return;
-        setCount(inbox.length);
+        setCount(inbox.length + pendingFlush.length);
       } catch (err: any) {
         if (cancelled) return;
         process.stderr.write(`[atlas-dash] usePendingCaptures error: ${err.message}\n`);

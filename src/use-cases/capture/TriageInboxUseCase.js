@@ -35,7 +35,12 @@ export class TriageInboxUseCase {
    * @returns {Promise<Object>} Stats about inbox
    */
   async getStats() {
-    const inbox = await this.captureRepository.findByStatus('inbox')
+    const inboxOnly = await this.captureRepository.findByStatus('inbox')
+    // pending-flush captures are still awaiting the user (queued for the
+    // Obsidian vault write-through, not yet triaged) — count them as
+    // inbox for flow-cli's `inbox --count` badge until a flush completes.
+    const pendingFlush = await this.captureRepository.findByStatus('pending-flush')
+    const inbox = [...inboxOnly, ...pendingFlush]
     const triaged = await this.captureRepository.findByStatus('triaged')
     const archived = await this.captureRepository.findByStatus('archived')
 

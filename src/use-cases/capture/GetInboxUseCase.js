@@ -21,7 +21,19 @@ export class GetInboxUseCase {
   async execute(options = {}) {
     const { project, type, status = 'inbox', limit = 50 } = options;
 
-    let items = await this.captureRepository.findByStatus(status);
+    let items;
+    if (status === 'inbox') {
+      // pending-flush captures are still awaiting the user (they're just
+      // also queued for the vault write-through) — surface them alongside
+      // plain inbox items until FlushCapturesUseCase marks them flushed.
+      const [inbox, pendingFlush] = await Promise.all([
+        this.captureRepository.findByStatus('inbox'),
+        this.captureRepository.findByStatus('pending-flush'),
+      ]);
+      items = [...inbox, ...pendingFlush];
+    } else {
+      items = await this.captureRepository.findByStatus(status);
+    }
 
     if (project) {
       items = items.filter(item => item.project === project);

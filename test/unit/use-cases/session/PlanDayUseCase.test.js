@@ -251,6 +251,29 @@ describe('PlanDayUseCase', () => {
 
       expect(result.inbox).toHaveLength(10)
     })
+
+    test('includes pending-flush captures alongside plain inbox items', async () => {
+      captureRepo.captures = [
+        { id: 'i1', status: 'inbox', text: 'plain inbox idea', type: 'idea', createdAt: new Date() },
+        { id: 'i2', status: 'pending-flush', text: 'queued for vault', type: 'idea', createdAt: new Date() }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.inbox.map(i => i.id)).toEqual(expect.arrayContaining(['i1', 'i2']))
+      expect(result.inbox).toHaveLength(2)
+    })
+
+    test('excludes flushed captures', async () => {
+      captureRepo.captures = [
+        { id: 'i1', status: 'inbox', text: 'plain inbox idea', type: 'idea', createdAt: new Date() },
+        { id: 'i2', status: 'flushed', text: 'already in vault', type: 'idea', createdAt: new Date() }
+      ]
+
+      const result = await useCase.execute({})
+
+      expect(result.inbox.map(i => i.id)).toEqual(['i1'])
+    })
   })
 
   describe('execute() - Active projects', () => {

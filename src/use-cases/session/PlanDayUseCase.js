@@ -178,7 +178,14 @@ export class PlanDayUseCase {
    * @private
    */
   async _getInboxItems() {
-    const inbox = await this.captureRepository.findByStatus('inbox')
+    // pending-flush captures are still awaiting the user (queued for the
+    // vault write-through, not yet triaged) — inbox-visible alongside
+    // plain inbox items until FlushCapturesUseCase marks them flushed.
+    const [inboxOnly, pendingFlush] = await Promise.all([
+      this.captureRepository.findByStatus('inbox'),
+      this.captureRepository.findByStatus('pending-flush')
+    ])
+    const inbox = [...inboxOnly, ...pendingFlush]
 
     return inbox.map(item => ({
       id: item.id,
