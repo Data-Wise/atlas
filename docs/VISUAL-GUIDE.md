@@ -18,7 +18,7 @@ Atlas adds five visual enhancement layers to the dashboard:
 | [Focus Score](#focus-score) | Inspector, `atlas stats` | Weighted quality metric with tier classification |
 | [Sparklines](#sparklines) | Sidebar rows | 5-day inline activity charts |
 | [Activity Heatmap](#activity-heatmap) | Inspector, Ecosystem | 13-week GitHub-style activity grid |
-| [Plan view analytics pane](#analyticsview-v0130) | Plan view (`a` key) | Interactive analytics with heatmap, velocity, and patterns |
+| [Plan view analytics pane](#analyticsview-v0130-folded-into-plan-in-v014) | Plan view (`a` key) | Interactive analytics with heatmap, velocity, and patterns |
 
 ---
 

@@ -4,6 +4,8 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-07-19
+
 ### Added
 - **Bare `atlas` digest** — running `atlas` with no arguments now prints one glanceable screen (active session, project focus + next, inbox count, streak, top-3 suggestions) via the new `GetDigestUseCase`, composing the existing `GetContextUseCase`/`PlanDayUseCase` read paths. Additive only: `where`, `plan`, `session status --format json`, `inbox --count`, and `trail --limit` keep their exact prior output (flow-cli contract).
 - **Evidence-linked `session end`** — computes the git delta (commits/files) since session start via `GitGateway`, prints it as evidence, prompts for the outcome only when stdin is a TTY (non-interactive runs keep the prior default-completed behavior), and auto-runs a registry sync scoped to the session's project. Non-git projects and zero-activity sessions degrade gracefully.
