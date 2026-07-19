@@ -1,12 +1,12 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.13.1 RELEASED
+## Phase: v0.14.0 IN PROGRESS (4 feature PRs merged to dev 2026-07-19)
 ## Priority: 1
 ## Progress: 100
 
 ## Focus: v0.13.1 released (registry orphan/dup-name detection #90/#91 + missed version-bump caught and closed) and Homebrew tap fixed (stale node@20 dep). Cross-repo research-ops adversarial review (atlas+obs+savant, 2026-07-16) previously landed — see prior entries. v0.14.0 P1 ecosystem scaffold (`feature/catch-obs-bridge`) started 2026-07-17 — see entry below.
-## Next: v0.14.0 P1 — wire `atlas flush` CLI + `atlas catch` write-through onto the merged ObsidianGateway/FlushCapturesUseCase scaffold, then docs (CLI-REFERENCE/API-GUIDE); PR not opened yet — hold until write-through lands so the PR reviews as one coherent unit | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate its cascade/architecture sections onto obs research board vs. leave the two renderers coexisting — see issue comment) before it can close | Follow-up: investigate RMediation missing from atlas package registry despite `kind: package` in its .STATUS (background task dispatched) | Follow-up: surface cranState in MCP atlas_get_projects text output — formatProjects() doesn't render it yet (background task dispatched) | Frontend/backend items deferred from the earlier design review (Inspector stale-data leak, Pomodoro timer wiring, duplicate repo-cache singletons, FS/SQLite coercion drift) — each needs its own spec | Observe next Monday 09:00 mediationverse-status-sync launchd run (verify exit 0 + real log) | Cleanup: two stray worktrees (`claude/compassionate-brahmagupta-5e8344`, `claude/frosty-elion-5e491d`) exist with unclear origin — investigate before deleting
+## Next: v0.14.0 release candidate — dev now carries PRs #94–#97 (TUI dead-code removal, .STATUS schema v1 + migrate, docs redesign, bare-atlas digest + evidence-linked end); remaining before release: TUI 3-view consolidation (SPEC-tui-consolidation phase 2), batch-migrate research repos' .STATUS (`atlas migrate --status --all-scanned`, coordinate with savant), release feature/catch-obs-bridge PR from hold when obs ships `write` | PlanDayUseCase `projectRepository.list()` bug — fix running as separate background task (task_b8860b0c) | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate its cascade/architecture sections onto obs research board vs. leave the two renderers coexisting — see issue comment) before it can close | Follow-up: investigate RMediation missing from atlas package registry despite `kind: package` in its .STATUS (background task dispatched) | Follow-up: surface cranState in MCP atlas_get_projects text output — formatProjects() doesn't render it yet (background task dispatched) | Frontend/backend items deferred from the earlier design review (Inspector stale-data leak, Pomodoro timer wiring, duplicate repo-cache singletons, FS/SQLite coercion drift) — each needs its own spec | Observe next Monday 09:00 mediationverse-status-sync launchd run (verify exit 0 + real log) | Stray worktrees: `compassionate-brahmagupta-5e8344` observed LIVE 2026-07-19 (switched itself to new branch `claude/sleepy-shtern-eea46f` — another active Claude surface, do NOT delete); `frosty-elion-5e491d` still unexplained
 
 ## Research-ops: #61 ✅ DONE. #62 ✅ DONE (unverified pending an observed live run). #63 🔵 OPEN — package-render-target half shipped (atlas#89 + obs#90, merged), golden-match/script-retirement half deferred pending a design decision (see issue #63 comment 2026-07-16). Dev tool audit: `docs/internal/PROJECT-SETUP-AUDIT.md`.
 
@@ -52,6 +52,16 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - GitHub: https://github.com/Data-Wise/atlas
 - Homebrew: `brew install data-wise/tap/atlas`
 - npm: `npm install -g @data-wise/atlas`
+
+## ✅ Just Completed (2026-07-19 Session — autonomous 5-workstream run)
+- **ADHD audit → grill → 5 specs** (`docs/specs/SPEC-{adhd-workflow-streamline,status-schema-yaml-canonical,tui-consolidation,obsidian-captures-scope,docs-adhd-redesign}-2026-07-19.md`), each with a drivable Execution section. Grilled decisions: TUI → 3 views; Obsidian = captures-only on P0; .STATUS canon = YAML frontmatter (breaking, migrate tool required); evidence-linked done; bare-`atlas`-digest + deprecation tier.
+- **PR #94 MERGED** — deleted ~5.9k LOC unreachable blessed dashboards + 6 dead test files.
+- **PR #95 MERGED** — docs-site ADHD redesign (landing quickstart, 7-item nav, Core-5 tiering, "Now what?" footers).
+- **PR #96 MERGED** — .STATUS schema `atlas/v1`: unified parser, refuse-don't-drop writer, `atlas migrate --status` (dry-run default), templates → frontmatter, `{{user}}` fix, docs/STATUS-SCHEMA.md. One CI-red fixed en route (dogfood template marker updated for frontmatter).
+- **PR #97 MERGED** — bare `atlas` digest (GetDigestUseCase), evidence-linked `session end` (git delta + TTY confirm + scoped auto-sync), `status --complete` closing evidence, deprecation warnings (crumb/trail/park/unpark/parked → v0.15 removal). flow-cli JSON contract snapshot-locked.
+- **feature/catch-obs-bridge advanced (held, no PR)** — pending-flush captures now inbox-visible (blackhole regression guard), `inbox --count` includes them, 100-capture idempotent flush test; commit `4a204ae` pushed.
+- Suite after merges: ~2,049 tests / 97 suites green (per PR #97 run). Note: this `.STATUS` is still legacy markdown — migrate it during the coordinated `atlas migrate --status` rollout, not piecemeal.
+- Process note: two stray "WS3" subagents (recursive delegation) detected and killed; one agent stall recovered by resume; 3 CHANGELOG/CLI-REFERENCE merge conflicts resolved in sequence.
 
 ## ✅ Just Completed (2026-07-17 Session)
 - **Fixed atlas#90** — `atlas doctor`/`sync --remove-orphans` keyed off registered `name` (a stale duplicate registry entry could shadow a real project's audit result); now keys off real disk existence (`orphaned`/`duplicateName` row flags) so orphan detection is safe under any `--paths` scan scope. PR #91 merged (dev→main).
@@ -136,7 +146,8 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - None
 
 ## 🔧 Active Worktrees
-- (none)
+- `~/.git-worktrees/atlas/feature-catch-obs-bridge` (`feature/catch-obs-bridge`) — held pending obs `write` (P0)
+- `~/.git-worktrees/atlas/compassionate-brahmagupta-5e8344` + `frosty-elion-5e491d` — external Claude sessions, not this repo's workflow (see Next)
 
 ## 🎯 Next Action
 A) **#63 obs package renderer** — render target shipped (atlas#89 + obs#90, merged); remaining: decide golden-match vs. cascade-migration vs. coexist (see issue comment 2026-07-16), then implement
