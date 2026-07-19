@@ -137,24 +137,29 @@ flowchart LR
 
 Start dashboard: `atlas dash`
 
-| Key         | Action                                           |
-| ----------- | ------------------------------------------------ |
-| `j` / `k`   | Navigate up/down                                 |
-| `Enter`     | Select project                                   |
-| `a`         | Analytics view (v0.13.1)                         |
-| `f`         | Focus mode (Pomodoro)                            |
-| `z`         | Zen mode                                         |
-| `T`         | Timeline view                                    |
-| `e`         | Ecosystem view                                   |
-| `p`         | Plan view (morning ritual)                       |
-| `c`         | Quick capture                                    |
-| `t`         | Cycle theme                                      |
-| `Tab`       | Cycle layout (SINGLE/SPLIT/TRIPLE)               |
-| `Shift+Tab` | Cycle panel focus (split/triple)                 |
-| `Space`     | Pause/resume Pomodoro (inspector focused)        |
-| `r`         | Reset Pomodoro timer (inspector focused, paused) |
-| `?`         | Show help                                        |
-| `q`         | Quit                                             |
+**v0.14 — 3 views, not 8** (Now / Timer / Plan — see `src/cli/dashboard-ink/lib/keymap.ts`, the single source of truth; `?` shows this table live in-app):
+
+| Key         | Scope   | Action                                           |
+| ----------- | ------- | ------------------------------------------------ |
+| `1` / `n`   | global  | Switch to **Now**                                |
+| `2` / `t`   | global  | Switch to **Timer**                              |
+| `3` / `p`   | global  | Switch to **Plan**                               |
+| `Tab`       | global  | Cycle layout (SINGLE/SPLIT/TRIPLE)               |
+| `q`         | global  | Quit                                             |
+| `?`         | global  | Toggle help overlay                              |
+| `j` / `k` / `↑↓` | Now | Navigate project list                       |
+| `Enter`     | Now     | Select project                                   |
+| `e`         | Now     | Toggle ecosystem-wide stats in the right pane    |
+| `Space`     | Timer   | Pause/resume                                     |
+| `r`         | Timer   | Reset (while paused)                             |
+| `+`/`-`     | Timer   | Adjust duration (while paused)                   |
+| `z`         | Timer   | Toggle zen (minimal chrome)                      |
+| `j` / `k` / `↑↓` | Plan | Navigate suggestions                        |
+| `e`         | Plan    | Cycle energy level                               |
+| `a`         | Plan    | Toggle analytics pane                            |
+| `s`         | Plan    | Start session (jumps to Timer)                   |
+
+**v0.14 — TUI consolidation:** 8 views → 3 (Now/Timer/Plan), 8 state-machine states → 3, one Pomodoro timer implementation (was 3), central `lib/keymap.ts`, new `?` help overlay. `atlas dash` unchanged; only internal navigation moved.
 
 **v0.13.1 — Task CLI (`atlas task add/list/done/rm`) · `atlas schedule push` · `atlas agenda` · AnalyticsView (`a` key) · StatusBar · CLI project remove fix · Vitest + Playwright E2E · Man pages · Zsh completions · ADHD nav design**
 

@@ -81,9 +81,13 @@ test_file_structure() {
     required_files=(
         "src/cli/dashboard-ink/index.tsx"
         "src/cli/dashboard-ink/components/App.tsx"
-        "src/cli/dashboard-ink/components/views/MainView.tsx"
-        "src/cli/dashboard-ink/components/SidebarPanel.tsx"
-        "src/cli/dashboard-ink/components/InspectorPanel.tsx"
+        "src/cli/dashboard-ink/components/views/NowView.tsx"
+        "src/cli/dashboard-ink/components/views/TimerView.tsx"
+        "src/cli/dashboard-ink/components/views/PlanView.tsx"
+        "src/cli/dashboard-ink/components/shared/ProjectList.tsx"
+        "src/cli/dashboard-ink/components/shared/PomodoroTimer.tsx"
+        "src/cli/dashboard-ink/components/HelpOverlay.tsx"
+        "src/cli/dashboard-ink/lib/keymap.ts"
         "src/cli/dashboard-ink/components/shared/Card.tsx"
         "src/cli/dashboard-ink/lib/AtlasContext.tsx"
         "src/cli/dashboard-ink/lib/LayoutManager.tsx"
@@ -259,7 +263,7 @@ test_multiple_runs() {
     log_pass "Multiple runs successful"
 }
 
-# Test 10: No hardcoded values remain in SidebarPanel/InspectorPanel props
+# Test 10: No hardcoded values remain in NowView/PomodoroTimer props
 test_no_hardcoded_props() {
     log_test "No hardcoded mock values in panel props"
 

@@ -982,84 +982,51 @@ atlas dashboard
 atlas dash
 ```
 
-**Keyboard Shortcuts:**
+**v0.14: 3 views, not 8.** The dashboard was consolidated from 8 views down to
+**Now** / **Timer** / **Plan** (SPEC-tui-consolidation-2026-07-19.md). Every
+key below lives in `src/cli/dashboard-ink/lib/keymap.ts`, the single source
+of truth — press `?` in the dashboard to see the same table live.
 
-| Key         | Action                                    |
-| ----------- | ----------------------------------------- |
-| `↑↓` / `j`/`k` | Navigate projects                     |
-| `Enter`     | Open project detail                       |
-| `Esc`       | Back / Exit current view                  |
-| `a`         | Analytics view (v0.13.0)                  |
-| `f`         | Enter focus mode (Pomodoro)               |
-| `z`         | Zen mode                                  |
-| `T`         | Timeline view (time blocks)               |
-| `e`         | Ecosystem view (multi-project overview)   |
-| `p`         | Plan view (morning ritual)                |
-| `c`         | Quick capture                             |
-| `t`         | Cycle themes                              |
-| `Tab`       | Cycle layout: SINGLE → SPLIT → TRIPLE    |
-| `Shift+Tab` | Cycle panel focus in split/triple layouts |
-| `q`         | Quit                                      |
-| `?`         | Show help                                 |
+**Global keys (work from any view):**
 
-> **Note:** The legacy blessed dashboard (`atlas dash --blessed`) uses different
-> bindings: `e` = End session, `s` = Start session, `p` = Filter paused,
-> `a` = Filter active, `/` = Search.
+| Key           | Action                                        |
+| ------------- | ---------------------------------------------- |
+| `1` / `n`     | Switch to **Now**                              |
+| `2` / `t`     | Switch to **Timer**                            |
+| `3` / `p`     | Switch to **Plan**                             |
+| `Tab`         | Cycle layout: SINGLE → SPLIT → TRIPLE          |
+| `q`           | Quit                                           |
+| `?`           | Toggle the help overlay                        |
 
-**Focus Mode Keys:**
+**Now view (default)** — project list + selected-project detail. Absorbs the
+former MainView, DetailView, InspectorPanel, and EcosystemView:
 
-| Key     | Action             |
-| ------- | ------------------ |
-| `Space` | Pause/Resume timer |
-| `r`     | Reset timer        |
-| `+`     | Add 5 minutes      |
-| `-`     | Subtract 5 minutes |
-| `c`     | Quick capture      |
-| `Esc`   | Exit focus mode    |
+| Key                | Action                                             |
+| ------------------ | --------------------------------------------------- |
+| `j`/`k` / `↑↓`      | Navigate the project list                          |
+| `Enter`             | Select project                                      |
+| `e`                 | Toggle the right pane between project detail and ecosystem-wide stats |
 
-**Task-Based Focus (v0.7.0):**
+**Timer view** — the single Pomodoro implementation. Absorbs the former
+FocusView, ZenView, and the InspectorPanel's embedded timer:
 
-When starting a Pomodoro:
-1. Dashboard prompts "What will you focus on?"
-2. Task is displayed during focus session
-3. After timer completes, asks for completion status:
-   - `c` - Completed
-   - `p` - Partial progress
-   - `n` - Pivoted to something else
+| Key     | Action                                  |
+| ------- | ---------------------------------------- |
+| `Space` | Pause/Resume timer                       |
+| `r`     | Reset timer (while paused)               |
+| `+`/`-` | Adjust duration (while paused)           |
+| `z`     | Toggle zen (minimal chrome) vs full chrome |
 
-**Timeline View (v0.7.0):**
+**Plan view** — morning ritual. Absorbs the former PlanView and AnalyticsView:
 
-Press `T` (Shift+T) to enter the time block view:
-- Visual timeline of today's sessions
-- Color-coded by project
-- Shows session durations and gaps
-- Helps identify work patterns
-
-**Analytics View (v0.13.0):**
-
-Press `a` to enter the full-screen analytics view:
-- **Focus Velocity** — 30-day ASCII sparkline, trend indicator, and 4-week summary table
-- **Flow Patterns** — 7×24 hour-day heatmap for productivity distribution, including best day/hour and dead zone callouts
-- **Navigation** — Tab-locked single-panel layout with project cycling (← →)
-- Quick-links to Focus (`f`) and Detail (`Enter`)
-
-**Ecosystem View (v0.8.0):**
-
-Press `e` to see all projects across your ecosystem:
-- Scans ~/projects/dev-tools for .STATUS files
-- Shows project status, progress, and priority
-- Displays focus/next action for selected project
-- Navigate with arrow keys, `Enter` for detail
-- Useful for managing 10+ projects
-
-**Plan View (v0.8.0):**
-
-Press `p` to enter the morning planning ritual:
-- Yesterday's session summary
-- Current streak display
-- Inbox items pending triage
-- Smart suggestions based on history
-- Helps start the day with intention
+| Key      | Action                                    |
+| -------- | ------------------------------------------ |
+| `j`/`k` / `↑↓` | Navigate suggestions                 |
+| `Enter`  | Execute suggestion                        |
+| `e`      | Cycle energy level                        |
+| `s`      | Start a session (jumps to Timer view)     |
+| `a`      | Toggle the analytics pane (focus velocity + flow patterns) |
+| `←`/`→`  | Switch project (while the analytics pane is open) |
 
 **Real Data (v0.9.2):**
 

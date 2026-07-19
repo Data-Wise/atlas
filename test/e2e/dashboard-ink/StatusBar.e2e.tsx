@@ -34,7 +34,7 @@ import { StatusBar } from '../../../src/cli/dashboard-ink/components/StatusBar.j
 // ─── Default props ────────────────────────────────────────────────────────────
 
 const defaultProps = {
-  currentView: STATES.BROWSE,
+  currentView: STATES.NOW,
   layout: LAYOUT.SINGLE as string,
   focusPanel: 'main' as 'sidebar' | 'main' | 'inspector',
   hasActiveSession: true,
@@ -93,14 +93,9 @@ describe('StatusBar E2E', () => {
 
   describe('Key hints (center zone)', () => {
     const viewCases: Array<{ view: string; label: string; checks: string[] }> = [
-      { view: STATES.BROWSE,    label: 'BROWSE',    checks: ['j/k:nav', 'Enter:detail', 'f:Focus', 'a:Analytics'] },
-      { view: STATES.DETAIL,    label: 'DETAIL',    checks: ['q:back', 'f:Focus', 'a:Analytics'] },
-      { view: STATES.FOCUS,     label: 'FOCUS',     checks: ['Space:pause', 'q:back'] },
-      { view: STATES.ZEN,       label: 'ZEN',       checks: ['q:back'] },
-      { view: STATES.TIMELINE,  label: 'TIMELINE',  checks: ['j/k:scroll', 'q:back'] },
-      { view: STATES.ECOSYSTEM, label: 'ECOSYSTEM', checks: ['j/k:nav', 'Enter:detail', 'q:back'] },
-      { view: STATES.PLAN,      label: 'PLAN',      checks: ['j/k:nav', 'Enter:select', 'q:back'] },
-      { view: STATES.ANALYTICS, label: 'ANALYTICS', checks: ['q:back', 'f:Focus'] },
+      { view: STATES.NOW,   label: 'NOW',   checks: ['j/k:nav', 'Enter:select', 'e:Eco'] },
+      { view: STATES.TIMER, label: 'TIMER', checks: ['Space:pause', 'r:reset', 'z:zen'] },
+      { view: STATES.PLAN,  label: 'PLAN',  checks: ['j/k:nav', 'e:energy', 'a:analytics'] },
     ]
 
     viewCases.forEach(({ view, label, checks }) => {
@@ -113,15 +108,6 @@ describe('StatusBar E2E', () => {
           expect(frame).toContain(hint)
         })
       })
-    })
-
-    it('shows arrow symbols for ANALYTICS project switching', () => {
-      const { lastFrame } = render(
-        <StatusBar {...defaultProps} currentView={STATES.ANALYTICS} />
-      )
-      const frame = lastFrame() ?? ''
-      expect(frame).toContain('\u2190')
-      expect(frame).toContain('\u2192')
     })
   })
 
@@ -192,7 +178,7 @@ describe('StatusBar E2E', () => {
       expect(frame).not.toContain('q:back')
     })
 
-    it('renders something for all 8 view states', () => {
+    it('renders something for all 3 view states', () => {
       const views = Object.values(STATES)
       views.forEach(view => {
         const { lastFrame } = render(

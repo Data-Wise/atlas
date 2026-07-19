@@ -69,9 +69,9 @@ src/
 │   └── index.js      # Tools: get_context, start_session, capture, etc.
 ├── cli/              # Dashboard TUI
 │   └── dashboard-ink/       # Ink dashboard (default since v0.9.x)
-│       ├── components/      # App.tsx, views/, SidebarPanel, InspectorPanel
+│       ├── components/      # App.tsx, HelpOverlay.tsx, views/{Now,Timer,Plan}View, shared/{ProjectList,PomodoroTimer}
 │       ├── hooks/           # useProjects, useActiveSession, useProjectStats, usePendingCaptures, useAnalytics
-│       ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts, ThemeContext.tsx
+│       ├── lib/             # AtlasContext.tsx, LayoutManager.tsx, stateMachine.ts (3 states), ThemeContext.tsx, keymap.ts
 │       ├── types.ts         # Shared Project interface
 │       └── constants.ts     # STATUS_ICON, STATUS_COLOR maps
 └── index.js          # Commander.js CLI entry

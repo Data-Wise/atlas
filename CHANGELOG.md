@@ -45,6 +45,27 @@ Each deprecated command prints a one-line stderr pointer to its replacement; std
 
 ### Removed
 - **Legacy blessed dashboards (~5.9k LOC)** — deleted `src/cli/dashboard-blessed.js` (2,765 LOC), `src/cli/dashboard/` (3,125 LOC across `CardPool.js`, `ViewStateManager.js`, `constants.js`, `dialogs.js`, `helpers.js`, `stateMachine.js`, `timerManager.js`, `views/*.js`), and their 6 associated test files under `test/unit/cli/dashboard/` (1,597 LOC). Neither was reachable from `bin/atlas.js` or any live `src/` code — the `atlas dashboard`/`atlas dash` commands have used the Ink dashboard (`src/cli/dashboard-ink-launcher.js`) exclusively since v0.9.0. Confirmed via `grep -r "dashboard-blessed\|cli/dashboard/" src/ bin/ test/` returning zero hits before deletion. The `blessed`/`blessed-contrib` npm dependencies are retained for now because `src/ui/Dashboard.js` (a separate, also-unreferenced legacy component outside this change's scope) still imports them.
+- **`src/ui/Dashboard.js` (425 LOC) + its sole referencer `test/e2e/dashboard.test.js`** — the last remaining `blessed`/`blessed-contrib` importer, confirmed unreachable from `bin/` or any live `src/` code. With this gone, `blessed` and `blessed-contrib` are removed from `package.json` dependencies (`grep -r "blessed" src/ bin/` now returns only comment/doc mentions, zero real imports) and the lockfile refreshed via `npm install`.
+
+### Changed — TUI 3-view consolidation (SPEC-tui-consolidation-2026-07-19.md)
+- **Ink dashboard: 8 views → 3** — `MainView`/`DetailView`/`InspectorPanel`/`EcosystemView` merged into **Now** (default; project list + selected-project detail, `e` toggles an ecosystem-wide stats pane); `FocusView`/`ZenView`/the InspectorPanel timer merged into **Timer** (single `PomodoroTimer` component, `z` toggles zen/dense chrome); `PlanView`/`AnalyticsView` merged into **Plan** (`a` toggles an analytics pane). `TimelineView` (time-block view) is dropped rather than re-homed — it had no natural absorption target in the 3-view design and is not restored elsewhere.
+- **State machine: 8 states → 3** (`NOW`/`TIMER`/`PLAN`, `src/cli/dashboard-ink/lib/stateMachine.ts`).
+- **New `lib/keymap.ts`** — single source of truth for every dashboard keybinding, grouped by scope (`global`/`now`/`timer`/`plan`/`help`); a mechanical test (`test/unit/cli/dashboard-ink/lib/keymap.test.tsx`) asserts no duplicate key within a scope. **New `?` help overlay** (`components/HelpOverlay.tsx`) renders directly from the keymap.
+- **Shared components extracted:** `components/shared/ProjectList.tsx` (moved from `SidebarPanel.tsx`, used by Now's left pane) and `components/shared/PomodoroTimer.tsx` (the one Pomodoro timer implementation, replacing three separate copies in `FocusView`/`ZenView`/`InspectorPanel`).
+- **`src/cli/dashboard-ink` LOC: 4,358 → 3,216 (26% reduction)** this PR; combined with the #94 deletion PR, the TUI layer is well past the spec's ≥55%-reduction target from the original 10,250-line baseline.
+
+#### Keybinding migration (before → after)
+
+| Action | Before | After |
+|---|---|---|
+| Switch view | per-view only (`f`/`z`/`T`/`e`/`p` from Browse) | `1`/`2`/`3` or `n`/`t`/`p` from anywhere |
+| Ecosystem stats | dedicated `ECOSYSTEM` view (`e` from Browse) | `e` toggles ecosystem pane inside **Now** |
+| Zen mode | dedicated `ZEN` view (`z` from Browse) | `z` toggles dense chrome inside **Timer** |
+| Analytics | dedicated `ANALYTICS` view (`a`, any view) | `a` toggles analytics pane inside **Plan** |
+| Help | none | `?` opens the new help overlay |
+| Pause / resume timer | `Space` (3 separate implementations) | `Space` (1 implementation, `shared/PomodoroTimer.tsx`) |
+
+No user-facing CLI change: `atlas dash` keeps working; only internal dashboard navigation changed.
 
 ## [0.13.1] - 2026-07-17
 

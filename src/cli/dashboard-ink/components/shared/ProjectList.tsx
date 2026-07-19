@@ -1,5 +1,5 @@
 /**
- * SidebarPanel
+ * ProjectList
  *
  * Compact project list column rendered in SPLIT and TRIPLE layout modes.
  * Replaces the card stack with a dense list optimised for narrow widths (25–28%).
@@ -24,12 +24,12 @@
 
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
-import type { Project } from '../types.js';
-import { statusIcon } from '../constants.js';
-import { useTheme } from '../lib/ThemeContext.js';
-import type { Theme } from '../lib/ThemeContext.js';
+import type { Project } from '../../types.js';
+import { statusIcon } from '../../constants.js';
+import { useTheme } from '../../lib/ThemeContext.js';
+import type { Theme } from '../../lib/ThemeContext.js';
 
-interface SidebarPanelProps {
+interface ProjectListProps {
   projects: Project[];
   /** Controlled selection index */
   selectedIndex: number;
@@ -151,9 +151,9 @@ const Row: React.FC<RowProps> = ({ project, isHighlighted, isActiveSession }) =>
   );
 };
 
-// ─── SidebarPanel ─────────────────────────────────────────────────────────────
+// ─── ProjectList ─────────────────────────────────────────────────────────────
 
-export const SidebarPanel: React.FC<SidebarPanelProps> = ({
+export const ProjectList: React.FC<ProjectListProps> = ({
   projects,
   selectedIndex,
   onSelect,

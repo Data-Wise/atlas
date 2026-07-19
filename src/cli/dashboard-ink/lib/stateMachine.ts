@@ -3,32 +3,27 @@
  *
  * Manages view states and transitions for the ADHD-friendly dashboard.
  * Provides explicit state management with enter/exit hooks and event emission.
+ *
+ * v0.14 consolidation: 8 states -> 3 (SPEC-tui-consolidation-2026-07-19.md).
+ *   NOW   absorbs Main + Detail + Inspector + Ecosystem
+ *   TIMER absorbs Focus + Zen + Inspector timer
+ *   PLAN  absorbs Plan + Analytics
  */
 
 // Valid dashboard states
 export const STATES = {
-  BROWSE: 'browse',        // Main project list view
-  DETAIL: 'detail',        // Single project detail view
-  FOCUS: 'focus',          // Focus mode with timer
-  ZEN: 'zen',              // Minimal zen mode
-  TIMELINE: 'timeline',    // Time block view
-  ECOSYSTEM: 'ecosystem',  // Multi-project ecosystem overview
-  PLAN: 'plan',            // Morning ritual / daily planning
-  ANALYTICS: 'analytics'   // Velocity + pattern analytics (v0.13.0)
+  NOW: 'now',      // Project list + selected project detail (+ ecosystem toggle)
+  TIMER: 'timer',  // Pomodoro timer (+ zen density toggle)
+  PLAN: 'plan'     // Morning ritual (+ analytics toggle)
 } as const;
 
 export type StateType = typeof STATES[keyof typeof STATES];
 
-// Valid transitions between states
+// All 3 states can freely transition to one another.
 const TRANSITIONS: Record<StateType, StateType[]> = {
-  [STATES.BROWSE]: [STATES.DETAIL, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.DETAIL]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.FOCUS]: [STATES.BROWSE, STATES.ZEN, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.ZEN]: [STATES.BROWSE, STATES.FOCUS, STATES.TIMELINE, STATES.ECOSYSTEM, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.TIMELINE]: [STATES.BROWSE, STATES.FOCUS, STATES.ZEN, STATES.ECOSYSTEM, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.ECOSYSTEM]: [STATES.BROWSE, STATES.DETAIL, STATES.FOCUS, STATES.PLAN, STATES.ANALYTICS],
-  [STATES.PLAN]: [STATES.BROWSE, STATES.FOCUS, STATES.DETAIL, STATES.ANALYTICS],
-  [STATES.ANALYTICS]: [STATES.BROWSE, STATES.DETAIL, STATES.FOCUS]
+  [STATES.NOW]: [STATES.TIMER, STATES.PLAN],
+  [STATES.TIMER]: [STATES.NOW, STATES.PLAN],
+  [STATES.PLAN]: [STATES.NOW, STATES.TIMER]
 };
 
 interface StateMachineOptions {
@@ -57,7 +52,7 @@ type EventHandler = (data: any) => void;
  * Create a new state machine for the dashboard
  */
 export function createStateMachine(options: StateMachineOptions = {}) {
-  let currentState: StateType = options.initial || STATES.BROWSE;
+  let currentState: StateType = options.initial || STATES.NOW;
   let previousState: StateType | null = null;
   const listeners = new Map<string, EventHandler[]>();
   const stateData = new Map<StateType, StateData>();
@@ -152,8 +147,8 @@ export function createStateMachine(options: StateMachineOptions = {}) {
     if (previousState) {
       return transition(previousState);
     }
-    // Default to browse if no previous
-    return transition(STATES.BROWSE);
+    // Default to NOW if no previous
+    return transition(STATES.NOW);
   }
 
   /**

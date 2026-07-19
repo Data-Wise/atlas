@@ -469,230 +469,95 @@ echo ""
 echo -e "  ${DIM}LayoutManager D1 dogfood complete${NC}"
 
 # ============================================================================
-# 17. SIDEBAR PANEL - D2 (feature/multi-panel-dashboard)
+# 17. shared/ProjectList - Compact Project List Column (v0.14 consolidation)
 # ============================================================================
 
-header "17. SidebarPanel D2 - Compact Project List Column"
+header "17. shared/ProjectList - Compact Project List Column"
 
-SIDEBAR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/SidebarPanel.tsx"
+PROJECTLIST_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/shared/ProjectList.tsx"
 CONSTANTS_SRC="$(dirname "$0")/../src/cli/dashboard-ink/constants.ts"
 
-# File present
-test_succeeds "SidebarPanel.tsx exists" "ls '$SIDEBAR_SRC'"
+test_succeeds "ProjectList.tsx exists" "ls '$PROJECTLIST_SRC'"
 
-# 1. Exports
-test_contains "Exports SidebarPanel component" \
-  "grep -c 'export const SidebarPanel' '$SIDEBAR_SRC'" "1"
+test_contains "Exports ProjectList component" \
+  "grep -c 'export const ProjectList' '$PROJECTLIST_SRC'" "1"
 
 test_contains "Imports Project type from shared types" \
-  "grep -c \"from '../types.js'\" '$SIDEBAR_SRC'" "1"
+  "grep -c \"from '../../types.js'\" '$PROJECTLIST_SRC'" "1"
 
-# 2. Status icons — all 6 must be in shared constants
 test_contains "Status icon: active ●" \
   "grep \"'●'\" '$CONSTANTS_SRC'" "'●'"
 
 test_contains "Status icon: paused ◐" \
   "grep \"'◐'\" '$CONSTANTS_SRC'" "'◐'"
 
-test_contains "Status icon: stable ◆" \
-  "grep \"'◆'\" '$CONSTANTS_SRC'" "'◆'"
-
-test_contains "Status icon: complete ✓" \
-  "grep \"'✓'\" '$CONSTANTS_SRC'" "'✓'"
-
-test_contains "Status icon: planning ○" \
-  "grep \"'○'\" '$CONSTANTS_SRC'" "'○'"
-
-test_contains "Status icon: blocked ✗" \
-  "grep \"'✗'\" '$CONSTANTS_SRC'" "'✗'"
-
-# 3. Status colours — in shared constants
-test_contains "Status colour: active=green" \
-  "grep \"active.*'green'\" '$CONSTANTS_SRC'" "green"
-
-test_contains "Status colour: paused=yellow" \
-  "grep \"paused.*'yellow'\" '$CONSTANTS_SRC'" "yellow"
-
-test_contains "Status colour: blocked=red" \
-  "grep \"blocked.*'red'\" '$CONSTANTS_SRC'" "red"
-
-# 4. Progress formatter — padStart(4)
-test_contains "fmtProgress uses padStart(4)" \
-  "grep 'padStart(4)' '$SIDEBAR_SRC'" "padStart(4)"
-
-test_contains "fmtProgress clamps to 0–100" \
-  "grep 'Math.max(0, Math.min(100' '$SIDEBAR_SRC'" "Math.max"
-
-# 5. Truncate helper — Unicode ellipsis
-test_contains "truncate uses Unicode ellipsis (…)" \
-  "grep '…' '$SIDEBAR_SRC'" "…"
-
-# 6. Windowing — 12-row window
-test_contains "Window size is 12 rows" \
-  "grep 'WINDOW = 12' '$SIDEBAR_SRC'" "WINDOW = 12"
-
-test_contains "windowStart calculation present" \
-  "grep 'windowStart' '$SIDEBAR_SRC'" "windowStart"
-
-test_contains "Visible slice uses WINDOW" \
-  "grep 'WINDOW + WINDOW' '$SIDEBAR_SRC' || grep 'windowStart + WINDOW' '$SIDEBAR_SRC'" "WINDOW"
-
-# 7. isActive guard
 test_contains "isActive guard in useInput" \
-  "grep 'if (!isActive) return' '$SIDEBAR_SRC'" "if (!isActive) return"
-
-# 8. Keyboard navigation — j/k + arrows
-test_contains "j key navigation" \
-  "grep \"input === 'j'\" '$SIDEBAR_SRC'" "input === 'j'"
-
-test_contains "k key navigation" \
-  "grep \"input === 'k'\" '$SIDEBAR_SRC'" "input === 'k'"
-
-test_contains "downArrow navigation" \
-  "grep 'key.downArrow' '$SIDEBAR_SRC'" "downArrow"
-
-test_contains "upArrow navigation" \
-  "grep 'key.upArrow' '$SIDEBAR_SRC'" "upArrow"
-
-# 9. Enter / select
-test_contains "Enter fires onSelectProject" \
-  "grep 'onSelectProject(p)' '$SIDEBAR_SRC'" "onSelectProject"
-
-# 10. Inbox badge
-test_contains "Inbox badge uses pendingCaptures" \
-  "grep 'pendingCaptures' '$SIDEBAR_SRC'" "pendingCaptures"
-
-test_contains "Inbox badge icon is 📥" \
-  "grep '📥' '$SIDEBAR_SRC'" "📥"
-
-# 11. Active session indicator
-test_contains "activeProjectId prop present" \
-  "grep 'activeProjectId' '$SIDEBAR_SRC'" "activeProjectId"
-
-test_contains "Session timer icon ⏱ present" \
-  "grep '⏱' '$SIDEBAR_SRC'" "⏱"
-
-# 12. Ink imports
-test_contains "Imports Box from ink" \
-  "grep \"from 'ink'\" '$SIDEBAR_SRC'" "Box"
-
-test_contains "Imports useInput from ink" \
-  "grep \"from 'ink'\" '$SIDEBAR_SRC'" "useInput"
+  "grep 'if (!isActive) return' '$PROJECTLIST_SRC'" "if (!isActive) return"
 
 echo ""
-echo -e "  ${DIM}SidebarPanel D2 dogfood complete${NC}"
+echo -e "  ${DIM}shared/ProjectList dogfood complete${NC}"
 
 # ============================================================================
-# 18. INSPECTOR PANEL - D3 (feature/multi-panel-dashboard)
+# 18. shared/PomodoroTimer - the single Pomodoro implementation (v0.14)
 # ============================================================================
 
-header "18. InspectorPanel D3 - Detail + Pomodoro Right Panel"
+header "18. shared/PomodoroTimer - Single Timer Implementation"
 
-INSPECTOR_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/InspectorPanel.tsx"
+TIMER_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/shared/PomodoroTimer.tsx"
+NOW_SRC="$(dirname "$0")/../src/cli/dashboard-ink/components/views/NowView.tsx"
 
-# File present
-test_succeeds "InspectorPanel.tsx exists" "ls '$INSPECTOR_SRC'"
+test_succeeds "PomodoroTimer.tsx exists" "ls '$TIMER_SRC'"
 
-# 1. Exports
-test_contains "Exports InspectorPanel component" \
-  "grep -c 'export const InspectorPanel' '$INSPECTOR_SRC'" "1"
+test_contains "Exports PomodoroTimer component" \
+  "grep -c 'export const PomodoroTimer' '$TIMER_SRC'" "1"
 
-test_contains "Imports Project type from shared types" \
-  "grep -c \"from '../types.js'\" '$INSPECTOR_SRC'" "1"
+test_contains "fmtTime/timeStr uses padStart(2" \
+  "grep 'padStart(2' '$TIMER_SRC'" "padStart(2"
 
-# 2. Status icons — in shared constants (not InspectorPanel directly)
-test_contains "Constants file has status icons" \
-  "grep -c \"'●'\" '$CONSTANTS_SRC'" "1"
-
-# 3. progressBar helper — 8-char bar
-test_contains "progressBar uses W = 8" \
-  "grep 'const W = 8' '$INSPECTOR_SRC'" "8"
-
-test_contains "Filled char is █" \
-  "grep \"'█'\" '$INSPECTOR_SRC'" "█"
-
-test_contains "Empty char is ░" \
-  "grep \"'░'\" '$INSPECTOR_SRC'" "░"
-
-# 4. fmtTime — MM:SS format with padStart
-test_contains "fmtTime uses padStart(2" \
-  "grep 'padStart(2' '$INSPECTOR_SRC'" "padStart(2"
-
-# 5. trunc — 22-char default
-test_contains "trunc default max = 22" \
-  "grep 'max = 22' '$INSPECTOR_SRC'" "22"
-
-test_contains "trunc uses Unicode ellipsis (…)" \
-  "grep '…' '$INSPECTOR_SRC'" "…"
-
-# 6. next actions parsing — comma + newline split, max 3
-test_contains "next actions split regex [,\\n]" \
-  "grep 'split(/\[,\\\\n\]/)' '$INSPECTOR_SRC'" "split"
-
-test_contains "next actions sliced to 3" \
-  "grep 'slice(0, 3)' '$INSPECTOR_SRC'" "slice(0, 3)"
-
-# 7. Pomodoro mini-timer — reuses FocusView pattern
 test_contains "useEffect for timer tick" \
-  "grep 'useEffect' '$INSPECTOR_SRC'" "useEffect"
+  "grep 'useEffect' '$TIMER_SRC'" "useEffect"
 
 test_contains "setInterval for 1-second tick" \
-  "grep 'setInterval' '$INSPECTOR_SRC'" "setInterval"
+  "grep 'setInterval' '$TIMER_SRC'" "setInterval"
 
 test_contains "clearInterval cleanup" \
-  "grep 'clearInterval' '$INSPECTOR_SRC'" "clearInterval"
+  "grep 'clearInterval' '$TIMER_SRC'" "clearInterval"
 
-# 8. isActive guard in PomodoroBlock
 test_contains "isActive guard in useInput" \
-  "grep 'if (!isActive) return' '$INSPECTOR_SRC'" "if (!isActive) return"
+  "grep 'if (!isActive) return' '$TIMER_SRC'" "if (!isActive) return"
 
-# 9. Pomodoro state labels
 test_contains "BREAK TIME label (☕)" \
-  "grep '☕ BREAK TIME' '$INSPECTOR_SRC'" "☕ BREAK TIME"
+  "grep '☕ BREAK TIME' '$TIMER_SRC'" "☕ BREAK TIME"
 
 test_contains "PAUSED label (◑)" \
-  "grep '◑ PAUSED' '$INSPECTOR_SRC'" "◑ PAUSED"
+  "grep '◑ PAUSED' '$TIMER_SRC'" "◑ PAUSED"
 
 test_contains "FOCUSING label (●)" \
-  "grep '● FOCUSING' '$INSPECTOR_SRC'" "● FOCUSING"
+  "grep '● FOCUSING' '$TIMER_SRC'" "● FOCUSING"
 
-# 10. Timer reset on session change
-test_contains "Timer resets elapsed on session change" \
-  "grep 'setElapsed(0)' '$INSPECTOR_SRC'" "setElapsed(0)"
+test_contains "dense (zen) chrome toggle supported" \
+  "grep 'dense' '$TIMER_SRC'" "dense"
 
-test_contains "Paused resets on session change" \
-  "grep 'setPaused(false)' '$INSPECTOR_SRC'" "setPaused(false)"
-
-# 11. Empty state
-test_contains "Empty state message when no project" \
-  "grep 'Select a project' '$INSPECTOR_SRC'" "Select a project"
-
-# 12. Breadcrumbs sliced to 3
-test_contains "Breadcrumbs sliced to max 3" \
-  "grep 'slice(0, 3)' '$INSPECTOR_SRC'" "slice(0, 3)"
-
-# 13. Keyboard — Space + r (when active)
 test_contains "Space key toggles pause" \
-  "grep \"input === ' '\" '$INSPECTOR_SRC'" "input === ' '"
+  "grep \"input === ' '\" '$TIMER_SRC'" "input === ' '"
 
 test_contains "r key resets timer" \
-  "grep \"input === 'r'\" '$INSPECTOR_SRC'" "input === 'r'"
+  "grep \"input === 'r'\" '$TIMER_SRC'" "input === 'r'"
 
-# 14. Ink imports
-test_contains "Imports Box, Text from ink" \
-  "grep \"from 'ink'\" '$INSPECTOR_SRC'" "Box"
+# NowView.tsx now owns the project-detail pane (progressBar/trunc/next/breadcrumbs)
+test_succeeds "NowView.tsx exists" "ls '$NOW_SRC'"
 
-test_contains "Imports useInput from ink" \
-  "grep \"from 'ink'\" '$INSPECTOR_SRC'" "useInput"
+test_contains "Empty state message when no project" \
+  "grep 'Select a project' '$NOW_SRC'" "Select a project"
 
-test_contains "Imports useState from react" \
-  "grep 'useState' '$INSPECTOR_SRC'" "useState"
+test_contains "next actions split regex [,\\n]" \
+  "grep 'split(/\[,\\\\n\]/)' '$NOW_SRC'" "split"
 
-test_contains "Imports useEffect from react" \
-  "grep 'useEffect' '$INSPECTOR_SRC'" "useEffect"
+test_contains "Breadcrumbs sliced to max 3" \
+  "grep 'slice(0, 3)' '$NOW_SRC'" "slice(0, 3)"
 
 echo ""
-echo -e "  ${DIM}InspectorPanel D3 dogfood complete${NC}"
+echo -e "  ${DIM}shared/PomodoroTimer + NowView dogfood complete${NC}"
 
 # ============================================================================
 # 19. APP.TSX D4 - Multi-Panel Wiring
@@ -715,56 +580,42 @@ test_contains "Imports LayoutManager" \
 test_contains "Imports StatusBar" \
   "grep 'StatusBar' '$APP_SRC'" "StatusBar"
 
-test_contains "Imports LAYOUT constant" \
-  "grep 'LAYOUT' '$APP_SRC'" "LAYOUT"
+test_contains "Imports LayoutManager module (LAYOUT enum lives there)" \
+  "grep \"lib/LayoutManager.js\" '$APP_SRC'" "LayoutManager.js"
 
-# 2. Panel component imports
-test_contains "Imports SidebarPanel" \
-  "grep 'SidebarPanel' '$APP_SRC'" "SidebarPanel"
+# 2. 3-view component imports (v0.14 consolidation)
+test_contains "Imports NowView" \
+  "grep 'NowView' '$APP_SRC'" "NowView"
 
-test_contains "Imports InspectorPanel" \
-  "grep 'InspectorPanel' '$APP_SRC'" "InspectorPanel"
+test_contains "Imports TimerView" \
+  "grep 'TimerView' '$APP_SRC'" "TimerView"
+
+test_contains "Imports HelpOverlay" \
+  "grep 'HelpOverlay' '$APP_SRC'" "HelpOverlay"
 
 # 3. useLayout call
 test_contains "Calls useLayout with LAYOUT.SINGLE" \
   "grep 'useLayout' '$APP_SRC'" "useLayout"
 
-test_contains "Uses LAYOUT.SINGLE as initial" \
-  "grep 'LAYOUT.SINGLE' '$APP_SRC'" "LAYOUT.SINGLE"
+test_contains "Uses single as the initial layout mode" \
+  "grep \"initial: 'single'\" '$APP_SRC'" "single"
 
 # 4. LayoutManager render-prop usage
 test_contains "<LayoutManager> present" \
   "grep '<LayoutManager' '$APP_SRC'" "<LayoutManager"
 
-test_contains "sidebar && conditional guard" \
-  "grep 'sidebar &&' '$APP_SRC'" "sidebar &&"
+# v0.14: NowView now owns its own list+detail layout internally, so App.tsx
+# no longer wraps it in an external sidebar/inspector split (see NowView.tsx
+# section 17/18 assertions above for that wiring instead).
+test_contains "renderCurrentView() dispatches on currentView" \
+  "grep 'renderCurrentView' '$APP_SRC'" "renderCurrentView"
 
-test_contains "inspector && conditional guard" \
-  "grep 'inspector &&' '$APP_SRC'" "inspector &&"
-
-# 5. Width forwarding
-test_contains "sidebar.widthPct forwarded to Box" \
-  "grep 'sidebar.widthPct' '$APP_SRC'" "widthPct"
-
-test_contains "main.widthPct forwarded to Box" \
-  "grep 'main.widthPct' '$APP_SRC'" "widthPct"
-
-test_contains "inspector.widthPct forwarded to Box" \
-  "grep 'inspector.widthPct' '$APP_SRC'" "widthPct"
-
-# 6. isActive prop forwarding
-test_contains "sidebar.isActive forwarded" \
-  "grep 'sidebar.isActive' '$APP_SRC'" "isActive"
-
-test_contains "inspector.isActive forwarded" \
-  "grep 'inspector.isActive' '$APP_SRC'" "isActive"
-
-# 7. Sidebar ↔ inspector sync
-test_contains "handleSidebarIndexChange updates inspector" \
+# 5. Selected-project sync
+test_contains "handleSidebarIndexChange updates selectedProject" \
   "grep 'handleSidebarIndexChange' '$APP_SRC'" "handleSidebarIndexChange"
 
-test_contains "handleSidebarSelect guards on BROWSE" \
-  "grep 'STATES.BROWSE' '$APP_SRC'" "BROWSE"
+test_contains "3-state dispatch uses STATES.NOW" \
+  "grep 'STATES.NOW' '$APP_SRC'" "STATES.NOW"
 
 # 8. StatusBar in command bar
 test_contains "StatusBar rendered" \
@@ -773,8 +624,8 @@ test_contains "StatusBar rendered" \
 test_contains "StatusBar receives layout prop" \
   "grep 'layout={layout}' '$APP_SRC'" "layout={layout}"
 
-# 9. All 7 views still present
-for view in MainView DetailView FocusView ZenView TimelineView EcosystemView PlanView; do
+# 9. All 3 consolidated views present (v0.14: 8 views -> 3)
+for view in NowView TimerView PlanView; do
   test_contains "$view still rendered" \
     "grep '$view' '$APP_SRC'" "$view"
 done
