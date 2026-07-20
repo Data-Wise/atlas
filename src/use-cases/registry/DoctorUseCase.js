@@ -20,6 +20,8 @@
  */
 import { existsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { legacyConfigDir, xdgConfigDir, migrationMarkerPath } from '../../utils/configPath.js'
+import { migrateToXdg } from '../../utils/migrateXdg.js'
 
 export class DoctorUseCase {
   /**
@@ -29,13 +31,40 @@ export class DoctorUseCase {
    * @param {(p:string,c:string)=>void} [deps.writeFile] - injectable for tests
    * @param {StatusFileParser} [deps.statusFileParser] - optional; when provided,
    *   .STATUS parse warnings (non-numeric progress, duplicate keys) surface as findings
+   * @param {Function} [deps.migrateToXdgFn] - injectable for tests (SPEC-xdg-config-migration §4)
    */
-  constructor({ projectRepository, fileExists = existsSync, writeFile = writeFileSync, statusFileParser = null }) {
+  constructor({
+    projectRepository,
+    fileExists = existsSync,
+    writeFile = writeFileSync,
+    statusFileParser = null,
+    migrateToXdgFn = migrateToXdg
+  }) {
     if (!projectRepository) throw new Error('projectRepository is required')
     this.projectRepository = projectRepository
     this.fileExists = fileExists
     this.writeFile = writeFile
     this.statusFileParser = statusFileParser
+    this.migrateToXdgFn = migrateToXdgFn
+  }
+
+  /**
+   * Non-project-scoped check: is atlas's own data directory still on the
+   * legacy ~/.atlas path with a real XDG migration available? Informational
+   * only — staying on the legacy path is a fully supported steady state.
+   *
+   * Skipped entirely when ATLAS_CONFIG/ATLAS_DATA_DIR is set: those
+   * overrides mean the active config dir isn't derived from legacy/XDG
+   * detection at all, so a leftover ~/.atlas (e.g. from before the
+   * override was introduced) is irrelevant — nudging to migrate it would
+   * point at data atlas isn't even using.
+   * @private
+   */
+  _xdgMigrationAvailable() {
+    if (process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR) return false
+    const legacy = legacyConfigDir()
+    const xdg = xdgConfigDir()
+    return this.fileExists(legacy) && !this.fileExists(migrationMarkerPath(xdg))
   }
 
   /** Skip registry cruft so the audit reflects real projects. */
@@ -117,12 +146,30 @@ export class DoctorUseCase {
       orphaned: rows.filter(r => r.orphaned).length,
       parseWarnings: rows.reduce((n, r) => n + (r.parseWarnings?.length || 0), 0)
     }
-    return { summary, rows }
+    // Informational only (SPEC-xdg-config-migration §4) — staying on the
+    // legacy path is a fully supported steady state, not a gap to fix.
+    const xdgHint = this._xdgMigrationAvailable()
+      ? `atlas found a newer, tidier home for your data (${xdgConfigDir()}). Run 'atlas migrate --xdg' whenever you'd like — no rush.`
+      : null
+    return { summary, rows, xdgHint }
   }
 
   /**
    * Create missing CLAUDE.md (preview unless options.write). Never creates
    * .flow/obsidian-sync.yml — that's obs/savant's to scaffold (ADR-001).
+   *
+   * Also previews/applies the XDG data-directory migration (SPEC
+   * -xdg-config-migration §4), following the same two-tier pattern:
+   * `--fix` alone previews, `--fix --write` calls the guarded
+   * `migrateToXdg({ apply: true })` path — same process-lock guard as a
+   * manual `atlas migrate --xdg --apply`. If that guard trips, the
+   * migration is skipped for this run (reported, not forced) — --write
+   * never bypasses a safety check just because it was passed.
+   *
+   * Per-action objects carry a `type` discriminator ('claude-md' |
+   * 'xdg-migration') since the XDG action isn't project-scoped and can't
+   * share the {project, file} shape the per-project actions use.
+   *
    * @returns {Promise<{actions: Array, wrote: boolean}>}
    */
   async fix(options = {}) {
@@ -134,9 +181,28 @@ export class DoctorUseCase {
       if (!r.has.claude) {
         const path = join(r.path, 'CLAUDE.md')
         if (write) this.writeFile(path, this._claudeStub(r))
-        actions.push({ project: r.name, file: 'CLAUDE.md', path, written: write })
+        actions.push({ type: 'claude-md', project: r.name, file: 'CLAUDE.md', path, written: write })
       }
     }
+
+    if (this._xdgMigrationAvailable()) {
+      const to = xdgConfigDir()
+      const from = legacyConfigDir()
+      if (!write) {
+        actions.push({ type: 'xdg-migration', from, to, written: false })
+      } else {
+        const result = await this.migrateToXdgFn({ apply: true, atlasVersion: options.atlasVersion })
+        actions.push({
+          type: 'xdg-migration',
+          from,
+          to,
+          written: !!result.success,
+          skipped: !result.success,
+          detail: result.message
+        })
+      }
+    }
+
     return { actions, wrote: write }
   }
 

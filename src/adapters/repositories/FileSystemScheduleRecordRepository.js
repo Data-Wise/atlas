@@ -7,11 +7,12 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { ScheduleRecord } from '../../domain/entities/ScheduleRecord.js'
 import { IScheduleRecordRepository } from '../../domain/repositories/IScheduleRecordRepository.js'
+import { resolveConfigDir } from '../../utils/configPath.js'
 
 export class FileSystemScheduleRecordRepository extends IScheduleRecordRepository {
   constructor(configPath) {
     super()
-    this.configPath = configPath || `${process.env.HOME}/.atlas`
+    this.configPath = configPath || resolveConfigDir()
     this.filePath = path.join(this.configPath, 'schedule.json')
   }
 

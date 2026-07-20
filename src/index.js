@@ -9,6 +9,7 @@
 
 import { Container } from './adapters/Container.js';
 import { Config } from './utils/Config.js';
+import { resolveConfigDir } from './utils/configPath.js';
 
 // Re-export domain entities for library consumers
 export { Project } from './domain/entities/Project.js';
@@ -64,9 +65,7 @@ export class Atlas {
   }
 
   _defaultConfigPath() {
-    // ATLAS_DATA_DIR is the documented data-dir override (see docs/CONFIGURATION.md)
-    // and is honored by the MCP entry point; honor it here too so the CLI matches.
-    return process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR || `${process.env.HOME}/.atlas`;
+    return resolveConfigDir();
   }
 
   /**
