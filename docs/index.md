@@ -34,6 +34,14 @@ atlas session start myproject                  # 3. start working
 
     [:octicons-arrow-right-24: Get Started](getting-started/installation.md)
 
+-   :material-head-heart-outline:{ .lg .middle } **ADHD Guide**
+
+    ---
+
+    Streaks, time-blindness cues, and "good enough" endings — the product's core design.
+
+    [:octicons-arrow-right-24: ADHD Guide](user-guide/adhd-guide/index.md)
+
 -   :material-book-open-variant:{ .lg .middle } **CLI Reference**
 
     ---
@@ -70,13 +78,13 @@ atlas session start myproject                  # 3. start working
 
 ## :heart: Why Atlas (ADHD-first)
 
-| Feature | What it does |
-|---------|---------------|
-| **Streak Tracking** | Visual motivation through consecutive-day tracking |
-| **Time Blindness Helper** | Gentle time cues without breaking flow |
-| **Celebration Helper** | Positive reinforcement on real progress |
-| **Context Restoration** | "Last time you were…" on session start |
-| **Anti-Perfectionism** | "Good enough" session endings that actually ship |
+<div class="chip-row" markdown>
+- :material-fire:{ .chip-icon } **Streak Tracking** — visual motivation through consecutive-day tracking
+- :material-clock-alert-outline:{ .chip-icon } **Time Blindness Helper** — gentle time cues without breaking flow
+- :material-party-popper:{ .chip-icon } **Celebration Helper** — positive reinforcement on real progress
+- :material-history:{ .chip-icon } **Context Restoration** — "Last time you were…" on session start
+- :material-check-decagram-outline:{ .chip-icon } **Anti-Perfectionism** — "Good enough" session endings that actually ship
+</div>
 
 ??? note "See it in action (demo GIF)"
     ![Getting Started Demo](demos/getting-started.gif)

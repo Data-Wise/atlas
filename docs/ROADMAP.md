@@ -6,7 +6,23 @@
 
 ---
 
-## Current Version: v0.15.0 ✅ SHIPPED
+## Current Version: v0.16.0 ✅ SHIPPED
+
+ADHD-friendly docs-site redesign — implements the full "Suggested next steps" table from
+`docs/specs/PROPOSAL-docs-site-design-audit-2026-07-19.md`.
+
+- [x] **Pill nav** — 7-tab bar collapsed to Home + 4 color pills (Learn/Do/Build/Code) + a sidebar search filter (`overrides/partials/tabs.html`)
+- [x] **Section-color theming** — previously-dead `--atlas-learn/do/build/code` tokens now wired into the sidebar via a `data-atlas-section` body attribute (`docs/assets/javascripts/section-nav.js`)
+- [x] **Single-open sidebar accordion** with item-count badges — required dropping `navigation.sections` from `mkdocs.yml` (it forced L2 nav groups always-expanded, silently defeating the checkbox collapse)
+- [x] **Homepage** — card grid rebalanced to 6 (added ADHD Guide), 5-row ADHD-principles table replaced with a scannable chip row
+- [x] **Retuned tokens** — off-white/near-black surfaces instead of pure white/black, 16.5px/1.65 body type for long reading sessions; extended both reduced-motion blocks (nav-arrow rotate, tabs-link hover)
+- [x] Retired `WEB-DESIGN-PROPOSAL.md` from the nav (moved to `docs/specs/`)
+
+See `docs/specs/PROPOSAL-docs-site-design-audit-2026-07-19.md` for the full audit.
+
+---
+
+## v0.15.0 - XDG Base Directory Support ✅ COMPLETE
 
 XDG Base Directory support — new installs default to `$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas`);
 existing `~/.atlas` installs are unaffected until an explicit, guarded migration.
@@ -36,10 +52,10 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 
 ---
 
-## ⏳ v0.16.0 Candidates (Planned)
+## ⏳ v0.17.0 Candidates (Planned)
 
-Not yet started — priority order, top first (renumbered from "v0.15.0 Candidates": v0.15.0 was
-used for the ad-hoc XDG Base Directory migration instead — none of the items below shipped):
+Not yet started — priority order, top first (renumbered from "v0.16.0 Candidates": v0.16.0 was
+used for the ad-hoc docs-site redesign instead — none of the items below shipped):
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).

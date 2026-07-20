@@ -1,5 +1,7 @@
 # Atlas Docs Site — Design & Content Audit (2026-07-19)
 
+**Status:** Implemented — merged via PR #106, released in v0.16.0.
+
 **Prototype:** [Homepage redesign mockup](https://claude.ai/code/artifact/05479587-b14f-4d18-b757-764c42987787)
 (Claude Artifact — homepage + nav only, content unchanged).
 

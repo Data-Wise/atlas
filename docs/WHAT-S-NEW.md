@@ -4,6 +4,17 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.16.0 — ADHD-Friendly Docs-Site Redesign
+
+!!! success "Same information, easier to scan"
+    The docs site nav collapsed from 7 tabs to Home + 4 color pills (Learn/Do/Build/Code) with a
+    sidebar search filter, the sidebar is now a single-open accordion with item counts, and the
+    homepage leads with a 6-card grid and a scannable chip row instead of a table.
+
+See `docs/specs/PROPOSAL-docs-site-design-audit-2026-07-19.md` in the repo for the full rationale.
+
+---
+
 ## v0.15.0 — XDG Base Directory Support
 
 !!! success "New installs get a tidier home; existing ones are untouched until you say so"

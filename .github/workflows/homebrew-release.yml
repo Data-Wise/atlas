@@ -126,10 +126,10 @@ jobs:
           echo "Updated formula head:"
           head -15 "$FORMULA"
 
-      - name: Commit and push to tap
+      - name: Commit to a branch (tap main is PR-only — see homebrew-tap SPEC-release-drift-gates-2026-07-16)
+        id: commit
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
-          TAP_TOKEN: ${{ steps.app-token.outputs.token }}
         working-directory: homebrew-tap
         run: |
           git config user.name "github-actions[bot]"
@@ -137,9 +137,31 @@ jobs:
           git add Formula/atlas.rb generator/manifest.json
           if git diff --staged --quiet; then
             echo "No changes to commit (formula already at v${VERSION})"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          BRANCH="formula/atlas-${VERSION}"
+          git checkout -b "$BRANCH"
           git commit -m "atlas: update to v${VERSION}"
-          PUSH_URL="https://x-access-token:${TAP_TOKEN}@github.com/Data-Wise/homebrew-tap.git"
+          PUSH_URL="https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/Data-Wise/homebrew-tap.git"
           git remote set-url origin "$PUSH_URL"
-          git push origin main
+          git push origin "$BRANCH"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Open PR and enable auto-merge
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        working-directory: homebrew-tap
+        run: |
+          PR_URL=$(gh pr create \
+            --repo Data-Wise/homebrew-tap \
+            --base main \
+            --head "$BRANCH" \
+            --title "atlas: update to v${VERSION}" \
+            --body "Automated formula update from [atlas v${VERSION}](https://github.com/Data-Wise/atlas/releases/tag/v${VERSION}).")
+          echo "PR: $PR_URL"
+          gh pr merge --auto --squash --repo Data-Wise/homebrew-tap "$PR_URL"
