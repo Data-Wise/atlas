@@ -55,11 +55,13 @@
   --atlas-error: #c62828;          /* Red 800 */
   --atlas-info: #1565c0;           /* Blue 800 */
 
-  /* Neutrals (Light) */
-  --atlas-surface: #ffffff;
-  --atlas-surface-variant: #f5f5f5;
+  /* Neutrals (Light) — off-white/near-black, not pure white/black:
+     easier on the eyes for long reading sessions (ADHD hyperfocus
+     often means hours on this page without a break). */
+  --atlas-surface: #fafaf8;
+  --atlas-surface-variant: #f2f1ee;
   --atlas-surface-elevated: #ffffff;
-  --atlas-on-surface: #1c1c1c;
+  --atlas-on-surface: #1a1a18;
   --atlas-on-surface-variant: #444444;
   --atlas-outline: #d0d0d0;
   --atlas-outline-variant: #e0e0e0;
@@ -100,10 +102,10 @@
   --atlas-text-h3-weight: 600;
   --atlas-text-h3-line: 1.4;
 
-  /* Body */
-  --atlas-text-body: 1rem;
+  /* Body — 16.5px/1.65 for readability during long ADHD reading sessions */
+  --atlas-text-body: 1.03125rem;
   --atlas-text-body-weight: 400;
-  --atlas-text-body-line: 1.6;
+  --atlas-text-body-line: 1.65;
   --atlas-text-body-small: 0.875rem;
   --atlas-text-body-small-weight: 400;
   --atlas-text-body-small-line: 1.6;
@@ -688,6 +690,8 @@ textarea:focus-visible {
 /* ── Reduced Motion ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .md-nav__link,
+  .md-nav__item--nested > .md-nav__link::before,
+  .md-tabs__link,
   .md-search__form,
   .md-typeset .feature-card,
   .atlas-scroll-progress,
