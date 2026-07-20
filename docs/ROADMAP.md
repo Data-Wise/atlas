@@ -2,11 +2,24 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-07-19
+**Last Updated:** 2026-07-20
 
 ---
 
-## Current Version: v0.14.0 ✅ SHIPPED
+## Current Version: v0.15.0 ✅ SHIPPED
+
+XDG Base Directory support — new installs default to `$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas`);
+existing `~/.atlas` installs are unaffected until an explicit, guarded migration.
+
+- [x] **`resolveConfigDir()`** — single resolver (env override → legacy `~/.atlas` → XDG default) across all 8 previously-hardcoded call sites
+- [x] **`atlas migrate --xdg [--apply] [--force]`** — dry-run by default; hard refusal on an existing XDG target (never bypassed); PID-lock guard against a running `atlas-mcp`/`atlas dash`; EXDEV-safe move; migration marker (see [Migrating to the XDG location](CONFIGURATION.md#migrating-to-the-xdg-location))
+- [x] **`atlas doctor` XDG nudge** — informational only; `--fix`/`--fix --write` apply through the same guarded path
+
+See `docs/specs/SPEC-xdg-config-migration-2026-07-19.md` for the full spec and its 19-decision grill ledger.
+
+---
+
+## v0.14.0 - TUI Consolidation & Evidence-Linked Workflow ✅ COMPLETE
 
 TUI consolidation + evidence-linked workflow — the bare `atlas` digest, evidence-linked session
 end, `.STATUS` migration tooling, and a 3-view dashboard rebuild.
@@ -23,9 +36,10 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 
 ---
 
-## ⏳ v0.15.0 Candidates (Planned)
+## ⏳ v0.16.0 Candidates (Planned)
 
-Not yet started — priority order, top first:
+Not yet started — priority order, top first (renumbered from "v0.15.0 Candidates": v0.15.0 was
+used for the ad-hoc XDG Base Directory migration instead — none of the items below shipped):
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).

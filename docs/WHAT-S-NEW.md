@@ -4,6 +4,26 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.15.0 — XDG Base Directory Support
+
+!!! success "New installs get a tidier home; existing ones are untouched until you say so"
+    Atlas now follows the XDG Base Directory convention by default — `~/.atlas` still works exactly as before, and moving is always your choice.
+
+### `atlas migrate --xdg`
+
+```bash
+atlas migrate --xdg              # dry-run — shows what would move
+atlas migrate --xdg --apply      # actually move it
+```
+
+Relocates `~/.atlas` to `$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas`). Refuses to overwrite an existing target, and won't run out from under a live `atlas-mcp`/`atlas dash` (guarded by a process lock — `--force` overrides a stale one). See [Migrating to the XDG location](CONFIGURATION.md#migrating-to-the-xdg-location).
+
+### `atlas doctor` nudge
+
+If you're still on the legacy path, `atlas doctor` mentions it — informational only, never a warning. `doctor --fix --write` can apply the move for you through the same guarded path.
+
+---
+
 ## v0.14.0 — TUI Consolidation & Evidence-Linked Workflow
 
 !!! success "3 views, not 8 — plus a status-file schema that won't rot"
