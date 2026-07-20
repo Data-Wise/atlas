@@ -4,6 +4,19 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-07-20
+
+### Added
+- **ADHD-friendly docs-site redesign** — implements the full "Suggested next steps" table from `docs/specs/PROPOSAL-docs-site-design-audit-2026-07-19.md`:
+  - Nav bar collapsed from 7 tabs to Home + 4 color pills (Learn/Do/Build/Code) + a sidebar search filter (`overrides/partials/tabs.html`).
+  - The previously-dead `--atlas-learn/do/build/code` CSS tokens are now wired into the sidebar via a `data-atlas-section` body attribute set by the new `docs/assets/javascripts/section-nav.js`, tinting the active nav item and pill dot to match the current section.
+  - Single-open sidebar accordion with item-count badges — required dropping `navigation.sections` from `mkdocs.yml`, since that Material feature forces L2 nav groups always-expanded via CSS and silently defeated the checkbox-based collapse.
+  - Homepage card grid rebalanced to 6 (added an ADHD Guide card), and the 5-row ADHD-principles table replaced with a scannable chip row.
+  - Retuned background/type tokens: off-white/near-black surfaces instead of pure white/black, 16.5px/1.65 body type for long reading sessions.
+
+### Fixed
+- Both reduced-motion media-query blocks (`extra.css` and `fonts.css` each had their own) were missing the nav-arrow rotate and tabs-link hover transitions — extended to cover both.
+
 ## [0.15.0] - 2026-07-20
 
 ### Added

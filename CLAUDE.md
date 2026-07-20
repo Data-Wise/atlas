@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI (3 views: Now/Timer/Plan)
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.15.0 |
+| **Version** | 0.16.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | ~2,000 (Jest + Vitest) |
@@ -298,6 +298,7 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.16.0** - ADHD-friendly docs-site redesign: nav collapsed to Home + 4 color pills (Learn/Do/Build/Code) + sidebar search filter (`overrides/partials/tabs.html`); section-color theming wired into the sidebar via a `data-atlas-section` body attribute (`docs/assets/javascripts/section-nav.js`); single-open sidebar accordion with item-count badges; homepage grid rebalanced to 6 cards (added ADHD Guide), ADHD-principles table replaced with a chip row; off-white/near-black surface tokens + 16.5px/1.65 body type; reduced-motion coverage extended to nav-arrow and tabs-link transitions.
 - **v0.15.0** - XDG Base Directory support: `resolveConfigDir()` centralizes config-dir resolution (env override → legacy `~/.atlas` → XDG default) across all 8 call sites; guarded `atlas migrate --xdg [--apply] [--force]` (PID-lock guard, hard existing-target refusal, EXDEV-safe move, migration marker); `doctor`/`doctor --fix` XDG nudge through the same guarded path.
 - **v0.14.0** - TUI Consolidation & Evidence-Linked Workflow: bare `atlas` digest (`GetDigestUseCase`), evidence-linked `session end` (git delta + auto-sync), canonical `.STATUS` schema `atlas/v1` + `atlas migrate --status`, 3-view Ink dashboard (8→3 views/states), SwiftBar menu-bar plugin.
 - **v0.13.0** - Task CLI & Schedule Push/Agenda: Implement Tasks & Schedule Records persistence (SQLite & FileSystem), Task CRUD CLI (`atlas task`), schedule sync/push (`atlas schedule push`), and chronological merged agenda (`atlas agenda`). Also: AnalyticsView (`a` key), StatusBar, Vitest + ink-testing-library + Playwright E2E.
