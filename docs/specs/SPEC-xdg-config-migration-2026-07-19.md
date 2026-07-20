@@ -341,6 +341,18 @@ implementer has to infer:
 - **SQLite files open during move.** Same root cause as above — if
   `atlas.db` is open (WAL mode) in a long-running process during
   `--apply`, the move can leave WAL/SHM files inconsistent.
+- **Doctor's XDG nudge ignored `ATLAS_CONFIG`/`ATLAS_DATA_DIR` — found and
+  fixed during PR #104 review.** `_xdgMigrationAvailable()` checked only
+  `legacyConfigDir()`/`xdgConfigDir()` existence, so a user with either
+  override set (active config dir is neither legacy nor XDG) would still
+  get an "atlas found a newer home for your data" nudge, and
+  `doctor --fix --write` would migrate a `~/.atlas` the override means
+  atlas isn't even using. `atlas migrate --xdg` run directly is
+  unaffected by design (it always targets the legacy default explicitly,
+  regardless of override) — only the automatic doctor nudge/fix path was
+  wrong. Fixed: `_xdgMigrationAvailable()` now short-circuits to `false`
+  when either env var is set. Covered by 3 new tests in
+  `DoctorUseCase.xdg.test.js`.
 - **Dotfile managers.** Some users' `XDG_CONFIG_HOME` may already point
   somewhere unexpected (chezmoi, stow-managed dirs) — the resolver just
   honors whatever's set, which is correct behavior, but worth a docs note
