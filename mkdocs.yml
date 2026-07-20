@@ -27,7 +27,6 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.tabs
-    - navigation.sections
     - navigation.path
     - navigation.top
     - search.suggest
@@ -86,6 +85,7 @@ extra_javascript:
   - assets/javascripts/scroll-progress.js
   - assets/javascripts/reading-time.js
   - assets/javascripts/section-toc.js
+  - assets/javascripts/section-nav.js
 
 extra_css:
   - stylesheets/fonts.css
@@ -136,5 +136,4 @@ nav:
   - Changelog:
     - What's New: WHAT-S-NEW.md
     - Roadmap: ROADMAP.md
-    - Design Proposal: WEB-DESIGN-PROPOSAL.md
     - Contributing: CONTRIBUTING.md

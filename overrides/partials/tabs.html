@@ -1,0 +1,75 @@
+{#-
+  Atlas override of Material's default tabs.html.
+
+  Replaces the 7-tab bar (Home / Get Started / Guide / Reference /
+  Architecture / Integrations / Changelog) with "Home + 4 color pills +
+  search". The pills fold multiple mkdocs.yml nav: sections into 4 IA
+  groups (learn/do/build/code) — see
+  docs/assets/javascripts/section-nav.js for the matching active-state
+  and search-filter logic, and docs/stylesheets/extra.css for the
+  --atlas-learn/do/build/code color tokens these pills consume.
+
+  Section → nav.items mapping:
+    do    → Get Started
+    learn → Guide
+    build → Architecture (Integrations lives under the same pill)
+    code  → Reference
+  Changelog has no pill; it stays a plain text link so it's reachable
+  without crowding the 4-color system.
+-#}
+{% set pill_sections = {
+  'do': 'Get Started',
+  'learn': 'Guide',
+  'build': 'Architecture',
+  'code': 'Reference'
+} %}
+{#- nav_item.children[0] can itself be a section (no .url) rather than a
+   page — e.g. Guide's first child is the "ADHD Guide" group. Recurse to
+   the first actual leaf page instead of silently falling back to "/". -#}
+{% macro first_page_url(nav_item) %}
+  {%- if nav_item.children -%}
+    {{ first_page_url(nav_item.children[0]) }}
+  {%- else -%}
+    {{ nav_item.url | url }}
+  {%- endif -%}
+{% endmacro %}
+<nav class="md-tabs atlas-tabs" aria-label="{{ lang.t('tabs') }}" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list atlas-pill-list">
+      <li class="md-tabs__item">
+        <a href="{{ nav.homepage.url | url }}" class="md-tabs__link atlas-pill atlas-pill--home">
+          {{ lang.t('nav.home') if lang.t('nav.home') != 'nav.home' else 'Home' }}
+        </a>
+      </li>
+      {% for section, title in pill_sections.items() %}
+        {% for nav_item in nav.items %}
+          {% if nav_item.title == title %}
+            <li class="md-tabs__item">
+              <a href="{{ first_page_url(nav_item) }}"
+                 class="md-tabs__link atlas-pill"
+                 data-section="{{ section }}">
+                {{ title }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% for nav_item in nav.items %}
+        {% if nav_item.title == 'Changelog' %}
+          <li class="md-tabs__item">
+            <a href="{{ first_page_url(nav_item) }}"
+               class="md-tabs__link atlas-pill atlas-pill--muted">
+              {{ nav_item.title }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      <li class="md-tabs__item atlas-pill-search-item">
+        <input type="search"
+               class="atlas-pill-search"
+               placeholder="Filter sidebar…"
+               aria-label="Filter sidebar navigation">
+      </li>
+    </ul>
+  </div>
+</nav>

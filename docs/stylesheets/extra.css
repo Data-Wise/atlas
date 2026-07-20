@@ -387,6 +387,136 @@
   box-shadow: inset 0 -3px 0 var(--atlas-accent);
 }
 
+/* ── Pill Nav (Home + 4 color pills + search) ──────────────── */
+/* Replaces the 7-tab bar via overrides/partials/tabs.html. Each pill
+   carries data-section="learn|do|build|code"; section-nav.js toggles
+   .atlas-pill--active based on the current page's URL. */
+.atlas-pill-list {
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.atlas-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem !important;
+  margin-top: 0 !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.atlas-pill::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.9;
+}
+
+.atlas-pill--home::before {
+  content: none;
+}
+
+.atlas-pill[data-section="learn"] { color: var(--atlas-learn); }
+.atlas-pill[data-section="do"] { color: var(--atlas-do); }
+.atlas-pill[data-section="build"] { color: var(--atlas-build); }
+.atlas-pill[data-section="code"] { color: var(--atlas-code); }
+
+.atlas-pill[data-section] {
+  /* Pill text stays high-contrast on the colored header bar; only the
+     dot (::before, currentColor) and the active state carry the hue. */
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.atlas-pill[data-section]::before {
+  color: inherit;
+}
+
+.atlas-pill[data-section="learn"]::before { background-color: var(--atlas-learn); }
+.atlas-pill[data-section="do"]::before { background-color: var(--atlas-do); }
+.atlas-pill[data-section="build"]::before { background-color: var(--atlas-build); }
+.atlas-pill[data-section="code"]::before { background-color: var(--atlas-code); }
+
+.atlas-pill--active {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.atlas-pill--muted {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.atlas-pill-search-item {
+  margin-left: auto;
+  margin-top: 0 !important;
+}
+
+.atlas-pill-search {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: var(--atlas-font-ui);
+  font-size: 0.85rem;
+  width: 11rem;
+}
+
+.atlas-pill-search::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.atlas-pill-search:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 1px;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Section-Aware Sidebar Theming ─────────────────────────── */
+/* data-atlas-section is stamped on <body> by section-nav.js; tints the
+   sidebar's active-item accent to match the current pill's color
+   instead of the flat brand purple everywhere. */
+body[data-atlas-section="learn"] .md-nav--primary .md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-learn);
+  color: var(--atlas-learn);
+}
+
+body[data-atlas-section="do"] .md-nav--primary .md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-do);
+  color: var(--atlas-do);
+}
+
+body[data-atlas-section="build"] .md-nav--primary .md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-build);
+  color: var(--atlas-build);
+}
+
+body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav__link {
+  border-left-color: var(--atlas-code);
+  color: var(--atlas-code);
+}
+
+/* ── Sidebar Accordion — Item Count Badge ──────────────────── */
+/* Populated by section-nav.js's wireAccordion(); shows how many pages
+   live inside a collapsed top-level section. */
+.atlas-nav-count {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background-color: var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color--light);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+  vertical-align: middle;
+}
+
 /* ── Content Area — Breathing Room ─────────────────────────── */
 .md-typeset .md-content__inner {
   padding-top: 1.5rem;
@@ -432,6 +562,38 @@
   font-size: 1.1rem;
   opacity: 0.8;
   max-width: 42rem;
+}
+
+/* ── Chip Row (Why Atlas) ──────────────────────────────────── */
+/* Replaces a 5-row feature/description table with scannable pills —
+   easier to skim than a table when every row shares the same shape
+   (icon + name + one-line payoff). */
+.md-typeset .chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atlas-space-2);
+  list-style: none;
+  margin: var(--atlas-space-3) 0;
+  padding: 0;
+}
+
+.md-typeset .chip-row li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1 1 15rem;
+  padding: var(--atlas-space-2);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--atlas-radius);
+  background-color: var(--md-default-bg-color);
+  margin: 0;
+}
+
+.md-typeset .chip-row .chip-icon {
+  color: var(--atlas-active);
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
 }
 
 /* ── Feature Grid ──────────────────────────────────────────── */
@@ -565,6 +727,8 @@ details[open].atlas-mobile-toc summary::before {
 /* ── Reduced Motion ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .md-nav__link,
+  .md-nav__item--nested > .md-nav__link::before,
+  .md-tabs__link,
   .md-search__form,
   .md-typeset .feature-card {
     transition: none;
