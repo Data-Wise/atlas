@@ -1,7 +1,8 @@
 # SPEC: XDG Base Directory Default + Migration
 
 **Date:** 2026-07-19
-**Status:** Draft — not implemented. Supersedes "Option B" from
+**Status:** Implemented — merged via [PR #104](https://github.com/Data-Wise/atlas/pull/104)
+(2026-07-19, squash commit `2bf9a43`). Supersedes "Option B" from
 `REPORT-xdg-config-dir-investigation-2026-07-19.md` with an actual design.
 **Depends on:** `REPORT-init-procedure-investigation-2026-07-19.md` (why
 `atlas init` targets a global dir at all) and the XDG report above (current
