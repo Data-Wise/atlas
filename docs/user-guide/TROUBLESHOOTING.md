@@ -4,6 +4,20 @@
 
 ---
 
+## Start Here: `atlas doctor`
+
+Before digging into a specific symptom below, run the built-in audit — it catches the most
+common root causes (missing `.STATUS`, missing `CLAUDE.md`, contract drift) in one pass:
+
+```bash
+atlas doctor                 # audit all registered projects
+atlas doctor --fix --write   # create missing CLAUDE.md files
+```
+
+If `doctor` comes back clean and you're still stuck, the sections below cover the rest.
+
+---
+
 ## Installation Issues
 
 ### `atlas: command not found`
@@ -289,11 +303,15 @@ atlas config setup
 
 ### Dashboard Keys Not Working
 
+**v0.14:** the dashboard has 3 views (Now/Timer/Plan) with keys defined in
+`src/cli/dashboard-ink/lib/keymap.ts` — press `?` in-app for the live table, or see
+[REFCARD](../REFCARD.md#keyboard-shortcuts-dashboard).
+
 | Key | Issue | Fix |
 |-----|-------|-----|
 | `Tab` | Cycles layout | Ensure terminal supports `Tab` (not intercepted) |
-| `f` | Focus mode | Ensure not in input field |
-| `?` | Help | Ensure not in input field |
+| `1`/`2`/`3` or `n`/`t`/`p` | Switch views | Ensure not in an input field |
+| `?` | Help overlay | Ensure not in an input field |
 | `Tab` (split) | Panel focus | Use `Shift+Tab` for reverse |
 
 ---
@@ -346,13 +364,11 @@ rm ~/.atlas/atlas.db-shm
 
 ### MCP Server Won't Start
 
-```bash
-atlas mcp
-# Error: Cannot find module
-```
+`atlas-mcp` is a **separate binary** (package.json `bin` entry), not an `atlas mcp` subcommand:
 
-**Fix:**
 ```bash
+command -v atlas-mcp
+# Not found? Cannot find module?
 cd /path/to/atlas
 npm install
 npm link
@@ -366,8 +382,7 @@ npm link
 {
   "mcpServers": {
     "atlas": {
-      "command": "atlas",
-      "args": ["mcp"]
+      "command": "atlas-mcp"
     }
   }
 }
@@ -379,11 +394,11 @@ npm link
 
 ```bash
 # Test manually
-atlas mcp
-# Should show: "Atlas MCP Server v0.13.1 running on stdio"
+atlas-mcp
+# Should show the server running on stdio
 
 # Test tool
-echo '{"method":"tools/call","params":{"name":"atlas_get_context","arguments":{}}}' | atlas mcp
+echo '{"method":"tools/call","params":{"name":"atlas_get_context","arguments":{}}}' | atlas-mcp
 ```
 
 ---
@@ -535,6 +550,18 @@ atlas init
 
 ---
 
+## Uninstalling / Exporting Your Data
+
+```bash
+tar -czf atlas-export-$(date +%Y%m%d).tar.gz ~/.atlas/   # everything: registry, sessions, tasks
+brew uninstall atlas   # or: npm uninstall -g @data-wise/atlas
+rm -rf ~/.atlas/       # optional — only if you don't want the data kept
+```
+
+Your `.STATUS` files live in your projects, not `~/.atlas/` — uninstalling atlas never touches them.
+
+---
+
 ## Still Stuck?
 
 | Channel | Response Time |
@@ -553,3 +580,7 @@ atlas init
 - [Core Principles](adhd-guide/core-principles.md) — Mental models
 - [CLI Reference](../CLI-REFERENCE.md) — Full command docs
 - [Architecture](../ARCHITECTURE.md) — System design
+
+---
+
+**Now what?** → [Quick Wins](adhd-guide/quick-wins.md)

@@ -1,5 +1,7 @@
 # Atlas Architecture
 
+> **v0.14 note:** the Ink dashboard was consolidated from 8 views to 3 (**Now** / **Timer** / **Plan** — SPEC-tui-consolidation-2026-07-19.md). The legacy `blessed` TUI (`src/cli/dashboard.js`, `src/cli/dashboard/`) was removed entirely — Ink is the only dashboard. File paths below reflect the current tree; see [Visual Guide](VISUAL-GUIDE.md) for the view-level detail and [REFCARD](REFCARD.md#keyboard-shortcuts-dashboard) for the keymap.
+
 Atlas follows **Clean Architecture** principles, ensuring separation of concerns, testability, and maintainability.
 
 ## Overview
@@ -169,7 +171,7 @@ src/
 │   │   └── StatusFileParser.js # .STATUS file YAML parser (v0.8.0)
 │   ├── presenters/             # Formatting and presentation logic
 │   │   ├── ProjectPresenter.js # UI-agnostic formatters
-│   │   ├── TuiPresenter.js     # blessed-specific formatters
+│   │   ├── TuiPresenter.js     # Ink-facing formatters
 │   │   ├── StatsPresenter.js   # Analytics, sparklines, heatmap grid
 │   │   ├── FocusScorePresenter.js  # Focus tier icons, labels, colors (v0.9.1)
 │   │   ├── PatternPresenter.js # Pattern/analytics formatting (v0.10.0)
@@ -181,42 +183,35 @@ src/
 │   └── Container.js            # Dependency injection container
 │
 ├── cli/                         # Command-line interface
-│   ├── dashboard.js            # TUI dashboard entry (legacy blessed)
-│   ├── dashboard-ink/          # ✨ v0.9.x Ink TUI (default)
-│   │   ├── components/         # Leaf components
-│   │   │   ├── App.tsx         # Root component, state machine driver
-│   │   │   ├── SidebarPanel.tsx  # Compact list + sparklines + focus tiers
-│   │   │   ├── InspectorPanel.tsx # Detail + Pomodoro + heatmap + focus score
-│   │   │   ├── shared/
-│   │   │   │   ├── Card.tsx    # Project card component
-│   │   │   │   └── HeatmapComponent.tsx  # ✨ Activity heatmap (v0.9.1)
-│   │   │   └── views/
-│   │   │       ├── MainView.tsx    # Card stack (BROWSE)
-│   │   │       ├── DetailView.tsx  # Project details (DETAIL)
-│   │   │       ├── FocusView.tsx   # Pomodoro timer (FOCUS)
-│   │   │       ├── ZenView.tsx     # Minimal mode (ZEN)
-│   │   │       ├── TimelineView.tsx # Time blocks (TIMELINE)
-│   │   │       ├── EcosystemView.tsx # Multi-project + compact heatmap
-│   │   │       └── PlanView.tsx    # Morning ritual (PLAN)
-│   │   ├── hooks/                     # ✨ Real data hooks (v0.9.2)
-│   │   │   ├── useProjects.ts        # Project list + focus/sparkline (5s poll)
-│   │   │   ├── useActiveSession.ts   # Session detection + 1s timer
-│   │   │   ├── useProjectStats.ts    # Heatmap, streak, breadcrumbs (10s poll)
-│   │   │   └── usePendingCaptures.ts # Inbox count (10s poll)
-│   │   ├── lib/
-│   │   │   ├── AtlasContext.tsx       # ✨ React Context for DI Container (v0.9.2)
-│   │   │   ├── LayoutManager.tsx      # ✨ Layout engine: SINGLE/SPLIT/TRIPLE
-│   │   │   ├── ThemeContext.tsx        # ✨ 5 themes + ThemeProvider (v0.9.1)
-│   │   │   └── stateMachine.ts        # View state machine
-│   │   ├── types.ts               # Shared Project type (+ focusScore, recentActivity)
-│   │   └── constants.ts           # STATUS_ICON, STATUS_COLOR maps
-│   └── dashboard/              # Legacy blessed components
-│       ├── constants.js
-│       ├── helpers.js
-│       ├── stateMachine.js
-│       ├── timerManager.js
-│       ├── dialogs.js
-│       └── views/              # Blessed view components
+│   ├── dashboard-ink-launcher.js  # Dashboard entry point
+│   └── dashboard-ink/          # The Ink TUI — only dashboard as of v0.14 (blessed removed)
+│       ├── components/         # Leaf components
+│       │   ├── App.tsx         # Root component, keymap dispatch, state machine driver
+│       │   ├── HelpOverlay.tsx # ✨ `?` help overlay (v0.14) — renders keymap.ts live
+│       │   ├── StatusBar.tsx   # Status/context bar
+│       │   ├── shared/
+│       │   │   ├── Card.tsx           # Project card component
+│       │   │   ├── HeatmapComponent.tsx  # Activity heatmap (v0.9.1)
+│       │   │   ├── ProjectList.tsx    # ✨ Shared list (v0.14) — used by Now view
+│       │   │   └── PomodoroTimer.tsx  # ✨ The one Pomodoro implementation (v0.14, was 3)
+│       │   └── views/          # ✨ 3 views (v0.14, consolidated from 8)
+│       │       ├── NowView.tsx    # Project list + detail (absorbs Main/Detail/Inspector/Ecosystem)
+│       │       ├── TimerView.tsx  # Pomodoro (absorbs Focus/Zen/Inspector timer)
+│       │       └── PlanView.tsx   # Morning ritual (absorbs Plan/Analytics)
+│       ├── hooks/                     # Real data hooks (v0.9.2)
+│       │   ├── useProjects.ts        # Project list + focus/sparkline (5s poll)
+│       │   ├── useActiveSession.ts   # Session detection + 1s timer
+│       │   ├── useProjectStats.ts    # Heatmap, streak, breadcrumbs (10s poll)
+│       │   ├── usePendingCaptures.ts # Inbox count (10s poll)
+│       │   └── useAnalytics.ts       # Analytics pane data (Plan view)
+│       ├── lib/
+│       │   ├── AtlasContext.tsx       # React Context for DI Container (v0.9.2)
+│       │   ├── LayoutManager.tsx      # Layout engine: SINGLE/SPLIT/TRIPLE
+│       │   ├── ThemeContext.tsx       # 5 themes + ThemeProvider (v0.9.1)
+│       │   ├── stateMachine.ts        # ✨ 3-state machine (v0.14, was 7)
+│       │   └── keymap.ts              # ✨ Single source of truth for all keybindings (v0.14)
+│       ├── types.ts               # Shared Project type (+ focusScore, recentActivity)
+│       └── constants.ts           # STATUS_ICON, STATUS_COLOR maps
 │
 ├── mcp/                         # Model Context Protocol server (v0.7.0)
 │   ├── index.js                # MCP server entry point
@@ -623,7 +618,7 @@ classDiagram
     }
 
     class TuiPresenter {
-        <<blessed-specific>>
+        <<Ink-facing>>
         +sparkline(data, width) String
         +progressBar(percent, width) String
         +createMiniProgressBar(percent) String
@@ -745,85 +740,49 @@ graph TB
     Dashboard --> Time
 ```
 
-## Dashboard State Machine (v0.8.0)
+## Dashboard State Machine (v0.14 — 3 states, was 7)
 
-The dashboard uses a state machine pattern for view management:
+The v0.14 consolidation cut the state machine from 7 states down to 3, matching the 3-view TUI:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> BROWSE
-    BROWSE --> DETAIL: Enter on project
-    BROWSE --> FOCUS: f key
-    BROWSE --> ZEN: z key
-    BROWSE --> TIMELINE: T key
-    BROWSE --> ECOSYSTEM: e key
-    BROWSE --> PLAN: p key
-    BROWSE --> ANALYTICS: a key
+    [*] --> NOW
+    NOW --> TIMER: 2 / t key, or s in Plan
+    NOW --> PLAN: 3 / p key
 
-    DETAIL --> BROWSE: Escape
-    DETAIL --> FOCUS: f key
-    DETAIL --> ANALYTICS: a key
+    TIMER --> NOW: 1 / n key
+    TIMER --> PLAN: 3 / p key
 
-    FOCUS --> BROWSE: Escape
-    FOCUS --> ZEN: z key
-    FOCUS --> ANALYTICS: a key
-
-    ZEN --> BROWSE: Escape
-    ZEN --> FOCUS: f key
-    ZEN --> ANALYTICS: a key
-
-    TIMELINE --> BROWSE: Escape
-    TIMELINE --> FOCUS: f key
-    TIMELINE --> ANALYTICS: a key
-
-    ECOSYSTEM --> BROWSE: Escape
-    ECOSYSTEM --> DETAIL: Enter on project
-    ECOSYSTEM --> FOCUS: f key
-    ECOSYSTEM --> ANALYTICS: a key
-
-    PLAN --> BROWSE: Escape
-    PLAN --> FOCUS: Start session
-    PLAN --> DETAIL: Select project
-    PLAN --> ANALYTICS: a key
-
-    ANALYTICS --> BROWSE: Escape
-    ANALYTICS --> DETAIL: Enter on project
-    ANALYTICS --> FOCUS: f key
+    PLAN --> NOW: 1 / n key
+    PLAN --> TIMER: 2 / t key
 ```
 
 **States:**
-| State       | View          | Purpose                          |
-| ----------- | ------------- | -------------------------------- |
-| `BROWSE`    | MainView      | Default card-based project list  |
-| `DETAIL`    | DetailView    | Single project details panel     |
-| `FOCUS`     | FocusView     | Pomodoro timer with task         |
-| `ZEN`       | ZenView       | Minimal distraction mode         |
-| `TIMELINE`  | TimelineView  | Time block visualization         |
-| `ECOSYSTEM` | EcosystemView | Multi-project ecosystem overview |
-| `PLAN`      | PlanView      | Morning ritual daily planning    |
-| `ANALYTICS` | AnalyticsView | Velocity + pattern analytics     |
+| State   | View      | Purpose                                                              |
+| ------- | --------- | ---------------------------------------------------------------------|
+| `NOW`   | NowView   | Project list + detail (absorbs old Browse/Detail/Inspector/Ecosystem)|
+| `TIMER` | TimerView | Pomodoro (absorbs old Focus/Zen/Inspector timer)                     |
+| `PLAN`  | PlanView  | Morning ritual + analytics pane (absorbs old Plan/Analytics)         |
 
-**Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts`
+**Implementation:** `src/cli/dashboard-ink/lib/stateMachine.ts` · keybindings: `src/cli/dashboard-ink/lib/keymap.ts` (single source of truth; a uniqueness test enforces no key collides within a scope — see `keymapTest.ts`).
 
-## TUI Component Architecture (v0.9.1)
-
-The v0.9.1 Ink TUI uses a three-layer component model:
+## TUI Component Architecture (v0.14)
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│  App.tsx  (state machine driver, data provider)        │
+│  App.tsx  (keymap dispatch, state machine driver)      │
 ├────────────────────────────────────────────────────────┤
 │  LayoutManager.tsx  (layout engine — SINGLE/SPLIT/TRIPLE)│
 │  useLayout() hook → Tab cycles modes, Shift+Tab focus  │
 ├──────────────┬──────────────────┬──────────────────────┤
-│ SidebarPanel │   View Layer     │  InspectorPanel      │
-│ (25-28%)     │ (MainView,       │  (28%)               │
-│              │  DetailView,     │                      │
-│ compact list │  FocusView…)     │  detail + Pomodoro   │
+│ ProjectList  │   View Layer     │  StatusBar /          │
+│ (sidebar,    │ (NowView,        │  detail panel         │
+│  25-28%)     │  TimerView,      │  (28%, Triple only)   │
+│ compact list │  PlanView)       │  detail + Pomodoro    │
 └──────────────┴──────────────────┴──────────────────────┘
 ```
 
-### LayoutManager (D1)
+### LayoutManager
 
 ```typescript
 // useLayout() returns:
@@ -842,56 +801,33 @@ The v0.9.1 Ink TUI uses a three-layer component model:
 
 **Key exports:** `LAYOUT`, `PANEL_CONFIG`, `useLayout`, `LayoutManager`, `LayoutStatusBar`, `PanelBox`
 
-### SidebarPanel (D2)
+### ProjectList (shared/ProjectList.tsx)
 
-Compact project list column for SPLIT and TRIPLE modes.
-
-```typescript
-interface SidebarPanelProps {
-  projects: SidebarProject[];   // project list
-  selectedIndex: number;        // controlled selection
-  onSelect: (idx: number) => void;
-  onSelectProject: (p: SidebarProject) => void; // fires on Enter
-  isActive: boolean;            // guards keyboard input
-  pendingCaptures?: number;     // inbox badge count
-  activeProjectId?: string;     // ⏱ session indicator
-}
-```
+Compact project list column, shared by the Now view and the SPLIT/TRIPLE sidebar (v0.14; unified from the old separate `SidebarPanel`).
 
 - **Windowing:** 12 visible rows, scroll indicator when > 12 projects
 - **Row format:** `● name   75%` (icon + 14-char name + 4-char %-padded)
-- **isActive guard:** `j/k/Enter` are no-ops when sidebar is not focused
+- **isActive guard:** `j/k/Enter` are no-ops when the list is not focused
 
-### InspectorPanel (D3)
+### PomodoroTimer (shared/PomodoroTimer.tsx)
 
-Right-hand detail + embedded Pomodoro mini-timer for TRIPLE mode.
+The single Pomodoro implementation (v0.14; consolidated from 3 separate timers in Focus/Zen/Inspector). Powers the Timer view directly and the Now view's session indicator.
 
-```typescript
-interface InspectorPanelProps {
-  project?: InspectorProject;   // undefined → empty state
-  isActive: boolean;            // guards Space/r keys
-  sessionSeconds?: number;      // > 0 → shows live timer
-  pomodoroLength?: number;      // default: 25 min
-  breadcrumbs?: string[];       // newest-first, max 3 shown
-}
-```
-
-- **Sections:** Name/type → Status bar → Focus → Next actions → Pomodoro → Breadcrumbs
 - **Pomodoro states:** `● FOCUSING` → `◑ PAUSED` → `☕ BREAK TIME`
-- **Timer resets** when `sessionSeconds` changes (new session)
-- **next actions** parsed from `project.next` via comma/newline split, sliced to 3
+- **Keys:** `Space` pause/resume, `r` reset (while paused), `+`/`-` adjust duration (while paused), `z` toggle zen (minimal chrome)
 
 ### Component Communication
 
 ```mermaid
 graph TB
-  App["App.tsx\n(state + data)"] -->|layout prop| LM["LayoutManager"]
-  LM -->|isActive, onSelect| SP["SidebarPanel"]
-  LM -->|currentView| VL["View Layer\n(MainView etc)"]
-  LM -->|isActive, project| IP["InspectorPanel"]
-  SP -->|onSelectProject| App
+  App["App.tsx\n(keymap + state + data)"] -->|layout prop| LM["LayoutManager"]
+  LM -->|isActive, onSelect| PL["ProjectList"]
+  LM -->|currentView| VL["View Layer\n(NowView, TimerView, PlanView)"]
+  LM -->|isActive, project| SB["StatusBar / detail panel"]
+  PL -->|onSelectProject| App
   VL -->|onTransition| App
 ```
+
 
 ## Template System
 
@@ -993,14 +929,27 @@ npm run test:unit         # Unit tests only
 npm run test:coverage     # With coverage report
 ```
 
-**v0.9.1 dashboard-ink integration tests:**
+**dashboard-ink integration tests (v0.14 tree):**
 ```
 test/integration/dashboard-ink/
-├── layoutManager.test.js   # 30 tests — LayoutManager D1
-├── sidebarPanel.test.js    # 35 tests — SidebarPanel D2
-├── inspectorPanel.test.js  # 40 tests — InspectorPanel D3
-├── app.test.js             # ✨ Source contract tests (hooks wired, no mocks)
-└── view-transitions.test.js # State machine transitions
+├── layoutManager.test.js   # LayoutManager (SINGLE/SPLIT/TRIPLE)
+├── projectList.test.js     # ProjectList (shared sidebar/Now list)
+├── pomodoroTimer.test.js   # The one Pomodoro implementation
+├── nowViewDetail.test.js   # Now view detail pane
+├── app.test.js             # Source contract tests (hooks wired, no mocks)
+└── view-transitions.test.js # State machine transitions (3 states)
+```
+
+**dashboard-ink unit tests:**
+```
+test/unit/cli/dashboard-ink/
+├── lib/keymap.test.tsx                       # Keymap uniqueness (planted-defect check)
+├── lib/ThemeContext.test.tsx
+├── components/views/NowView.test.tsx
+├── components/views/planViewAnalytics.test.tsx
+├── components/shared/Card.test.tsx
+├── components/shared/ProjectListSparkline.test.tsx
+└── components/HeatmapComponent.test.tsx
 ```
 
 **v0.9.2 dogfood tests (real data, cross-validated):**

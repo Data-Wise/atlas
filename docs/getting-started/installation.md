@@ -1,17 +1,11 @@
 # Installation
 
-Multiple installation methods are available for Atlas.
-
 ## Requirements
 
 - **Node.js**: 18.0 or higher
 - **Operating System**: macOS, Linux, or Windows (WSL)
 
-## Installation Methods
-
-### Homebrew (macOS) :material-apple:
-
-The recommended method for macOS users:
+## Recommended: Homebrew (macOS) :material-apple:
 
 ```bash
 brew tap data-wise/tap
@@ -23,97 +17,96 @@ To upgrade:
 brew upgrade atlas
 ```
 
-### Direct Install (curl) :material-download:
+That's it — skip to [Initial Setup](#initial-setup).
 
-One-line installation for any Unix-like system:
+??? note "Other install methods (curl, npm, from source)"
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
-```
+    ### Direct Install (curl) :material-download:
 
-This script:
+    One-line installation for any Unix-like system:
 
-- Detects your system architecture
-- Downloads the latest release
-- Installs to `~/.local/bin`
-- Adds to PATH if needed
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh | bash
+    ```
 
-### npm :material-npm:
+    This script detects your architecture, downloads the latest release,
+    installs to `~/.local/bin`, and adds it to `PATH` if needed.
 
-Install globally via npm:
+    ### npm :material-npm:
 
-```bash
-npm install -g @data-wise/atlas
-```
+    ```bash
+    npm install -g @data-wise/atlas
+    ```
 
-### From Source :material-git:
+    ### From Source :material-git:
 
-For development or customization:
+    For development or customization:
 
-```bash
-git clone https://github.com/Data-Wise/atlas.git
-cd atlas
-npm install
-npm link  # Makes 'atlas' available globally
-```
+    ```bash
+    git clone https://github.com/Data-Wise/atlas.git
+    cd atlas
+    npm install
+    npm link  # Makes 'atlas' available globally
+    ```
 
 ## Verify Installation
 
 ```bash
 atlas --version
-# Should output: 0.13.1 (or current version)
+# Should output: 0.14.0 (or current version)
 
 atlas --help
 # Shows available commands
 ```
 
-## Shell Completions
+??? note "Shell completions"
 
-Enable tab completion for your shell:
+    Enable tab completion for your shell:
 
-=== "Zsh"
+    === "Zsh"
+
+        ```bash
+        # Write completions to fpath
+        atlas completions zsh > ~/.config/zsh/completions/_atlas
+
+        # Add to ~/.zshrc (if not already present):
+        fpath=(~/.config/zsh/completions $fpath)
+        autoload -Uz compinit && compinit
+        ```
+
+    === "Bash"
+
+        ```bash
+        # Write completions file
+        atlas completions bash > ~/.bash_completion.d/atlas
+
+        # Add to ~/.bashrc (if not already present):
+        source ~/.bash_completion.d/atlas
+        ```
+
+    === "Fish"
+
+        ```bash
+        atlas completions fish > ~/.config/fish/completions/atlas.fish
+        ```
+
+??? note "Man pages"
+
+    Atlas ships with man pages for offline reference:
 
     ```bash
-    # Write completions to fpath
-    atlas completions zsh > ~/.config/zsh/completions/_atlas
+    # Add to your MANPATH (add to ~/.zshrc or ~/.bashrc)
+    export MANPATH="$HOME/projects/dev-tools/atlas/man:$MANPATH"
 
-    # Add to ~/.zshrc (if not already present):
-    fpath=(~/.config/zsh/completions $fpath)
-    autoload -Uz compinit && compinit
+    # Then read man pages
+    man atlas            # Main man page — all commands, options, files
+    man atlas-session    # Session management
+    man atlas-project    # Project registry
+    man atlas-status     # Status updates and .STATUS format
     ```
 
-=== "Bash"
-
-    ```bash
-    # Write completions file
-    atlas completions bash > ~/.bash_completion.d/atlas
-
-    # Add to ~/.bashrc (if not already present):
-    source ~/.bash_completion.d/atlas
-    ```
-
-=== "Fish"
-
-    ```bash
-    atlas completions fish > ~/.config/fish/completions/atlas.fish
-    ```
-
-## Man Pages
-
-Atlas ships with man pages for offline reference:
-
-```bash
-# Add to your MANPATH (add to ~/.zshrc or ~/.bashrc)
-export MANPATH="$HOME/projects/dev-tools/atlas/man:$MANPATH"
-
-# Then read man pages
-man atlas            # Main man page — all commands, options, files
-man atlas-session    # Session management
-man atlas-project    # Project registry
-man atlas-status     # Status updates and .STATUS format
-```
-
-If you installed from source into a different location, adjust the path accordingly.
+    If you installed from source into a different location, adjust the path
+    accordingly.
 
 ## Initial Setup
 

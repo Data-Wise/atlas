@@ -2,23 +2,37 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-07-02
+**Last Updated:** 2026-07-19
 
 ---
 
-## Current Version: v0.13.1
+## Current Version: v0.14.0 ✅ SHIPPED
 
-Task CLI & Schedule Push/Agenda — native task CRUD, merged agenda view, analytics dashboard, and E2E testing infrastructure.
+TUI consolidation + evidence-linked workflow — the bare `atlas` digest, evidence-linked session
+end, `.STATUS` migration tooling, and a 3-view dashboard rebuild.
+
+- [x] **Bare `atlas` digest** — running `atlas` with no args shows "what am I doing / what's next" (`plan`/`where` now views onto the same digest data)
+- [x] **Evidence-linked session end** — `atlas session end` shows the git delta and auto-syncs the registry
+- [x] **`.STATUS` atlas/v1 frontmatter** — canonical YAML schema; legacy `## Key:` headers still read, never silently rewritten (see [.STATUS Schema](STATUS-SCHEMA.md))
+- [x] **`atlas migrate --status`** — dry-run diff + `--apply`, `--all-scanned` batch mode for legacy `.STATUS` files
+- [x] **3-view Ink dashboard** — 8 views → 3 (Now/Timer/Plan), 8 state-machine states → 3, one Pomodoro implementation (was 3), central `lib/keymap.ts`, new `?` help overlay (see [Architecture](ARCHITECTURE.md))
+- [x] **SwiftBar plugin** — menu-bar digest, no dashboard required (see [SwiftBar](user-guide/swiftbar.md))
+- [x] Node 18/20/22/26 CI matrix, ESLint flat config carried forward from v0.12.2
+
+See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-status-schema-yaml-canonical-2026-07-19.md` for the full specs.
 
 ---
 
-## ⏳ v0.14.0 - Analytics + Calendar (Planned)
+## ⏳ v0.15.0 Candidates (Planned)
 
-- [ ] Dead-zone iCal export — focus block calendar events from `--patterns` dead zones
-- [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
-- [ ] Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
+Not yet started — priority order, top first:
 
-See `docs/specs/SPEC-atlas-task-agenda-2026-07-02.md` in the repository for the full spec.
+1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
+2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).
+3. **Ambient surfaces expansion** — SwiftBar refresh-interval tuning, additional menu-bar item types beyond the digest.
+4. **Deprecation removals** — drop any remaining v0.13-era compatibility shims once v0.14 has soaked (candidates tracked per-PR, not yet finalized).
+5. **Dead-zone iCal export** — focus block calendar events from `--patterns` dead zones *(carried forward from v0.13.0, still not scheduled)*.
+6. **Multi-project calibration comparison** — `atlas stats --calibrate` across the whole registry at once *(carried forward from v0.13.0, still not scheduled)*.
 
 ---
 
@@ -70,16 +84,15 @@ See `docs/specs/SPEC-atlas-task-agenda-2026-07-02.md` in the repository for the 
 
 ---
 
-## v0.13.0 - Analytics + Calendar ✅ COMPLETE
+## v0.13.0 – v0.13.1 - Task CLI & Schedule Push/Agenda ✅ COMPLETE
 
-### Dashboard
-- [ ] AnalyticsView in Ink dashboard (key `a`) — deferred from v0.10.0
-- [ ] Dead-zone iCal export — focus block calendar events from `--patterns` dead zones
-- [ ] Multi-project calibration comparison — `atlas stats --calibrate` across the registry
+- [x] Native Task CRUD (`atlas task add/list/done/rm`)
+- [x] `atlas schedule push` + `atlas agenda` — merged task+schedule view
+- [x] AnalyticsView in the (now-retired) 8-view Ink dashboard, key `a` — deferred from v0.10.0, later folded into the v0.14 Plan view's analytics pane
+- [x] StatusBar, Vitest + ink-testing-library + Playwright E2E
+- [x] Man pages, Zsh completions, ADHD nav design
 
-### Ecosystem Integration (gated on obsidian-cli-ops RFC#35)
-- [ ] `atlas catch` write-through to Obsidian (`obs write`)
-- [ ] flow-cli `obs-bridge` (read-only, buildable now)
+*(Dead-zone iCal export and multi-project calibration comparison did not ship in v0.13 — carried forward, see v0.15 candidates above.)*
 
 ---
 
@@ -170,3 +183,7 @@ Priority areas for contribution:
 2. Additional ADHD-friendly utilities
 3. IDE/editor integrations
 4. Documentation improvements
+
+---
+
+**Now what?** → [What's New](WHAT-S-NEW.md) for the release-by-release changelog

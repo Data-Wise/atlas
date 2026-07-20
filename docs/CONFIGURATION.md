@@ -652,23 +652,23 @@ atlas template dir
 
 ## .STATUS File Format
 
-Projects use `.STATUS` files for metadata:
+Projects use `.STATUS` files for metadata. As of v0.14.0, atlas writes canonical **atlas/v1 YAML frontmatter**:
 
 ```markdown
-## Project: My Project
+---
+schema: atlas/v1
+status: active
+progress: 50
+type: node
+priority: medium
+focus: Current focus text here
+next:
+  - First task
+  - Second task
+---
 
-## Status: active
-## Progress: 50
-## Type: node
+# My Project
 
-## Focus
-Current focus text here
-
-## Next
-- [ ] First task
-- [ ] Second task
-
-## Notes
 Additional notes here
 ```
 
@@ -676,11 +676,15 @@ Additional notes here
 
 | Field | Values | Description |
 |-------|--------|-------------|
-| `Status` | `active`, `paused`, `blocked`, `archived`, `complete` | Project status |
-| `Progress` | `0-100` | Completion percentage |
-| `Type` | `r-package`, `quarto`, `node`, `python`, etc. | Project type |
-| `Focus` | text | Current focus/checkpoint |
-| `Next` | markdown list | Next actions |
+| `status` | `active`, `paused`, `blocked`, `planning`, `stable`, `complete`, `archived` | Project status |
+| `progress` | `0-100` | Completion percentage |
+| `type` | `r-package`, `quarto`, `node`, `python`, etc. | Project type |
+| `focus` | text | Current focus/checkpoint |
+| `next` | YAML list | Next actions, first = next up |
+
+Full reference: [.STATUS Schema (atlas/v1)](STATUS-SCHEMA.md).
+
+> **Legacy format:** `## Status:` / `## Progress:` markdown headers still parse (read-only compatibility) — atlas never rewrites them without `atlas migrate --status --apply`. See [Migration Guide](user-guide/MIGRATION-GUIDE.md).
 
 ---
 
@@ -722,3 +726,7 @@ chmod 644 ~/.atlas/*.json
 - [CLI Reference](./CLI-REFERENCE.md)
 - [Architecture](./ARCHITECTURE.md)
 - [API Guide](./API-GUIDE.md)
+
+---
+
+**Now what?** → [.STATUS Schema](STATUS-SCHEMA.md)

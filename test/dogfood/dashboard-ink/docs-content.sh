@@ -59,12 +59,12 @@ test_nav_entries_exist() {
 
 # Test 2: Cookbook has 28 recipes (1-28)
 test_cookbook_recipes() {
-    log_test "Cookbook has 28 recipes"
+    log_test "Cookbook has 31 recipes"
     local count=$(grep -c "^## Recipe " docs/user-guide/cookbook/COOKBOOK.md)
-    if [[ $count -eq 28 ]]; then
+    if [[ $count -eq 31 ]]; then
         log_pass "Cookbook has $count recipes"
     else
-        log_fail "Cookbook has $count recipes (expected 28)"
+        log_fail "Cookbook has $count recipes (expected 31)"
         return 1
     fi
 }
@@ -217,13 +217,14 @@ test_man_pages_version() {
     fi
 }
 
-# Test 9: Cheatsheet has correct version badge
+# Test 9: Refcard has correct version badge (Cheatsheet merged into Refcard 2026-07-19 — now a
+# redirect stub with no version string of its own, see docs/CHEATSHEET.md)
 test_cheatsheet_version() {
-    log_test "Cheatsheet shows v0.13.1"
-    if grep -q "v0.13.1" docs/CHEATSHEET.md && grep -q "v0.13.1" docs/REFCARD.md; then
-        log_pass "Cheatsheet and Refcard show v0.13.1"
+    log_test "Refcard shows v0.14.0; Cheatsheet redirects to it"
+    if grep -q "v0.14.0" docs/REFCARD.md && grep -q "REFCARD.md" docs/CHEATSHEET.md; then
+        log_pass "Refcard shows v0.14.0 and Cheatsheet redirects to it"
     else
-        log_fail "Cheatsheet or Refcard has wrong version"
+        log_fail "Refcard has wrong version, or Cheatsheet no longer redirects"
         return 1
     fi
 }

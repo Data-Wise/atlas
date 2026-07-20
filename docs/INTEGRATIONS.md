@@ -34,6 +34,19 @@ The dev-tools ecosystem follows a three-layer architecture:
 - `flow dash` → shells out to `atlas dashboard` for the live TUI
 - `tm ghost` → delegates to aiterm for rich terminal status
 
+### Ambient Surface: SwiftBar (v0.14.0)
+
+A fourth surface below the dashboard: an always-visible menu-bar item, no terminal or dashboard
+required. Read-only against atlas's stable JSON contract (`session status --format json`,
+`inbox --count`, `stats --format json`).
+
+```
+🎯 25m · 📥 3 · 🔥 4     ← session running
+⚪ idle · 📥 3 · 🔥 4    ← no session
+```
+
+See [SwiftBar](user-guide/swiftbar.md) for install and refresh-interval tuning.
+
 ---
 
 ## Current Architecture (2026-07-04)

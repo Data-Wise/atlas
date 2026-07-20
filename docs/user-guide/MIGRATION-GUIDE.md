@@ -1,10 +1,56 @@
-# Migration Guide: v0.13.0 → v0.13.1
+# Migration Guide
 
-> **Smooth upgrade. No breaking changes for most users.**
+> **Smooth upgrades. No breaking changes for most users, ever.** Latest section first.
 
 ---
 
-## Quick Check
+## v0.13.x → v0.14.0
+
+### Quick Check
+
+```bash
+atlas --version
+# 0.14.0
+```
+
+### What Changed
+
+| Area | Change | Impact |
+|---|---|---|
+| `.STATUS` format | New canonical **atlas/v1 YAML frontmatter** (see [.STATUS Schema](../STATUS-SCHEMA.md)) | Legacy `## Key:` headers still read — nothing rewrites automatically |
+| Dashboard | 8 views → 3 (Now/Timer/Plan), 8 state-machine states → 3 | Old view keys (`f`, `T`, `a` as a global toggle) are retired — see the [keymap](../REFCARD.md#keyboard-shortcuts-dashboard) |
+| `atlas` (bare) | Now shows the digest directly | `atlas plan`/`atlas where` unchanged, same underlying data |
+| `session end` | Shows git evidence + auto-syncs | No flag needed, always on |
+
+**Deprecated (still works, will warn/sunset in v0.15.0):**
+
+| Deprecated | Replacement | Removal target |
+|---|---|---|
+| Legacy `## Status:` / `## Progress:` `.STATUS` headers | atlas/v1 frontmatter via `atlas migrate --status --apply` | Read-path sunset warning planned v0.15.0 — no removal date set |
+| 8-view dashboard keybindings (`f` focus, `T` timeline, `a` analytics-as-view, `t` theme-cycle) | 3-view keymap (`1/n`, `2/t`, `3/p`, `?` for help) | Removed in v0.14.0 (no compatibility shim — this is a hard cut) |
+
+### Migrating `.STATUS` files
+
+```bash
+# Dry-run: see the field-level diff, no writes
+atlas migrate --status .STATUS
+
+# Apply: writes canonical frontmatter
+atlas migrate --status .STATUS --apply
+
+# Batch a whole tree
+atlas migrate --status --all-scanned --apply
+```
+
+Dry-run never writes. `write()` on a legacy-format file refuses and throws `LegacyStatusFileError`
+naming `atlas migrate` unless the caller explicitly opts in — so nothing is rewritten by surprise.
+Full reference: [.STATUS Schema](../STATUS-SCHEMA.md).
+
+---
+
+## v0.13.0 → v0.13.1
+
+### Quick Check
 
 ```bash
 atlas --version
@@ -13,9 +59,7 @@ atlas --version
 
 If you see `0.13.1`, you're already upgraded.
 
----
-
-## What Changed
+### What Changed
 
 | Area | Change | Impact |
 |------|--------|--------|
@@ -218,3 +262,7 @@ atlas migrate --from filesystem --to filesystem
 | ✅ | All tests pass (2003) |
 
 **Upgrade with confidence.**
+
+---
+
+**Now what?** → [.STATUS Schema](../STATUS-SCHEMA.md)
