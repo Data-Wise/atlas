@@ -1342,6 +1342,16 @@ atlas doctor --fix --write                # actually create them
 > often a stale duplicate left behind by a repo move or monorepo archival) print their `path` in
 > brackets so the real project is never mistaken for the dead one. Run `atlas sync --remove-orphans`
 > to clean up orphaned entries.
+>
+> **XDG data-directory nudge:** if atlas is still using the legacy `~/.atlas`
+> path, bare `atlas doctor` prints an informational tip pointing at
+> `atlas migrate --xdg` (never a warning — staying on the legacy path is
+> fully supported). `--fix` previews the move alongside any CLAUDE.md
+> actions; `--fix --write` performs it, using the same guarded path as a
+> manual `atlas migrate --xdg --apply` (see below) — if `atlas-mcp` or
+> `atlas dash` looks like it's running, the migration is skipped for that
+> run rather than forced through. See
+> [Configuration Location](CONFIGURATION.md#configuration-location).
 
 ---
 
@@ -1442,6 +1452,47 @@ atlas config prefs set templateVariables.github_user youruser
 ---
 
 ## Storage & Migration
+
+### `atlas migrate --xdg`
+
+Relocate atlas's data directory from the legacy `~/.atlas` to the XDG
+location (`$XDG_CONFIG_HOME/atlas`, or `~/.config/atlas` if unset).
+Optional — atlas works fine on the legacy path indefinitely. Dry-run by
+default; nothing moves until `--apply` is passed. See
+[Migrating to the XDG location](CONFIGURATION.md#migrating-to-the-xdg-location)
+for the full picture.
+
+```bash
+atlas migrate --xdg [options]
+
+Options:
+  --xdg      Relocate ~/.atlas to the XDG config location
+  --apply    Actually move (default is dry-run — reports file count/size)
+  --force    Override the process-lock guard only (see below) — never
+             bypasses the refusal when the XDG target already exists
+```
+
+**Examples:**
+```bash
+# See what would move, without changing anything
+atlas migrate --xdg
+
+# Actually move it
+atlas migrate --xdg --apply
+
+# atlas-mcp or atlas dash is running and you're sure it's safe to proceed anyway
+atlas migrate --xdg --apply --force
+```
+
+If `atlas-mcp` or `atlas dash` is running, `--apply` refuses — both hold a
+long-lived reference to the data directory's path and won't notice it
+moved out from under them until restarted. Close them first, or pass
+`--force` if you're confident the lock is stale (e.g. left over from a
+crash). If the XDG target directory already exists (a previous partial
+migration), `--apply` always refuses — resolve it manually; no flag
+overrides this one.
+
+---
 
 ??? note "Legacy — `atlas migrate` (rarely needed; most users stay on the default filesystem backend)"
 

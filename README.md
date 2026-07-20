@@ -455,7 +455,12 @@ src/
 
 ## Data Storage
 
-Atlas supports two storage backends:
+Atlas supports two storage backends, kept under a single data directory —
+`$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas`) on new installs, `~/.atlas`
+on existing ones until you run `atlas migrate --xdg` (see
+[CONFIGURATION.md](docs/CONFIGURATION.md#migrating-to-the-xdg-location)).
+The examples below use `~/.atlas` for brevity — run `atlas doctor` if
+you're not sure which location is currently active.
 
 ### Filesystem (Default)
 ```

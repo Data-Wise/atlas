@@ -28,6 +28,8 @@ const require = createRequire(import.meta.url)
 const pkg = require('../../package.json')
 
 import Atlas from '../index.js'
+import { resolveConfigDir } from '../utils/configPath.js'
+import { acquireLock, releaseLock } from '../utils/atlasLock.js'
 import { BusinessRules } from '../domain/constants/BusinessRules.js'
 import {
   formatContext,
@@ -43,8 +45,15 @@ import {
 } from './formatters.js'
 
 // Initialize Atlas instance
+// NOTE: Atlas's constructor reads `configPath`, not `dataDir` (that's
+// Container's key) — this previously silently ignored an explicit
+// dataDir and relied on Atlas's own env fallback to still work. Fixed as
+// part of centralizing config-dir resolution (SPEC-xdg-config-migration).
+const resolvedConfigPath = resolveConfigDir()
+acquireLock(resolvedConfigPath, 'atlas-mcp')
+
 const atlas = new Atlas({
-  dataDir: process.env.ATLAS_DATA_DIR,
+  configPath: resolvedConfigPath,
   storage: process.env.ATLAS_STORAGE || 'filesystem'
 })
 
@@ -516,11 +525,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 // Cleanup on exit
 process.on('SIGINT', () => {
   atlas.close()
+  releaseLock(resolvedConfigPath)
   process.exit(0)
 })
 
 process.on('SIGTERM', () => {
   atlas.close()
+  releaseLock(resolvedConfigPath)
   process.exit(0)
 })
 

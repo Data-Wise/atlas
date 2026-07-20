@@ -4,7 +4,16 @@ Complete reference for Atlas configuration options, preferences, and customizati
 
 ## Configuration File
 
-Atlas stores configuration in `~/.atlas/config.json`:
+Atlas stores configuration and data in a single directory, `config.json`
+alongside the JSON/SQLite data stores. Where that directory lives depends on
+your install:
+
+- **New installs** default to the XDG location:
+  `$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas` if `XDG_CONFIG_HOME` isn't
+  set).
+- **Existing installs** keep using `~/.atlas` until you explicitly migrate —
+  atlas never silently relocates your data. See
+  [Migrating to the XDG location](#migrating-to-the-xdg-location) below.
 
 ```json
 {
@@ -17,21 +26,63 @@ Atlas stores configuration in `~/.atlas/config.json`:
 
 ## Configuration Location
 
-| Setting | Path |
-|---------|------|
-| Config Directory | `~/.atlas/` |
-| Config File | `~/.atlas/config.json` |
-| Projects Data | `~/.atlas/projects.json` |
-| Sessions Data | `~/.atlas/sessions.json` |
-| Captures Data | `~/.atlas/captures.json` |
-| Breadcrumbs Data | `~/.atlas/breadcrumbs.json` |
-| SQLite Database | `~/.atlas/atlas.db` |
-| Custom Templates | `~/.atlas/templates/` |
+| Setting | Path (XDG default) | Path (legacy, pre-migration) |
+|---------|---------------------|-------------------------------|
+| Config Directory | `~/.config/atlas/` | `~/.atlas/` |
+| Config File | `~/.config/atlas/config.json` | `~/.atlas/config.json` |
+| Projects Data | `~/.config/atlas/projects.json` | `~/.atlas/projects.json` |
+| Sessions Data | `~/.config/atlas/sessions.json` | `~/.atlas/sessions.json` |
+| Captures Data | `~/.config/atlas/captures.json` | `~/.atlas/captures.json` |
+| Breadcrumbs Data | `~/.config/atlas/breadcrumbs.json` | `~/.atlas/breadcrumbs.json` |
+| SQLite Database | `~/.config/atlas/atlas.db` | `~/.atlas/atlas.db` |
+| Custom Templates | `~/.config/atlas/templates/` | `~/.atlas/templates/` |
+
+Run `atlas doctor` at any time to see which location atlas is currently
+using and whether a migration is available.
 
 ### Override Config Directory
 
 ```bash
 export ATLAS_CONFIG=/custom/path
+```
+
+`ATLAS_CONFIG` (and its alias `ATLAS_DATA_DIR`) always take precedence over
+both the XDG default and the legacy path — set either one and atlas uses
+exactly that directory, no detection logic involved.
+
+> **Not the same as `ATLAS_DIR`.** `install.sh`'s `ATLAS_DIR` environment
+> variable controls where the *atlas binary itself* gets installed
+> (default `~/.local/share/atlas`) — a completely different, unrelated
+> setting from `ATLAS_CONFIG`/`ATLAS_DATA_DIR`/`XDG_CONFIG_HOME`, which
+> control where your *data* lives. Setting one does not affect the other.
+
+### Migrating to the XDG location
+
+If atlas is still using the legacy `~/.atlas` path, `atlas doctor` will
+mention it. To move your data:
+
+```bash
+atlas migrate --xdg              # dry-run — shows what would move
+atlas migrate --xdg --apply      # actually move it
+```
+
+This is always your choice — atlas doesn't require it and doesn't nag. The
+move is a single directory relocation with a small `.atlas-migration.json`
+marker left at the new location recording where it came from and when.
+
+**If `atlas-mcp` or `atlas dash` is running**, `--apply` refuses (your data
+could be actively in use) unless you pass `--force`:
+
+```bash
+atlas migrate --xdg --apply --force   # only if you're sure that's a stale lock
+```
+
+**To reverse a migration** (there's no dedicated rollback command — this is
+just a directory move):
+
+```bash
+mv ~/.config/atlas ~/.atlas
+rm -f ~/.atlas/.atlas-migration.json
 ```
 
 ---
@@ -364,10 +415,11 @@ The MCP server reads configuration from environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `ATLAS_DATA_DIR` | Override data directory | `~/.atlas` |
+| `ATLAS_DATA_DIR` | Override data directory | XDG default, or legacy `~/.atlas` if already present — see [Configuration Location](#configuration-location) |
 | `ATLAS_STORAGE` | Override storage backend | `filesystem` |
 
-No additional configuration needed beyond standard `~/.atlas/config.json`.
+No additional configuration needed beyond the standard config file at
+whichever location applies (see above).
 
 ---
 
@@ -418,9 +470,15 @@ All 6 builtin templates now emit canonical `.STATUS` YAML frontmatter (schema `a
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `ATLAS_CONFIG` | Override config directory | `~/.atlas` |
-| `ATLAS_DATA_DIR` | Override data directory (MCP) | `~/.atlas` |
+| `ATLAS_CONFIG` | Override config directory | XDG default, or legacy `~/.atlas` if already present |
+| `ATLAS_DATA_DIR` | Override data directory (alias of `ATLAS_CONFIG`, honored by the MCP server too) | same as above |
+| `XDG_CONFIG_HOME` | Base for the XDG default (`$XDG_CONFIG_HOME/atlas`) | `~/.config` |
 | `ATLAS_STORAGE` | Override storage backend | `filesystem` |
+
+`ATLAS_CONFIG`/`ATLAS_DATA_DIR` set an exact directory and skip all
+detection logic. `XDG_CONFIG_HOME` only changes where the *default*
+resolves to — see [Configuration Location](#configuration-location) for
+the full precedence and how existing `~/.atlas` installs are handled.
 
 **Example:**
 ```bash
@@ -689,6 +747,10 @@ Full reference: [.STATUS Schema (atlas/v1)](STATUS-SCHEMA.md).
 ---
 
 ## Troubleshooting
+
+> The commands below use `~/.atlas` for brevity. If you've migrated to the
+> XDG location, substitute `~/.config/atlas` (or run `atlas doctor` first
+> if you're not sure which one is active).
 
 ### Config Not Loading
 

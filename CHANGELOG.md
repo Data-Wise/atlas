@@ -4,6 +4,16 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-07-20
+
+### Added
+- **XDG Base Directory support** — new installs default to `$XDG_CONFIG_HOME/atlas` (or `~/.config/atlas`); existing `~/.atlas` installs keep working unchanged until you opt in. `resolveConfigDir()` centralizes the resolution logic (explicit `ATLAS_CONFIG`/`ATLAS_DATA_DIR` override → legacy `~/.atlas` if present → XDG default) across all 8 places atlas previously hardcoded the path, including a fix for a dead `dataDir` option in the MCP server that was silently ignored.
+- **`atlas migrate --xdg [--apply] [--force]`** — relocates `~/.atlas` to the XDG location. Dry-run by default (reports file count/size); refuses to overwrite an existing XDG target (never bypassed, even with `--force`); guards against a concurrently running `atlas-mcp`/`atlas dash` via a PID lock (stale locks auto-clear; `--force` overrides a live one); falls back to a safe copy+rename+delete when the move crosses filesystems (`EXDEV`); writes a migration marker so re-runs and the resolver know it's done. See [Migrating to the XDG location](docs/CONFIGURATION.md#migrating-to-the-xdg-location).
+- **`atlas doctor` XDG nudge** — bare `doctor` mentions (informationally, never a warning) when legacy data is still unmigrated; `doctor --fix`/`--fix --write` preview and apply the migration through the same guarded path.
+
+### Fixed
+- `Container.js` (the entry point `atlas dash` constructs directly) previously fell back to a hardcoded `~/.atlas` instead of the shared resolver — now consistent with every other call site.
+
 ## [0.14.0] - 2026-07-19
 
 ### Added

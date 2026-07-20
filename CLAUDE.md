@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI (3 views: Now/Timer/Plan)
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.14.0 |
+| **Version** | 0.15.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | ~2,000 (Jest + Vitest) |
@@ -298,6 +298,8 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.15.0** - XDG Base Directory support: `resolveConfigDir()` centralizes config-dir resolution (env override → legacy `~/.atlas` → XDG default) across all 8 call sites; guarded `atlas migrate --xdg [--apply] [--force]` (PID-lock guard, hard existing-target refusal, EXDEV-safe move, migration marker); `doctor`/`doctor --fix` XDG nudge through the same guarded path.
+- **v0.14.0** - TUI Consolidation & Evidence-Linked Workflow: bare `atlas` digest (`GetDigestUseCase`), evidence-linked `session end` (git delta + auto-sync), canonical `.STATUS` schema `atlas/v1` + `atlas migrate --status`, 3-view Ink dashboard (8→3 views/states), SwiftBar menu-bar plugin.
 - **v0.13.0** - Task CLI & Schedule Push/Agenda: Implement Tasks & Schedule Records persistence (SQLite & FileSystem), Task CRUD CLI (`atlas task`), schedule sync/push (`atlas schedule push`), and chronological merged agenda (`atlas agenda`). Also: AnalyticsView (`a` key), StatusBar, Vitest + ink-testing-library + Playwright E2E.
 - **v0.12.2** - ESLint adoption: flat config, CI lint gate, zero-warning cleanup across all sources
 - **v0.12.1** - Node 26 support (better-sqlite3 12.11.1), FW-30 id convergence, PatternAnalyzer crash fix, +42 edge tests

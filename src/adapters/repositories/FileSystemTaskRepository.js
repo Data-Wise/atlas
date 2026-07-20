@@ -7,11 +7,12 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { Task } from '../../domain/entities/Task.js'
 import { ITaskRepository } from '../../domain/repositories/ITaskRepository.js'
+import { resolveConfigDir } from '../../utils/configPath.js'
 
 export class FileSystemTaskRepository extends ITaskRepository {
   constructor(configPath) {
     super()
-    this.configPath = configPath || `${process.env.HOME}/.atlas`
+    this.configPath = configPath || resolveConfigDir()
     this.filePath = path.join(this.configPath, 'tasks.json')
   }
 

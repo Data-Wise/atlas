@@ -1,0 +1,137 @@
+<title>Atlas v0.14.0 — Release Plan Report</title>
+<style>
+  :root {
+    --ground: #faf9f6; --panel: #ffffff; --ink: #231f2b; --muted: #6f6a7a;
+    --line: #e4e1d8; --accent: #6d4fc4; --accent-soft: #efeaf9;
+    --status: #b8860b; --status-soft: #f7efdc; --good: #2e7d4f; --mono-bg: #f1efe9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #1b1822; --panel: #241f2e; --ink: #ece9f1; --muted: #a49db3;
+      --line: #37313f; --accent: #a98ff0; --accent-soft: #322a47;
+      --status: #d9a83f; --status-soft: #3a3122; --good: #6cc394; --mono-bg: #2c2637;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #1b1822; --panel: #241f2e; --ink: #ece9f1; --muted: #a49db3;
+    --line: #37313f; --accent: #a98ff0; --accent-soft: #322a47;
+    --status: #d9a83f; --status-soft: #3a3122; --good: #6cc394; --mono-bg: #2c2637;
+  }
+  :root[data-theme="light"] {
+    --ground: #faf9f6; --panel: #ffffff; --ink: #231f2b; --muted: #6f6a7a;
+    --line: #e4e1d8; --accent: #6d4fc4; --accent-soft: #efeaf9;
+    --status: #b8860b; --status-soft: #f7efdc; --good: #2e7d4f; --mono-bg: #f1efe9;
+  }
+  body { background: var(--ground); color: var(--ink); margin: 0;
+    font: 16px/1.55 -apple-system, system-ui, "Segoe UI", sans-serif; }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  .eyebrow { color: var(--accent); font-size: .75rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; margin: 0 0 .5rem; }
+  h1 { font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-weight: 700;
+    font-size: 1.9rem; line-height: 1.15; margin: 0 0 .6rem; text-wrap: balance; }
+  .src { color: var(--muted); font-size: .85rem; margin: 0 0 1rem; }
+  .src code { font-family: "SF Mono", ui-monospace, monospace; font-size: .8rem; }
+  .pill { display: inline-block; background: var(--status-soft); color: var(--status);
+    border: 1px solid color-mix(in srgb, var(--status) 35%, transparent);
+    border-radius: 999px; padding: .25rem .8rem; font-size: .8rem; font-weight: 600; }
+  h2 { font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-size: 1.05rem;
+    letter-spacing: .02em; margin: 2.4rem 0 .9rem; padding-top: 1.2rem;
+    border-top: 1px solid var(--line); }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: .7rem; margin-top: 1.4rem; }
+  .metric { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: .8rem .9rem; }
+  .metric .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .metric .k { color: var(--muted); font-size: .74rem; letter-spacing: .05em;
+    text-transform: uppercase; margin-top: .15rem; }
+  ul.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+  ul.plain li { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: .65rem .85rem; font-size: .92rem; }
+  ul.plain b { color: var(--accent); }
+  .cisi { border: 1.5px solid var(--accent); border-radius: 10px; overflow: hidden;
+    background: var(--panel); }
+  .cisi .row { display: grid; grid-template-columns: 6.2rem 1fr; gap: .8rem;
+    padding: .7rem .9rem; border-top: 1px solid var(--line); font-size: .92rem; }
+  .cisi .row:first-child { border-top: 0; }
+  .cisi .tag { align-self: start; justify-self: start; background: var(--accent-soft);
+    color: var(--accent); font-size: .68rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; border-radius: 4px; padding: .18rem .45rem; }
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: .55rem; }
+  .steps li { counter-increment: s; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: .65rem .85rem .65rem 2.9rem; position: relative; font-size: .92rem; }
+  .steps li::before { content: counter(s); position: absolute; left: .8rem; top: .68rem;
+    width: 1.45rem; height: 1.45rem; border-radius: 50%; background: var(--accent);
+    color: var(--panel); font-size: .8rem; font-weight: 700; display: flex;
+    align-items: center; justify-content: center; }
+  .tablewrap { overflow-x: auto; }
+  table.risk { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  table.risk th { text-align: left; color: var(--muted); font-size: .72rem;
+    text-transform: uppercase; letter-spacing: .06em; padding: .4rem .7rem; }
+  table.risk td { background: var(--panel); border: 1px solid var(--line);
+    padding: .6rem .7rem; vertical-align: top; }
+  table.risk td:last-child { border-left: 3px solid var(--good); }
+  code { background: var(--mono-bg); border-radius: 4px; padding: .08rem .3rem;
+    font-family: "SF Mono", ui-monospace, monospace; font-size: .84em; }
+  .note { color: var(--muted); font-size: .82rem; margin-top: 2.2rem;
+    border-top: 1px solid var(--line); padding-top: .9rem; }
+</style>
+<div class="wrap">
+  <p class="eyebrow">Atlas · Release Report</p>
+  <h1>v0.14.0 Release Plan</h1>
+  <p class="src">Restructured from <code>PROPOSAL-v0.14.0-release-2026-07-19.md</code> — no new content; every claim traces to the source doc.</p>
+  <span class="pill">proposed (awaiting go) · base dev 66fa38b · 2026-07-19</span>
+
+  <div class="metrics">
+    <div class="metric"><div class="v">6</div><div class="k">Feature PRs (#94–#99)</div></div>
+    <div class="metric"><div class="v">0.14.0</div><div class="k">Version call (minor)</div></div>
+    <div class="metric"><div class="v">6 · ~30 min</div><div class="k">Pipeline steps</div></div>
+    <div class="metric"><div class="v">1,833</div><div class="k">Tests green (96 suites)</div></div>
+    <div class="metric"><div class="v">5</div><div class="k">Deprecated cmds → v0.15</div></div>
+    <div class="metric"><div class="v">1</div><div class="k">Branch held (obs P0)</div></div>
+  </div>
+
+  <h2>Scope — what ships</h2>
+  <ul class="plain">
+    <li><b>#94 + #99 · TUI</b> — −7.5k LOC dead blessed code; 8→3 views (Now/Timer/Plan), one timer, keymap + <code>?</code> overlay; <code>blessed</code> deps dropped. <code>atlas dash</code> keys change (CHANGELOG table).</li>
+    <li><b>#96 · .STATUS</b> — <code>atlas/v1</code> canonical schema, unified parser, refuse-don't-drop writer, <code>atlas migrate --status</code>. Breaking on the write path only.</li>
+    <li><b>#97 · workflow</b> — bare <code>atlas</code> digest; evidence-linked <code>session end</code>; <code>status --complete</code> evidence; deprecation warnings.</li>
+    <li><b>#95 · docs</b> — ADHD site redesign; deploys automatically on merge to main.</li>
+    <li><b>#98 · contrib</b> — SwiftBar ambient plugin; opt-in, no runtime impact.</li>
+    <li>Plus 5 specs + 2 proposals (docs-only). Held out: <code>feature/catch-obs-bridge</code> (gated on obs <code>write</code>).</li>
+  </ul>
+
+  <h2>Decision — version call</h2>
+  <div class="cisi">
+    <div class="row"><span class="tag">Concept</span><div>Release everything on dev as one coherent ADHD-redesign release, versioned 0.14.0.</div></div>
+    <div class="row"><span class="tag">Issue</span><div>The .STATUS schema change is breaking — does it force a bigger version?</div></div>
+    <div class="row"><span class="tag">Solution</span><div>Minor (0.14.0): breaking only on an explicit write path, with a migration tool, under pre-1.0 semver; deprecations are warn-only.</div></div>
+    <div class="row"><span class="tag">Impact</span><div><code>sync</code> against legacy .STATUS files warns/refuses on write paths — release notes must lead with <code>atlas migrate --status</code> (dry-run first); the 15-repo research rollout stays a separate coordinated proposal. flow-cli consumers unaffected (JSON contract snapshot-locked in #97).</div></div>
+  </div>
+
+  <h2>Release checklist</h2>
+  <ol class="steps">
+    <li>Pre-flight on dev: full suite + <code>mkdocs build --strict</code> + stale-version grep.</li>
+    <li>Stamp: package.json → 0.14.0; CHANGELOG <code>[Unreleased]</code> → <code>[0.14.0]</code>; .STATUS.</li>
+    <li>Release PR <code>dev → main</code>, merge-commit (keeps main an ancestor of dev).</li>
+    <li>Verify main CI green, then tag <code>v0.14.0</code> + GitHub release.</li>
+    <li>Automatic on publish: Homebrew formula update + docs deploy — verify both, brew smoke test.</li>
+    <li>Post-release: FF-sync dev; update memory/.STATUS; announce deprecation table prominently.</li>
+  </ol>
+
+  <h2>Risks → mitigations</h2>
+  <div class="tablewrap">
+    <table class="risk">
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>Dogfood/e2e count shifts (TimelineView dropped, analytics e2e deleted)</td><td>Already flagged in #99; note in release body, not blocking</td></tr>
+      <tr><td>Legacy .STATUS write paths now warn/refuse</td><td>Release notes lead with <code>atlas migrate --status</code>; research rollout separate</td></tr>
+      <tr><td>Dash keybinding muscle-memory break</td><td>CHANGELOG before/after table + REFCARD; acceptable for a minor</td></tr>
+    </table>
+  </div>
+
+  <h2>Next steps</h2>
+  <ol class="steps">
+    <li>Say <b>"release"</b> → execute steps 1–6 end-to-end (stop only on red CI). Rationale: dev/main divergence widens the docs/Homebrew drift window; everything on dev is already green and evidence-backed.</li>
+  </ol>
+
+  <p class="note">Source: docs/specs/PROPOSAL-v0.14.0-release-2026-07-19.md · Report markdown: docs/specs/REPORT-v0.14.0-release-2026-07-19.md</p>
+</div>
