@@ -1090,16 +1090,26 @@ program
   .action(async (options) => {
     const a = getAtlas();
     if (options.fix) {
-      const { actions, wrote } = await a.projects.doctorFix(options);
+      const { actions, wrote } = await a.projects.doctorFix({ ...options, atlasVersion: pkg.version });
       if (options.format === 'json') { console.log(JSON.stringify({ actions, wrote }, null, 2)); return; }
       console.log(`\n🩺 atlas doctor --fix ${wrote ? '(applied)' : '(preview — pass --write to apply)'}`);
       if (actions.length === 0) console.log('   ✅ nothing to fix');
-      else for (const ac of actions) console.log(`   ${wrote ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
+      else for (const ac of actions) {
+        if (ac.type === 'xdg-migration') {
+          if (ac.skipped) {
+            console.log(`   ⏭  xdg migration skipped — ${ac.detail}`);
+          } else {
+            console.log(`   ${ac.written ? '✓ moved' : '• would move'} atlas data ${ac.from} → ${ac.to}`);
+          }
+        } else {
+          console.log(`   ${ac.written ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
+        }
+      }
       return;
     }
-    const { summary, rows } = await a.projects.doctor(options);
+    const { summary, rows, xdgHint } = await a.projects.doctor(options);
     if (options.format === 'json') {
-      console.log(JSON.stringify({ summary, rows }, null, 2));
+      console.log(JSON.stringify({ summary, rows, xdgHint }, null, 2));
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
@@ -1109,6 +1119,9 @@ program
     }
     if (summary.parseWarnings > 0) {
       console.log(`   .STATUS parse warnings: ${summary.parseWarnings}`);
+    }
+    if (xdgHint) {
+      console.log(`   💡 ${xdgHint}`);
     }
     console.log('');
     const show = options.all ? rows : rows.filter(r => !r.ok || (r.parseWarnings && r.parseWarnings.length > 0));
@@ -1311,9 +1324,23 @@ program
   .option('-t, --to <type>', 'Target storage type', 'sqlite')
   .option('--dry-run', 'Show what would be migrated (default for --status)')
   .option('--status', 'Migrate a legacy .STATUS file (or directory of them, with --batch) to canonical YAML frontmatter')
-  .option('--apply', 'Write the migration (--status only; default is dry-run)')
+  .option('--xdg', 'Relocate ~/.atlas to the XDG config location (~/.config/atlas or $XDG_CONFIG_HOME/atlas)')
+  .option('--apply', 'Write the migration (--status/--xdg; default is dry-run)')
   .option('--all-scanned', 'Batch-migrate every .STATUS found under [path] (--status only)')
+  .option('--force', 'With --xdg --apply: override the process-lock guard (atlas-mcp/atlas dash may be running). Never bypasses the existing-target refusal.')
   .action(async (path, options) => {
+    if (options.xdg) {
+      const { migrateToXdg } = await import('../src/utils/migrateXdg.js');
+      const result = await migrateToXdg({
+        apply: !!options.apply,
+        force: !!options.force,
+        atlasVersion: pkg.version
+      });
+      console.log(result.message);
+      if (!result.success) process.exitCode = 1;
+      return;
+    }
+
     if (options.status) {
       const { MigrateStatusUseCase } = await import('../src/use-cases/status/MigrateStatusUseCase.js');
       const target = path || process.cwd();

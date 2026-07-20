@@ -7,10 +7,11 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { Capture } from '../../domain/entities/Capture.js';
+import { resolveConfigDir } from '../../utils/configPath.js';
 
 export class FileSystemCaptureRepository {
   constructor(configPath) {
-    this.configPath = configPath || `${process.env.HOME}/.atlas`;
+    this.configPath = configPath || resolveConfigDir();
     this.filePath = path.join(this.configPath, 'captures.json');
   }
 

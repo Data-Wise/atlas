@@ -11,7 +11,7 @@
  */
 
 import { join } from 'node:path'
-import { homedir } from 'node:os'
+import { resolveConfigDir } from '../utils/configPath.js'
 
 // FileSystem repositories
 import { FileSystemSessionRepository } from './repositories/FileSystemSessionRepository.js'
@@ -77,9 +77,9 @@ export class Container {
   constructor(options = {}) {
     this.instances = {}
 
-    // Configuration - use ~/.atlas by default for atlas
+    // Configuration - defaults via the shared resolver (SPEC-xdg-config-migration)
     this.config = {
-      dataDir: options.dataDir || join(homedir(), '.atlas'),
+      dataDir: options.dataDir || resolveConfigDir(),
       storage: options.storage || Container.STORAGE_TYPES.FILESYSTEM,
       detectorScriptPath: options.detectorScriptPath || null
     }

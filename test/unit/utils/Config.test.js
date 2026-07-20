@@ -4,6 +4,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { Config } from '../../../src/utils/Config.js';
+import { resolveConfigDir } from '../../../src/utils/configPath.js';
 import { mkdir, rm, writeFile, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -64,8 +65,8 @@ describe('Config', () => {
       expect(new Config().configDir).toBe('/tmp/from-config-env');
     });
 
-    it('falls back to ~/.atlas when no env vars are set', () => {
-      expect(new Config().configDir).toBe(`${process.env.HOME}/.atlas`);
+    it('falls back to resolveConfigDir() when no env vars are set (XDG-aware default; see configPath.test.js for full precedence coverage)', () => {
+      expect(new Config().configDir).toBe(resolveConfigDir());
     });
   });
 

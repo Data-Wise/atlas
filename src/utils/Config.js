@@ -12,6 +12,7 @@
 import { readFile, writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { resolveConfigDir } from './configPath.js'
 
 const DEFAULT_CONFIG = {
   scanPaths: [`${process.env.HOME}/projects`],
@@ -80,7 +81,7 @@ function deepMerge(target, source) {
 
 export class Config {
   constructor(configDir) {
-    this.configDir = configDir || process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR || `${process.env.HOME}/.atlas`
+    this.configDir = configDir || resolveConfigDir()
     this.configPath = join(this.configDir, 'config.json')
     this._config = null
   }

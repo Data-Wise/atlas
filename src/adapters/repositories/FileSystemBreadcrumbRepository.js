@@ -9,10 +9,11 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { Breadcrumb } from '../../domain/entities/Breadcrumb.js';
+import { resolveConfigDir } from '../../utils/configPath.js';
 
 export class FileSystemBreadcrumbRepository {
   constructor(configPath, options = {}) {
-    this.configPath = configPath || `${process.env.HOME}/.atlas`;
+    this.configPath = configPath || resolveConfigDir();
     this.filePath = path.join(this.configPath, 'breadcrumbs.json');
     this.retentionDays = options.retentionDays || 30;
   }
