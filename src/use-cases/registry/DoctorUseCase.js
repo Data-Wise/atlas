@@ -52,9 +52,16 @@ export class DoctorUseCase {
    * Non-project-scoped check: is atlas's own data directory still on the
    * legacy ~/.atlas path with a real XDG migration available? Informational
    * only — staying on the legacy path is a fully supported steady state.
+   *
+   * Skipped entirely when ATLAS_CONFIG/ATLAS_DATA_DIR is set: those
+   * overrides mean the active config dir isn't derived from legacy/XDG
+   * detection at all, so a leftover ~/.atlas (e.g. from before the
+   * override was introduced) is irrelevant — nudging to migrate it would
+   * point at data atlas isn't even using.
    * @private
    */
   _xdgMigrationAvailable() {
+    if (process.env.ATLAS_CONFIG || process.env.ATLAS_DATA_DIR) return false
     const legacy = legacyConfigDir()
     const xdg = xdgConfigDir()
     return this.fileExists(legacy) && !this.fileExists(migrationMarkerPath(xdg))

@@ -7,13 +7,42 @@
  * process.env.HOME, but whether those paths "exist" is entirely controlled
  * by the injected fileExists fake.
  */
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect, afterEach } from '@jest/globals'
 import { DoctorUseCase } from '../../../../src/use-cases/registry/DoctorUseCase.js'
 import { legacyConfigDir, xdgConfigDir, migrationMarkerPath } from '../../../../src/utils/configPath.js'
 
 const repoOf = (projects) => ({ findAll: async () => projects })
 
 describe('DoctorUseCase — XDG migration', () => {
+  afterEach(() => {
+    delete process.env.ATLAS_CONFIG
+    delete process.env.ATLAS_DATA_DIR
+  })
+
+  test('execute(): no hint when ATLAS_CONFIG is set, even if legacy exists (override means legacy is irrelevant)', async () => {
+    process.env.ATLAS_CONFIG = '/custom/path'
+    const present = new Set([legacyConfigDir()])
+    const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: (p) => present.has(p) })
+    const { xdgHint } = await uc.execute()
+    expect(xdgHint).toBeNull()
+  })
+
+  test('execute(): no hint when ATLAS_DATA_DIR is set, even if legacy exists', async () => {
+    process.env.ATLAS_DATA_DIR = '/custom/data-dir'
+    const present = new Set([legacyConfigDir()])
+    const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: (p) => present.has(p) })
+    const { xdgHint } = await uc.execute()
+    expect(xdgHint).toBeNull()
+  })
+
+  test('fix(): no xdg-migration action when ATLAS_CONFIG is set, even if legacy exists', async () => {
+    process.env.ATLAS_CONFIG = '/custom/path'
+    const present = new Set([legacyConfigDir()])
+    const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: (p) => present.has(p) })
+    const { actions } = await uc.fix({})
+    expect(actions.find(a => a.type === 'xdg-migration')).toBeUndefined()
+  })
+
   test('execute(): no hint when legacy dir does not exist (fresh/already-migrated install)', async () => {
     const uc = new DoctorUseCase({ projectRepository: repoOf([]), fileExists: () => false })
     const { xdgHint } = await uc.execute()
