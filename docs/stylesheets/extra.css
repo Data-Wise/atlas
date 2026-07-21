@@ -604,6 +604,20 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   max-width: 42rem;
 }
 
+/* Mantra — the one line the whole product is organized around ("never
+   lose the thread"). One deliberate moment of scale + color; everything
+   else on the page stays quiet by comparison. */
+.md-typeset .atlas-mantra {
+  font-family: var(--atlas-font-display);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--atlas-active);
+  margin: var(--atlas-space-2) 0 var(--atlas-space-3);
+  max-width: none;
+  opacity: 1;
+}
+
 /* ── Chip Row (Why Atlas) ──────────────────────────────────── */
 /* Replaces a 5-row feature/description table with scannable pills —
    easier to skim than a table when every row shares the same shape
@@ -636,7 +650,75 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   margin-top: 0.1rem;
 }
 
-/* ── Feature Grid ──────────────────────────────────────────── */
+/* ── The Loop (homepage signature) ─────────────────────────── */
+/* Atlas's actual habit loop (catch → session → plan → repeat, from the
+   ADHD Guide's "3 Core Habits") as a real connected sequence — numbered
+   because it genuinely IS an order, not a decorative 1-2-3. Wraps to a
+   vertical stack on narrow screens; the arrow becomes a down-arrow. */
+.md-typeset .atlas-loop {
+  display: flex;
+  align-items: stretch;
+  gap: var(--atlas-space-2);
+  margin: var(--atlas-space-3) 0;
+  flex-wrap: wrap;
+}
+
+.md-typeset .atlas-loop__step {
+  position: relative;
+  flex: 1 1 12rem;
+  padding: var(--atlas-space-3) var(--atlas-space-3) var(--atlas-space-3) 2.75rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--atlas-radius);
+  background-color: var(--md-default-bg-color);
+}
+
+.md-typeset .atlas-loop__step::before {
+  content: attr(data-step);
+  position: absolute;
+  top: var(--atlas-space-2);
+  left: var(--atlas-space-2);
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--atlas-active);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.md-typeset .atlas-loop__step p {
+  margin: 0.3rem 0 0;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.md-typeset .atlas-loop__step code {
+  font-size: 0.82em;
+}
+
+.md-typeset .atlas-loop__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.5rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 1.2rem;
+}
+
+/* On narrow screens the row wraps into a column — the arrow should read
+   as "next step down", not a stray sideways glyph. */
+@media screen and (max-width: 45em) {
+  .md-typeset .atlas-loop__arrow {
+    width: 100%;
+    transform: rotate(90deg);
+  }
+}
+
+/* ── Feature Grid / Doc Map ────────────────────────────────── */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -647,17 +729,45 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
 .md-typeset .feature-card {
   padding: var(--atlas-space-3);
   border: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 3px solid var(--md-default-fg-color--lightest);
   border-radius: var(--atlas-radius);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .md-typeset .feature-card:hover {
   border-color: var(--atlas-active);
+  border-left-color: var(--atlas-active);
   box-shadow: 0 2px 8px var(--atlas-focus-ring);
 }
 
 .md-typeset .feature-card h3 {
   margin-top: 0;
+}
+
+/* Doc-map variant: each card's left rule + heading icon carry the SAME
+   section color as the sidebar's own spine and the header's pill nav —
+   the homepage becomes a literal legend for the rest of the site's color
+   system, not a fifth unrelated color language. */
+.md-typeset .feature-card[data-section="do"] { border-left-color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"] { border-left-color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"] { border-left-color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"] { border-left-color: var(--atlas-code); }
+
+.md-typeset .feature-card[data-section="do"]:hover { border-color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"]:hover { border-color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"]:hover { border-color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"]:hover { border-color: var(--atlas-code); }
+
+.md-typeset .feature-card[data-section="do"] h3 .twemoji { color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"] h3 .twemoji { color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"] h3 .twemoji { color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"] h3 .twemoji { color: var(--atlas-code); }
+
+/* ── Secondary Link Row (quiet, below the doc map) ─────────── */
+.md-typeset .atlas-more-links {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-top: -0.5rem;
 }
 
 /* ── Intro Callout (guide leads) ───────────────────────────── */
