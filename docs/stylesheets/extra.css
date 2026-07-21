@@ -10,9 +10,9 @@
   --atlas-build: #e65100;
   --atlas-code: #1565c0;
 
-  /* Functional — purple kept as a single, sparing brand accent */
-  --atlas-active: #9c27b0;
-  --atlas-focus-ring: rgba(156, 39, 176, 0.3);
+  /* Functional — teal/blue, single sparing brand accent (matches fonts.css) */
+  --atlas-active: #00838f;
+  --atlas-focus-ring: rgba(0, 131, 143, 0.3);
   --atlas-sidebar-width: 18rem;
 
   /* One spacing scale (8px base) */
@@ -31,11 +31,11 @@
   --atlas-do: #ce93d8;
   --atlas-build: #ffb74d;
   --atlas-code: #64b5f6;
-  --atlas-active: #ce93d8;
-  --atlas-focus-ring: rgba(206, 147, 216, 0.3);
+  --atlas-active: #4dd0e1;
+  --atlas-focus-ring: rgba(77, 208, 225, 0.3);
 }
 
-/* ── Sidebar: Visual Hierarchy ─────────────────────────────── */
+/* ── Sidebar: Color Spine ──────────────────────────────────── */
 
 /*
  * Material renders nav as:
@@ -44,11 +44,30 @@
  *   .md-nav__item          → individual page link
  *     .md-nav__link        → the page title
  *
- * Goal: section headers look like LABELS.
- *       page items look like LINKS.
+ * Design: each top-level group (and standalone top-level page) carries a
+ * thin left rule in its own section color (learn/do/build/code — stamped
+ * as data-atlas-section by section-nav.js's stampGroupSections()). One
+ * gutter, one consistent language for grouped AND standalone items — no
+ * boxes, no fills. The active item is the one strong signal: bold weight,
+ * section-color text, solid spine. Hierarchy comes from type + color, not
+ * containers (ADHD-design guidance: reduce visual clutter, one consistent
+ * treatment per level, whitespace over borders).
  */
 
-/* Section headers — quiet label treatment (purple reserved for active state) */
+/* Shared gutter for the whole rail — inactive groups get a quiet neutral
+   rule so the active section's color reads as *the* signal, not one of many. */
+.md-nav--primary > .md-nav__list > .md-nav__item {
+  border-left: 2px solid var(--md-default-fg-color--lightest);
+  padding-left: var(--atlas-space-1);
+  margin: var(--atlas-space-2) 0;
+}
+
+.md-nav--primary > .md-nav__list > .md-nav__item[data-atlas-section="learn"] { border-left-color: var(--atlas-learn); }
+.md-nav--primary > .md-nav__list > .md-nav__item[data-atlas-section="do"] { border-left-color: var(--atlas-do); }
+.md-nav--primary > .md-nav__list > .md-nav__item[data-atlas-section="build"] { border-left-color: var(--atlas-build); }
+.md-nav--primary > .md-nav__list > .md-nav__item[data-atlas-section="code"] { border-left-color: var(--atlas-code); }
+
+/* Section headers — quiet label treatment; color follows the group's own spine */
 .md-nav__item--nested > .md-nav__link {
   font-weight: 700;
   font-size: 0.72rem;
@@ -56,10 +75,26 @@
   text-transform: uppercase;
   color: var(--md-default-fg-color--light);
   padding: var(--atlas-space-1) var(--atlas-space-2);
-  margin-top: 0.75rem;
   margin-bottom: 0.15rem;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
   cursor: pointer;
+}
+
+/* Material wraps the label text in its own <span class="md-ellipsis">,
+   which carries the truncating overflow/white-space/text-overflow rules —
+   overriding them on .md-nav__link alone (the parent) has no effect. The
+   full section name (e.g. "TUTORIALS", "WORKFLOWS") must always be
+   readable, so let it wrap instead of clipping. */
+.md-nav__item--nested > .md-nav__link .md-ellipsis {
+  display: inline;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/* Material's own built-in expand-icon (we render our own "▸" via ::before
+   above) would otherwise compete for the same line's width. */
+.md-nav__item--nested > .md-nav__link > .md-nav__icon {
+  display: none;
 }
 
 /* Foldable arrow — rotate when expanded */
@@ -82,34 +117,36 @@
   margin: 0.05rem 0;
 }
 
-/* Page links — clear clickable treatment */
+/* Page links — plain, no fill/box; the spine + active state carry the signal */
 .md-nav__link {
   font-size: 0.88rem;
   font-weight: 400;
   padding: var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-1) var(--atlas-space-2);
-  border-radius: var(--atlas-radius);
-  transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease;
-  border-left: 3px solid transparent;
+  transition: color 0.15s ease;
   color: var(--md-default-fg-color);
 }
 
-/* Hover — visible left accent */
+/* Hover — color hint only, no background */
 .md-nav__link:hover {
-  background-color: var(--md-default-fg-color--lightest);
-  border-left-color: var(--atlas-active);
   color: var(--atlas-active);
 }
 
-/* Active page — strong signal */
+/* Active page — the one strong signal: bold + section-color text + a dot
+   (echoes the pill nav's own dot motif — one consistent marker vocabulary). */
 .md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-active);
   font-weight: 600;
   color: var(--atlas-active);
-  background-color: rgba(156, 39, 176, 0.06);
 }
 
-[data-md-color-scheme="slate"] .md-nav__item--active > .md-nav__link {
-  background-color: rgba(206, 147, 216, 0.08);
+.md-nav__item--active > .md-nav__link::after {
+  content: "";
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  vertical-align: middle;
 }
 
 /* Nested page items — extra indent for depth */
@@ -117,6 +154,10 @@
   padding-left: 1.5rem;
   font-size: 0.84rem;
   color: var(--md-default-fg-color--light);
+}
+
+.md-nav__item--nested .md-nav__item--active .md-nav__link {
+  color: var(--atlas-active);
 }
 
 /* ── Breadcrumb / Navigation Path ──────────────────────────── */
@@ -216,7 +257,7 @@
 
 .md-typeset .tip > .admonition-title,
 .md-typeset .tip > summary {
-  background-color: rgba(156, 39, 176, 0.08);
+  background-color: rgba(0, 131, 143, 0.08);
 }
 
 /* ── Code Blocks — Readability ─────────────────────────────── */
@@ -270,9 +311,16 @@
   border-radius: var(--atlas-radius);
 }
 
-/* ── Layout — use the viewport width (fixes "squished in middle") ── */
+/* ── Layout — use the viewport width for the grid (sidebar + TOC get
+   breathing room on wide screens), but cap the PROSE column narrower for
+   readability — very long line lengths are harder to track line-to-line,
+   which compounds with ADHD reading fatigue. ── */
 .md-grid {
   max-width: 100rem;
+}
+
+.md-content__inner > .md-typeset {
+  max-width: 54rem;
 }
 
 /* Pin the TOC to the SCREEN's right edge (not the centered grid).
@@ -478,31 +526,19 @@
 
 /* ── Section-Aware Sidebar Theming ─────────────────────────── */
 /* data-atlas-section is stamped on <body> by section-nav.js; tints the
-   sidebar's active-item accent to match the current pill's color
-   instead of the flat brand purple everywhere. */
-body[data-atlas-section="learn"] .md-nav--primary .md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-learn);
-  color: var(--atlas-learn);
-}
-
-body[data-atlas-section="do"] .md-nav--primary .md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-do);
-  color: var(--atlas-do);
-}
-
-body[data-atlas-section="build"] .md-nav--primary .md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-build);
-  color: var(--atlas-build);
-}
-
-body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav__link {
-  border-left-color: var(--atlas-code);
-  color: var(--atlas-code);
-}
+   active item's text + dot to match the current page's section color
+   instead of the flat brand purple everywhere. (Every group's own spine
+   color comes from data-atlas-section on the group itself, set by
+   stampGroupSections() — see the "Sidebar: Color Spine" rules above.) */
+body[data-atlas-section="learn"] .md-nav--primary .md-nav__item--active > .md-nav__link { color: var(--atlas-learn); }
+body[data-atlas-section="do"] .md-nav--primary .md-nav__item--active > .md-nav__link { color: var(--atlas-do); }
+body[data-atlas-section="build"] .md-nav--primary .md-nav__item--active > .md-nav__link { color: var(--atlas-build); }
+body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav__link { color: var(--atlas-code); }
 
 /* ── Sidebar Accordion — Item Count Badge ──────────────────── */
 /* Populated by section-nav.js's wireAccordion(); shows how many pages
-   live inside a collapsed top-level section. */
+   live inside a collapsed top-level section. Quiet, and hidden while the
+   group is open (the count only matters as a peek into a closed group). */
 .atlas-nav-count {
   display: inline-block;
   margin-left: 0.4rem;
@@ -515,6 +551,10 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   letter-spacing: normal;
   text-transform: none;
   vertical-align: middle;
+}
+
+.md-nav__item--nested > input.md-toggle:checked ~ .md-nav__link .atlas-nav-count {
+  display: none;
 }
 
 /* ── Content Area — Breathing Room ─────────────────────────── */
@@ -564,6 +604,20 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   max-width: 42rem;
 }
 
+/* Mantra — the one line the whole product is organized around ("never
+   lose the thread"). One deliberate moment of scale + color; everything
+   else on the page stays quiet by comparison. */
+.md-typeset .atlas-mantra {
+  font-family: var(--atlas-font-display);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--atlas-active);
+  margin: var(--atlas-space-2) 0 var(--atlas-space-3);
+  max-width: none;
+  opacity: 1;
+}
+
 /* ── Chip Row (Why Atlas) ──────────────────────────────────── */
 /* Replaces a 5-row feature/description table with scannable pills —
    easier to skim than a table when every row shares the same shape
@@ -596,7 +650,75 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   margin-top: 0.1rem;
 }
 
-/* ── Feature Grid ──────────────────────────────────────────── */
+/* ── The Loop (homepage signature) ─────────────────────────── */
+/* Atlas's actual habit loop (catch → session → plan → repeat, from the
+   ADHD Guide's "3 Core Habits") as a real connected sequence — numbered
+   because it genuinely IS an order, not a decorative 1-2-3. Wraps to a
+   vertical stack on narrow screens; the arrow becomes a down-arrow. */
+.md-typeset .atlas-loop {
+  display: flex;
+  align-items: stretch;
+  gap: var(--atlas-space-2);
+  margin: var(--atlas-space-3) 0;
+  flex-wrap: wrap;
+}
+
+.md-typeset .atlas-loop__step {
+  position: relative;
+  flex: 1 1 12rem;
+  padding: var(--atlas-space-3) var(--atlas-space-3) var(--atlas-space-3) 2.75rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: var(--atlas-radius);
+  background-color: var(--md-default-bg-color);
+}
+
+.md-typeset .atlas-loop__step::before {
+  content: attr(data-step);
+  position: absolute;
+  top: var(--atlas-space-2);
+  left: var(--atlas-space-2);
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--atlas-active);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.md-typeset .atlas-loop__step p {
+  margin: 0.3rem 0 0;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.md-typeset .atlas-loop__step code {
+  font-size: 0.82em;
+}
+
+.md-typeset .atlas-loop__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.5rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 1.2rem;
+}
+
+/* On narrow screens the row wraps into a column — the arrow should read
+   as "next step down", not a stray sideways glyph. */
+@media screen and (max-width: 45em) {
+  .md-typeset .atlas-loop__arrow {
+    width: 100%;
+    transform: rotate(90deg);
+  }
+}
+
+/* ── Feature Grid / Doc Map ────────────────────────────────── */
 .md-typeset .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -607,17 +729,45 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
 .md-typeset .feature-card {
   padding: var(--atlas-space-3);
   border: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 3px solid var(--md-default-fg-color--lightest);
   border-radius: var(--atlas-radius);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .md-typeset .feature-card:hover {
   border-color: var(--atlas-active);
+  border-left-color: var(--atlas-active);
   box-shadow: 0 2px 8px var(--atlas-focus-ring);
 }
 
 .md-typeset .feature-card h3 {
   margin-top: 0;
+}
+
+/* Doc-map variant: each card's left rule + heading icon carry the SAME
+   section color as the sidebar's own spine and the header's pill nav —
+   the homepage becomes a literal legend for the rest of the site's color
+   system, not a fifth unrelated color language. */
+.md-typeset .feature-card[data-section="do"] { border-left-color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"] { border-left-color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"] { border-left-color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"] { border-left-color: var(--atlas-code); }
+
+.md-typeset .feature-card[data-section="do"]:hover { border-color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"]:hover { border-color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"]:hover { border-color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"]:hover { border-color: var(--atlas-code); }
+
+.md-typeset .feature-card[data-section="do"] h3 .twemoji { color: var(--atlas-do); }
+.md-typeset .feature-card[data-section="learn"] h3 .twemoji { color: var(--atlas-learn); }
+.md-typeset .feature-card[data-section="build"] h3 .twemoji { color: var(--atlas-build); }
+.md-typeset .feature-card[data-section="code"] h3 .twemoji { color: var(--atlas-code); }
+
+/* ── Secondary Link Row (quiet, below the doc map) ─────────── */
+.md-typeset .atlas-more-links {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-top: -0.5rem;
 }
 
 /* ── Intro Callout (guide leads) ───────────────────────────── */
@@ -627,7 +777,7 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   border: 1px solid var(--atlas-active);
   border-left-width: 4px;
   border-radius: var(--atlas-radius);
-  background-color: rgba(156, 39, 176, 0.06);
+  background-color: rgba(0, 131, 143, 0.06);
   padding: 1rem 1.25rem;
   margin: 1.5rem 0;
   color: var(--md-default-fg-color);
@@ -641,7 +791,7 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
 }
 
 [data-md-color-scheme="slate"] .md-typeset .atlas-intro {
-  background-color: rgba(206, 147, 216, 0.1);
+  background-color: rgba(77, 208, 225, 0.1);
 }
 
 /* ── Badge Styling ─────────────────────────────────────────── */

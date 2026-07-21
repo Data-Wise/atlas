@@ -461,6 +461,7 @@ All 6 builtin templates now emit canonical `.STATUS` YAML frontmatter (schema `a
 [STATUS-SCHEMA.md](STATUS-SCHEMA.md)), not the old `## Key:` markdown headers.
 
 **Built-in Variables:**
+
 - `{{name}}` - Project name (from --name option)
 - `{{date}}` - Current date
 
@@ -593,11 +594,13 @@ Data stored as JSON files:
 ```
 
 **Pros:**
+
 - Human-readable
 - Easy to backup/edit
 - No dependencies
 
 **Cons:**
+
 - Slower for large datasets
 - No concurrent access
 
@@ -611,11 +614,13 @@ Data stored in single database:
 ```
 
 **Pros:**
+
 - Better performance
 - ACID transactions
 - Supports concurrent access
 
 **Cons:**
+
 - Requires native module (better-sqlite3)
 - Binary format
 

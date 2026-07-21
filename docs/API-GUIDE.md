@@ -84,6 +84,7 @@ await atlas.projects.register(path, options);
 ```
 
 **Parameters:**
+
 - `path` (string): Absolute path to project directory
 - `options` (object):
   - `tags` (string[]): Project tags
@@ -106,6 +107,7 @@ const projects = await atlas.projects.list(options);
 ```
 
 **Options:**
+
 - `status` (string): Filter by status
 - `tag` (string): Filter by tag
 - `kind` (string): Filter by research kind — `manuscript` | `program` | `package`
@@ -277,6 +279,7 @@ const session = await atlas.sessions.start(project, options);
 ```
 
 **Parameters:**
+
 - `project` (string): Project name
 - `options` (object):
   - `task` (string): Task description
@@ -307,6 +310,7 @@ await atlas.sessions.end(note);
 ```
 
 **Parameters:**
+
 - `note` (string): Optional session summary
 
 **Example:**
@@ -357,12 +361,14 @@ const stats = await atlas.sessions.stats(options);
 ```
 
 **Parameters:**
+
 - `options` (object):
   - `days` (number): Days to analyze (default: 7)
   - `project` (string): Filter by project
   - `period` (string): Preset period (`week`, `month`)
 
 **Returns:** Analytics object with:
+
 - `period`: Date range info
 - `summary`: Total sessions, time, flow percentage, completion rate
 - `streak`: Current and longest streak
@@ -397,6 +403,7 @@ const result = await atlas.sessions.export(options);
 ```
 
 **Parameters:**
+
 - `options` (object):
   - `days` (number): Days to export (default: 30)
   - `project` (string): Filter by project
@@ -404,6 +411,7 @@ const result = await atlas.sessions.export(options);
   - `format` (string): Output format (`ical`, `json`)
 
 **Returns:** Object with:
+
 - `content`: iCal string or JSON string
 - `sessions`: Number of sessions exported
 - `format`: Format used
@@ -432,6 +440,7 @@ console.log(`Exported ${sessions.length} sessions`);
 
 **iCal Output:**
 The iCal export follows RFC 5545 and works with:
+
 - Apple Calendar (double-click .ics file)
 - Google Calendar (Settings → Import)
 - Outlook (File → Import)
@@ -443,10 +452,12 @@ const plan = await atlas.sessions.planDay(options);
 ```
 
 **Parameters:**
+
 - `options` (object):
   - `ecosystemPath` (string): Path to scan for .STATUS files
 
 **Returns:** Planning data object with:
+
 - `yesterdaySessions`: Array of yesterday's sessions
 - `streak`: Current streak info
 - `inboxItems`: Pending inbox captures
@@ -489,6 +500,7 @@ await atlas.capture.add(text, options);
 ```
 
 **Parameters:**
+
 - `text` (string): Capture content (max 500 chars)
 - `options` (object):
   - `project` (string): Associate with project
@@ -515,6 +527,7 @@ const items = await atlas.capture.inbox(options);
 ```
 
 **Options:**
+
 - `project` (string): Filter by project
 - `type` (string): Filter by type
 - `status` (string): Filter by status
@@ -624,6 +637,7 @@ const trail = await atlas.context.trail(project, days, limit);
 ```
 
 **Parameters:**
+
 - `project` (string): Project name (optional)
 - `days` (number): Days to look back (default: 7)
 - `limit` (number): Max breadcrumbs to return, most recent first (default: 50)
@@ -659,6 +673,7 @@ const result = await atlas.sync(options);
 ```
 
 **Options:**
+
 - `paths` (string[]): Directories to scan
 - `dryRun` (boolean): Preview without changes
 - `removeOrphans` (boolean): Remove registry entries whose `path` no longer exists on disk —
@@ -717,6 +732,7 @@ results.forEach(({ path, parsed }) => {
 ```
 
 **Parsed fields:**
+
 - `name` (string): Project name from file
 - `type` (string): Project type (node, r-package, etc.)
 - `status` (string): Status value
@@ -929,6 +945,7 @@ interface SidebarProject {
 ```
 
 **Display contract:**
+
 - Row: `● atlas   75%` — icon(1) + space + name(14) + progress(4)
 - 12-row window, scroll indicator `1-12/N` when N > 12
 - Header border: `cyan` when `isActive`, `gray` when not
@@ -958,6 +975,7 @@ interface InspectorProject {
 ```
 
 **Pomodoro mini-timer:**
+
 - Live tick via `useEffect` + `setInterval(1000)`
 - States: `● FOCUSING` (green) → `◑ PAUSED` (yellow) → `☕ BREAK TIME` (yellow)
 - `Space` toggles pause, `r` resets (both guarded by `isActive`)
@@ -1052,6 +1070,7 @@ try {
 ```
 
 **Error Codes:**
+
 - `PROJECT_NOT_FOUND` - Project doesn't exist
 - `SESSION_ACTIVE` - Session already in progress
 - `NO_ACTIVE_SESSION` - No session to end

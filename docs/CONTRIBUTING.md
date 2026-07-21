@@ -275,6 +275,7 @@ DEBUG=atlas:* npx tsx src/cli/dashboard-ink/index.tsx
 ## Recognition
 
 All contributors listed in:
+
 - [Contributors](https://github.com/Data-Wise/atlas/graphs/contributors)
 - Release notes
 - Annual contributor appreciation post

@@ -9,12 +9,14 @@
 ## Why ADHD-Friendly Design Matters
 
 Traditional productivity tools assume:
+
 - Consistent attention span
 - Perfect time estimation
 - Linear workflow
 - Perfect memory for context
 
 **ADHD brains don't work that way.** We experience:
+
 - Time blindness (hours feel like minutes)
 - Context switching paralysis
 - Hyperfocus followed by crashes

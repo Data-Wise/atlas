@@ -28,6 +28,7 @@ atlas session start myproject
 ```
 
 **Why it works:**
+
 - Visual + numeric
 - Always visible in dashboard
 - No mental math required
@@ -46,6 +47,7 @@ atlas config setup
 ```
 
 **What happens every 30 min (configurable):**
+
 - Dashboard: subtle pulse animation
 - Terminal: `⏱ 30 min — how's it going?`
 - No sound, no pop-up, no interruption
@@ -82,6 +84,7 @@ atlas stats --velocity
 ```
 
 **Shows:**
+
 - 4-week rolling velocity (sessions/week, hours/week)
 - Trend line (improving? declining? stable?)
 - Sparkline in dashboard
@@ -96,6 +99,7 @@ Trend: ↗ +15%
 ```
 
 **Use it to:**
+
 - Set realistic weekly goals
 - See if you're burning out
 - Celebrate progress (not perfection)
@@ -111,6 +115,7 @@ atlas stats --patterns
 ```
 
 **Shows:**
+
 - Best days of week
 - Best hours of day
 - Session length distribution
@@ -127,6 +132,7 @@ Flow sessions: 34% of total
 ```
 
 **Use this to:**
+
 - Schedule deep work in peak hours
 - Protect peak hours (no meetings)
 - Schedule admin in dead zones
@@ -170,6 +176,7 @@ atlas session export --format ics > sessions.ics
 ```
 
 **Result:** Your work sessions appear as calendar blocks.
+
 - See gaps (unstructured time)
 - See clusters (deep work days)
 - Share with team/partner
@@ -187,6 +194,7 @@ atlas stats --patterns
 ```
 
 **Dead zone signals:**
+
 - Sessions < 15 min repeatedly
 - Flow % < 20%
 - High interruption count

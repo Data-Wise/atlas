@@ -8,13 +8,11 @@
  * directory or a directory to batch-scan for .STATUS files.
  */
 
-import { readdir, stat } from 'node:fs/promises'
+import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { StatusFileGateway } from '../../adapters/gateways/StatusFileGateway.js'
-import { StatusFileParser } from '../../adapters/gateways/StatusFileParser.js'
 
 const gateway = new StatusFileGateway()
-const parser = new StatusFileParser()
 
 export class MigrateStatusUseCase {
   /**

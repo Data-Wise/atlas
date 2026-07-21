@@ -194,6 +194,7 @@ Start dashboard: `atlas dash`
 | `Tab` (3×) | `▦ Triple` | Sidebar 25% + Main 47% + Inspector 28% |
 
 **Sidebar panel (Split/Triple):**
+
 - Compact rows: `● atlas  75% ▂▃▅▇█` — focus tier + name + progress + sparkline
 - Focus tier icons: `●` deep (80+) • `◕` strong (60-79) • `◑` steady (40-59) • `◔` warming (20-39) • `○` drift (0-19)
 - Sparklines: 5-day activity `▁▂▃▄▅▆▇█` — green=rising, yellow=declining
@@ -202,6 +203,7 @@ Start dashboard: `atlas dash`
 - `j/k` navigate when focused • `Enter` opens project detail
 
 **Inspector panel (Triple only):**
+
 - Name + type + status bar + focus score (`◕ 72 strong`)
 - Focus text + up to 3 Next actions
 - Live Pomodoro mini-timer: `● FOCUSING` → `◑ PAUSED` → `☕ BREAK`
@@ -212,10 +214,12 @@ Start dashboard: `atlas dash`
 **Themes (v0.9.1):** Press `t` to cycle: default → nord → solarized → mono → high-contrast
 
 **v0.8.0 Views:**
+
 - `e` - Ecosystem: See all dev-tools projects from .STATUS files
 - `p` - Plan: Morning ritual with yesterday's work, inbox, focus
 
 **Focus Mode:**
+
 - Prompts "What will you focus on?" before timer
 - Shows task during Pomodoro
 - After completion: `c` (done), `p` (partial), `n` (pivoted)

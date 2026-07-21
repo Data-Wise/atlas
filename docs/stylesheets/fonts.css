@@ -46,9 +46,9 @@
   --atlas-code: #1565c0;        /* Blue 800 - Developer */
 
   /* Semantic Colors (Light) */
-  --atlas-primary: #5e35b1;        /* Deep Purple 800 - Primary brand */
-  --atlas-primary-light: #7e57c2;  /* Deep Purple 400 */
-  --atlas-primary-lighter: #b39ddb; /* Deep Purple 200 */
+  --atlas-primary: #00695c;        /* Teal 800 - Primary brand */
+  --atlas-primary-light: #26a69a;  /* Teal 400 */
+  --atlas-primary-lighter: #b2dfdb; /* Teal 100 */
   --atlas-accent: #ffb300;         /* Amber 700 - Attention/CTA */
   --atlas-success: #2e7d32;        /* Green 800 */
   --atlas-warning: #e65100;        /* Orange 900 */
@@ -67,9 +67,9 @@
   --atlas-outline-variant: #e0e0e0;
 
   /* Functional */
-  --atlas-active: #5e35b1;
-  --atlas-focus-ring: rgba(94, 53, 177, 0.3);
-  --atlas-focus-ring-strong: rgba(94, 53, 177, 0.5);
+  --atlas-active: #00838f;
+  --atlas-focus-ring: rgba(0, 131, 143, 0.3);
+  --atlas-focus-ring-strong: rgba(0, 131, 143, 0.5);
 
   /* Breathing room */
   --atlas-space-1: 4px;
@@ -142,9 +142,9 @@
   --atlas-code: #64b5f6;
 
   /* Semantic Colors (Dark) */
-  --atlas-primary: #b39ddb;
-  --atlas-primary-light: #ce93d8;
-  --atlas-primary-lighter: #7e57c2;
+  --atlas-primary: #4db6ac;
+  --atlas-primary-light: #80cbc4;
+  --atlas-primary-lighter: #26a69a;
   --atlas-accent: #ffd54f;
   --atlas-success: #66bb6a;
   --atlas-warning: #ffb74d;
@@ -161,9 +161,9 @@
   --atlas-outline-variant: #333333;
 
   /* Functional */
-  --atlas-active: #b39ddb;
-  --atlas-focus-ring: rgba(179, 157, 218, 0.3);
-  --atlas-focus-ring-strong: rgba(179, 157, 218, 0.5);
+  --atlas-active: #4dd0e1;
+  --atlas-focus-ring: rgba(77, 208, 225, 0.3);
+  --atlas-focus-ring-strong: rgba(77, 208, 225, 0.5);
 
   /* Shadows (Dark) */
   --atlas-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
@@ -328,7 +328,7 @@ blockquote, .md-typeset blockquote {
 
 [data-md-color-scheme="slate"] blockquote,
 [data-md-color-scheme="slate"] .md-typeset blockquote {
-  background-color: rgba(94, 53, 177, 0.12);
+  background-color: rgba(0, 105, 92, 0.12);
   border-left-color: var(--atlas-primary-light);
 }
 
@@ -615,18 +615,18 @@ hr, .md-typeset hr {
 .md-typeset details.adhd {
   border-color: var(--atlas-primary);
   border-left-width: 4px;
-  background-color: rgba(94, 53, 177, 0.06);
+  background-color: rgba(0, 105, 92, 0.06);
   border-radius: var(--atlas-radius-md);
 }
 
 .md-typeset .adhd > .admonition-title,
 .md-typeset .adhd > summary {
-  background-color: rgba(94, 53, 177, 0.1);
+  background-color: rgba(0, 105, 92, 0.1);
   color: var(--atlas-primary);
   font-weight: 600;
   padding: var(--atlas-space-2) var(--atlas-space-3);
   border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
-  border-bottom: 1px solid rgba(94, 53, 177, 0.2);
+  border-bottom: 1px solid rgba(0, 105, 92, 0.2);
 }
 
 /* ── Tables — Scannable ────────────────────────────────────── */

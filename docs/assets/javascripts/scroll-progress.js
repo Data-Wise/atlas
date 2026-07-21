@@ -110,7 +110,7 @@
       
       .md-scroll-progress__bar {
         height: 100%;
-        background: var(--atlas-primary, #5e35b1);
+        background: var(--atlas-primary, #00695c);
         transform-origin: left center;
         transform: scaleX(0);
         transition: transform 0.1s linear, width 0.1s linear;
@@ -118,7 +118,7 @@
       }
       
       [data-md-color-scheme="slate"] .md-scroll-progress__bar {
-        background: var(--atlas-primary-light, #ce93d8);
+        background: var(--atlas-primary-light, #26a69a);
       }
       
       /* Reduced motion */
