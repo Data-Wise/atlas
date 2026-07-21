@@ -8,7 +8,7 @@
 import { describe, test, expect, beforeAll } from '@jest/globals'
 import { execFileSync } from 'child_process'
 import { readFileSync, existsSync, readdirSync } from 'fs'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)

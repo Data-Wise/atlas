@@ -90,7 +90,7 @@ describe('Deprecation-with-warning tier (v0.14 — nothing removed)', () => {
   })
 
   test('trail prints a one-line stderr deprecation pointer, stdout unchanged', () => {
-    const { stdout, stderr, exitCode } = runCLI('trail', env)
+    const { stderr, exitCode } = runCLI('trail', env)
     expect(exitCode).toBe(0)
     expect(stderr).toContain('deprecated')
   })
