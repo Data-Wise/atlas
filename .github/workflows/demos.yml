@@ -311,10 +311,20 @@ jobs:
           git push origin "$BRANCH"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
+      - name: Mint GitHub App token (default GITHUB_TOKEN can't open PRs)
+        id: app-token
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: Data-Wise
+          repositories: atlas
+
       - name: Open PR and enable auto-merge
         if: steps.check.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           BRANCH: ${{ steps.commit.outputs.branch }}
         run: |
           PR_URL=$(gh pr create \
