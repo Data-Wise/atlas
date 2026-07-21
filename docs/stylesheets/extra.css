@@ -10,9 +10,9 @@
   --atlas-build: #e65100;
   --atlas-code: #1565c0;
 
-  /* Functional — purple kept as a single, sparing brand accent */
-  --atlas-active: #9c27b0;
-  --atlas-focus-ring: rgba(156, 39, 176, 0.3);
+  /* Functional — teal/blue, single sparing brand accent (matches fonts.css) */
+  --atlas-active: #00838f;
+  --atlas-focus-ring: rgba(0, 131, 143, 0.3);
   --atlas-sidebar-width: 18rem;
 
   /* One spacing scale (8px base) */
@@ -31,8 +31,8 @@
   --atlas-do: #ce93d8;
   --atlas-build: #ffb74d;
   --atlas-code: #64b5f6;
-  --atlas-active: #ce93d8;
-  --atlas-focus-ring: rgba(206, 147, 216, 0.3);
+  --atlas-active: #4dd0e1;
+  --atlas-focus-ring: rgba(77, 208, 225, 0.3);
 }
 
 /* ── Sidebar: Color Spine ──────────────────────────────────── */
@@ -257,7 +257,7 @@
 
 .md-typeset .tip > .admonition-title,
 .md-typeset .tip > summary {
-  background-color: rgba(156, 39, 176, 0.08);
+  background-color: rgba(0, 131, 143, 0.08);
 }
 
 /* ── Code Blocks — Readability ─────────────────────────────── */
@@ -311,9 +311,16 @@
   border-radius: var(--atlas-radius);
 }
 
-/* ── Layout — use the viewport width (fixes "squished in middle") ── */
+/* ── Layout — use the viewport width for the grid (sidebar + TOC get
+   breathing room on wide screens), but cap the PROSE column narrower for
+   readability — very long line lengths are harder to track line-to-line,
+   which compounds with ADHD reading fatigue. ── */
 .md-grid {
   max-width: 100rem;
+}
+
+.md-content__inner > .md-typeset {
+  max-width: 54rem;
 }
 
 /* Pin the TOC to the SCREEN's right edge (not the centered grid).
@@ -660,7 +667,7 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
   border: 1px solid var(--atlas-active);
   border-left-width: 4px;
   border-radius: var(--atlas-radius);
-  background-color: rgba(156, 39, 176, 0.06);
+  background-color: rgba(0, 131, 143, 0.06);
   padding: 1rem 1.25rem;
   margin: 1.5rem 0;
   color: var(--md-default-fg-color);
@@ -674,7 +681,7 @@ body[data-atlas-section="code"] .md-nav--primary .md-nav__item--active > .md-nav
 }
 
 [data-md-color-scheme="slate"] .md-typeset .atlas-intro {
-  background-color: rgba(206, 147, 216, 0.1);
+  background-color: rgba(77, 208, 225, 0.1);
 }
 
 /* ── Badge Styling ─────────────────────────────────────────── */
