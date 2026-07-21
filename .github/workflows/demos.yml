@@ -298,11 +298,29 @@ jobs:
             git status docs/demos/
           fi
 
-      - name: Commit updated GIFs
+      - name: Commit to a branch (main is PR-only)
+        id: commit
         if: steps.check.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="chore/demo-gifs-${{ github.run_number }}"
+          git checkout -b "$BRANCH"
           git add docs/demos/*.gif
           git commit -m "chore: regenerate demo GIFs [skip ci]"
-          git push
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Open PR and enable auto-merge
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+        run: |
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: regenerate demo GIFs" \
+            --body "Automated GIF regeneration from the Demo GIFs workflow (run #${{ github.run_number }}).")
+          echo "PR: $PR_URL"
+          gh pr merge --auto --squash "$PR_URL"
