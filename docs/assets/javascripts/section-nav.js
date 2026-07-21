@@ -12,6 +12,11 @@
  *    search box to filter the left sidebar.
  * 3. Collapses the left sidebar's top-level sections into a single-open
  *    accordion, with an item count on each collapsed header.
+ * 4. Stamps each top-level sidebar group (and standalone top-level page)
+ *    with its own `data-atlas-section`, so the "color spine" treatment in
+ *    extra.css can tint every group by its own hue at once — not just the
+ *    single group matching the current page (that's `applySectionAttribute`
+ *    on <body>, which this complements).
  */
 
 (function () {
@@ -40,17 +45,20 @@
     ['CONTRIBUTING', 'do']
   ];
 
-  function currentSection() {
-    // location.pathname is the *rendered* site path (e.g. /atlas/user-guide/...),
-    // not the source .md path — but mkdocs preserves the doc's relative path
-    // structure 1:1 in the built site, so the same prefixes apply.
-    var path = window.location.pathname;
+  function sectionForPath(path) {
     for (var i = 0; i < SECTION_BY_PREFIX.length; i++) {
       if (path.indexOf(SECTION_BY_PREFIX[i][0]) !== -1) {
         return SECTION_BY_PREFIX[i][1];
       }
     }
     return null;
+  }
+
+  function currentSection() {
+    // location.pathname is the *rendered* site path (e.g. /atlas/user-guide/...),
+    // not the source .md path — but mkdocs preserves the doc's relative path
+    // structure 1:1 in the built site, so the same prefixes apply.
+    return sectionForPath(window.location.pathname);
   }
 
   function applySectionAttribute() {
@@ -120,6 +128,37 @@
     });
   }
 
+  // ── Sidebar color spine — tint every group by its own section ───────
+  function stampGroupSections() {
+    // Top-level items directly under the primary nav's root list: both
+    // nested groups (e.g. "ADHD Guide") and standalone pages (e.g.
+    // "Cookbook") — the spine treatment applies to both alike.
+    var groups = document.querySelectorAll(
+      '.md-nav--primary > .md-nav__list > .md-nav__item'
+    );
+
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      var firstLink = group.querySelector('.md-nav__link[href]');
+      if (!firstLink) continue;
+
+      var href = firstLink.getAttribute('href') || '';
+      var path;
+      try {
+        path = new URL(href, window.location.href).pathname;
+      } catch (e) {
+        continue;
+      }
+
+      var section = sectionForPath(path);
+      if (section) {
+        group.setAttribute('data-atlas-section', section);
+      } else {
+        group.removeAttribute('data-atlas-section');
+      }
+    }
+  }
+
   // ── Sidebar single-open accordion ───────────────────────────────────
   function wireAccordion() {
     var groups = document.querySelectorAll(
@@ -160,6 +199,7 @@
   function init() {
     applySectionAttribute();
     wirePillNav();
+    stampGroupSections();
     wireAccordion();
   }
 
