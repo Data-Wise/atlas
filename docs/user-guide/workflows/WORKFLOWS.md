@@ -219,6 +219,7 @@ atlas dash
 ```
 
 **The dashboard shows:**
+
 - Your focus task prominently displayed
 - Timer countdown
 - Today's completed Pomodoros
@@ -598,6 +599,7 @@ Commands: [flow-cli Integration](../../INTEGRATIONS.md), `atlas schedule push --
 ```
 
 Keep `atlas dash` visible to see:
+
 - Current session duration
 - Streak status
 - Time cues
@@ -643,6 +645,7 @@ Create `.vscode/tasks.json`:
 **Schedule:** Monday 09:15 (after `pmed-extensions-weekly-advance` 08:07, before `research-action-board-weekly` 09:38)
 
 **Components:**
+
 - `scripts/sync-research-board.sh` — Wrapper script
 - `~/Library/LaunchAgents/com.data-wise.atlas-sync.plist` — launchd job
 

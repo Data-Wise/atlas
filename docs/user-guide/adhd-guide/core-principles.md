@@ -25,12 +25,14 @@ ADHD working memory is limited. Every thought, task, idea, question — get it *
 > **Context restores flow. Memory fails.**
 
 When you stop work, you lose:
+
 - What you were doing
 - Why you were doing it
 - What blocked you
 - What's next
 
 **Atlas gives you:**
+
 - `atlas where` → Last project, focus, duration
 - `atlas trail` → Breadcrumbs (thoughts, blockers, decisions)
 - `atlas parked` → Saved contexts for switching
@@ -44,6 +46,7 @@ When you stop work, you lose:
 > **One thing at a time. Everything else waits.**
 
 Multitasking destroys ADHD flow. Atlas enforces:
+
 - Only **one active session** at a time
 - Switch = `atlas park` → `atlas session start`
 - No "background" sessions
@@ -84,11 +87,13 @@ Multitasking destroys ADHD flow. Atlas enforces:
 > **Write for the person you'll be tomorrow.**
 
 Breadcrumbs (`atlas crumb "stuck on OAuth callback"`) serve Future You:
+
 - "Where was I?" → `atlas trail`
 - "What was I stuck on?" → `atlas trail --limit 5`
 - "What did I decide?" → Search breadcrumbs
 
 **Format:** `atlas crumb "specific, actionable note"`
+
 - ❌ "stuck"
 - ✅ "OAuth callback returns 400, tried scopes A+B, need C"
 

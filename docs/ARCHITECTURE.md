@@ -708,6 +708,7 @@ flowchart LR
 ```
 
 **Event Types:**
+
 - `SessionStarted` - When a session begins
 - `SessionEnded` - When a session ends
 - `SessionPaused` - When a session is paused
@@ -858,6 +859,7 @@ flowchart TD
 ```
 
 **Template Variables:**
+
 - `{{name}}` - Project name
 - `{{date}}` - Current date
 - `{{author}}` - From config
@@ -893,6 +895,7 @@ graph LR
 ```
 
 **Integration Points:**
+
 - Uses Atlas core APIs (`atlas.sessions`, `atlas.capture`, `atlas.context`)
 - Formatters convert domain objects to MCP-friendly text responses
 - Resources provide real-time JSON data for session/context

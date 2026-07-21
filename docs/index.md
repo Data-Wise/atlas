@@ -79,6 +79,7 @@ atlas session start myproject                  # 3. start working
 ## :heart: Why Atlas (ADHD-first)
 
 <div class="chip-row" markdown>
+
 - :material-fire:{ .chip-icon } **Streak Tracking** — visual motivation through consecutive-day tracking
 - :material-clock-alert-outline:{ .chip-icon } **Time Blindness Helper** — gentle time cues without breaking flow
 - :material-party-popper:{ .chip-icon } **Celebration Helper** — positive reinforcement on real progress

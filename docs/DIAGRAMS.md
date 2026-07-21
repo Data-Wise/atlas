@@ -190,6 +190,7 @@ sequenceDiagram
 ```
 
 **Key Points:**
+
 - Session lifecycle flows through Use Cases → Domain Entities → Repositories
 - Each write operation persists to storage (Filesystem JSON or SQLite)
 - Domain events trigger cross-cutting concerns (streak, notifications, etc.)
@@ -280,6 +281,7 @@ erDiagram
 ```
 
 **Relationships:**
+
 - **1:N (Project → Session):** Each project has multiple sessions
 - **1:N (Project → Capture):** Each project receives multiple captures
 - **1:N (Project → Breadcrumb):** Each project logs multiple breadcrumbs
@@ -341,6 +343,7 @@ stateDiagram-v2
 ```
 
 **State Transitions:**
+
 - **Idle → Active:** Start work session
 - **Active → Paused:** Take a break (preserves start time)
 - **Active → Ended:** Complete work (calculates duration)
@@ -738,6 +741,7 @@ graph TD
 ```
 
 **Template Variables:**
+
 - `{{name}}` - Project name
 - `{{date}}` - Current date (YYYY-MM-DD)
 - `{{author}}` - From config
@@ -841,6 +845,7 @@ graph TB
 ```
 
 **Presenter Pattern Benefits:**
+
 - **Separation of Concerns:** UI formatting separate from business logic
 - **Testability:** Pure functions easy to unit test (65 tests)
 - **Reusability:** ProjectPresenter can be used by future web/API interfaces
@@ -922,6 +927,7 @@ graph TB
 ```
 
 **Layout Modes (Tab cycles):**
+
 - **SINGLE:** Main view only (100%)
 - **SPLIT:** Sidebar (28%) + Main (72%)
 - **TRIPLE:** Sidebar (25%) + Main (47%) + Inspector (28%)
@@ -985,6 +991,7 @@ flowchart TB
 ```
 
 **Key design decisions:**
+
 - Theme is pure React Context — no prop drilling
 - Presenters are framework-agnostic (used by both CLI and TUI)
 - All visual data derived from one `GetSessionStatsUseCase` fetch
@@ -1134,6 +1141,7 @@ flowchart TB
 ## Rendering Notes
 
 All diagrams use standard Mermaid syntax and should render correctly in:
+
 - GitHub markdown (`.md` files)
 - GitLab markdown
 - Notion

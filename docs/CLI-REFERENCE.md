@@ -193,6 +193,7 @@ atlas project remove <name-or-id>
 ```
 
 **Behavior:**
+
 *   **Case-Insensitive Resolution**: Matches registered projects by name case-insensitively.
 *   **UUID/Path Fallback**: Falls back to direct path/ID matching if no name matches.
 *   **Ambiguity Guard**: If multiple registered projects share the same name, Atlas aborts and lists conflicting paths/IDs to avoid accidental deletion.
@@ -242,6 +243,7 @@ atlas session start myproject -t "Fix bug" -e 30 --energy high
 ```
 
 **Output includes:**
+
 - Context restoration ("Last time you were...")
 - Current streak display
 - Session start confirmation
@@ -267,6 +269,7 @@ atlas session end "Completed login flow, needs testing"
 ```
 
 **Output includes:**
+
 - Session duration
 - **Evidence** (v0.14.0): the git delta since session start — commits and files touched,
   computed via the project's git history. Non-git projects, or sessions with zero commits,
@@ -291,6 +294,7 @@ Options:
 ```
 
 **Output includes:**
+
 - Active session project and task
 - Duration and flow state
 - Or "No active session" message
@@ -337,6 +341,7 @@ atlas session export --format json > sessions.json
 ```
 
 **iCal Output:**
+
 - Standard RFC 5545 format
 - Compatible with Apple Calendar, Google Calendar, Outlook
 - Each session becomes a calendar event
@@ -412,6 +417,7 @@ atlas stats --calibrate atlas --minutes 30
 ```
 
 **Output includes:**
+
 - Total sessions and time
 - Daily average duration
 - Flow sessions percentage (sessions ≥ 15 min)
@@ -625,6 +631,7 @@ atlas where myproject
 ```
 
 **Output includes:**
+
 - Current focus
 - Active session info
 - Recent breadcrumbs
@@ -715,6 +722,7 @@ atlas plan --json
 ```
 
 **The planning ritual includes:**
+
 - Yesterday's work summary
 - Current streak display
 - Inbox items for quick triage
@@ -923,6 +931,7 @@ atlas park --force "saving context"
 ```
 
 **Saved context includes:**
+
 - Project name
 - Current task
 - Session duration
@@ -938,6 +947,7 @@ atlas parked
 ```
 
 **Output shows:**
+
 - Context ID
 - Project name
 - Task
@@ -966,6 +976,7 @@ atlas unpark abc123
 ```
 
 **Restoration includes:**
+
 - Starts new session with saved project/task
 - Shows "where you left off" summary
 
@@ -1176,6 +1187,7 @@ atlas init --template r-package --name mypackage
 ```
 
 **Built-in Templates:**
+
 - `node` - Node.js/npm package
 - `r-package` - R package with roxygen2/testthat
 - `python` - Python package with pytest

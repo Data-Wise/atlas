@@ -156,6 +156,7 @@
 ```
 
 **Disabled:**
+
 - Page transitions
 - Sidebar expand/collapse
 - Scroll progress bar
@@ -341,6 +342,7 @@ npx pa11y https://data-wise.github.io/atlas/
 | Priority | P0 (blocks access) → 24h fix |
 
 **Include:**
+
 - Browser/OS/assistive tech
 - Steps to reproduce
 - Expected vs actual

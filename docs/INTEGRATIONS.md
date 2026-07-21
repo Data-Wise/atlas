@@ -30,6 +30,7 @@ The dev-tools ecosystem follows a three-layer architecture:
 ```
 
 **Design Principle:** Each layer delegates instant operations down to lower layers.
+
 - `aiterm feature` → delegates to `flow-cli g feature` for git ops
 - `flow dash` → shells out to `atlas dashboard` for the live TUI
 - `tm ghost` → delegates to aiterm for rich terminal status
@@ -103,11 +104,13 @@ See [SwiftBar](user-guide/swiftbar.md) for install and refresh-interval tuning.
 | `ait worktree` | `flow-cli wt` | Pure ZSH worktree management |
 
 **What flows:**
+
 - Feature branch creation
 - Git workflow commands
 - Terminal status and configuration
 
 **Implementation:**
+
 - aiterm checks if flow-cli is installed
 - Delegates via subprocess call
 - Falls back to Python implementation if flow-cli unavailable
@@ -206,6 +209,7 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 | **filesystem** | npx | File system access (browser only) | claude.ai via extension |
 
 **What flows:**
+
 - Commands from Claude to MCP servers
 - Results back to Claude
 - File system operations
@@ -213,6 +217,7 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 - Literature searches
 
 **Configuration:**
+
 - Desktop/CLI: `~/.claude/settings.json`
 - Browser: `~/projects/dev-tools/claude-mcp/MCP_SERVER_CONFIG.json`
 
@@ -236,6 +241,7 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 | scribe | v1.1.0 | GitHub (cask) | macOS app |
 
 **What flows:**
+
 - Version updates via GitHub Actions
 - Automated formula updates (creates PRs)
 - Manual merge for safety
@@ -261,6 +267,7 @@ Counts/names must never start with `{` or `[` — flow-cli treats a JSON-prefixe
 ```
 
 **Migration Path:**
+
 - zsh-claude-workflow functionality merged into flow-cli
 - Old aliases deprecated in favor of flow-cli commands
 - Symlinks being removed
@@ -296,22 +303,26 @@ homebrew-tap
 ### Tool Categories
 
 **Core Infrastructure:**
+
 - atlas - State management
 - flow-cli - Shell workflow
 - aiterm - Rich automation
 
 **MCP Ecosystem:**
+
 - statistical-research - R + literature
 - nexus - Knowledge management
 - rforge - R package coordination
 - obsidian-ops - Vault operations
 
 **Specialized Tools:**
+
 - scribe - Screenshot + annotation
 - homebrew-tap - Distribution
 - spacemacs-rstats - Emacs config
 
 **Archived/Deprecated:**
+
 - zsh-claude-workflow - Merged into flow-cli
 - dev-planning - Archived (this migration)
 - docs-standards - Migrated to flow-cli
@@ -418,6 +429,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 **Goal:** flow-cli queries atlas for enriched project data
 
 **Benefits:**
+
 - Show dependency trees in `flow dash`
 - Highlight projects with stale dependencies
 - Warn about circular dependencies
@@ -430,6 +442,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 **Goal:** Single source of truth for MCP server configuration
 
 **Benefits:**
+
 - One config file synced across Desktop, CLI, Browser
 - Centralized in atlas or flow-cli
 - Version control for MCP setup
@@ -441,6 +454,7 @@ All projects follow conventions defined in **flow-cli/docs/conventions/**:
 **Goal:** Atlas tracks sessions across aiterm, flow-cli, Claude
 
 **Benefits:**
+
 - See all work sessions in one place
 - Automatic context recovery
 - Integrated time tracking

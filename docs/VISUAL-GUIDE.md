@@ -406,6 +406,7 @@ atlas dash
 ### Data Source
 
 The analytics pane reads from `~/.atlas/sessions/` and aggregates:
+
 - **Heatmap**: Session minutes per day, normalized to 5 levels (·░▒▓█)
 - **Velocity**: Sessions per day over 4-week rolling window
 - **Patterns**: Session start times and durations across 90 days

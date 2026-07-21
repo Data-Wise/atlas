@@ -110,6 +110,7 @@ atlas --help
 ```
 
 **What just happened?**
+
 - Created `~/.atlas/` directory for data storage
 - Atlas is ready to track your projects
 
@@ -168,6 +169,7 @@ atlas session start myproject
 ```
 
 **What you'll see:**
+
 - "Last time you were..." message (context restoration)
 - Your current streak (if you worked yesterday)
 - Current focus/task
@@ -273,6 +275,7 @@ atlas unpark
 ```
 
 **What just happened?**
+
 - `park` saved: your project, task, duration, breadcrumbs, and a note
 - `unpark` restored: new session with same project/task, showed your note
 
@@ -284,6 +287,7 @@ atlas parked
 ### Context Restoration
 
 Every time you start a session, Atlas tells you:
+
 - What you were working on last time
 - When you last worked on this
 - Your current streak
@@ -343,6 +347,7 @@ atlas dash
 ```
 
 **What you see:**
+
 - All your projects
 - Active session highlighted
 - Progress bars
@@ -448,6 +453,7 @@ Press `Tab` to cycle through three layout modes without leaving the dashboard:
 ```
 
 When inspector is focused (`Shift+Tab` to reach it):
+
 - `Space` → pause/resume the Pomodoro
 - `r` → reset the countdown
 - `Shift+Tab` → move focus to next panel
@@ -487,6 +493,7 @@ Can't decide what to work on? Press `d`:
 🎲 What should you work on?
 
 Based on:
+
 - Time of day (morning = fresh tasks)
 - Project progress (unfinished work)
 - Recent activity (what's hot)
@@ -512,6 +519,7 @@ atlas init --list-templates
 ```
 
 **Built-in templates:**
+
 - `node` - Node.js/npm package
 - `r-package` - R package
 - `python` - Python package
@@ -810,6 +818,7 @@ atlas session export --format json > sessions.json
 ```
 
 **Works with:**
+
 - Apple Calendar (double-click the .ics file)
 - Google Calendar (import from settings)
 - Outlook (import calendar)
