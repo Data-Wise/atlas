@@ -493,7 +493,6 @@ Can't decide what to work on? Press `d`:
 🎲 What should you work on?
 
 Based on:
-
 - Time of day (morning = fresh tasks)
 - Project progress (unfinished work)
 - Recent activity (what's hot)

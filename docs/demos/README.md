@@ -51,7 +51,6 @@ Edit tape files to adjust:
 Add to GitHub Actions:
 
 ```yaml
-
 - name: Generate demo GIFs
   run: |
     brew install vhs
