@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, afterEach } from '@jest/globals';
-import { writeFileSync, existsSync, unlinkSync } from 'fs';
+import { writeFileSync } from 'fs';
 import { acquireLock, releaseLock, checkLock, lockPath } from '../../../src/utils/atlasLock.js';
 
 describe('atlasLock', () => {
