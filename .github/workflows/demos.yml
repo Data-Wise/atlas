@@ -333,4 +333,4 @@ jobs:
             --title "chore: regenerate demo GIFs" \
             --body "Automated GIF regeneration from the Demo GIFs workflow (run #${{ github.run_number }}).")
           echo "PR: $PR_URL"
-          gh pr merge --auto --squash "$PR_URL"
+          gh pr merge --auto --squash "$PR_URL" || gh pr merge --squash "$PR_URL"
