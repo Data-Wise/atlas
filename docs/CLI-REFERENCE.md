@@ -907,6 +907,24 @@ Reminders that fire via macOS `launchd` — unlike `atlas` commands, they trigge
 notification; state is shared across surfaces via `~/.claude/guards.json` so
 Claude Code, Cowork, etc. all see the same outstanding nudges.
 
+> **One-time setup — check this first if a scheduled nudge fires (`atlas nudge
+> ls` shows `fired`) but no banner ever appears.** Notifications are delivered
+> via `osascript`, which macOS attributes to **Script Editor**. Two System
+> Settings → Notifications → Script Editor settings can silently swallow the
+> banner with zero error anywhere:
+> - **Allow Notifications** must be On.
+> - **Alert Style** must be **Banners** or **Alerts** — if it's set to
+>   **None**, the notification is logged to Notification Center history but
+>   never shown or sounded. `osascript` still exits 0, so nothing in atlas's
+>   own logs or exit codes reveals this — the nudge state correctly flips to
+>   `fired`, and it looks identical to a real firing to anything except your
+>   own eyes. This was the actual cause the first time this shipped: manually
+>   firing `osascript -e 'display notification ...'` directly in a terminal
+>   produced no visible banner either, confirming it wasn't a launchd/atlas
+>   bug — Alert Style was set to None.
+> - A Focus mode (Control Center) can also suppress it if Script Editor isn't
+>   on that Focus's allowed-apps list.
+
 ### `atlas nudge add`
 
 Schedule a wall-clock nudge.
