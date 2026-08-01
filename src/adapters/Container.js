@@ -58,6 +58,14 @@ import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
 import { GitGateway } from './gateways/GitGateway.js'
+import { GuardsFileNudgeStore } from './gateways/GuardsFileNudgeStore.js'
+import { LaunchdNudgeScheduler } from './gateways/LaunchdNudgeScheduler.js'
+import { AddNudgeUseCase } from '../use-cases/nudge/AddNudgeUseCase.js'
+import { FireNudgeUseCase } from '../use-cases/nudge/FireNudgeUseCase.js'
+import { AckNudgeUseCase } from '../use-cases/nudge/AckNudgeUseCase.js'
+import { RmNudgeUseCase } from '../use-cases/nudge/RmNudgeUseCase.js'
+import { ListNudgesUseCase } from '../use-cases/nudge/ListNudgesUseCase.js'
+import { GetDayActivityUseCase } from '../use-cases/day/GetDayActivityUseCase.js'
 
 export class Container {
   /**
@@ -456,6 +464,85 @@ export class Container {
     })
   }
 
+  /**
+   * Nudge persistence. Registered as a gateway, NOT via the storage-branching
+   * repository accessors above: nudges live in the shared guards.json
+   * regardless of the configured backend, so a SQLite variant can never
+   * legitimately exist. See SPEC Design §1.
+   */
+  getNudgeStore() {
+    return this._resolve('nudgeStore', () => {
+      return new GuardsFileNudgeStore()
+    })
+  }
+
+  getNudgeScheduler() {
+    return this._resolve('nudgeScheduler', () => {
+      return new LaunchdNudgeScheduler()
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Nudge
+  // ============================================================================
+
+  getAddNudgeUseCase() {
+    return this._resolve('addNudgeUseCase', () => {
+      return new AddNudgeUseCase({
+        nudgeStore: this.getNudgeStore(),
+        scheduler: this.getNudgeScheduler()
+      })
+    })
+  }
+
+  getFireNudgeUseCase() {
+    return this._resolve('fireNudgeUseCase', () => {
+      return new FireNudgeUseCase({
+        nudgeStore: this.getNudgeStore()
+      })
+    })
+  }
+
+  getAckNudgeUseCase() {
+    return this._resolve('ackNudgeUseCase', () => {
+      return new AckNudgeUseCase({
+        nudgeStore: this.getNudgeStore(),
+        scheduler: this.getNudgeScheduler()
+      })
+    })
+  }
+
+  getRmNudgeUseCase() {
+    return this._resolve('rmNudgeUseCase', () => {
+      return new RmNudgeUseCase({
+        nudgeStore: this.getNudgeStore(),
+        scheduler: this.getNudgeScheduler()
+      })
+    })
+  }
+
+  getListNudgesUseCase() {
+    return this._resolve('listNudgesUseCase', () => {
+      return new ListNudgesUseCase({
+        nudgeStore: this.getNudgeStore()
+      })
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Day Activity
+  // ============================================================================
+
+  getGetDayActivityUseCase() {
+    return this._resolve('getDayActivityUseCase', () => {
+      return new GetDayActivityUseCase({
+        gitGateway: this.getGitGateway(),
+        sessionRepository: this.getSessionRepository(),
+        projectRepository: this.getProjectRepository()
+      })
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -535,6 +622,14 @@ export class Container {
       'StatusFileGateway': () => this.getStatusFileGateway(),
       'StatusFileParser': () => this.getStatusFileParser(),
       'GitGateway': () => this.getGitGateway(),
+      'NudgeStore': () => this.getNudgeStore(),
+      'NudgeScheduler': () => this.getNudgeScheduler(),
+      'AddNudgeUseCase': () => this.getAddNudgeUseCase(),
+      'FireNudgeUseCase': () => this.getFireNudgeUseCase(),
+      'AckNudgeUseCase': () => this.getAckNudgeUseCase(),
+      'RmNudgeUseCase': () => this.getRmNudgeUseCase(),
+      'ListNudgesUseCase': () => this.getListNudgesUseCase(),
+      'GetDayActivityUseCase': () => this.getGetDayActivityUseCase(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),

@@ -2,13 +2,27 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-07-20
+**Last Updated:** 2026-08-01
 
 ---
 
-## Current Version: v0.16.0 ✅ SHIPPED
+## Current Version: v0.17.0 ✅ SHIPPED
 
-ADHD-friendly docs-site redesign — implements the full "Suggested next steps" table from
+Wall-clock nudges + multi-repo day activity — not on the v0.17.0 Candidates list below; shipped
+ad hoc from issue #114, same pattern as v0.16.0's docs-site redesign.
+
+- [x] **`atlas nudge {add,fire,ack,rm,ls}`** — wall-clock reminders via macOS `launchd`, firing even with every Claude surface closed; delivered as an OS notification via `osascript` (argv-safe against injection); state shared cross-surface via `~/.claude/guards.json`'s `nudges.wall-clock` key (`GuardsFileNudgeStore` gateway, lock-protected against concurrent writers)
+- [x] **`atlas day [--date] [--format table|json]`** — multi-repo commit + `.STATUS`-diff + session-minutes activity provider across the four project trees, feeding savant's `research-day-log` skill
+- [x] **`atlas doctor` nudge-drift reconciliation** — flags a scheduled nudge record with no matching loaded `launchd` job
+- Two real bugs found via live E2E (not just unit tests): a `launchd` PATH resolution issue (`process.execPath` now invoked directly, bypassing the `#!/usr/bin/env node` shebang) and a macOS Notification Alert Style gotcha (documented as a setup prerequisite)
+
+See `docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md` for the full spec.
+
+---
+
+## v0.16.0 - ADHD-Friendly Docs-Site Redesign ✅ COMPLETE
+
+Implements the full "Suggested next steps" table from
 `docs/specs/PROPOSAL-docs-site-design-audit-2026-07-19.md`.
 
 - [x] **Pill nav** — 7-tab bar collapsed to Home + 4 color pills (Learn/Do/Build/Code) + a sidebar search filter (`overrides/partials/tabs.html`)
@@ -52,10 +66,13 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 
 ---
 
-## ⏳ v0.17.0 Candidates (Planned)
+## ⏳ v0.18.0 Candidates (Planned)
 
-Not yet started — priority order, top first (renumbered from "v0.16.0 Candidates": v0.16.0 was
-used for the ad-hoc docs-site redesign instead — none of the items below shipped):
+Not yet started — priority order, top first (renumbered from "v0.17.0 Candidates": v0.17.0 was
+used for the ad-hoc wall-clock nudges + `atlas day` feature instead — none of the items below
+shipped). #115 (surface fired-but-unacked nudges in `atlas dash`'s NowView) is a new fast-follow
+candidate, unblocked now that v0.17.0's `Nudge`/`INudgeStore` exist — not added to the numbered
+list below since it wasn't part of the original candidates pass.
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).

@@ -900,6 +900,125 @@ atlas agenda 14 --format json
 
 ---
 
+## Wall-Clock Nudges (v0.17.0+)
+
+Reminders that fire via macOS `launchd` — unlike `atlas` commands, they trigger
+**even when no Claude surface (app or terminal) is open**. Delivery is an OS
+notification; state is shared across surfaces via `~/.claude/guards.json` so
+Claude Code, Cowork, etc. all see the same outstanding nudges.
+
+> **One-time setup — check this first if a scheduled nudge fires (`atlas nudge
+> ls` shows `fired`) but no banner ever appears.** Notifications are delivered
+> via `osascript`, which macOS attributes to **Script Editor**. Two System
+> Settings → Notifications → Script Editor settings can silently swallow the
+> banner with zero error anywhere:
+> - **Allow Notifications** must be On.
+> - **Alert Style** must be **Banners** or **Alerts** — if it's set to
+>   **None**, the notification is logged to Notification Center history but
+>   never shown or sounded. `osascript` still exits 0, so nothing in atlas's
+>   own logs or exit codes reveals this — the nudge state correctly flips to
+>   `fired`, and it looks identical to a real firing to anything except your
+>   own eyes. This was the actual cause the first time this shipped: manually
+>   firing `osascript -e 'display notification ...'` directly in a terminal
+>   produced no visible banner either, confirming it wasn't a launchd/atlas
+>   bug — Alert Style was set to None.
+> - A Focus mode (Control Center) can also suppress it if Script Editor isn't
+>   on that Focus's allowed-apps list.
+
+### `atlas nudge add`
+
+Schedule a wall-clock nudge.
+
+```bash
+atlas nudge add <time> <message> [options]
+
+Arguments:
+  time       HH:MM, 24-hour (e.g. 23:00)
+  message    Notification text
+
+Options:
+  --daily    Recur daily instead of firing once
+```
+
+**Examples:**
+```bash
+# One-shot nudge tonight at 11pm
+atlas nudge add "23:00" "wrap up and commit"
+
+# Recurring daily reminder
+atlas nudge add "09:00" "morning planning" --daily
+```
+
+### `atlas nudge fire <id>`
+
+Fires a nudge immediately. This is invoked by `launchd` at the scheduled time
+— not meant for interactive use, though running it manually is safe (it fires
+the same OS notification).
+
+### `atlas nudge ack <id>`
+
+Acknowledge a fired nudge.
+
+- **One-shot:** also unschedules it — the job is done.
+- **`--daily`:** stays scheduled for tomorrow; only marks today's firing acked.
+
+### `atlas nudge rm <id>`
+
+Remove a nudge and stop it, regardless of state. The only way to stop a
+`--daily` nudge from recurring.
+
+### `atlas nudge ls`
+
+List nudges.
+
+```bash
+atlas nudge ls [options]
+
+Options:
+  --outstanding        Show only pending/fired (not yet acked) nudges
+  --format <format>    Output format: table (default), json
+```
+
+**Examples:**
+```bash
+# Everything outstanding
+atlas nudge ls --outstanding
+
+# All nudges as JSON
+atlas nudge ls --format json
+```
+
+---
+
+## Day Activity (v0.17.0+)
+
+### `atlas day`
+
+Multi-repo activity for a date — commits and `.STATUS` changes across the four
+project trees (`r-packages/`, `research/`, `teaching/`, `dev-tools/`), plus
+tracked session minutes per tree. A memory aid for "what did I do today"
+across many repos, never a source of truth — sessions with unresolvable
+projects are silently excluded rather than guessed at.
+
+```bash
+atlas day [options]
+
+Options:
+  --date <date>        YYYY-MM-DD (default: today)
+  --format <format>    Output format: table (default), json
+```
+
+**Examples:**
+```bash
+# Today, table view
+atlas day
+
+# A specific date as JSON (e.g. for savant's research-day-log skill)
+atlas day --date 2026-08-01 --format json
+```
+
+---
+
 ## Context Parking (v0.5.1+)
 
 > **Deprecated (v0.14.0), removal planned v0.15.0.** `park`/`unpark`/`parked` fold into a

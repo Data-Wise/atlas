@@ -105,3 +105,94 @@ describe('DoctorUseCase — fix', () => {
     expect(actions[0].written).toBe(true)
   })
 })
+
+describe('DoctorUseCase — nudge reconciliation (Phase 2b.5)', () => {
+  const noProjects = repoOf([])
+
+  const makeNudgeStore = (nudges) => ({ list: async () => nudges, remove: async () => true })
+  const makeScheduler = (loadedLabels) => ({
+    isLoaded: async (label) => loadedLabels.includes(label),
+    unschedule: async () => {}
+  })
+
+  const outstandingNudge = (id, overrides = {}) => ({
+    id,
+    state: 'pending',
+    launchdLabel: `com.data-wise.atlas-nudge.${id}`,
+    ...overrides
+  })
+
+  test('reports no drift when it has no nudgeStore/nudgeScheduler injected (backward compatible no-op)', async () => {
+    const uc = new DoctorUseCase({ projectRepository: noProjects, fileExists: () => true })
+    const { nudges } = await uc.execute()
+    expect(nudges.drift).toEqual([])
+  })
+
+  test('reports no drift when every outstanding nudge has a loaded launchd job', async () => {
+    const nudge = outstandingNudge('ndg_ok')
+    const uc = new DoctorUseCase({
+      projectRepository: noProjects,
+      fileExists: () => true,
+      nudgeStore: makeNudgeStore([nudge]),
+      nudgeScheduler: makeScheduler([nudge.launchdLabel])
+    })
+    const { nudges } = await uc.execute()
+    expect(nudges.drift).toEqual([])
+  })
+
+  test('flags an outstanding nudge whose launchd job is not loaded — the silent-no-fire bug', async () => {
+    const nudge = outstandingNudge('ndg_orphaned')
+    const uc = new DoctorUseCase({
+      projectRepository: noProjects,
+      fileExists: () => true,
+      nudgeStore: makeNudgeStore([nudge]),
+      nudgeScheduler: makeScheduler([]) // nothing loaded
+    })
+    const { nudges } = await uc.execute()
+    expect(nudges.drift).toHaveLength(1)
+    expect(nudges.drift[0]).toMatchObject({ id: 'ndg_orphaned', issue: 'orphaned-record' })
+  })
+
+  test('does NOT flag an acked nudge with no loaded job — that is the intended one-shot ack outcome', async () => {
+    const acked = outstandingNudge('ndg_acked', { state: 'acked' })
+    const uc = new DoctorUseCase({
+      projectRepository: noProjects,
+      fileExists: () => true,
+      nudgeStore: makeNudgeStore([acked]),
+      nudgeScheduler: makeScheduler([])
+    })
+    const { nudges } = await uc.execute()
+    expect(nudges.drift).toEqual([])
+  })
+
+  test('fix() previews the drift as a nudge-drift action without --write', async () => {
+    const nudge = outstandingNudge('ndg_orphaned')
+    const uc = new DoctorUseCase({
+      projectRepository: noProjects,
+      fileExists: () => true,
+      nudgeStore: makeNudgeStore([nudge]),
+      nudgeScheduler: makeScheduler([])
+    })
+    const { actions, wrote } = await uc.fix()
+    expect(wrote).toBe(false)
+    const nudgeActions = actions.filter((a) => a.type === 'nudge-drift')
+    expect(nudgeActions).toHaveLength(1)
+    expect(nudgeActions[0]).toMatchObject({ type: 'nudge-drift', id: 'ndg_orphaned', written: false })
+  })
+
+  test('fix({ write: true }) removes the orphaned record — the safe default action', async () => {
+    const nudge = outstandingNudge('ndg_orphaned')
+    const removed = []
+    const uc = new DoctorUseCase({
+      projectRepository: noProjects,
+      fileExists: () => true,
+      nudgeStore: { list: async () => [nudge], remove: async (id) => removed.push(id) },
+      nudgeScheduler: makeScheduler([])
+    })
+    const { actions, wrote } = await uc.fix({ write: true })
+    expect(wrote).toBe(true)
+    expect(removed).toEqual(['ndg_orphaned'])
+    const nudgeActions = actions.filter((a) => a.type === 'nudge-drift')
+    expect(nudgeActions[0].written).toBe(true)
+  })
+})

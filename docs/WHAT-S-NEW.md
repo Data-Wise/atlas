@@ -4,6 +4,21 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.17.0 — Wall-Clock Nudges & Multi-Repo Day Activity
+
+!!! success "Reminders that actually fire, and a cross-repo memory aid"
+    `atlas nudge add "23:00" "wrap up"` schedules a reminder that fires as a real macOS
+    notification via `launchd` — even with every Claude surface fully closed. `atlas day`
+    rolls up commits, `.STATUS` changes, and tracked session time across your four project
+    trees for a given date, feeding tools like savant's `research-day-log` skill.
+
+See `docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md` in the repo for the
+full design, including two real bugs found via live end-to-end testing (a `launchd` PATH
+resolution issue, and a macOS Notification Alert Style gotcha — both documented in
+`docs/CLI-REFERENCE.md`'s Wall-Clock Nudges section).
+
+---
+
 ## v0.16.0 — ADHD-Friendly Docs-Site Redesign
 
 !!! success "Same information, easier to scan"

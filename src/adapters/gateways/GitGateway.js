@@ -5,12 +5,20 @@
  * Provides git status, branch, and uncommitted changes.
  */
 
-import { exec } from 'child_process'
+import { exec, execFile } from 'child_process'
 import { promisify } from 'util'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const execAsync = promisify(exec)
+const execFileAsync = promisify(execFile)
+
+/** date + 1 day, as YYYY-MM-DD, for a git --until upper bound. */
+function nextDay(dateStr) {
+  const d = new Date(`${dateStr}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
 
 export class GitGateway {
   /**
@@ -197,6 +205,71 @@ export class GitGateway {
     } catch (error) {
       console.error(`Warning: Could not compute git delta: ${error.message}`)
       return null
+    }
+  }
+
+  /**
+   * List commits made on a given calendar date. Backs `atlas day` (SPEC
+   * Design §5). Uses execFile with an argument array — never a
+   * string-interpolated exec() — since `date` originates from a CLI flag
+   * (adversarial-review injection-safety finding).
+   * @param {string} projectPath
+   * @param {string} date - YYYY-MM-DD (validated by the caller, GetDayActivityUseCase)
+   * @returns {Promise<Array<{sha: string, subject: string}>>} Empty array for a non-repo or no activity
+   */
+  async getCommitsSince(projectPath, date) {
+    if (!existsSync(join(projectPath, '.git'))) return []
+
+    try {
+      const { stdout } = await execFileAsync('git', [
+        'log',
+        // A bare YYYY-MM-DD's time-of-day defaults to "now" in git's
+        // approxidate parser, not midnight — silently excludes same-day
+        // commits earlier than the current wall-clock time. Verified via
+        // direct git testing; always pin an explicit 00:00:00.
+        `--since=${date} 00:00:00`,
+        `--until=${nextDay(date)} 00:00:00`,
+        '--pretty=format:%H\t%s'
+      ], { cwd: projectPath })
+
+      return stdout
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+          const [sha, ...rest] = line.split('\t')
+          return { sha, subject: rest.join('\t') }
+        })
+    } catch {
+      return []
+    }
+  }
+
+  /**
+   * `.STATUS`-only diff for commits on a given calendar date. Deliberately
+   * scoped to the `.STATUS` pathspec, not a full multi-file diff (SPEC
+   * Design §5) — status edits often mark work that produced no commit, but
+   * a full diff would re-introduce the "commits are a bad proxy" problem
+   * `atlas day` exists to avoid.
+   * @param {string} projectPath
+   * @param {string} date - YYYY-MM-DD
+   * @returns {Promise<string>} Empty string for a non-repo or no .STATUS activity
+   */
+  async getStatusDiff(projectPath, date) {
+    if (!existsSync(join(projectPath, '.git'))) return ''
+
+    try {
+      const { stdout } = await execFileAsync('git', [
+        'log',
+        '-p',
+        `--since=${date} 00:00:00`,
+        `--until=${nextDay(date)} 00:00:00`,
+        '--',
+        '.STATUS'
+      ], { cwd: projectPath })
+
+      return stdout
+    } catch {
+      return ''
     }
   }
 }

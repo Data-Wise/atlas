@@ -1101,15 +1101,17 @@ program
           } else {
             console.log(`   ${ac.written ? '✓ moved' : '• would move'} atlas data ${ac.from} → ${ac.to}`);
           }
+        } else if (ac.type === 'nudge-drift') {
+          console.log(`   ${ac.written ? '✓ removed' : '• would remove'} orphaned nudge ${ac.id} (${ac.issue} — no loaded launchd job)`);
         } else {
           console.log(`   ${ac.written ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
         }
       }
       return;
     }
-    const { summary, rows, xdgHint } = await a.projects.doctor(options);
+    const { summary, rows, xdgHint, nudges } = await a.projects.doctor(options);
     if (options.format === 'json') {
-      console.log(JSON.stringify({ summary, rows, xdgHint }, null, 2));
+      console.log(JSON.stringify({ summary, rows, xdgHint, nudges }, null, 2));
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
@@ -1122,6 +1124,9 @@ program
     }
     if (xdgHint) {
       console.log(`   💡 ${xdgHint}`);
+    }
+    if (nudges?.drift?.length > 0) {
+      console.log(`   ⚠️  nudge drift: ${nudges.drift.length} record(s) with no loaded launchd job (will never fire) — run 'atlas doctor --fix --write' to remove`);
     }
     console.log('');
     const show = options.all ? rows : rows.filter(r => !r.ok || (r.parseWarnings && r.parseWarnings.length > 0));
@@ -1702,6 +1707,85 @@ task
     }
   });
 
+// Nudge commands (wall-clock reminders, cross-surface — see
+// docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md)
+const nudge = program.command('nudge').description('Wall-clock reminders (fire via launchd, cross-surface)');
+
+nudge
+  .command('add <time> <message>')
+  .description('Schedule a wall-clock nudge (default: one-shot; fires even if no Claude app is open)')
+  .option('--daily', 'Recur daily instead of firing once')
+  .action(async (time, message, options) => {
+    const a = getAtlas();
+    try {
+      const result = await a.nudges.add(time, message, { daily: options.daily });
+      console.log(`✓ Nudge scheduled: ${result.id} at ${result.time}${result.recurring ? ' (daily)' : ''}`);
+    } catch (error) {
+      console.error(`❌ Error scheduling nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('fire <id>')
+  .description('Fire a nudge now (invoked by launchd — not meant for interactive use)')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      await a.nudges.fire(id);
+      // No console.log on success — this runs unattended via launchd with
+      // no terminal to read it; the osascript notification is the signal.
+    } catch (error) {
+      console.error(`❌ Error firing nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('ack <id>')
+  .description('Acknowledge a fired nudge (one-shot: also stops it; --daily: stays scheduled for tomorrow)')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      const result = await a.nudges.ack(id);
+      console.log(`✓ Nudge acked: ${result.id}${result.recurring ? ' (still scheduled — daily)' : ''}`);
+    } catch (error) {
+      console.error(`❌ Error acking nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('rm <id>')
+  .description('Remove a nudge and stop it, regardless of state — the only way to stop a --daily nudge')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      await a.nudges.remove(id);
+      console.log(`✓ Nudge removed: ${id}`);
+    } catch (error) {
+      console.error(`❌ Error removing nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('ls')
+  .description('List nudges')
+  .option('--outstanding', 'Show only pending/fired (not yet acked) nudges')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      const { formatNudgesTable, formatNudgesJson } = await import('../src/adapters/presenters/NudgePresenter.js');
+      const nudges = await a.nudges.list({ outstandingOnly: options.outstanding });
+      console.log(options.format === 'json' ? formatNudgesJson(nudges) : formatNudgesTable(nudges));
+    } catch (error) {
+      console.error(`❌ Error listing nudges: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
 // Schedule commands
 const schedule = program.command('schedule').description('Schedule sync/push operations');
 
@@ -1757,6 +1841,24 @@ program
       }
     } catch (error) {
       console.error(`❌ Error getting agenda: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('day')
+  .description('Multi-repo activity for a date — commits + .STATUS diffs + session time. A memory aid, never a source of truth.')
+  .option('--date <date>', 'YYYY-MM-DD (default: today)')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      const date = options.date || new Date().toISOString().slice(0, 10);
+      const activity = await a.day.activity(date);
+      const { formatDayActivityTable, formatDayActivityJson } = await import('../src/adapters/presenters/DayActivityPresenter.js');
+      console.log(options.format === 'json' ? formatDayActivityJson(activity) : formatDayActivityTable(activity));
+    } catch (error) {
+      console.error(`❌ Error getting day activity: ${error.message}`);
       process.exit(1);
     }
   });
