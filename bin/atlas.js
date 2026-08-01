@@ -1702,6 +1702,40 @@ task
     }
   });
 
+// Nudge commands (wall-clock reminders, cross-surface — see
+// docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md)
+const nudge = program.command('nudge').description('Wall-clock reminders (fire via launchd, cross-surface)');
+
+nudge
+  .command('add <time> <message>')
+  .description('Schedule a wall-clock nudge (default: one-shot; fires even if no Claude app is open)')
+  .option('--daily', 'Recur daily instead of firing once')
+  .action(async (time, message, options) => {
+    const a = getAtlas();
+    try {
+      const result = await a.nudges.add(time, message, { daily: options.daily });
+      console.log(`✓ Nudge scheduled: ${result.id} at ${result.time}${result.recurring ? ' (daily)' : ''}`);
+    } catch (error) {
+      console.error(`❌ Error scheduling nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('fire <id>')
+  .description('Fire a nudge now (invoked by launchd — not meant for interactive use)')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      await a.nudges.fire(id);
+      // No console.log on success — this runs unattended via launchd with
+      // no terminal to read it; the osascript notification is the signal.
+    } catch (error) {
+      console.error(`❌ Error firing nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
 // Schedule commands
 const schedule = program.command('schedule').description('Schedule sync/push operations');
 

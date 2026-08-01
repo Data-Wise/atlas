@@ -55,6 +55,7 @@ export class Atlas {
     this.capture = new CaptureAPI(this.container);
     this.context = new ContextAPI(this.container);
     this.tasks = new TasksAPI(this.container);
+    this.nudges = new NudgesAPI(this.container);
   }
 
   /**
@@ -733,6 +734,26 @@ class TasksAPI {
   async agenda(windowDays) {
     const agendaUseCase = this.container.resolve('AgendaUseCase');
     return await agendaUseCase.execute({ windowDays });
+  }
+}
+
+/**
+ * Nudges API - Wall-clock reminders that fire via launchd, cross-surface.
+ * See docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md
+ */
+class NudgesAPI {
+  constructor(container) {
+    this.container = container;
+  }
+
+  async add(time, message, options = {}) {
+    const addNudgeUseCase = this.container.resolve('AddNudgeUseCase');
+    return await addNudgeUseCase.execute({ time, message, daily: options.daily });
+  }
+
+  async fire(id) {
+    const fireNudgeUseCase = this.container.resolve('FireNudgeUseCase');
+    return await fireNudgeUseCase.execute({ id });
   }
 }
 

@@ -59,6 +59,9 @@ import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
 import { GitGateway } from './gateways/GitGateway.js'
 import { GuardsFileNudgeStore } from './gateways/GuardsFileNudgeStore.js'
+import { LaunchdNudgeScheduler } from './gateways/LaunchdNudgeScheduler.js'
+import { AddNudgeUseCase } from '../use-cases/nudge/AddNudgeUseCase.js'
+import { FireNudgeUseCase } from '../use-cases/nudge/FireNudgeUseCase.js'
 
 export class Container {
   /**
@@ -469,6 +472,33 @@ export class Container {
     })
   }
 
+  getNudgeScheduler() {
+    return this._resolve('nudgeScheduler', () => {
+      return new LaunchdNudgeScheduler()
+    })
+  }
+
+  // ============================================================================
+  // USE CASES - Nudge
+  // ============================================================================
+
+  getAddNudgeUseCase() {
+    return this._resolve('addNudgeUseCase', () => {
+      return new AddNudgeUseCase({
+        nudgeStore: this.getNudgeStore(),
+        scheduler: this.getNudgeScheduler()
+      })
+    })
+  }
+
+  getFireNudgeUseCase() {
+    return this._resolve('fireNudgeUseCase', () => {
+      return new FireNudgeUseCase({
+        nudgeStore: this.getNudgeStore()
+      })
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -549,6 +579,8 @@ export class Container {
       'StatusFileParser': () => this.getStatusFileParser(),
       'GitGateway': () => this.getGitGateway(),
       'NudgeStore': () => this.getNudgeStore(),
+      'AddNudgeUseCase': () => this.getAddNudgeUseCase(),
+      'FireNudgeUseCase': () => this.getFireNudgeUseCase(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
