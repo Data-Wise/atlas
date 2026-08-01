@@ -37,6 +37,19 @@ describe('Nudge', () => {
     it('trims surrounding whitespace from the message', () => {
       expect(new Nudge({ ...valid, message: '  padded  ' }).message).toBe('padded')
     })
+
+    it.each([
+      ['../../../../tmp/evil', 'path traversal'],
+      ['ndg_1/../../etc', 'embedded traversal'],
+      ['ndg with spaces', 'whitespace'],
+      ['ndg;rm -rf', 'shell metacharacter']
+    ])('rejects an id containing %s (%s) — it flows unescaped into a launchd plist filename', (id) => {
+      expect(() => new Nudge({ ...valid, id })).toThrow(/id/i)
+    })
+
+    it('accepts an id made only of the generator\'s own alphabet (alnum, underscore, hyphen)', () => {
+      expect(new Nudge({ ...valid, id: 'ndg_1785619847883_snaa4nqpl' }).id).toBe('ndg_1785619847883_snaa4nqpl')
+    })
   })
 
   describe('defaults', () => {

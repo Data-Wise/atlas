@@ -12,11 +12,13 @@
  * behavior — neither is a second source of scheduling truth.
  * See docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md
  */
+const ID_RE = /^[A-Za-z0-9_-]+$/
+
 export class Nudge {
   static STATES = ['pending', 'fired', 'acked']
 
   constructor({ id, time, message, recurring = false, state = 'pending', createdAt }) {
-    this._validate(time, message, state)
+    this._validate(id, time, message, state)
 
     this.id = id || this._generateId()
     this.time = time
@@ -26,7 +28,14 @@ export class Nudge {
     this.createdAt = createdAt || new Date().toISOString()
   }
 
-  _validate(time, message, state) {
+  _validate(id, time, message, state) {
+    // id flows unescaped into a launchd plist filename (LaunchdNudgeScheduler
+    // ._plistPath) — a self-generated id is always safe, but a hand-edited
+    // or corrupted guards.json entry could carry a path-traversal or shell
+    // metacharacter payload. Restrict to the generator's own alphabet.
+    if (id !== undefined && id !== null && !ID_RE.test(id)) {
+      throw new Error('Nudge id may only contain letters, digits, underscore, and hyphen')
+    }
     if (!time || typeof time !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) {
       throw new Error('Nudge time must be in HH:MM 24-hour format')
     }

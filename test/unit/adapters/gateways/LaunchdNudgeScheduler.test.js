@@ -60,6 +60,19 @@ describe('buildPlist', () => {
     expect(strings).toEqual(['/opt/homebrew/bin/node', '/opt/atlas/bin/atlas.js', 'nudge', 'fire', 'ndg_x'])
   })
 
+  it('XML-escapes path values so a & in an install path cannot produce malformed plist XML', () => {
+    // A path like /Users/dt/R&D/atlas would otherwise break the plist's XML
+    // parser — launchctl load would fail with no indication the actual
+    // cause was an unescaped &, <, or > in a path.
+    const xml = buildPlist({
+      ...params,
+      atlasBinPath: '/Users/dt/R&D <atlas>/bin/atlas.js',
+      daily: false
+    })
+    expect(xml).toContain('<string>/Users/dt/R&amp;D &lt;atlas&gt;/bin/atlas.js</string>')
+    expect(xml).not.toContain('R&D <atlas>')
+  })
+
   it('includes the correct hour/minute', () => {
     const xml = buildPlist({ ...params, schedule: { hour: 9, minute: 5 }, daily: true })
     expect(xml).toContain('<integer>9</integer>')

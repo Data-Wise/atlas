@@ -12,12 +12,80 @@
  * breaks. See SPEC Design §1.
  */
 
-import { readFile, writeFile, mkdir } from 'fs/promises'
+import { readFile, writeFile, mkdir, rename, unlink } from 'fs/promises'
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { INudgeStore } from '../../domain/gateways/INudgeStore.js'
 import { Nudge } from '../../domain/entities/Nudge.js'
+
+const LOCK_RETRY_MS = 20
+const LOCK_TIMEOUT_MS = 3000
+
+function isProcessAlive(pid) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Acquire an exclusive lock on `${guardsFile}.lock` (atomic create via the
+ * 'wx' flag — fails if the file already exists), run `fn`, then release.
+ * Serializes every read-modify-write cycle across concurrent atlas
+ * processes/calls sharing the same guards.json, so a launchd fire racing an
+ * interactive `nudge add`/`ack` can no longer silently drop one write.
+ * A lock left behind by a crashed process (stale PID) is reclaimed
+ * automatically; a live contender is retried with backoff up to
+ * LOCK_TIMEOUT_MS before giving up with a clear error.
+ * @param {string} guardsFile
+ * @param {() => Promise<any>} fn
+ * @returns {Promise<any>}
+ */
+async function withGuardsLock(guardsFile, fn) {
+  const lockPath = `${guardsFile}.lock`
+  const deadline = Date.now() + LOCK_TIMEOUT_MS
+
+  await mkdir(dirname(guardsFile), { recursive: true })
+
+  for (;;) {
+    try {
+      await writeFile(lockPath, String(process.pid), { flag: 'wx' })
+      break
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err
+
+      let heldByLivePid = true
+      try {
+        const pid = Number((await readFile(lockPath, 'utf8')).trim())
+        heldByLivePid = Number.isInteger(pid) && isProcessAlive(pid)
+      } catch {
+        heldByLivePid = false // Lock file vanished or is unreadable — treat as stale.
+      }
+
+      if (!heldByLivePid) {
+        await unlink(lockPath).catch(() => {})
+        continue
+      }
+
+      if (Date.now() >= deadline) {
+        throw new Error(
+          `Timed out waiting for the guards.json lock (${lockPath}) held by another atlas process. ` +
+          'If no atlas process is actually running, delete this file and retry.'
+        )
+      }
+      await new Promise((resolve) => setTimeout(resolve, LOCK_RETRY_MS))
+    }
+  }
+
+  try {
+    return await fn()
+  } finally {
+    await unlink(lockPath).catch(() => {})
+  }
+}
 
 /**
  * Resolve the guards.json path.
@@ -81,7 +149,12 @@ export class GuardsFileNudgeStore extends INudgeStore {
     }
 
     await mkdir(dirname(this.guardsFile), { recursive: true })
-    await writeFile(this.guardsFile, `${JSON.stringify(next, null, 2)}\n`, 'utf8')
+    // Write to a sibling temp file then rename — rename is atomic on the
+    // same filesystem, so a concurrent get()/list() (which don't take the
+    // write lock) can never observe a partially-written file.
+    const tmpPath = `${this.guardsFile}.tmp.${process.pid}`
+    await writeFile(tmpPath, `${JSON.stringify(next, null, 2)}\n`, 'utf8')
+    await rename(tmpPath, this.guardsFile)
   }
 
   /**
@@ -96,16 +169,18 @@ export class GuardsFileNudgeStore extends INudgeStore {
   }
 
   async add(nudge) {
-    const data = await this._readFile()
-    const nudges = this._extract(data)
+    return withGuardsLock(this.guardsFile, async () => {
+      const data = await this._readFile()
+      const nudges = this._extract(data)
 
-    if (nudges.some((n) => n.id === nudge.id)) {
-      throw new Error(`Nudge ${nudge.id} already exists`)
-    }
+      if (nudges.some((n) => n.id === nudge.id)) {
+        throw new Error(`Nudge ${nudge.id} already exists`)
+      }
 
-    nudges.push(nudge)
-    await this._writeNudges(data, nudges)
-    return nudge
+      nudges.push(nudge)
+      await this._writeNudges(data, nudges)
+      return nudge
+    })
   }
 
   async get(id) {
@@ -120,29 +195,33 @@ export class GuardsFileNudgeStore extends INudgeStore {
   }
 
   async update(nudge) {
-    const data = await this._readFile()
-    const nudges = this._extract(data)
-    const index = nudges.findIndex((n) => n.id === nudge.id)
+    return withGuardsLock(this.guardsFile, async () => {
+      const data = await this._readFile()
+      const nudges = this._extract(data)
+      const index = nudges.findIndex((n) => n.id === nudge.id)
 
-    if (index === -1) {
-      throw new Error(`Nudge ${nudge.id} not found`)
-    }
+      if (index === -1) {
+        throw new Error(`Nudge ${nudge.id} not found`)
+      }
 
-    nudges[index] = nudge
-    await this._writeNudges(data, nudges)
-    return nudge
+      nudges[index] = nudge
+      await this._writeNudges(data, nudges)
+      return nudge
+    })
   }
 
   async remove(id) {
-    const data = await this._readFile()
-    const nudges = this._extract(data)
-    const remaining = nudges.filter((n) => n.id !== id)
+    return withGuardsLock(this.guardsFile, async () => {
+      const data = await this._readFile()
+      const nudges = this._extract(data)
+      const remaining = nudges.filter((n) => n.id !== id)
 
-    if (remaining.length === nudges.length) {
-      return false
-    }
+      if (remaining.length === nudges.length) {
+        return false
+      }
 
-    await this._writeNudges(data, remaining)
-    return true
+      await this._writeNudges(data, remaining)
+      return true
+    })
   }
 }

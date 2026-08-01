@@ -23,6 +23,16 @@ const execFileAsync = promisify(execFile)
 
 const DEFAULT_LAUNCH_AGENTS_DIR = join(homedir(), 'Library', 'LaunchAgents')
 
+/** Escape XML special characters for safe interpolation into plist <string> values. */
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
 /**
  * Build the plist XML for a nudge. `atlasBinPath`/`nodePath` are passed
  * explicitly (rather than resolved here) so tests can point them at a
@@ -57,14 +67,14 @@ export function buildPlist({ label, nodePath, atlasBinPath, nudgeId, schedule, d
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>${label}</string>
+  <string>${escapeXml(label)}</string>
   <key>ProgramArguments</key>
   <array>
-    <string>${nodePath}</string>
-    <string>${atlasBinPath}</string>
+    <string>${escapeXml(nodePath)}</string>
+    <string>${escapeXml(atlasBinPath)}</string>
     <string>nudge</string>
     <string>fire</string>
-    <string>${nudgeId}</string>
+    <string>${escapeXml(nudgeId)}</string>
   </array>
   <key>StartCalendarInterval</key>
   <dict>

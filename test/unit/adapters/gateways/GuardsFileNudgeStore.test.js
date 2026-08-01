@@ -39,6 +39,37 @@ describe('GuardsFileNudgeStore', () => {
   const makeNudge = (overrides = {}) =>
     new Nudge({ time: '23:00', message: 'wrap up', ...overrides })
 
+  describe('concurrent writers', () => {
+    it('never loses a write when two operations race on the same guards.json', async () => {
+      // Regression for the unlocked-read-modify-write finding: a launchd
+      // fire (state update) racing an interactive `nudge add`/`ack` used to
+      // be able to silently clobber one write with a stale copy of the
+      // rest of the file. Fire off several concurrent operations against
+      // the SAME store instance and the same file — every one of them
+      // must survive.
+      const nudges = Array.from({ length: 8 }, (_, i) => makeNudge({ id: `ndg_race_${i}` }))
+
+      await Promise.all(nudges.map((n) => store.add(n)))
+
+      const persisted = await store.list()
+      expect(persisted.map((n) => n.id).sort()).toEqual(nudges.map((n) => n.id).sort())
+    })
+
+    it('never loses a concurrent update racing an add', async () => {
+      const base = makeNudge({ id: 'ndg_base' })
+      await store.add(base)
+
+      const other = makeNudge({ id: 'ndg_other' })
+      const updated = new Nudge({ ...base.toJSON(), state: 'fired' })
+
+      await Promise.all([store.add(other), store.update(updated)])
+
+      const persisted = await store.list()
+      expect(persisted.find((n) => n.id === 'ndg_other')).toBeTruthy()
+      expect(persisted.find((n) => n.id === 'ndg_base').state).toBe('fired')
+    })
+  })
+
   describe('guard-key isolation', () => {
     it('leaves the guards key byte-for-byte identical across a full lifecycle', async () => {
       await seedGuards()
