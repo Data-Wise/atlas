@@ -58,6 +58,7 @@ import { SimpleEventPublisher } from './events/SimpleEventPublisher.js'
 import { StatusFileGateway } from './gateways/StatusFileGateway.js'
 import { StatusFileParser } from './gateways/StatusFileParser.js'
 import { GitGateway } from './gateways/GitGateway.js'
+import { GuardsFileNudgeStore } from './gateways/GuardsFileNudgeStore.js'
 
 export class Container {
   /**
@@ -456,6 +457,18 @@ export class Container {
     })
   }
 
+  /**
+   * Nudge persistence. Registered as a gateway, NOT via the storage-branching
+   * repository accessors above: nudges live in the shared guards.json
+   * regardless of the configured backend, so a SQLite variant can never
+   * legitimately exist. See SPEC Design §1.
+   */
+  getNudgeStore() {
+    return this._resolve('nudgeStore', () => {
+      return new GuardsFileNudgeStore()
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -535,6 +548,7 @@ export class Container {
       'StatusFileGateway': () => this.getStatusFileGateway(),
       'StatusFileParser': () => this.getStatusFileParser(),
       'GitGateway': () => this.getGitGateway(),
+      'NudgeStore': () => this.getNudgeStore(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
