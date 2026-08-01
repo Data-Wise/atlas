@@ -1101,15 +1101,17 @@ program
           } else {
             console.log(`   ${ac.written ? '✓ moved' : '• would move'} atlas data ${ac.from} → ${ac.to}`);
           }
+        } else if (ac.type === 'nudge-drift') {
+          console.log(`   ${ac.written ? '✓ removed' : '• would remove'} orphaned nudge ${ac.id} (${ac.issue} — no loaded launchd job)`);
         } else {
           console.log(`   ${ac.written ? '✓ created' : '• would create'} ${ac.file} in ${ac.project}`);
         }
       }
       return;
     }
-    const { summary, rows, xdgHint } = await a.projects.doctor(options);
+    const { summary, rows, xdgHint, nudges } = await a.projects.doctor(options);
     if (options.format === 'json') {
-      console.log(JSON.stringify({ summary, rows, xdgHint }, null, 2));
+      console.log(JSON.stringify({ summary, rows, xdgHint, nudges }, null, 2));
       process.exit(summary.missingStatus > 0 ? 1 : 0);
     }
     console.log(`\n🩺 atlas doctor — ${summary.ok}/${summary.total} projects pass the settings contract`);
@@ -1122,6 +1124,9 @@ program
     }
     if (xdgHint) {
       console.log(`   💡 ${xdgHint}`);
+    }
+    if (nudges?.drift?.length > 0) {
+      console.log(`   ⚠️  nudge drift: ${nudges.drift.length} record(s) with no loaded launchd job (will never fire) — run 'atlas doctor --fix --write' to remove`);
     }
     console.log('');
     const show = options.all ? rows : rows.filter(r => !r.ok || (r.parseWarnings && r.parseWarnings.length > 0));

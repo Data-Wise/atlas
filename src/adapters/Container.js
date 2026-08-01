@@ -608,6 +608,7 @@ export class Container {
       'StatusFileParser': () => this.getStatusFileParser(),
       'GitGateway': () => this.getGitGateway(),
       'NudgeStore': () => this.getNudgeStore(),
+      'NudgeScheduler': () => this.getNudgeScheduler(),
       'AddNudgeUseCase': () => this.getAddNudgeUseCase(),
       'FireNudgeUseCase': () => this.getFireNudgeUseCase(),
       'AckNudgeUseCase': () => this.getAckNudgeUseCase(),

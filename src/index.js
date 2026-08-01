@@ -445,14 +445,18 @@ class ProjectsAPI {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
     const statusFileParser = this.container.resolve('StatusFileParser');
-    const uc = new DoctorUseCase({ projectRepository, statusFileParser });
+    const nudgeStore = this.container.resolve('NudgeStore');
+    const nudgeScheduler = this.container.resolve('NudgeScheduler');
+    const uc = new DoctorUseCase({ projectRepository, statusFileParser, nudgeStore, nudgeScheduler });
     return uc.execute(options);
   }
 
   async doctorFix(options = {}) {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
-    const uc = new DoctorUseCase({ projectRepository });
+    const nudgeStore = this.container.resolve('NudgeStore');
+    const nudgeScheduler = this.container.resolve('NudgeScheduler');
+    const uc = new DoctorUseCase({ projectRepository, nudgeStore, nudgeScheduler });
     return uc.fix(options);
   }
 
