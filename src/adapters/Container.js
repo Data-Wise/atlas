@@ -62,6 +62,7 @@ import { GuardsFileNudgeStore } from './gateways/GuardsFileNudgeStore.js'
 import { LaunchdNudgeScheduler } from './gateways/LaunchdNudgeScheduler.js'
 import { AddNudgeUseCase } from '../use-cases/nudge/AddNudgeUseCase.js'
 import { FireNudgeUseCase } from '../use-cases/nudge/FireNudgeUseCase.js'
+import { AckNudgeUseCase } from '../use-cases/nudge/AckNudgeUseCase.js'
 
 export class Container {
   /**
@@ -499,6 +500,15 @@ export class Container {
     })
   }
 
+  getAckNudgeUseCase() {
+    return this._resolve('ackNudgeUseCase', () => {
+      return new AckNudgeUseCase({
+        nudgeStore: this.getNudgeStore(),
+        scheduler: this.getNudgeScheduler()
+      })
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -581,6 +591,7 @@ export class Container {
       'NudgeStore': () => this.getNudgeStore(),
       'AddNudgeUseCase': () => this.getAddNudgeUseCase(),
       'FireNudgeUseCase': () => this.getFireNudgeUseCase(),
+      'AckNudgeUseCase': () => this.getAckNudgeUseCase(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
