@@ -64,6 +64,7 @@ import { AddNudgeUseCase } from '../use-cases/nudge/AddNudgeUseCase.js'
 import { FireNudgeUseCase } from '../use-cases/nudge/FireNudgeUseCase.js'
 import { AckNudgeUseCase } from '../use-cases/nudge/AckNudgeUseCase.js'
 import { RmNudgeUseCase } from '../use-cases/nudge/RmNudgeUseCase.js'
+import { ListNudgesUseCase } from '../use-cases/nudge/ListNudgesUseCase.js'
 
 export class Container {
   /**
@@ -519,6 +520,14 @@ export class Container {
     })
   }
 
+  getListNudgesUseCase() {
+    return this._resolve('listNudgesUseCase', () => {
+      return new ListNudgesUseCase({
+        nudgeStore: this.getNudgeStore()
+      })
+    })
+  }
+
   // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
@@ -603,6 +612,7 @@ export class Container {
       'FireNudgeUseCase': () => this.getFireNudgeUseCase(),
       'AckNudgeUseCase': () => this.getAckNudgeUseCase(),
       'RmNudgeUseCase': () => this.getRmNudgeUseCase(),
+      'ListNudgesUseCase': () => this.getListNudgesUseCase(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
