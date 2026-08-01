@@ -755,6 +755,21 @@ class NudgesAPI {
     const fireNudgeUseCase = this.container.resolve('FireNudgeUseCase');
     return await fireNudgeUseCase.execute({ id });
   }
+
+  async ack(id) {
+    const ackNudgeUseCase = this.container.resolve('AckNudgeUseCase');
+    return await ackNudgeUseCase.execute({ id });
+  }
+
+  async remove(id) {
+    const rmNudgeUseCase = this.container.resolve('RmNudgeUseCase');
+    return await rmNudgeUseCase.execute({ id });
+  }
+
+  async list(options = {}) {
+    const listNudgesUseCase = this.container.resolve('ListNudgesUseCase');
+    return await listNudgesUseCase.execute(options);
+  }
 }
 
 // Default export

@@ -1736,6 +1736,51 @@ nudge
     }
   });
 
+nudge
+  .command('ack <id>')
+  .description('Acknowledge a fired nudge (one-shot: also stops it; --daily: stays scheduled for tomorrow)')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      const result = await a.nudges.ack(id);
+      console.log(`✓ Nudge acked: ${result.id}${result.recurring ? ' (still scheduled — daily)' : ''}`);
+    } catch (error) {
+      console.error(`❌ Error acking nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('rm <id>')
+  .description('Remove a nudge and stop it, regardless of state — the only way to stop a --daily nudge')
+  .action(async (id) => {
+    const a = getAtlas();
+    try {
+      await a.nudges.remove(id);
+      console.log(`✓ Nudge removed: ${id}`);
+    } catch (error) {
+      console.error(`❌ Error removing nudge: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
+nudge
+  .command('ls')
+  .description('List nudges')
+  .option('--outstanding', 'Show only pending/fired (not yet acked) nudges')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      const { formatNudgesTable, formatNudgesJson } = await import('../src/adapters/presenters/NudgePresenter.js');
+      const nudges = await a.nudges.list({ outstandingOnly: options.outstanding });
+      console.log(options.format === 'json' ? formatNudgesJson(nudges) : formatNudgesTable(nudges));
+    } catch (error) {
+      console.error(`❌ Error listing nudges: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
 // Schedule commands
 const schedule = program.command('schedule').description('Schedule sync/push operations');
 
