@@ -1845,6 +1845,24 @@ program
     }
   });
 
+program
+  .command('day')
+  .description('Multi-repo activity for a date — commits + .STATUS diffs + session time. A memory aid, never a source of truth.')
+  .option('--date <date>', 'YYYY-MM-DD (default: today)')
+  .option('--format <format>', 'Output format (table|json)', 'table')
+  .action(async (options) => {
+    const a = getAtlas();
+    try {
+      const date = options.date || new Date().toISOString().slice(0, 10);
+      const activity = await a.day.activity(date);
+      const { formatDayActivityTable, formatDayActivityJson } = await import('../src/adapters/presenters/DayActivityPresenter.js');
+      console.log(options.format === 'json' ? formatDayActivityJson(activity) : formatDayActivityTable(activity));
+    } catch (error) {
+      console.error(`❌ Error getting day activity: ${error.message}`);
+      process.exit(1);
+    }
+  });
+
 // ============================================================================
 // BARE `atlas` (no args) — the digest
 // ============================================================================

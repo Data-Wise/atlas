@@ -56,6 +56,7 @@ export class Atlas {
     this.context = new ContextAPI(this.container);
     this.tasks = new TasksAPI(this.container);
     this.nudges = new NudgesAPI(this.container);
+    this.day = new DayAPI(this.container);
   }
 
   /**
@@ -773,6 +774,21 @@ class NudgesAPI {
   async list(options = {}) {
     const listNudgesUseCase = this.container.resolve('ListNudgesUseCase');
     return await listNudgesUseCase.execute(options);
+  }
+}
+
+/**
+ * Day API - Multi-repo activity provider.
+ * See docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md
+ */
+class DayAPI {
+  constructor(container) {
+    this.container = container;
+  }
+
+  async activity(date) {
+    const getDayActivityUseCase = this.container.resolve('GetDayActivityUseCase');
+    return await getDayActivityUseCase.execute({ date });
   }
 }
 
