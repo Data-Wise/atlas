@@ -4,9 +4,17 @@ All notable changes to Atlas are documented here.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-08-01
+
 ### Added
 - **Wall-clock nudges** (`atlas nudge add/fire/ack/rm/ls`) — reminders that fire via macOS `launchd`, unlike every other atlas command, even when no Claude surface (app or terminal) is open. State lives in `~/.claude/guards.json` (shared across surfaces) via a new `INudgeStore` gateway (`GuardsFileNudgeStore`), never through the storage-backend-branching repository path, since it's a fixed external file, not swappable storage. One-shot and `--daily` recurring nudges branch differently on `ack` (one-shot unschedules; `--daily` stays loaded for tomorrow) and `rm` (unconditional stop, the only way to kill a `--daily` nudge). `atlas nudge fire` takes its message from the stored `Nudge` record, never from `launchd`-supplied arguments, and passes it to `osascript` via `on run argv` (argument array, not string interpolation) to close an AppleScript-injection path. `atlas doctor`/`doctor --fix` gained nudge-drift reconciliation (a scheduled nudge with no matching `launchctl` job).
 - **`atlas day [--date YYYY-MM-DD] [--format table|json]`** — multi-repo activity provider: commits and `.STATUS` changes across the `r-packages/`, `research/`, `teaching/`, and `dev-tools/` project trees, plus tracked session minutes per tree. Feeds savant's `research-day-log` skill via `--format json`. All four tree keys are always present in the output, even with no activity. `GitGateway` gained `getCommitsSince`/`getStatusDiff`, both using `execFile` with an argument array (never a string-interpolated `exec()` call) and pathspec-scoped to `.STATUS` for the diff variant.
+
+### Fixed
+- A bare `git log --since=YYYY-MM-DD` defaults its time-of-day to *now* (wall-clock time when the command runs), not midnight — silently excluding same-day commits made earlier in the day. `GitGateway`'s new date-range methods pin an explicit `00:00:00` on both `--since`/`--until`.
+- `GuardsFileNudgeStore` performed every nudge write as an unlocked read-modify-write of `guards.json` — a `launchd` fire updating state could race an interactive `nudge add`/`ack` and silently drop one write. Added a lock file (`${guardsFile}.lock`, atomic create, stale-PID reclaim) serializing writes, plus write-then-rename for atomicity.
+- `LaunchdNudgeScheduler`'s generated plist XML did not escape its interpolated path values, so a `&`, `<`, or `>` in an install path could produce malformed XML with a confusing "launchctl load failed" error.
+- `Nudge`'s constructor validated `time`/`message`/`state` but not `id`, which flows unescaped into a filesystem path via `launchdLabel`. Restricted to the id generator's own alphabet.
 
 ## [0.16.0] - 2026-07-20
 
