@@ -32,13 +32,19 @@ export class DoctorUseCase {
    * @param {StatusFileParser} [deps.statusFileParser] - optional; when provided,
    *   .STATUS parse warnings (non-numeric progress, duplicate keys) surface as findings
    * @param {Function} [deps.migrateToXdgFn] - injectable for tests (SPEC-xdg-config-migration §4)
+   * @param {import('../../domain/gateways/INudgeStore.js').INudgeStore} [deps.nudgeStore] -
+   *   optional; when provided (with nudgeScheduler), reconciles guards.json
+   *   nudge records against actually-loaded launchd jobs (SPEC Design §3)
+   * @param {import('../../adapters/gateways/LaunchdNudgeScheduler.js').LaunchdNudgeScheduler} [deps.nudgeScheduler]
    */
   constructor({
     projectRepository,
     fileExists = existsSync,
     writeFile = writeFileSync,
     statusFileParser = null,
-    migrateToXdgFn = migrateToXdg
+    migrateToXdgFn = migrateToXdg,
+    nudgeStore = null,
+    nudgeScheduler = null
   }) {
     if (!projectRepository) throw new Error('projectRepository is required')
     this.projectRepository = projectRepository
@@ -46,6 +52,42 @@ export class DoctorUseCase {
     this.writeFile = writeFile
     this.statusFileParser = statusFileParser
     this.migrateToXdgFn = migrateToXdgFn
+    this.nudgeStore = nudgeStore
+    this.nudgeScheduler = nudgeScheduler
+  }
+
+  /**
+   * Reconcile guards.json nudge records against actually-loaded launchd
+   * jobs. No-op (empty drift) when nudgeStore/nudgeScheduler weren't
+   * injected — same backward-compatible pattern as statusFileParser.
+   *
+   * Only outstanding (non-acked) nudges are checked: an acked one-shot
+   * nudge legitimately has no loaded job (AckNudgeUseCase unschedules it
+   * on purpose), so that is not drift.
+   *
+   * Only the "record exists, job missing" direction is checked — the
+   * silent-no-fire failure this exists to catch (SPEC Design §3). The
+   * reverse (a loaded job with no matching record) would need the
+   * scheduler to enumerate all `com.data-wise.atlas-nudge.*` labels, which
+   * isn't implemented; add it if that direction turns out to matter in
+   * practice, not preemptively.
+   * @returns {Promise<Array<{id: string, issue: string}>>}
+   * @private
+   */
+  async _nudgeDrift() {
+    if (!this.nudgeStore || !this.nudgeScheduler) return []
+
+    const nudges = await this.nudgeStore.list()
+    const outstanding = nudges.filter((n) => n.state !== 'acked')
+
+    const drift = []
+    for (const nudge of outstanding) {
+      const loaded = await this.nudgeScheduler.isLoaded(nudge.launchdLabel)
+      if (!loaded) {
+        drift.push({ id: nudge.id, issue: 'orphaned-record' })
+      }
+    }
+    return drift
   }
 
   /**
@@ -151,7 +193,8 @@ export class DoctorUseCase {
     const xdgHint = this._xdgMigrationAvailable()
       ? `atlas found a newer, tidier home for your data (${xdgConfigDir()}). Run 'atlas migrate --xdg' whenever you'd like — no rush.`
       : null
-    return { summary, rows, xdgHint }
+    const nudges = { drift: await this._nudgeDrift() }
+    return { summary, rows, xdgHint, nudges }
   }
 
   /**
@@ -201,6 +244,18 @@ export class DoctorUseCase {
           detail: result.message
         })
       }
+    }
+
+    for (const d of await this._nudgeDrift()) {
+      if (write) {
+        // Safe default: remove the orphaned record. Re-loading the job
+        // instead was considered (SPEC Design §3 mentions both options)
+        // but rescheduling a one-shot nudge whose original fire moment may
+        // already be in the past has no obviously-correct new time to
+        // pick — removal is the unambiguous action, so it's the default.
+        await this.nudgeStore.remove(d.id)
+      }
+      actions.push({ type: 'nudge-drift', id: d.id, issue: d.issue, written: write })
     }
 
     return { actions, wrote: write }

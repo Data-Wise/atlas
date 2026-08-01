@@ -55,6 +55,8 @@ export class Atlas {
     this.capture = new CaptureAPI(this.container);
     this.context = new ContextAPI(this.container);
     this.tasks = new TasksAPI(this.container);
+    this.nudges = new NudgesAPI(this.container);
+    this.day = new DayAPI(this.container);
   }
 
   /**
@@ -444,14 +446,18 @@ class ProjectsAPI {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
     const statusFileParser = this.container.resolve('StatusFileParser');
-    const uc = new DoctorUseCase({ projectRepository, statusFileParser });
+    const nudgeStore = this.container.resolve('NudgeStore');
+    const nudgeScheduler = this.container.resolve('NudgeScheduler');
+    const uc = new DoctorUseCase({ projectRepository, statusFileParser, nudgeStore, nudgeScheduler });
     return uc.execute(options);
   }
 
   async doctorFix(options = {}) {
     const { DoctorUseCase } = await import('./use-cases/registry/DoctorUseCase.js');
     const projectRepository = this.container.resolve('ProjectRepository');
-    const uc = new DoctorUseCase({ projectRepository });
+    const nudgeStore = this.container.resolve('NudgeStore');
+    const nudgeScheduler = this.container.resolve('NudgeScheduler');
+    const uc = new DoctorUseCase({ projectRepository, nudgeStore, nudgeScheduler });
     return uc.fix(options);
   }
 
@@ -733,6 +739,56 @@ class TasksAPI {
   async agenda(windowDays) {
     const agendaUseCase = this.container.resolve('AgendaUseCase');
     return await agendaUseCase.execute({ windowDays });
+  }
+}
+
+/**
+ * Nudges API - Wall-clock reminders that fire via launchd, cross-surface.
+ * See docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md
+ */
+class NudgesAPI {
+  constructor(container) {
+    this.container = container;
+  }
+
+  async add(time, message, options = {}) {
+    const addNudgeUseCase = this.container.resolve('AddNudgeUseCase');
+    return await addNudgeUseCase.execute({ time, message, daily: options.daily });
+  }
+
+  async fire(id) {
+    const fireNudgeUseCase = this.container.resolve('FireNudgeUseCase');
+    return await fireNudgeUseCase.execute({ id });
+  }
+
+  async ack(id) {
+    const ackNudgeUseCase = this.container.resolve('AckNudgeUseCase');
+    return await ackNudgeUseCase.execute({ id });
+  }
+
+  async remove(id) {
+    const rmNudgeUseCase = this.container.resolve('RmNudgeUseCase');
+    return await rmNudgeUseCase.execute({ id });
+  }
+
+  async list(options = {}) {
+    const listNudgesUseCase = this.container.resolve('ListNudgesUseCase');
+    return await listNudgesUseCase.execute(options);
+  }
+}
+
+/**
+ * Day API - Multi-repo activity provider.
+ * See docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md
+ */
+class DayAPI {
+  constructor(container) {
+    this.container = container;
+  }
+
+  async activity(date) {
+    const getDayActivityUseCase = this.container.resolve('GetDayActivityUseCase');
+    return await getDayActivityUseCase.execute({ date });
   }
 }
 
