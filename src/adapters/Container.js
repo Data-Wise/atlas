@@ -65,6 +65,7 @@ import { FireNudgeUseCase } from '../use-cases/nudge/FireNudgeUseCase.js'
 import { AckNudgeUseCase } from '../use-cases/nudge/AckNudgeUseCase.js'
 import { RmNudgeUseCase } from '../use-cases/nudge/RmNudgeUseCase.js'
 import { ListNudgesUseCase } from '../use-cases/nudge/ListNudgesUseCase.js'
+import { GetDayActivityUseCase } from '../use-cases/day/GetDayActivityUseCase.js'
 
 export class Container {
   /**
@@ -529,6 +530,20 @@ export class Container {
   }
 
   // ============================================================================
+  // USE CASES - Day Activity
+  // ============================================================================
+
+  getGetDayActivityUseCase() {
+    return this._resolve('getDayActivityUseCase', () => {
+      return new GetDayActivityUseCase({
+        gitGateway: this.getGitGateway(),
+        sessionRepository: this.getSessionRepository(),
+        projectRepository: this.getProjectRepository()
+      })
+    })
+  }
+
+  // ============================================================================
   // SERVICES (Infrastructure Layer)
   // ============================================================================
 
@@ -614,6 +629,7 @@ export class Container {
       'AckNudgeUseCase': () => this.getAckNudgeUseCase(),
       'RmNudgeUseCase': () => this.getRmNudgeUseCase(),
       'ListNudgesUseCase': () => this.getListNudgesUseCase(),
+      'GetDayActivityUseCase': () => this.getGetDayActivityUseCase(),
 
       // Repositories
       'SessionRepository': () => this.getSessionRepository(),
