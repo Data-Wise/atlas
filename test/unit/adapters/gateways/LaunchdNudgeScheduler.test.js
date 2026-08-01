@@ -20,6 +20,7 @@ function fakeExecFile(handlers) {
 describe('buildPlist', () => {
   const params = {
     label: 'com.data-wise.atlas-nudge.ndg_x',
+    nodePath: '/opt/homebrew/bin/node',
     atlasBinPath: '/opt/atlas/bin/atlas.js',
     nudgeId: 'ndg_x',
     schedule: { hour: 23, minute: 0 }
@@ -45,6 +46,18 @@ describe('buildPlist', () => {
     expect(xml).toContain('<string>nudge</string>')
     expect(xml).toContain('<string>fire</string>')
     expect(xml).toContain('<string>ndg_x</string>')
+  })
+
+  it('invokes the node binary directly (not via the shebang) so launchd\'s minimal PATH cannot fail to resolve it', () => {
+    // Root cause of the first live E2E failure: launchd's default PATH is
+    // just /usr/bin:/bin:/usr/sbin:/sbin. `#!/usr/bin/env node` can't
+    // resolve a Homebrew/nvm-installed node from there, so the job exits
+    // 127 before ever running atlas.js. Passing the resolved node path as
+    // ProgramArguments[0] sidesteps PATH resolution entirely.
+    const xml = buildPlist({ ...params, daily: false })
+    const programArgsMatch = xml.match(/<key>ProgramArguments<\/key>\s*<array>([\s\S]*?)<\/array>/)
+    const strings = [...programArgsMatch[1].matchAll(/<string>(.*?)<\/string>/g)].map((m) => m[1])
+    expect(strings).toEqual(['/opt/homebrew/bin/node', '/opt/atlas/bin/atlas.js', 'nudge', 'fire', 'ndg_x'])
   })
 
   it('includes the correct hour/minute', () => {

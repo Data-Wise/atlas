@@ -24,17 +24,23 @@ const execFileAsync = promisify(execFile)
 const DEFAULT_LAUNCH_AGENTS_DIR = join(homedir(), 'Library', 'LaunchAgents')
 
 /**
- * Build the plist XML for a nudge. `atlasBinPath` is passed explicitly
- * (rather than resolved here) so tests can point it at a fixture.
+ * Build the plist XML for a nudge. `atlasBinPath`/`nodePath` are passed
+ * explicitly (rather than resolved here) so tests can point them at a
+ * fixture. `nodePath` is invoked directly as ProgramArguments[0] rather
+ * than relying on atlas.js's own `#!/usr/bin/env node` shebang — launchd
+ * runs jobs with a minimal default PATH (/usr/bin:/bin:/usr/sbin:/sbin)
+ * that does not include Homebrew/nvm node install locations, so `env`
+ * cannot resolve `node` and the job exits 127 before atlas.js ever runs.
  * @param {Object} params
  * @param {string} params.label
+ * @param {string} params.nodePath - Absolute path to the node binary
  * @param {string} params.atlasBinPath - Absolute path to the atlas CLI entry
  * @param {string} params.nudgeId
  * @param {{hour: number, minute: number}} params.schedule
  * @param {boolean} params.daily
  * @returns {string}
  */
-export function buildPlist({ label, atlasBinPath, nudgeId, schedule, daily }) {
+export function buildPlist({ label, nodePath, atlasBinPath, nudgeId, schedule, daily }) {
   const now = new Date()
 
   const calendarEntries = daily
@@ -54,6 +60,7 @@ export function buildPlist({ label, atlasBinPath, nudgeId, schedule, daily }) {
   <string>${label}</string>
   <key>ProgramArguments</key>
   <array>
+    <string>${nodePath}</string>
     <string>${atlasBinPath}</string>
     <string>nudge</string>
     <string>fire</string>
@@ -73,6 +80,10 @@ export function buildPlist({ label, atlasBinPath, nudgeId, schedule, daily }) {
 export class LaunchdNudgeScheduler {
   /**
    * @param {Object} [options]
+   * @param {string} [options.nodePath] - Absolute path to the node binary
+   *   invoked by the plist. Defaults to `process.execPath` (the node
+   *   running this process) — never relies on `env`/PATH resolution,
+   *   since launchd's default PATH lacks Homebrew/nvm install locations.
    * @param {string} [options.atlasBinPath] - Absolute path to the atlas CLI
    *   entry point invoked by the plist. Defaults to this package's own
    *   bin/atlas.js so a globally-linked `atlas` isn't required at fire time.
@@ -84,7 +95,8 @@ export class LaunchdNudgeScheduler {
    *   mocking node's child_process module, which this codebase doesn't do
    *   elsewhere. Defaults to the real promisified execFile.
    */
-  constructor({ atlasBinPath, launchAgentsDir, execFileFn } = {}) {
+  constructor({ nodePath, atlasBinPath, launchAgentsDir, execFileFn } = {}) {
+    this.nodePath = nodePath || process.execPath
     this.atlasBinPath =
       atlasBinPath || join(dirname(new URL(import.meta.url).pathname), '..', '..', '..', 'bin', 'atlas.js')
     this.launchAgentsDir = launchAgentsDir || DEFAULT_LAUNCH_AGENTS_DIR
@@ -118,6 +130,7 @@ export class LaunchdNudgeScheduler {
       path,
       buildPlist({
         label,
+        nodePath: this.nodePath,
         atlasBinPath: this.atlasBinPath,
         nudgeId: nudge.id,
         schedule: nudge.schedule,
