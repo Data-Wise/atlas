@@ -658,6 +658,69 @@ priority: invalid
       const result = await parser.parse(statusPath)
       expect(result._parseWarnings).toEqual([])
     })
+
+    test('yaml: nested keys inside a backlog block do not warn or overwrite top-level fields', async () => {
+      // Real-world shape: rforge/.STATUS keeps a `backlog:` sequence of
+      // mappings where every item legitimately has its own `priority:`.
+      // The flat line scanner must treat column-0 keys as the project
+      // fields and ignore nested keys entirely (13 false duplicate-key
+      // warnings + priorityLabel pollution before this fix).
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, [
+        'project: demo',
+        'status: active',
+        'priority: high',
+        'progress: 80',
+        '',
+        'backlog:',
+        '  - title: "v2.3.0 — hardening"',
+        '    priority: merged-to-dev',
+        '    notes: "MERGED to dev. Unreleased."',
+        '  - title: "v2.4.0 — discovery"',
+        '    priority: SHIPPED',
+        '    notes: "SHIPPED."',
+        '  - title: "Path B v1.4.0"',
+        '    priority: parked',
+        '    notes: "Descoped pending demand."'
+      ].join('\n'))
+      const result = await parser.parse(statusPath)
+      expect(result.status).toBe('active')
+      expect(result.priority).toBe(3) // 'high' label → numeric default, not the last backlog item
+      expect(result.priorityLabel).toBe('high')
+      expect(result.progress).toBe(80)
+      expect(result._parseWarnings).toEqual([])
+    })
+
+    test('yaml: indented duplicate of a top-level key is ignored (not last-occurrence-wins)', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, [
+        'status: active',
+        'progress: 45',
+        'notes:',
+        '  status: Planning',
+        '  progress: 5'
+      ].join('\n'))
+      const result = await parser.parse(statusPath)
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(45)
+      expect(result._parseWarnings).toEqual([])
+    })
+
+    test('yaml: tasks block items still parse after the nested-key guard', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, [
+        'status: active',
+        'tasks:',
+        '  - text: "define estimand"; priority: P1; done: false',
+        '  - text: "run simulation"; priority: P2; done: true',
+        'next: ship it'
+      ].join('\n'))
+      const result = await parser.parse(statusPath)
+      expect(result.tasks).toHaveLength(2)
+      expect(result.tasks[0]).toMatchObject({ text: 'define estimand', priority: 'P1', done: false })
+      expect(result.next).toBe('ship it')
+      expect(result._parseWarnings).toEqual([])
+    })
   })
 
   describe('cran_state (package kind)', () => {
