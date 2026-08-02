@@ -893,6 +893,8 @@ atlas status myproject --set active --create
 | `atlas stats`                   | Session analytics  |
 | `atlas plan`                    | Morning planning   |
 | `atlas agenda`                  | Merged task+schedule view |
+| `atlas nudge add "23:00" "text"` | Schedule a wall-clock reminder |
+| `atlas day`                     | Multi-repo activity for today |
 | `atlas task add "X"`           | Add a task         |
 | `atlas task list`              | List tasks         |
 | `atlas status [project]`       | Show/update status |
