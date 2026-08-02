@@ -128,7 +128,7 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 2,002 passing (Jest, 114 suites) + 20 (Vitest e2e) — verified 2026-08-01 (#115 session)
+- Total: 2,009 passing (Jest, 115 suites) + 20 (Vitest e2e) — verified 2026-08-02 (sync --from-status fix session; +7 tests: frontmatter-parse describe, summarize regression, sync e2e 4, dogfood 5)
 - E2E/Dogfood: covered within the full suite above (Vitest + ink-testing-library + Playwright + shell dogfood)
 - 2026-08-02 (`sync --from-status` coverage): gateways 112/112 (7 suites), e2e 117/117 (5 suites), dogfood sync 5/5
 
