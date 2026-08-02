@@ -4,6 +4,18 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.18.0 — Dashboard Nudge Awareness
+
+!!! success "See fired reminders without leaving `atlas dash`"
+    The Now view now surfaces fired-but-unacked wall-clock nudges directly — a banner (up to 3
+    fired nudges + `+N more`), `●N`/`○N` fired/pending badges on the sidebar, and a status-bar
+    chip visible from every view. Press `a` in Now to ack every fired nudge in one keystroke.
+
+See `docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md` in the repo for the full design,
+including the poll/ack race hazard the implementation guards against.
+
+---
+
 ## v0.17.0 — Wall-Clock Nudges & Multi-Repo Day Activity
 
 !!! success "Reminders that actually fire, and a cross-repo memory aid"

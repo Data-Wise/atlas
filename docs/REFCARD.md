@@ -166,6 +166,7 @@ Start dashboard: `atlas dash`
 | `j` / `k` / `↑↓` | Now | Navigate project list                       |
 | `Enter`     | Now     | Select project                                   |
 | `e`         | Now     | Toggle ecosystem-wide stats in the right pane    |
+| `a`         | Now     | Ack all fired nudges                             |
 | `Space`     | Timer   | Pause/resume                                     |
 | `r`         | Timer   | Reset (while paused)                             |
 | `+`/`-`     | Timer   | Adjust duration (while paused)                   |
@@ -357,7 +358,7 @@ atlas project --help      # Project commands
 ---
 
 <div style="text-align: center; margin-top: 2em; color: #666;">
-<em>Atlas v0.17.0 | Made for ADHD brains</em>
+<em>Atlas v0.18.0 | Made for ADHD brains</em>
 </div>
 
 ---

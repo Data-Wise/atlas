@@ -78,7 +78,8 @@ source before applying.
 
 Legacy formats remain readable indefinitely as of v0.14.0 — no repo is
 rewritten without an explicit `atlas migrate` or `write(..., { migrate: true
-})`. A read-path sunset warning is planned for v0.15.0.
+})`. A read-path sunset warning is planned but not yet scheduled — see
+`docs/ROADMAP.md`'s v0.18.0 candidates list.
 
 ## Research fields (manuscripts, programs, packages)
 

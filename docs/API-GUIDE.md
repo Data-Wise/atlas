@@ -1002,9 +1002,10 @@ function MyComponent() {
 }
 ```
 
-### Data Hooks (v0.9.2)
+### Data Hooks
 
-Four hooks replace all mock data with live polling from `~/.atlas`:
+Six hooks replace all mock data with live polling from `~/.atlas` (the first four shipped in
+v0.9.2; `useAnalytics` and `useNudges` were added later — see each hook's own note):
 
 **`useProjects()`** — Project list with enrichment (5s poll)
 
@@ -1049,7 +1050,38 @@ const { count } = usePendingCaptures();
 // count: number — unprocessed captures in inbox
 ```
 
-**Resilience:** All hooks use stale-while-revalidate — on error, they return the last successfully fetched data and log to stderr.
+**`useAnalytics(projectId)`** — Velocity + pattern data for the Plan view's analytics pane (60s poll, added v0.10.0)
+
+```typescript
+import { useAnalytics } from '../hooks/useAnalytics';
+
+const { data, velocityLoading, patternLoading, velocityError, patternError }
+  = useAnalytics(selectedProject?.id ?? null);
+// data: AnalyticsData | null — velocitySparkline, velocityTrend, velocityAvg,
+//   weeklySummaries, patternGrid, patternBestDay/Hour, patternDeadZones
+// Velocity and pattern each have their own loading/error pair — they resolve independently
+// Returns loading:false with data:null when projectId is null
+```
+
+**`useNudges()`** — Fired/pending wall-clock nudges + ack (10s poll, added #115, v0.18.0)
+
+```typescript
+import { useNudges } from '../hooks/useNudges';
+
+const { fired, pending, acking, ackError, ackAllFired } = useNudges();
+// fired: DashboardNudge[] — state === 'fired', needs attention
+// pending: DashboardNudge[] — state === 'pending', informational only
+// ackAllFired(): acks every fired nudge, sequentially, never touches pending
+// acking: true while an ack round-trip is in flight
+// ackError: string | null — last ack failure (partial-failure-tolerant, not thrown)
+```
+
+Unlike the other five hooks, `useNudges` exposes a **write action** (`ackAllFired`), not just
+read data — it owns both the poll interval and the post-ack reconciliation, since only the hook
+itself can suppress a poll already in flight from resurrecting a just-cleared badge. See
+`docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md` for the full design rationale.
+
+**Resilience:** All hooks use stale-while-revalidate — on error, they return the last successfully fetched data and log to stderr (`useNudges`'s `ackAllFired` is the one exception — its errors go to `ackError` UI state, since `atlas dash` runs with `stdio: 'inherit'` and a stderr write from a user-triggered action would land inside the rendered frame).
 
 ---
 

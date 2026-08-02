@@ -988,6 +988,15 @@ atlas nudge ls --outstanding
 atlas nudge ls --format json
 ```
 
+### Dashboard awareness (v0.18.0+)
+
+`atlas dash`'s Now view surfaces fired-but-unacked nudges without running
+`atlas nudge ls` — a banner lists up to 3 (time + message, `+N more` beyond
+that), the sidebar project list carries `●N`/`○N` fired/pending count
+badges, and the status bar carries a standalone fired-count chip visible
+from every view. Press **`a`** in the Now view to ack every fired nudge at
+once (never pending ones) — the badge clears immediately.
+
 ---
 
 ## Day Activity (v0.17.0+)

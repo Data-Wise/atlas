@@ -2,7 +2,10 @@
 
 All notable changes to Atlas are documented here.
 
-## [Unreleased]
+## [0.18.0] - 2026-08-01
+
+### Added
+- **Dashboard nudge awareness** (`atlas dash`, #115) — the Now view surfaces fired-but-unacked wall-clock nudges without a separate `atlas nudge ls`: a bordered banner (up to 3 fired nudges + `+N more`, never showing pending), `●N`/`○N` fired/pending count badges on the sidebar project list, and a standalone fired-count chip on the status bar visible from every view. Press `a` in the Now view to ack every fired nudge in one keystroke — sequential, partial-failure-tolerant, and it never touches a pending (not-yet-fired) nudge. New `useNudges` hook polls `guards.json` every 10s and is the dashboard's first hook to return a write action, not just data; its post-ack refresh guards against a poll already in flight resurrecting a just-cleared badge (verified with a planted-defect test). See `docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md`.
 
 ## [0.17.0] - 2026-08-01
 
