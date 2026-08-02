@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { ProjectList } from '../shared/ProjectList.js';
 import { HeatmapComponent } from '../shared/HeatmapComponent.js';
-import type { Project } from '../../types.js';
+import type { Project, DashboardNudge } from '../../types.js';
 import { statusIcon } from '../../constants.js';
 import { useTheme } from '../../lib/ThemeContext.js';
 
@@ -35,6 +35,17 @@ interface NowViewProps {
   streakDays?: number;
   totalSessions?: number;
   breadcrumbs?: string[];
+  /** Fired-but-unacked nudges — drives the banner above the two panes, and
+   *  ProjectList's ● badge count (firedNudges.length). */
+  firedNudges?: DashboardNudge[];
+  /** Scheduled (not yet fired) nudge count — ProjectList's ○ badge only. */
+  pendingNudgesCount?: number;
+  /** True while an ack round-trip is in flight (disables another 'a' press). */
+  acking?: boolean;
+  /** Last ack failure, shown in the banner. */
+  ackError?: string | null;
+  /** Ack every currently-fired nudge — bound to 'a' below. */
+  onAckNudges?: () => void;
 }
 
 function progressBar(pct: number): { filled: string; empty: string } {
@@ -195,6 +206,41 @@ const EcosystemStats: React.FC<{
   );
 };
 
+/** Banner above the two panes — up to 3 fired nudges, "+N more", ack hint, ackError. */
+const NudgeBanner: React.FC<{
+  firedNudges: DashboardNudge[];
+  acking: boolean;
+  ackError: string | null | undefined;
+}> = ({ firedNudges, acking, ackError }) => {
+  const theme = useTheme();
+  if (firedNudges.length === 0 && !ackError) return null;
+
+  const shown = firedNudges.slice(0, 3);
+  const extra = firedNudges.length - shown.length;
+
+  return (
+    <Box flexDirection="column" paddingX={1} borderStyle="single" borderColor={theme.focus.paused}>
+      {shown.map(n => (
+        <Box key={n.id}>
+          <Text color={theme.focus.paused} bold>● {n.time}  </Text>
+          <Text color={theme.text.primary}>{trunc(n.message, 50)}</Text>
+        </Box>
+      ))}
+      {extra > 0 && (
+        <Text color={theme.text.muted} dimColor>+{extra} more</Text>
+      )}
+      {firedNudges.length > 0 && (
+        <Text color={theme.text.muted} dimColor>
+          {acking ? 'acking…' : 'a: ack all'}
+        </Text>
+      )}
+      {ackError && (
+        <Text color={theme.focus.paused}>{ackError}</Text>
+      )}
+    </Box>
+  );
+};
+
 export const NowView: React.FC<NowViewProps> = ({
   projects,
   onQuit,
@@ -209,6 +255,11 @@ export const NowView: React.FC<NowViewProps> = ({
   streakDays,
   totalSessions,
   breadcrumbs,
+  firedNudges = [],
+  pendingNudgesCount = 0,
+  acking = false,
+  ackError = null,
+  onAckNudges,
 }) => {
   const theme = useTheme();
   const [ecosystemMode, setEcosystemMode] = useState(false);
@@ -219,49 +270,56 @@ export const NowView: React.FC<NowViewProps> = ({
       onQuit();
     } else if (input === 'e') {
       setEcosystemMode(m => !m);
+    } else if (input === 'a') {
+      if (!acking && firedNudges.length > 0) onAckNudges?.();
     }
   });
 
   return (
-    <Box flexDirection="row" width="100%" height="100%">
-      <Box width="35%" height="100%">
-        <ProjectList
-          projects={projects}
-          selectedIndex={selectedIndex}
-          onSelect={onSelectedIndexChange}
-          onSelectProject={onSelectProject}
-          isActive={isActive}
-          pendingCaptures={pendingCaptures}
-          activeProjectId={activeProjectId ?? undefined}
-        />
-      </Box>
-
-      <Box width="65%" height="100%" flexDirection="column">
-        <Box paddingX={1} borderStyle="single" borderColor={isActive ? theme.panel.borderActive : theme.panel.borderInactive}>
-          <Text bold color={isActive ? theme.panel.headerActive : theme.panel.headerInactive}>
-            {ecosystemMode ? 'Ecosystem' : 'Detail'}
-          </Text>
+    <Box flexDirection="column" width="100%" height="100%">
+      <NudgeBanner firedNudges={firedNudges} acking={acking} ackError={ackError} />
+      <Box flexDirection="row" width="100%" flexGrow={1}>
+        <Box width="35%" height="100%">
+          <ProjectList
+            projects={projects}
+            selectedIndex={selectedIndex}
+            onSelect={onSelectedIndexChange}
+            onSelectProject={onSelectProject}
+            isActive={isActive}
+            pendingCaptures={pendingCaptures}
+            firedNudges={firedNudges.length}
+            pendingNudges={pendingNudgesCount}
+            activeProjectId={activeProjectId ?? undefined}
+          />
         </Box>
 
-        {ecosystemMode ? (
-          <EcosystemStats
-            projects={projects}
-            heatmapGrid={heatmapGrid}
-            streakDays={streakDays}
-            totalSessions={totalSessions}
-          />
-        ) : (
-          <ProjectDetail
-            project={selectedProject}
-            heatmapGrid={heatmapGrid}
-            streakDays={streakDays}
-            totalSessions={totalSessions}
-            breadcrumbs={breadcrumbs}
-          />
-        )}
+        <Box width="65%" height="100%" flexDirection="column">
+          <Box paddingX={1} borderStyle="single" borderColor={isActive ? theme.panel.borderActive : theme.panel.borderInactive}>
+            <Text bold color={isActive ? theme.panel.headerActive : theme.panel.headerInactive}>
+              {ecosystemMode ? 'Ecosystem' : 'Detail'}
+            </Text>
+          </Box>
 
-        <Box paddingX={1} borderStyle="single" borderColor={theme.panel.borderInactive}>
-          <Text color={theme.text.muted} dimColor>e: toggle ecosystem  q: quit  ?: help</Text>
+          {ecosystemMode ? (
+            <EcosystemStats
+              projects={projects}
+              heatmapGrid={heatmapGrid}
+              streakDays={streakDays}
+              totalSessions={totalSessions}
+            />
+          ) : (
+            <ProjectDetail
+              project={selectedProject}
+              heatmapGrid={heatmapGrid}
+              streakDays={streakDays}
+              totalSessions={totalSessions}
+              breadcrumbs={breadcrumbs}
+            />
+          )}
+
+          <Box paddingX={1} borderStyle="single" borderColor={theme.panel.borderInactive}>
+            <Text color={theme.text.muted} dimColor>e: toggle ecosystem  q: quit  ?: help</Text>
+          </Box>
         </Box>
       </Box>
     </Box>

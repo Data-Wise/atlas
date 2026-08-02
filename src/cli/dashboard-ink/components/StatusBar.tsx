@@ -13,6 +13,8 @@ interface StatusBarProps {
   activeProjectName: string | null;
   sessionSeconds: number;
   pendingCaptures: number;
+  /** Fired-but-unacked nudge count (chip shown only if > 0) */
+  firedNudges?: number;
 }
 
 // Unicode chars as JS strings (not JSX text — JSX treats \uXXXX as literal)
@@ -23,6 +25,7 @@ const ICON_LAYOUT_SPLIT = '\u25a5';   // ▥
 const ICON_LAYOUT_TRIPLE = '\u25a6';  // ▦
 const ICON_SEPARATOR = '\u2502';      // │
 const ICON_CAPTURE = '\u25c6';        // ◆
+const ICON_NUDGE_FIRED = '\u25cf';   // ●
 
 const LAYOUT_INFO: Record<string, { icon: string; label: string }> = {
   [LAYOUT.SINGLE]: { icon: ICON_LAYOUT_SINGLE, label: 'Single' },
@@ -31,7 +34,7 @@ const LAYOUT_INFO: Record<string, { icon: string; label: string }> = {
 };
 
 const KEY_HINTS: Record<string, string> = {
-  [STATES.NOW]:   'j/k:nav Enter:select e:Eco  1/2/3:views  ?:help',
+  [STATES.NOW]:   'j/k:nav Enter:select e:Eco a:ack  1/2/3:views  ?:help',
   [STATES.TIMER]: 'Space:pause r:reset z:zen  1/2/3:views  ?:help',
   [STATES.PLAN]:  'j/k:nav e:energy a:analytics  1/2/3:views  ?:help',
 };
@@ -45,7 +48,7 @@ function formatElapsed(seconds: number): string {
 export const StatusBar: React.FC<StatusBarProps> = ({
   currentView, layout,
   hasActiveSession, activeProjectName, sessionSeconds,
-  pendingCaptures,
+  pendingCaptures, firedNudges = 0,
 }) => {
   const theme = useTheme();
   const hints = KEY_HINTS[currentView] ?? '';
@@ -76,6 +79,9 @@ export const StatusBar: React.FC<StatusBarProps> = ({
         <Text>  {layoutInfo.icon} {layoutInfo.label}</Text>
         {pendingCaptures > 0 && (
           <Text>  {ICON_SEPARATOR}  {ICON_CAPTURE} {pendingCaptures}</Text>
+        )}
+        {firedNudges > 0 && (
+          <Text color={theme.focus.paused} bold>  {ICON_SEPARATOR}  {ICON_NUDGE_FIRED} {firedNudges}</Text>
         )}
       </Box>
     </Box>

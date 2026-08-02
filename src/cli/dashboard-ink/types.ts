@@ -28,6 +28,23 @@ export interface Project {
   };
 }
 
+/**
+ * A wall-clock nudge, flattened for the dashboard (useNudges hook).
+ *
+ * Deliberately a plain object, not the `Nudge` domain entity: entity
+ * instances must never enter React state (SPEC-dashboard-nudge-awareness
+ * §1). The hook maps at the boundary, which also keeps the test harness to
+ * object literals rather than constructed entities.
+ */
+export interface DashboardNudge {
+  id: string;
+  /** HH:MM, 24-hour */
+  time: string;
+  message: string;
+  recurring: boolean;
+  state: 'pending' | 'fired' | 'acked';
+}
+
 /** 30-day velocity data for one week (AnalyticsView) */
 export interface WeekSummary {
   label: string;

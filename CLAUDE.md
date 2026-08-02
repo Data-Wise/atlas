@@ -23,7 +23,7 @@ atlas sync --from-status         # Import from .STATUS files
 
 # Dashboard
 atlas dash                       # Launch TUI (3 views: Now/Timer/Plan)
-# Dashboard keys: 1/n=Now, 2/t=Timer, 3/p=Plan, Tab=layout, ?=Help — src/cli/dashboard-ink/lib/keymap.ts
+# Dashboard keys: 1/n=Now, 2/t=Timer, 3/p=Plan, Tab=layout, a=ack nudges (Now), ?=Help — src/cli/dashboard-ink/lib/keymap.ts
 ```
 
 ## Project Overview

@@ -93,7 +93,7 @@ describe('StatusBar E2E', () => {
 
   describe('Key hints (center zone)', () => {
     const viewCases: Array<{ view: string; label: string; checks: string[] }> = [
-      { view: STATES.NOW,   label: 'NOW',   checks: ['j/k:nav', 'Enter:select', 'e:Eco'] },
+      { view: STATES.NOW,   label: 'NOW',   checks: ['j/k:nav', 'Enter:select', 'e:Eco', 'a:ack'] },
       { view: STATES.TIMER, label: 'TIMER', checks: ['Space:pause', 'r:reset', 'z:zen'] },
       { view: STATES.PLAN,  label: 'PLAN',  checks: ['j/k:nav', 'e:energy', 'a:analytics'] },
     ]
@@ -205,4 +205,23 @@ describe('StatusBar E2E', () => {
       expect(frame).toContain('2')
     })
   })
+
+  describe('Fired nudges (right zone)', () => {
+    it('shows fired-nudge chip with separator when firedNudges > 0', () => {
+      const { lastFrame } = render(
+        <StatusBar {...defaultProps} firedNudges={2} />
+      )
+      const frame = lastFrame() ?? ''
+      expect(frame).toContain('\u2502')
+      expect(frame).toContain('\u25cf')
+      expect(frame).toContain('2')
+    })
+
+    it('hides the fired-nudge chip when firedNudges is 0 or omitted', () => {
+      const { lastFrame } = render(<StatusBar {...defaultProps} />)
+      const frame = lastFrame() ?? ''
+      expect(frame).not.toContain('\u25cf')
+    })
+  })
 })
+
