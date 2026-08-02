@@ -144,4 +144,78 @@ describe('NowView Component', () => {
       expect(lastFrame()).toContain('10');
     });
   });
+
+  describe('Nudge banner + ack (#115, SPEC-dashboard-nudge-awareness)', () => {
+    const FIRED_A = { id: 'ndg_a', time: '09:00', message: 'stand up', recurring: false, state: 'fired' };
+    const FIRED_B = { id: 'ndg_b', time: '11:30', message: 'water', recurring: true, state: 'fired' };
+    const FIRED_C = { id: 'ndg_c', time: '13:00', message: 'stretch', recurring: false, state: 'fired' };
+    const FIRED_D = { id: 'ndg_d', time: '15:00', message: 'walk', recurring: false, state: 'fired' };
+
+    it('renders no banner when there are no fired nudges', () => {
+      const { lastFrame } = renderNow();
+      expect(lastFrame()).not.toContain('ack all');
+    });
+
+    it('renders up to 3 fired nudges with time + message', () => {
+      const { lastFrame } = renderNow({ firedNudges: [FIRED_A, FIRED_B] });
+      const frame = lastFrame();
+      expect(frame).toContain('09:00');
+      expect(frame).toContain('stand up');
+      expect(frame).toContain('11:30');
+      expect(frame).toContain('water');
+      expect(frame).toContain('a: ack all');
+    });
+
+    it('shows "+N more" when more than 3 nudges are fired', () => {
+      const { lastFrame } = renderNow({ firedNudges: [FIRED_A, FIRED_B, FIRED_C, FIRED_D] });
+      const frame = lastFrame();
+      expect(frame).toContain('+1 more');
+      // Only the first 3 are listed individually.
+      expect(frame).not.toContain('walk');
+    });
+
+    it('shows ackError text when set', () => {
+      const { lastFrame } = renderNow({ firedNudges: [FIRED_A], ackError: '1 of 2 not acked: boom' });
+      expect(lastFrame()).toContain('1 of 2 not acked: boom');
+    });
+
+    it('shows "acking…" instead of the hint while acking', () => {
+      const { lastFrame } = renderNow({ firedNudges: [FIRED_A], acking: true });
+      const frame = lastFrame();
+      expect(frame).toContain('acking…');
+      expect(frame).not.toContain('a: ack all');
+    });
+
+    it('pressing a calls onAckNudges when fired nudges exist and not acking', async () => {
+      const onAckNudges = jest.fn();
+      const { stdin } = renderNow({ firedNudges: [FIRED_A], onAckNudges });
+      stdin.write('a');
+      await new Promise(resolve => setTimeout(resolve, 10));
+      expect(onAckNudges).toHaveBeenCalledTimes(1);
+    });
+
+    it('pressing a is a no-op when there are no fired nudges', async () => {
+      const onAckNudges = jest.fn();
+      const { stdin } = renderNow({ firedNudges: [], onAckNudges });
+      stdin.write('a');
+      await new Promise(resolve => setTimeout(resolve, 10));
+      expect(onAckNudges).not.toHaveBeenCalled();
+    });
+
+    it('pressing a is a no-op while already acking', async () => {
+      const onAckNudges = jest.fn();
+      const { stdin } = renderNow({ firedNudges: [FIRED_A], acking: true, onAckNudges });
+      stdin.write('a');
+      await new Promise(resolve => setTimeout(resolve, 10));
+      expect(onAckNudges).not.toHaveBeenCalled();
+    });
+
+    it('does not respond to a when isActive=false', async () => {
+      const onAckNudges = jest.fn();
+      const { stdin } = renderNow({ firedNudges: [FIRED_A], onAckNudges, isActive: false });
+      stdin.write('a');
+      await new Promise(resolve => setTimeout(resolve, 10));
+      expect(onAckNudges).not.toHaveBeenCalled();
+    });
+  });
 });
