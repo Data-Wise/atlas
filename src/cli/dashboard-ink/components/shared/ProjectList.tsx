@@ -9,6 +9,7 @@
  *   - One-line rows: icon + name + status colour + progress %
  *   - Active session row highlighted in green
  *   - Inbox badge when pendingCaptures > 0
+ *   - Nudge badges when firedNudges/pendingNudges > 0 (●/○, see NudgePresenter.js)
  *   - Enter fires onSelectProject; does NOT steal focus from main panel when
  *     isActive=false (keypresses pass through)
  *
@@ -19,6 +20,8 @@
  *   onSelectProject  - called on Enter with the highlighted project
  *   isActive         - whether this panel holds keyboard focus
  *   pendingCaptures  - inbox count (shows badge if > 0)
+ *   firedNudges      - fired-but-unacked nudge count (shows ● badge if > 0)
+ *   pendingNudges    - scheduled nudge count (shows ○ badge if > 0)
  *   activeProjectId  - id of project with running session (highlights row)
  */
 
@@ -39,6 +42,10 @@ interface ProjectListProps {
   isActive: boolean;
   /** Inbox badge count */
   pendingCaptures?: number;
+  /** Fired-but-unacked nudge count (● badge) */
+  firedNudges?: number;
+  /** Scheduled (not yet fired) nudge count (○ badge) */
+  pendingNudges?: number;
   /** ID of project with an active session */
   activeProjectId?: string;
 }
@@ -160,6 +167,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   onSelectProject,
   isActive,
   pendingCaptures = 0,
+  firedNudges = 0,
+  pendingNudges = 0,
   activeProjectId,
 }) => {
   // ── Keyboard navigation (only when focused) ──────────────────────────────
@@ -203,6 +212,26 @@ export const ProjectList: React.FC<ProjectListProps> = ({
             <Text color={theme.text.secondary}>  </Text>
             <Text color={theme.focus.paused} bold>
               📥{pendingCaptures}
+            </Text>
+          </>
+        )}
+
+        {/* Fired-nudge badge — needs attention, same yellow as the inbox badge */}
+        {firedNudges > 0 && (
+          <>
+            <Text color={theme.text.secondary}>  </Text>
+            <Text color={theme.focus.paused} bold>
+              ●{firedNudges}
+            </Text>
+          </>
+        )}
+
+        {/* Pending-nudge badge — informational only */}
+        {pendingNudges > 0 && (
+          <>
+            <Text color={theme.text.secondary}>  </Text>
+            <Text color={theme.text.muted} dimColor>
+              ○{pendingNudges}
             </Text>
           </>
         )}
