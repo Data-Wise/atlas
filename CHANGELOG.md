@@ -2,7 +2,7 @@
 
 All notable changes to Atlas are documented here.
 
-## [Unreleased]
+## [0.18.1] - 2026-08-02
 
 ### Fixed
 - **`atlas sync --from-status` crash on non-numeric `priority:`** — a frontmatter-format `.STATUS`

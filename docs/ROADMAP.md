@@ -6,7 +6,27 @@
 
 ---
 
-## Current Version: v0.18.0 ✅ SHIPPED
+## Current Version: v0.18.1 ✅ SHIPPED
+
+`sync --from-status` hardened against non-numeric priorities — a frontmatter-format `.STATUS` with
+`priority: P1` (found live in `scribe/.STATUS` and `_worktrees/scribe-fix-vitest-watch/.STATUS`)
+crashed sync with a `TypeError`; priorities now normalize across all three formats (`parseInt || 3`,
+raw label preserved as `priorityLabel`), and the sync gained unit, e2e, and dogfood regression
+coverage.
+
+- [x] **Frontmatter priority coercion** — `priority: P1` (or any non-numeric string) → `3`, raw label
+  preserved as `priorityLabel`, matching the markdown and bare-YAML formats
+- [x] **`summarize()` NaN guard** — any non-finite priority buckets to default tier 3 instead of
+  throwing `TypeError: Cannot read properties of undefined (reading 'push')`
+- [x] **Regression coverage** — frontmatter-parse unit describe + summarize test, 4-test e2e suite
+  (`test/e2e/sync-from-status.e2e.test.js`), 5-check isolated-HOME dogfood script
+  (`test/dogfood/sync-from-status.sh`, `npm run test:dogfood:sync`)
+
+Fix commit `6cc7163` on `dev`. Shipped in v0.18.1 (2026-08-02).
+
+---
+
+## v0.18.0 - Dashboard Nudge Awareness ✅ SHIPPED
 
 Dashboard nudge awareness — closes the gap left by v0.17.0's wall-clock nudges: `atlas dash`'s Now
 view surfaces fired-but-unacked nudges without a separate `atlas nudge ls`.
