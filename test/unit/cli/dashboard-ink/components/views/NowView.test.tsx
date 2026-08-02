@@ -217,5 +217,12 @@ describe('NowView Component', () => {
       await new Promise(resolve => setTimeout(resolve, 10));
       expect(onAckNudges).not.toHaveBeenCalled();
     });
+
+    it('forwards fired/pending counts to the ProjectList badges', () => {
+      const { lastFrame } = renderNow({ firedNudges: [FIRED_A, FIRED_B], pendingNudgesCount: 3 });
+      const frame = lastFrame();
+      expect(frame).toContain('●2');
+      expect(frame).toContain('○3');
+    });
   });
 });

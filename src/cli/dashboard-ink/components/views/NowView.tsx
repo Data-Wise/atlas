@@ -35,8 +35,11 @@ interface NowViewProps {
   streakDays?: number;
   totalSessions?: number;
   breadcrumbs?: string[];
-  /** Fired-but-unacked nudges — drives the banner above the two panes. */
+  /** Fired-but-unacked nudges — drives the banner above the two panes, and
+   *  ProjectList's ● badge count (firedNudges.length). */
   firedNudges?: DashboardNudge[];
+  /** Scheduled (not yet fired) nudge count — ProjectList's ○ badge only. */
+  pendingNudgesCount?: number;
   /** True while an ack round-trip is in flight (disables another 'a' press). */
   acking?: boolean;
   /** Last ack failure, shown in the banner. */
@@ -253,6 +256,7 @@ export const NowView: React.FC<NowViewProps> = ({
   totalSessions,
   breadcrumbs,
   firedNudges = [],
+  pendingNudgesCount = 0,
   acking = false,
   ackError = null,
   onAckNudges,
@@ -283,6 +287,8 @@ export const NowView: React.FC<NowViewProps> = ({
             onSelectProject={onSelectProject}
             isActive={isActive}
             pendingCaptures={pendingCaptures}
+            firedNudges={firedNudges.length}
+            pendingNudges={pendingNudgesCount}
             activeProjectId={activeProjectId ?? undefined}
           />
         </Box>

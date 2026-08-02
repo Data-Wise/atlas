@@ -28,6 +28,7 @@ import { useProjects } from '../hooks/useProjects.js';
 import { useActiveSession } from '../hooks/useActiveSession.js';
 import { useProjectStats } from '../hooks/useProjectStats.js';
 import { usePendingCaptures } from '../hooks/usePendingCaptures.js';
+import { useNudges } from '../hooks/useNudges.js';
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
@@ -54,6 +55,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   const projectStats = useProjectStats(selectedProject?.id ?? null);
   const { count: pendingCaptures } = usePendingCaptures();
+  const { fired: firedNudges, pending: pendingNudges, acking, ackError, ackAllFired } = useNudges();
 
   const { layout, focusPanel, renderProps } = useLayout({ initial: 'single' as const });
 
@@ -147,6 +149,11 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             streakDays={projectStats.streakDays}
             totalSessions={projectStats.totalSessions}
             breadcrumbs={projectStats.breadcrumbs}
+            firedNudges={firedNudges}
+            pendingNudgesCount={pendingNudges.length}
+            acking={acking}
+            ackError={ackError}
+            onAckNudges={ackAllFired}
           />
         );
     }
@@ -176,6 +183,7 @@ export const App: React.FC<{ onExit: () => void }> = ({ onExit }) => {
             activeProjectName={activeProjectName}
             sessionSeconds={sessionSeconds}
             pendingCaptures={pendingCaptures}
+            firedNudges={firedNudges.length}
           />
         </Box>
       </Box>
