@@ -20,6 +20,18 @@ See `docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md` for th
 
 ---
 
+## Merged to `dev`, not yet released
+
+- [x] **Dashboard nudge awareness** (#115) — `atlas dash`'s Now view surfaces fired-but-unacked
+  nudges without a separate `atlas nudge ls`: a banner (up to 3 fired + `+N more`), `●N`/`○N`
+  fired/pending badges on the sidebar, a status-bar chip visible from every view, and an `a`
+  keybinding to ack all fired nudges in one keystroke. New `useNudges` hook — the dashboard's
+  first hook to expose a write action, not just data. PR #118, merged `2099a2b`.
+
+See `docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md` for the full spec.
+
+---
+
 ## v0.16.0 - ADHD-Friendly Docs-Site Redesign ✅ COMPLETE
 
 Implements the full "Suggested next steps" table from
@@ -70,9 +82,9 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 
 Not yet started — priority order, top first (renumbered from "v0.17.0 Candidates": v0.17.0 was
 used for the ad-hoc wall-clock nudges + `atlas day` feature instead — none of the items below
-shipped). #115 (surface fired-but-unacked nudges in `atlas dash`'s NowView) is a new fast-follow
-candidate, unblocked now that v0.17.0's `Nudge`/`INudgeStore` exist — not added to the numbered
-list below since it wasn't part of the original candidates pass.
+shipped). #115 (surface fired-but-unacked nudges in `atlas dash`'s NowView) has since been merged
+to `dev` — see "Merged to `dev`, not yet released" above — so it's no longer listed as a candidate
+here.
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).

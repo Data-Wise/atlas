@@ -203,7 +203,8 @@ src/
 │       │   ├── useActiveSession.ts   # Session detection + 1s timer
 │       │   ├── useProjectStats.ts    # Heatmap, streak, breadcrumbs (10s poll)
 │       │   ├── usePendingCaptures.ts # Inbox count (10s poll)
-│       │   └── useAnalytics.ts       # Analytics pane data (Plan view)
+│       │   ├── useAnalytics.ts       # Analytics pane data (Plan view)
+│       │   └── useNudges.ts          # Fired/pending nudges + ack (10s poll, #115)
 │       ├── lib/
 │       │   ├── AtlasContext.tsx       # React Context for DI Container (v0.9.2)
 │       │   ├── LayoutManager.tsx      # Layout engine: SINGLE/SPLIT/TRIPLE

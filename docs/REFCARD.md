@@ -166,6 +166,7 @@ Start dashboard: `atlas dash`
 | `j` / `k` / `↑↓` | Now | Navigate project list                       |
 | `Enter`     | Now     | Select project                                   |
 | `e`         | Now     | Toggle ecosystem-wide stats in the right pane    |
+| `a`         | Now     | Ack all fired nudges                             |
 | `Space`     | Timer   | Pause/resume                                     |
 | `r`         | Timer   | Reset (while paused)                             |
 | `+`/`-`     | Timer   | Adjust duration (while paused)                   |
