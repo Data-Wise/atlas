@@ -39,6 +39,7 @@ export const NOW_KEYS: KeyBinding[] = [
   { key: 'j / k / ↓ / ↑', description: 'Navigate project list' },
   { key: 'Enter', description: 'Select project' },
   { key: 'e', description: 'Toggle ecosystem-wide stats in the right pane' },
+  { key: 'a', description: 'Ack all fired nudges' },
 ];
 
 /** Timer view — the single Pomodoro implementation (absorbs Focus/Zen/Inspector timer). */
