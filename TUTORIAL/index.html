@@ -1,0 +1,5049 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow">
+      
+      
+      
+        <link rel="canonical" href="https://data-wise.github.io/atlas/TUTORIAL/">
+      
+      
+        <link rel="prev" href="../getting-started/installation/">
+      
+      
+        <link rel="next" href="../DEMOS/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Tutorial - Atlas</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/fonts.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started-with-atlas" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      <!-- Scroll Progress Bar -->
+<div class="md-scroll-progress" data-md-component="scroll-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Page scroll progress">
+  <div class="md-scroll-progress__bar"></div>
+</div>
+
+
+  <header class="md-header" data-md-component="header">
+    <nav class="md-header__inner md-grid" aria-label="Header">
+      <a href="" title="Atlas" class="md-header__button md-logo" aria-label="Atlas" data-md-component="logo">
+        
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93c-3.72-.49-7-3.85-7-7.93 0-4.42 3.58-8 8-8s8 3.58 8 8-3.58 8-8 8zm0-2c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm0-10c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+        
+      </a>
+      <label class="md-header__button md-icon" for="__drawer" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      </label>
+      <div class="md-header__title" data-md-component="header-title">
+        <a href="" class="md-header__ellipsis" title="Atlas">
+          Atlas
+        </a>
+      </div>
+      <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5-.79.28v-.79l-.28.27C12.59 15.41 11.11 16 9.5 16S6 13.09 6 9.5 8.91 3 11.5 3 16 5.91 16 9.5c0 .76-.11 1.5-.29 2.2L19 19.79l-1.41 1.41L13.5 14.5h-.79z"/></svg>
+      </label>
+      
+        
+          <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+        
+      
+      
+        <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      
+      <div class="md-header__source">
+        
+          <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" class="md-button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        
+      </div>
+    </nav>
+  </header>
+
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs atlas-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list atlas-pill-list">
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link atlas-pill atlas-pill--home">
+          Home
+        </a>
+      </li>
+      
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../getting-started/installation/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="do">
+                Get Started
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../user-guide/adhd-guide/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="learn">
+                Guide
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../ARCHITECTURE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="build">
+                Architecture
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../CLI-REFERENCE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="code">
+                Reference
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li class="md-tabs__item">
+            <a href="../WHAT-S-NEW/"
+               class="md-tabs__link atlas-pill atlas-pill--muted">
+              Changelog
+            </a>
+          </li>
+        
+      
+      <li class="md-tabs__item atlas-pill-search-item">
+        <input type="search"
+               class="atlas-pill-search"
+               placeholder="Filter sidebar…"
+               aria-label="Filter sidebar navigation">
+      </li>
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Atlas" class="md-nav__button md-logo" aria-label="Atlas" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Atlas
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Data-Wise/atlas" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/atlas
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#try-this-now-your-first-win-2-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now: Your First Win (2 minutes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-atlas-does-visual-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Atlas Does (Visual Overview)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutorial-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tutorial Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-1-quick-start-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 1: Quick Start (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 1: Quick Start (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#first-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-1-your-first-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #1: Your First Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-2-your-first-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #2: Your First Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-2-core-workflow-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 2: Core Workflow (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 2: Core Workflow (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-daily-rhythm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Daily Rhythm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starting-your-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Starting Your Day
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-3-quick-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #3: Quick Capture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breadcrumbs-adhd-gold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadcrumbs (ADHD Gold)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-4-project-focus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #4: Project Focus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-3-adhd-features-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 3: ADHD Features (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 3: ADHD Features (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-context-switching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem: Context Switching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-5-park-unpark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #5: Park &amp; Unpark
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-restoration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context Restoration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-6-celebration-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #6: Celebration Levels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-awareness-no-time-blindness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Awareness (No Time Blindness)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-4-dashboard-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 4: Dashboard (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 4: Dashboard (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launch-the-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launch the TUI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-7-navigate-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #7: Navigate the Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timer-view-pomodoro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timer View (Pomodoro)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plan-view-morning-ritual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plan View (Morning Ritual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#real-data-dashboard-v092" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real Data Dashboard (v0.9.2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-panel-layout-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Panel Layout (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#themes-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Themes (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#focus-score-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Focus Score (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-5-templates-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 5: Templates (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 5: Templates (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Templates?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-8-see-available-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #8: See Available Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-project-from-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a Project from Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-9-create-a-custom-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #9: Create a Custom Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-6-task-management-v0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 6: Task Management (v0.13.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 6: Task Management (v0.13.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#working-with-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working with Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merged-agenda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merged Agenda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-10-your-first-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #10: Your First Task
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-7-analytics-view-v0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 7: Analytics View (v0.13.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 7: Analytics View (v0.13.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deep-productivity-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deep Productivity Insights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-11-explore-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #11: Explore Analytics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-8-tips-tricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 8: Tips &amp; Tricks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 8: Tips &amp; Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-from-status-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sync from .STATUS Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-driven-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyboard-Driven Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inbox-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbox Triage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-cli-integration-v093" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flow-cli Integration (v0.9.3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#man-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Man Pages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-completions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shell Completions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-export-v070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session Export (v0.7.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-wizard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Wizard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-status-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Status Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference Card
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Reference Card">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#essential-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-projects-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No projects found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-active-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No active session"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration not loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dashboard-looks-weird" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard looks weird
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lost-parked-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lost parked context?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's Next?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What&#39;s Next?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#learn-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learn More
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Ideas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zellij-integration-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zellij Integration (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Final Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-adhd-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For ADHD Users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-everyone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Everyone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#habit-formation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Habit Formation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remember" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remember
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get Help
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEMOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recording
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADHD Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADHD Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/core-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/quick-wins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Wins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/time-blindness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Time Blindness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/hyperfocus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hyperfocus Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/accessibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accessibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/visual-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/research-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/SCENARIOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WEEKLY-REVIEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weekly Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/MULTI-PROJECT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/AUTOMATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/cookbook/COOKBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../VISUAL-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/swiftbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SwiftBar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../STATUS-SCHEMA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .STATUS Schema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/MIGRATION-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CLI-REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REFCARD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference Card
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-RECIPES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MCP-SERVER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DIAGRAMS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Changelog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WHAT-S-NEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#try-this-now-your-first-win-2-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now: Your First Win (2 minutes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-atlas-does-visual-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Atlas Does (Visual Overview)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tutorial-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tutorial Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-1-quick-start-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 1: Quick Start (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 1: Quick Start (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#first-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        First Run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-1-your-first-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #1: Your First Project
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-2-your-first-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #2: Your First Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-2-core-workflow-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 2: Core Workflow (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 2: Core Workflow (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-daily-rhythm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Daily Rhythm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starting-your-day" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Starting Your Day
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-3-quick-capture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #3: Quick Capture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breadcrumbs-adhd-gold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breadcrumbs (ADHD Gold)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-4-project-focus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #4: Project Focus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-3-adhd-features-5-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 3: ADHD Features (5 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 3: ADHD Features (5 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-context-switching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem: Context Switching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-5-park-unpark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #5: Park &amp; Unpark
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-restoration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context Restoration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-6-celebration-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #6: Celebration Levels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-awareness-no-time-blindness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Awareness (No Time Blindness)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-4-dashboard-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 4: Dashboard (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 4: Dashboard (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launch-the-tui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launch the TUI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-7-navigate-the-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #7: Navigate the Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timer-view-pomodoro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timer View (Pomodoro)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plan-view-morning-ritual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plan View (Morning Ritual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#real-data-dashboard-v092" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real Data Dashboard (v0.9.2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-panel-layout-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Panel Layout (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#themes-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Themes (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#focus-score-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Focus Score (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision Helper
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-5-templates-3-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 5: Templates (3 minutes)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 5: Templates (3 minutes)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Templates?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-8-see-available-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #8: See Available Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-project-from-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a Project from Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-9-create-a-custom-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #9: Create a Custom Template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-6-task-management-v0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 6: Task Management (v0.13.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 6: Task Management (v0.13.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#working-with-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working with Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merged-agenda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Merged Agenda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-10-your-first-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #10: Your First Task
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-7-analytics-view-v0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 7: Analytics View (v0.13.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 7: Analytics View (v0.13.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deep-productivity-insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deep Productivity Insights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#try-this-now-11-explore-analytics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Try This Now #11: Explore Analytics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-8-tips-tricks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 8: Tips &amp; Tricks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Part 8: Tips &amp; Tricks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-shortcuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow Shortcuts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sync-from-status-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sync from .STATUS Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyboard-driven-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keyboard-Driven Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inbox-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbox Triage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-cli-integration-v093" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flow-cli Integration (v0.9.3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#man-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Man Pages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shell-completions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shell Completions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session-export-v070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session Export (v0.7.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-wizard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Wizard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-status-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Status Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference Card
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Reference Card">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#essential-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-projects-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No projects found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-active-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "No active session"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration not loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dashboard-looks-weird" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard looks weird
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lost-parked-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lost parked context?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's Next?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What&#39;s Next?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#learn-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learn More
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Ideas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zellij-integration-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zellij Integration (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Final Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-adhd-users" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For ADHD Users
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-everyone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For Everyone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#habit-formation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Habit Formation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remember" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remember
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get Help
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../getting-started/installation/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Get Started
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="getting-started-with-atlas">Getting Started with Atlas</h1>
+<p><strong>Welcome!</strong> This tutorial gets you from zero to productive with Atlas in about 15 minutes.</p>
+<div class="admonition tip">
+<p class="admonition-title">ADHD-Friendly Design</p>
+<p>This tutorial has <strong>"Try This Now"</strong> prompts. Do them! Hands-on learning sticks better than reading.</p>
+</div>
+<h2 id="try-this-now-your-first-win-2-minutes">Try This Now: Your First Win (2 minutes)</h2>
+<p>Skip the explanation — get a win first.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install (macOS shown; see Installation for Linux/curl/source)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>brew<span class="w"> </span>tap<span class="w"> </span>data-wise/tap<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>brew<span class="w"> </span>install<span class="w"> </span>atlas
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>atlas<span class="w"> </span>init
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># Register a project, start a session, end it</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">cd</span><span class="w"> </span>~/projects/my-project<span class="w">   </span><span class="c1"># or wherever</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>atlas<span class="w"> </span>project<span class="w"> </span>add
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;tried out atlas&quot;</span>
+</span></code></pre></div>
+<p><strong>That's it.</strong> You just registered a project, tracked a session, and got a celebration message. Everything below explains <em>why</em> — come back to Part 1 for the other install options.</p>
+<hr />
+<h2 id="what-atlas-does-visual-overview">What Atlas Does (Visual Overview)</h2>
+<pre class="mermaid"><code>flowchart LR
+    subgraph YOU["Your Brain"]
+        A[💡 Ideas]
+        B[🎯 Focus]
+        C[❓ Where was I?]
+    end
+
+    subgraph ATLAS["Atlas Helps"]
+        D[catch] --&gt; E[(Inbox)]
+        F[session] --&gt; G[(Tracked Time)]
+        H[where/trail] --&gt; I[(Context)]
+    end
+
+    A --&gt; D
+    B --&gt; F
+    C --&gt; H
+
+    style YOU fill:#fff3cd
+    style ATLAS fill:#d4edda</code></pre>
+<p>Atlas helps you:</p>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Atlas Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"What was I working on?"</td>
+<td><code>atlas where</code> + <code>atlas trail</code></td>
+</tr>
+<tr>
+<td>"I'll forget this idea"</td>
+<td><code>atlas catch "idea"</code></td>
+</tr>
+<tr>
+<td>"How long have I been at this?"</td>
+<td><code>atlas session status</code></td>
+</tr>
+<tr>
+<td>"I need to switch but don't want to lose context"</td>
+<td><code>atlas park</code> / <code>atlas unpark</code></td>
+</tr>
+<tr>
+<td>"Am I making progress?"</td>
+<td><code>atlas stats</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tutorial-structure">Tutorial Structure</h2>
+<ul>
+<li><strong>Part 1: Quick Start</strong> (5 min) - Get running fast</li>
+<li><strong>Part 2: Core Workflow</strong> (5 min) - Daily usage patterns</li>
+<li><strong>Part 3: ADHD Features</strong> (5 min) - Context switching &amp; restoration</li>
+<li><strong>Part 4: Dashboard</strong> (3 min) - Visual project overview</li>
+<li><strong>Part 5: Templates</strong> (3 min) - Starting new projects</li>
+<li><strong>Part 6: Task Management</strong> (2 min) - Tasks and agenda (v0.13.0)</li>
+<li><strong>Part 7: Analytics View</strong> (2 min) - Deep productivity insights (v0.13.0)</li>
+<li><strong>Part 8: Tips &amp; Tricks</strong> - Power user shortcuts</li>
+</ul>
+<p><strong>Each section has "Try This Now" prompts</strong> - do them for best results!</p>
+<hr />
+<h2 id="part-1-quick-start-5-minutes">Part 1: Quick Start (5 minutes)</h2>
+<h3 id="installation">Installation</h3>
+<p>Pick one method:</p>
+<p><strong>Option A: Homebrew (macOS)</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew<span class="w"> </span>tap<span class="w"> </span>data-wise/tap
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>brew<span class="w"> </span>install<span class="w"> </span>atlas
+</span></code></pre></div></p>
+<p><strong>Option B: curl (Linux/macOS)</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Data-Wise/atlas/main/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+</span></code></pre></div></p>
+<p><strong>Option C: From source</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/atlas.git
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>atlas<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>install<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>link
+</span></code></pre></div></p>
+<h3 id="first-run">First Run</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Initialize Atlas</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>atlas<span class="w"> </span>init
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># See what commands are available</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>atlas<span class="w"> </span>--help
+</span></code></pre></div>
+<p><strong>What just happened?</strong></p>
+<ul>
+<li>Created <code>~/.atlas/</code> directory for data storage</li>
+<li>Atlas is ready to track your projects</li>
+</ul>
+<h3 id="try-this-now-1-your-first-project">Try This Now #1: Your First Project</h3>
+<blockquote>
+<p>Already did the 2-minute win above? Skip to <a href="#part-2-core-workflow-5-minutes">Part 2</a>.</p>
+</blockquote>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Go to any project directory (or create one)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>~/projects/my-project<span class="w">  </span><span class="c1"># or wherever</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Register this project</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>atlas<span class="w"> </span>project<span class="w"> </span>add
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Verify it worked</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>atlas<span class="w"> </span>project<span class="w"> </span>list
+</span></code></pre></div>
+<p><strong>Quick win!</strong> You just registered your first project.</p>
+<h3 id="try-this-now-2-your-first-session">Try This Now #2: Your First Session</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Start working on something</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Check your session</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>atlas<span class="w"> </span>session<span class="w"> </span>status
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># End when you&#39;re done (or after 5 minutes)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;tried out atlas&quot;</span>
+</span></code></pre></div>
+<p><strong>Notice:</strong> You got a celebration message! Atlas celebrates your work.</p>
+<hr />
+<h2 id="part-2-core-workflow-5-minutes">Part 2: Core Workflow (5 minutes)</h2>
+<h3 id="the-daily-rhythm">The Daily Rhythm</h3>
+<p>Most Atlas usage follows this pattern:</p>
+<ol>
+<li><strong>Start session</strong> → Work → <strong>End session</strong></li>
+<li><strong>Capture ideas</strong> as they pop up (without breaking flow)</li>
+<li><strong>Check context</strong> when you return ("where was I?")</li>
+</ol>
+<h3 id="starting-your-day">Starting Your Day</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># See what you were working on</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>atlas<span class="w"> </span>where
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Start a session for a specific project</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span>myproject
+</span></code></pre></div>
+<p><strong>What you'll see:</strong></p>
+<ul>
+<li>"Last time you were..." message (context restoration)</li>
+<li>Your current streak (if you worked yesterday)</li>
+<li>Current focus/task</li>
+</ul>
+<h3 id="try-this-now-3-quick-capture">Try This Now #3: Quick Capture</h3>
+<p><em>Capture = a quick inbox note — jot it and keep working, process it later.</em></p>
+<p>Imagine you're working and remember something:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Capture without stopping work</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>atlas<span class="w"> </span>catch<span class="w"> </span><span class="s2">&quot;check the API documentation&quot;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Capture for a specific project</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>atlas<span class="w"> </span>catch<span class="w"> </span>-p<span class="w"> </span>myproject<span class="w"> </span><span class="s2">&quot;add input validation&quot;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Capture as a bug report</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>atlas<span class="w"> </span>catch<span class="w"> </span><span class="s2">&quot;login fails on Safari&quot;</span><span class="w"> </span>--type<span class="w"> </span>bug
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># View your inbox</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>atlas<span class="w"> </span>inbox
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="c1"># Filter by type (idea, task, bug, note, question, parked, win)</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>atlas<span class="w"> </span>inbox<span class="w"> </span>--type<span class="w"> </span>bug
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># Show latest 5 items</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>atlas<span class="w"> </span>inbox<span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="c1"># See inbox statistics</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>atlas<span class="w"> </span>inbox<span class="w"> </span>--stats
+</span></code></pre></div>
+<p><strong>Key insight:</strong> Capture gets it out of your head instantly. Process later.</p>
+<h3 id="breadcrumbs-adhd-gold">Breadcrumbs (ADHD Gold)</h3>
+<p><em>Breadcrumb = a trail marker for where you got stuck — leave one, come back later, follow it home.</em></p>
+<p>Leave yourself notes about WHERE you are:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># You&#39;re stuck on something</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;blocked on database migration issue&quot;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Work on something else...</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="c1"># Come back later:</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># See your trail</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>atlas<span class="w"> </span>trail
+</span></code></pre></div>
+<p><strong>Why this works:</strong> Breadcrumbs help you remember your thought process.</p>
+<h3 id="try-this-now-4-project-focus">Try This Now #4: Project Focus</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Show overall workflow status</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>atlas<span class="w"> </span>status
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Set what you&#39;re focusing on</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>atlas<span class="w"> </span>focus<span class="w"> </span>myproject<span class="w"> </span><span class="s2">&quot;implementing user authentication&quot;</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Check your context</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>atlas<span class="w"> </span>where
+</span></code></pre></div>
+<p>Detailed status (<code>--set</code>, <code>--progress</code>, etc.) needs a <code>.STATUS</code> file — create one inline, no need to browse templates yet:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>atlas<span class="w"> </span>init<span class="w"> </span>--template<span class="w"> </span>minimal<span class="w">   </span><span class="c1"># in your project directory</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="part-3-adhd-features-5-minutes">Part 3: ADHD Features (5 minutes)</h2>
+<h3 id="the-problem-context-switching">The Problem: Context Switching</h3>
+<p>You're deep in work on Project A. Urgent email arrives about Project B.</p>
+<p><strong>Without Atlas:</strong> Panic. Forget where you were. Lose 15 minutes re-orienting.</p>
+<p><strong>With Atlas:</strong> Park your context, handle the interrupt, restore when ready.</p>
+<h3 id="try-this-now-5-park-unpark">Try This Now #5: Park &amp; Unpark</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># You&#39;re working on projectA</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span>projectA
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>atlas<span class="w"> </span>focus<span class="w"> </span>projectA<span class="w"> </span><span class="s2">&quot;refactoring authentication module&quot;</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;found the bug in line 247 of auth.js&quot;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># INTERRUPT! Need to switch to projectB</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>atlas<span class="w"> </span>park<span class="w"> </span><span class="s2">&quot;urgent bug fix needed&quot;</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1"># Work on projectB</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span>projectB
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="c1"># ... do the urgent work ...</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>atlas<span class="w"> </span>session<span class="w"> </span>end
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="c1"># Return to projectA - restore exactly where you were</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>atlas<span class="w"> </span>unpark
+</span></code></pre></div>
+<p><strong>What just happened?</strong></p>
+<ul>
+<li><code>park</code> saved: your project, task, duration, breadcrumbs, and a note</li>
+<li><code>unpark</code> restored: new session with same project/task, showed your note</li>
+</ul>
+<p><strong>Check parked contexts anytime:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>atlas<span class="w"> </span>parked
+</span></code></pre></div></p>
+<h3 id="context-restoration">Context Restoration</h3>
+<p>Every time you start a session, Atlas tells you:</p>
+<ul>
+<li>What you were working on last time</li>
+<li>When you last worked on this</li>
+<li>Your current streak</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span>myproject
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># You&#39;ll see something like:</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># 🔥 3-day streak! Keep it going!</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># 📍 Last time you were: &quot;implementing login flow&quot; (2 hours ago)</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># 🎯 Session started: myproject</span>
+</span></code></pre></div>
+<p><strong>Disable if it's too much:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.showContextRestore<span class="w"> </span><span class="nb">false</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.showStreak<span class="w"> </span><span class="nb">false</span>
+</span></code></pre></div></p>
+<h3 id="try-this-now-6-celebration-levels">Try This Now #6: Celebration Levels</h3>
+<p>Atlas celebrates your work. Too much? Too little? Adjust:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># See current level</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>get<span class="w"> </span>adhd.celebrationLevel
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Options: minimal, normal, enthusiastic</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.celebrationLevel<span class="w"> </span>enthusiastic
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># End a session to test</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;finished the feature&quot;</span>
+</span></code></pre></div>
+<h3 id="time-awareness-no-time-blindness">Time Awareness (No Time Blindness)</h3>
+<p>Atlas can show gentle time cues without nagging:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Enable time awareness</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.showTimeCues<span class="w"> </span><span class="nb">true</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Set reminder interval (minutes)</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.timeBlindnessInterval<span class="w"> </span><span class="m">30</span>
+</span></code></pre></div>
+<p>During focus mode in the dashboard, you'll get gentle reminders.</p>
+<hr />
+<h2 id="part-4-dashboard-3-minutes">Part 4: Dashboard (3 minutes)</h2>
+<h3 id="launch-the-tui">Launch the TUI</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>atlas<span class="w"> </span>dash
+</span></code></pre></div>
+<p><strong>What you see:</strong></p>
+<ul>
+<li>All your projects</li>
+<li>Active session highlighted</li>
+<li>Progress bars</li>
+<li>Recent activity</li>
+<li>Command shortcuts at bottom</li>
+</ul>
+<h3 id="try-this-now-7-navigate-the-dashboard">Try This Now #7: Navigate the Dashboard</h3>
+<p><strong>v0.14 — 3 views, not 8</strong> (Now / Timer / Plan). <code>src/cli/dashboard-ink/lib/keymap.ts</code> is the single source of truth — press <code>?</code> in-app to see this table live (mirrors <a href="../REFCARD/#keyboard-shortcuts-dashboard">REFCARD</a>):</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Scope</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1</code> / <code>n</code></td>
+<td>global</td>
+<td>Switch to <strong>Now</strong></td>
+</tr>
+<tr>
+<td><code>2</code> / <code>t</code></td>
+<td>global</td>
+<td>Switch to <strong>Timer</strong></td>
+</tr>
+<tr>
+<td><code>3</code> / <code>p</code></td>
+<td>global</td>
+<td>Switch to <strong>Plan</strong></td>
+</tr>
+<tr>
+<td><code>Tab</code></td>
+<td>global</td>
+<td>Cycle layout (Single → Split → Triple)</td>
+</tr>
+<tr>
+<td><code>q</code></td>
+<td>global</td>
+<td>Quit</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>global</td>
+<td>Toggle help overlay</td>
+</tr>
+<tr>
+<td><code>j</code>/<code>k</code>/<code>↑↓</code></td>
+<td>Now</td>
+<td>Navigate project list</td>
+</tr>
+<tr>
+<td><code>Enter</code></td>
+<td>Now</td>
+<td>Select project</td>
+</tr>
+<tr>
+<td><code>e</code></td>
+<td>Now</td>
+<td>Toggle ecosystem-wide stats in the right pane</td>
+</tr>
+<tr>
+<td><code>a</code></td>
+<td>Now</td>
+<td>Ack all fired nudges</td>
+</tr>
+</tbody>
+</table>
+<h3 id="timer-view-pomodoro">Timer View (Pomodoro)</h3>
+<p>Press <code>2</code> or <code>t</code> to switch. Timer absorbs what used to be three separate implementations (Focus / Zen / Inspector timer):</p>
+<ol>
+<li><code>Space</code> — pause/resume</li>
+<li><code>r</code> — reset (while paused)</li>
+<li><code>+</code>/<code>-</code> — adjust duration (while paused)</li>
+<li><code>z</code> — toggle zen mode (minimal chrome, distraction-free)</li>
+</ol>
+<h3 id="plan-view-morning-ritual">Plan View (Morning Ritual)</h3>
+<p>Press <code>3</code> or <code>p</code>. Plan absorbs the old standalone Analytics view:</p>
+<ul>
+<li><code>j</code>/<code>k</code>/<code>↑↓</code> — navigate suggestions</li>
+<li><code>Enter</code> — execute a suggestion</li>
+<li><code>e</code> — cycle energy level</li>
+<li><code>s</code> — start a session (jumps to Timer)</li>
+<li><code>a</code> — toggle the analytics pane</li>
+</ul>
+<h3 id="real-data-dashboard-v092">Real Data Dashboard (v0.9.2)</h3>
+<p>The dashboard displays <strong>live data</strong> from your <code>~/.atlas</code> directory. Projects, sessions, captures, and breadcrumbs are fetched automatically and refreshed on a polling schedule (projects every 5s, stats every 10s). Temporary and archived projects are filtered out, so you only see what matters.</p>
+<h3 id="multi-panel-layout-v091">Multi-Panel Layout (v0.9.1)</h3>
+<p>Press <code>Tab</code> to cycle through three layout modes without leaving the dashboard:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>▣ SINGLE (default)        ▥ SPLIT                ▦ TRIPLE
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>┌────────────────┬──    ┌────┬─────────┬──    ┌────┬──────┬───────┬──
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>│ Card stack     │      │Side│ Card   │      │Side│ Card │ Timer │
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>│ All views fill │      │list│ stack  │      │list│ stack│ Detail│
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>└────────────────┴──    ────┴─────────┘         ────┴──────┴───────┘
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>100% width            28% sidebar + 72%       25% + 47% + 28%
+</span></code></pre></div>
+<p><strong>Try it:</strong>
+1. Press <code>Tab</code> once → <strong>Split</strong> view: project list sidebar + main content
+2. Press <code>Tab</code> again → <strong>Triple</strong> view: sidebar + content + inspector panel
+3. Press <code>Tab</code> again → back to <strong>Single</strong> (full screen)
+4. Press <code>Shift+Tab</code> → cycle keyboard focus between panels</p>
+<p><strong>Sidebar rows look like this (v0.9.1):</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>│ ● atlas       75% ▂▃▅▇█│  &lt;- deep focus (green) + sparkline
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>│ ◔ flow-cli    95% █▅▃▂▁│  &lt;- warming tier (yellow) + declining
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>│ ◕ mcp-server  80% ▃▃▅▆█⏱│  &lt;- strong focus + active session
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>│ ◑ rmediation  60% ▂▁··▂│  &lt;- steady tier (cyan)
+</span></code></pre></div></p>
+<p><strong>Focus tier icons (v0.9.1):</strong> <code>●</code> deep (80+) • <code>◕</code> strong (60-79) • <code>◑</code> steady (40-59) • <code>◔</code> warming (20-39) • <code>○</code> drift (0-19)
+<strong>Sparklines:</strong> 5-day activity history using <code>▁▂▃▄▅▆▇█</code> — green = trending up, yellow = trending down
+<strong><code>⏱</code></strong> marks the project with your active timer
+<strong><code>📥N</code></strong> shows in the sidebar header when you have N unprocessed inbox items</p>
+<p><strong>Inspector panel (Triple mode — right column):</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>│ Inspector               │
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>│ 🎯 atlas                │  ← selected project
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>│ node-package            │
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>│ ● active  75% ██████░░  │  ← status + 8-char bar
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>│ Focus  ◕ 72 strong      │  ← focus score + tier (v0.9.1)
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>│ ─────────────────────── │
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>│ Focus                   │
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>│ Implementing auth flow  │
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>│ Next                    │
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>│ · Add OAuth provider    │  ← up to 3 next actions
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>│ ─────────────────────── │
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>│ ⏱ SESSION               │
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>│ 24:10  ██████░░         │  ← live Pomodoro countdown
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>│ ● FOCUSING              │  → ◑ PAUSED → ☕ BREAK TIME
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>│ ─────────────────────── │
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>│ Activity (13w)          │  ← heatmap header (v0.9.1)
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>│ Mon ·░▒▓█·░▒▓█·░▒      │  7-day × 13-week grid
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>│ Tue ·····░░▒▒▓▓█        │  using ·░▒▓█ characters
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>│ ...                     │
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>│ 🔥 4d streak  23 sess   │  ← summary line
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>│ ─────────────────────── │
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>│ Recent                  │
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>│ · stuck on OAuth …      │  ← last 3 breadcrumbs
+</span></code></pre></div></p>
+<p>When inspector is focused (<code>Shift+Tab</code> to reach it):</p>
+<ul>
+<li><code>Space</code> → pause/resume the Pomodoro</li>
+<li><code>r</code> → reset the countdown</li>
+<li><code>Shift+Tab</code> → move focus to next panel</li>
+</ul>
+<p><strong>Layout indicator</strong> appears in the command bar: <code>▣ Single</code> / <code>▥ Split</code> / <code>▦ Triple</code></p>
+<h3 id="themes-v091">Themes (v0.9.1)</h3>
+<p>5 built-in themes ship with the dashboard (in-app cycling is retired as of v0.14 — <code>t</code> now switches to the Timer view; set a theme via config):</p>
+<table>
+<thead>
+<tr>
+<th>Theme</th>
+<th>Look</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Purple accents, warm grays</td>
+<td>General use</td>
+</tr>
+<tr>
+<td><code>nord</code></td>
+<td>Arctic blue palette</td>
+<td>Dark terminals</td>
+</tr>
+<tr>
+<td><code>solarized</code></td>
+<td>Warm tans and blues</td>
+<td>Light or dark</td>
+</tr>
+<tr>
+<td><code>mono</code></td>
+<td>Pure grayscale</td>
+<td>Minimal distraction</td>
+</tr>
+<tr>
+<td><code>high-contrast</code></td>
+<td>Maximum readability</td>
+<td>Accessibility</td>
+</tr>
+</tbody>
+</table>
+<p>All panels, sparklines, heatmap, and focus tier colors adapt to the selected theme.</p>
+<h3 id="focus-score-v091">Focus Score (v0.9.1)</h3>
+<p><code>atlas stats</code> now includes a focus score — a weighted quality metric:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>Focus Score:       ◕ 72 strong
+</span></code></pre></div>
+<p>The score combines duration (30%), flow sessions (30%), completion rate (25%), and consistency (15%). See the <a href="../VISUAL-GUIDE/">Visual Guide</a> for the full formula and tier breakdown.</p>
+<h3 id="decision-helper">Decision Helper</h3>
+<p>Can't decide what to work on? Press <code>d</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>🎲 What should you work on?
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>Based on:
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>- Time of day (morning = fresh tasks)
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>- Project progress (unfinished work)
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>- Recent activity (what&#39;s hot)
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>Suggestion: myproject
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>Reason: In progress (60%), last worked on 2h ago
+</span></code></pre></div>
+<hr />
+<h2 id="part-5-templates-3-minutes">Part 5: Templates (3 minutes)</h2>
+<h3 id="why-templates">Why Templates?</h3>
+<p>Every new project needs the same setup: README, status tracking, initial structure.</p>
+<p>Templates automate this.</p>
+<h3 id="try-this-now-8-see-available-templates">Try This Now #8: See Available Templates</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>atlas<span class="w"> </span>init<span class="w"> </span>--list-templates
+</span></code></pre></div>
+<p><strong>Built-in templates:</strong></p>
+<ul>
+<li><code>node</code> - Node.js/npm package</li>
+<li><code>r-package</code> - R package</li>
+<li><code>python</code> - Python package</li>
+<li><code>quarto</code> - Quarto document</li>
+<li><code>research</code> - Research project</li>
+<li><code>minimal</code> - Just a .STATUS file</li>
+</ul>
+<h3 id="create-a-project-from-template">Create a Project from Template</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Create a Node.js project</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>atlas<span class="w"> </span>init<span class="w"> </span>--template<span class="w"> </span>node<span class="w"> </span>--name<span class="w"> </span>my-awesome-app
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Creates:</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="c1"># - .STATUS file with project metadata</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="c1"># - Standard Node.js structure</span>
+</span></code></pre></div>
+<p><strong>What's in the .STATUS file?</strong> (atlas/v1 frontmatter — see <a href="../STATUS-SCHEMA/">.STATUS Schema</a>)
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>---
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>schema: atlas/v1
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>status: active
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>progress: 0
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>type: node
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>priority: medium
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>focus: Set up project structure
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>next:
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>Initialize npm package
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>Set up testing framework
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>Create initial module structure
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="gu">  - Add README documentation</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="gu">---</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a>
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="gh"># my-awesome-app</span>
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a>
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a>my-awesome-app is a Node.js package, maintained by you.
+</span></code></pre></div></p>
+<h3 id="try-this-now-9-create-a-custom-template">Try This Now #9: Create a Custom Template</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Create from scratch</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>my-template
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># Or copy an existing one</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>my-node<span class="w"> </span>--from<span class="w"> </span>node
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="c1"># Or extend (inherit + customize)</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>custom-node<span class="w"> </span>--extends<span class="w"> </span>node
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="c1"># Edit it</span>
+</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>atlas<span class="w"> </span>template<span class="w"> </span>dir<span class="w">  </span><span class="c1"># shows where templates live</span>
+</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="c1"># Edit ~/.atlas/templates/my-template.md</span>
+</span></code></pre></div>
+<p><strong>Template variables:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Set your info once</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>templateVariables.author<span class="w"> </span><span class="s2">&quot;Your Name&quot;</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>templateVariables.github_user<span class="w"> </span>youruser
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="c1"># Use in templates: {{author}}, {{github_user}}</span>
+</span></code></pre></div></p>
+<h3 id="template-inheritance">Template Inheritance</h3>
+<p>Create variations without copying:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nn">---</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Custom Node Template</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="nt">extends</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">node</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="nn">---</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="p p-Indicator">{{</span><span class="nv">parent</span><span class="p p-Indicator">}}</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="c1">## Custom Section</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="l l-Scalar l-Scalar-Plain">My additional content here</span>
+</span></code></pre></div>
+<p><strong>The <code>{{parent}}</code> placeholder</strong> includes the base template's content.</p>
+<hr />
+<h2 id="part-6-task-management-v0130">Part 6: Task Management (v0.13.0)</h2>
+<h3 id="working-with-tasks">Working with Tasks</h3>
+<p>Atlas tracks tasks alongside sessions and captures:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># Add a task</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>atlas<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;Implement OAuth login&quot;</span><span class="w"> </span>--priority<span class="w"> </span>high<span class="w"> </span>--project<span class="w"> </span>myapp
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="c1"># List incomplete tasks</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>atlas<span class="w"> </span>task<span class="w"> </span>list<span class="w"> </span>--incomplete
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="c1"># Complete a task</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>atlas<span class="w"> </span>task<span class="w"> </span><span class="k">done</span><span class="w"> </span>&lt;task-id&gt;
+</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>
+</span><span id="__span-30-10"><a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="c1"># Delete a task</span>
+</span><span id="__span-30-11"><a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>atlas<span class="w"> </span>task<span class="w"> </span>rm<span class="w"> </span>&lt;task-id&gt;
+</span></code></pre></div>
+<h3 id="merged-agenda">Merged Agenda</h3>
+<p>See tasks and schedule items in chronological order:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># 7-day view (default)</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>atlas<span class="w"> </span>agenda
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="c1"># 14-day window</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>atlas<span class="w"> </span>agenda<span class="w"> </span><span class="m">14</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="c1"># JSON output for scripting</span>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>atlas<span class="w"> </span>agenda<span class="w"> </span>--format<span class="w"> </span>json
+</span></code></pre></div>
+<h3 id="try-this-now-10-your-first-task">Try This Now #10: Your First Task</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Add a task for this project</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>atlas<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;Try the dashboard analytics view&quot;</span><span class="w"> </span>--project<span class="w"> </span>myproject
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># List your tasks</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>atlas<span class="w"> </span>task<span class="w"> </span>list<span class="w"> </span>--incomplete
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="c1"># Complete it when done</span>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>atlas<span class="w"> </span>task<span class="w"> </span><span class="k">done</span><span class="w"> </span>&lt;id&gt;
+</span></code></pre></div>
+<hr />
+<h2 id="part-7-analytics-view-v0130">Part 7: Analytics View (v0.13.0)</h2>
+<h3 id="deep-productivity-insights">Deep Productivity Insights</h3>
+<p>Press <code>a</code> in the dashboard for the full-screen analytics view:</p>
+<ul>
+<li><strong>Focus Velocity</strong> — 30-day sparkline showing your session trends</li>
+<li><strong>Flow Patterns</strong> — 7×24 heatmap showing your best working hours</li>
+<li><strong>Project Cycling</strong> — Use <code>←</code>/<code>→</code> to see analytics per project</li>
+</ul>
+<h3 id="try-this-now-11-explore-analytics">Try This Now #11: Explore Analytics</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>atlas<span class="w"> </span>dash
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="c1"># Press &#39;a&#39; to enter analytics view</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="c1"># Use ←/→ to cycle projects</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="c1"># Press &#39;f&#39; to jump to focus mode</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="c1"># Press Esc to return to browse</span>
+</span></code></pre></div>
+<hr />
+<h2 id="part-8-tips-tricks">Part 8: Tips &amp; Tricks</h2>
+<h3 id="workflow-shortcuts">Workflow Shortcuts</h3>
+<p><strong>Morning routine:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nb">alias</span><span class="w"> </span>start-day<span class="o">=</span><span class="s1">&#39;atlas where &amp;&amp; atlas dash&#39;</span>
+</span></code></pre></div></p>
+<p><strong>End of day:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nb">alias</span><span class="w"> </span>finish-day<span class="o">=</span><span class="s1">&#39;atlas session end &amp;&amp; atlas inbox --stats&#39;</span>
+</span></code></pre></div></p>
+<h3 id="sync-from-status-files">Sync from .STATUS Files</h3>
+<p>If you have existing projects with <code>.STATUS</code> files:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="c1"># Add paths to scan</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>add-path<span class="w"> </span>~/projects
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>atlas<span class="w"> </span>config<span class="w"> </span>add-path<span class="w"> </span>~/work
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="c1"># Sync all projects</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>atlas<span class="w"> </span>sync
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a>
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="c1"># Watch for changes (auto-sync)</span>
+</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a>atlas<span class="w"> </span>sync<span class="w"> </span>--watch
+</span></code></pre></div>
+<h3 id="keyboard-driven-workflow">Keyboard-Driven Workflow</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># Start session (current directory)</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="c1"># Quick capture (no project needed)</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">idea</span><span class="o">=</span><span class="s1">&#39;atlas catch&#39;</span>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="c1"># Check context</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">wh</span><span class="o">=</span><span class="s1">&#39;atlas where&#39;</span>
+</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>
+</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="c1"># Breadcrumb</span>
+</span><span id="__span-37-11"><a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">crumb</span><span class="o">=</span><span class="s1">&#39;atlas crumb&#39;</span>
+</span></code></pre></div>
+<h3 id="inbox-triage">Inbox Triage</h3>
+<p>Process your captured ideas:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>atlas<span class="w"> </span>inbox<span class="w"> </span>--triage
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="c1"># Interactive mode:</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="c1"># [a]ssign to project</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="c1"># [s]kip for now</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="c1"># [d]elete/archive</span>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="c1"># [q]uit</span>
+</span></code></pre></div>
+<h3 id="project-filtering">Project Filtering</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="c1"># Show only active projects</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>atlas<span class="w"> </span>project<span class="w"> </span>list<span class="w"> </span>--status<span class="w"> </span>active
+</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>
+</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="c1"># Show only R packages</span>
+</span><span id="__span-39-5"><a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>atlas<span class="w"> </span>project<span class="w"> </span>list<span class="w"> </span>--tag<span class="w"> </span>r-package
+</span><span id="__span-39-6"><a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a>
+</span><span id="__span-39-7"><a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a><span class="c1"># JSON output for scripting</span>
+</span><span id="__span-39-8"><a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>atlas<span class="w"> </span>project<span class="w"> </span>list<span class="w"> </span>--format<span class="w"> </span>json
+</span></code></pre></div>
+<h3 id="flow-cli-integration-v093">flow-cli Integration (v0.9.3)</h3>
+<p>Atlas exposes machine-readable flags designed for shell wrapper scripts like <a href="https://github.com/Data-Wise/flow-cli">flow-cli</a>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="c1"># Session state as JSON (for scripting)</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>status<span class="w"> </span>--format<span class="w"> </span>json
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="c1"># → {&quot;project&quot;:&quot;atlas&quot;,&quot;durationMinutes&quot;:25,&quot;state&quot;:&quot;active&quot;,&quot;task&quot;:&quot;Work session&quot;,&quot;startedAt&quot;:&quot;...&quot;}</span>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="c1"># Bare integer counts (no labels, no formatting)</span>
+</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a>atlas<span class="w"> </span>inbox<span class="w"> </span>--count<span class="w">           </span><span class="c1"># → 3</span>
+</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a>atlas<span class="w"> </span>project<span class="w"> </span>list<span class="w"> </span>--count<span class="w">    </span><span class="c1"># → 54</span>
+</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>
+</span><span id="__span-40-9"><a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="c1"># Smart project suggestion (most recently active)</span>
+</span><span id="__span-40-10"><a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a>atlas<span class="w"> </span>project<span class="w"> </span>list<span class="w"> </span>--suggest<span class="w">  </span><span class="c1"># → atlas</span>
+</span><span id="__span-40-11"><a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>
+</span><span id="__span-40-12"><a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="c1"># Limit breadcrumb output</span>
+</span><span id="__span-40-13"><a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a>atlas<span class="w"> </span>trail<span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span><span class="w">         </span><span class="c1"># shows last 3 crumbs only</span>
+</span><span id="__span-40-14"><a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a>atlas<span class="w"> </span>trail<span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span><span class="w"> </span>--days<span class="w"> </span><span class="m">7</span>
+</span></code></pre></div>
+<p>These flags are used by <code>at</code> (the flow-cli atlas dispatcher) to embed live atlas state into shell prompts, dashboards, and health-check scripts without parsing human-readable output.</p>
+<h3 id="man-pages">Man Pages</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="c1"># Read the main man page</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>man<span class="w"> </span>atlas
+</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>
+</span><span id="__span-41-4"><a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="c1"># Read specific command docs</span>
+</span><span id="__span-41-5"><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>man<span class="w"> </span>atlas-session
+</span><span id="__span-41-6"><a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a>man<span class="w"> </span>atlas-project
+</span><span id="__span-41-7"><a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a>man<span class="w"> </span>atlas-status
+</span></code></pre></div>
+<h3 id="shell-completions">Shell Completions</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="c1"># ZSH</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>atlas<span class="w"> </span>completions<span class="w"> </span>zsh<span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.zshrc
+</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>
+</span><span id="__span-42-4"><a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="c1"># Bash</span>
+</span><span id="__span-42-5"><a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>atlas<span class="w"> </span>completions<span class="w"> </span>bash<span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+</span><span id="__span-42-6"><a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>
+</span><span id="__span-42-7"><a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="c1"># Fish</span>
+</span><span id="__span-42-8"><a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>atlas<span class="w"> </span>completions<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/atlas.fish
+</span></code></pre></div>
+<p><strong>Now you get tab completion!</strong></p>
+<h3 id="session-export-v070">Session Export (v0.7.0)</h3>
+<p>Export your work sessions to calendar apps:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="c1"># Export to iCal file</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>atlas<span class="w"> </span>session<span class="w"> </span><span class="nb">export</span><span class="w"> </span>sessions.ics
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>
+</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="c1"># Export last 60 days</span>
+</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a>atlas<span class="w"> </span>session<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--days<span class="w"> </span><span class="m">60</span><span class="w"> </span>sessions.ics
+</span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a>
+</span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="c1"># Export specific project</span>
+</span><span id="__span-43-8"><a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>atlas<span class="w"> </span>session<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--project<span class="w"> </span>myproject<span class="w"> </span>project-sessions.ics
+</span><span id="__span-43-9"><a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a>
+</span><span id="__span-43-10"><a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="c1"># Export as JSON (for scripting)</span>
+</span><span id="__span-43-11"><a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a>atlas<span class="w"> </span>session<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>sessions.json
+</span></code></pre></div>
+<p><strong>Works with:</strong></p>
+<ul>
+<li>Apple Calendar (double-click the .ics file)</li>
+<li>Google Calendar (import from settings)</li>
+<li>Outlook (import calendar)</li>
+<li>Any app that supports iCal/ICS format</li>
+</ul>
+<h3 id="storage-backend">Storage Backend</h3>
+<p>Default is JSON files. For better performance:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># Migrate to SQLite</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>sqlite
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="c1"># Preview first</span>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>sqlite<span class="w"> </span>--dry-run
+</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>
+</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="c1"># Use SQLite for just one command</span>
+</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>atlas<span class="w"> </span>--storage<span class="w"> </span>sqlite<span class="w"> </span>status
+</span></code></pre></div>
+<h3 id="configuration-wizard">Configuration Wizard</h3>
+<p>Interactive setup:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>setup
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="c1"># Walks through:</span>
+</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="c1"># - Scan paths</span>
+</span><span id="__span-45-5"><a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="c1"># - Storage backend</span>
+</span><span id="__span-45-6"><a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="c1"># - ADHD preferences</span>
+</span><span id="__span-45-7"><a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a><span class="c1"># - Session settings</span>
+</span><span id="__span-45-8"><a id="__codelineno-45-8" name="__codelineno-45-8" href="#__codelineno-45-8"></a><span class="c1"># - Dashboard preferences</span>
+</span></code></pre></div>
+<h3 id="advanced-status-updates">Advanced Status Updates</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="c1"># Increment progress by 10% (default)</span>
+</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>atlas<span class="w"> </span>status<span class="w"> </span>myproject<span class="w"> </span>--increment
+</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>
+</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="c1"># Increment by custom amount</span>
+</span><span id="__span-46-5"><a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>atlas<span class="w"> </span>status<span class="w"> </span>myproject<span class="w"> </span>--increment<span class="w"> </span><span class="m">25</span>
+</span><span id="__span-46-6"><a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a>
+</span><span id="__span-46-7"><a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a><span class="c1"># Complete current action</span>
+</span><span id="__span-46-8"><a id="__codelineno-46-8" name="__codelineno-46-8" href="#__codelineno-46-8"></a>atlas<span class="w"> </span>status<span class="w"> </span>myproject<span class="w"> </span>--complete
+</span><span id="__span-46-9"><a id="__codelineno-46-9" name="__codelineno-46-9" href="#__codelineno-46-9"></a>
+</span><span id="__span-46-10"><a id="__codelineno-46-10" name="__codelineno-46-10" href="#__codelineno-46-10"></a><span class="c1"># Set multiple next actions at once</span>
+</span><span id="__span-46-11"><a id="__codelineno-46-11" name="__codelineno-46-11" href="#__codelineno-46-11"></a>atlas<span class="w"> </span>status<span class="w"> </span>myproject<span class="w"> </span>--next<span class="w"> </span><span class="s2">&quot;Task 1,Task 2,Task 3&quot;</span>
+</span><span id="__span-46-12"><a id="__codelineno-46-12" name="__codelineno-46-12" href="#__codelineno-46-12"></a>
+</span><span id="__span-46-13"><a id="__codelineno-46-13" name="__codelineno-46-13" href="#__codelineno-46-13"></a><span class="c1"># Create .STATUS if it doesn&#39;t exist</span>
+</span><span id="__span-46-14"><a id="__codelineno-46-14" name="__codelineno-46-14" href="#__codelineno-46-14"></a>atlas<span class="w"> </span>status<span class="w"> </span>myproject<span class="w"> </span>--set<span class="w"> </span>active<span class="w"> </span>--create
+</span></code></pre></div>
+<hr />
+<h2 id="quick-reference-card">Quick Reference Card</h2>
+<h3 id="essential-commands">Essential Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>atlas session start [project]</code></td>
+<td>Begin working</td>
+</tr>
+<tr>
+<td><code>atlas session end [note]</code></td>
+<td>Stop working</td>
+</tr>
+<tr>
+<td><code>atlas catch "text"</code></td>
+<td>Quick capture</td>
+</tr>
+<tr>
+<td><code>atlas where</code></td>
+<td>Where was I?</td>
+</tr>
+<tr>
+<td><code>atlas park [note]</code></td>
+<td>Save context</td>
+</tr>
+<tr>
+<td><code>atlas unpark</code></td>
+<td>Restore context</td>
+</tr>
+<tr>
+<td><code>atlas dash</code></td>
+<td>Visual dashboard</td>
+</tr>
+<tr>
+<td><code>atlas inbox</code></td>
+<td>See captured items</td>
+</tr>
+<tr>
+<td><code>atlas trail</code></td>
+<td>Breadcrumb history</td>
+</tr>
+<tr>
+<td><code>atlas stats</code></td>
+<td>Session analytics</td>
+</tr>
+<tr>
+<td><code>atlas plan</code></td>
+<td>Morning planning</td>
+</tr>
+<tr>
+<td><code>atlas agenda</code></td>
+<td>Merged task+schedule view</td>
+</tr>
+<tr>
+<td><code>atlas nudge add "23:00" "text"</code></td>
+<td>Schedule a wall-clock reminder</td>
+</tr>
+<tr>
+<td><code>atlas day</code></td>
+<td>Multi-repo activity for today</td>
+</tr>
+<tr>
+<td><code>atlas task add "X"</code></td>
+<td>Add a task</td>
+</tr>
+<tr>
+<td><code>atlas task list</code></td>
+<td>List tasks</td>
+</tr>
+<tr>
+<td><code>atlas status [project]</code></td>
+<td>Show/update status</td>
+</tr>
+<tr>
+<td><code>atlas doctor</code></td>
+<td>Audit projects</td>
+</tr>
+<tr>
+<td><code>atlas sync</code></td>
+<td>Sync from .STATUS</td>
+</tr>
+<tr>
+<td><code>atlas config paths</code></td>
+<td>Show scan paths</td>
+</tr>
+<tr>
+<td><code>atlas template list</code></td>
+<td>List templates</td>
+</tr>
+<tr>
+<td><code>atlas completions zsh</code></td>
+<td>Generate completions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quick-setup">Quick Setup</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="c1"># 1. Install</span>
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>brew<span class="w"> </span>install<span class="w"> </span>atlas<span class="w">  </span><span class="c1"># or curl method</span>
+</span><span id="__span-47-3"><a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>
+</span><span id="__span-47-4"><a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a><span class="c1"># 2. Initialize</span>
+</span><span id="__span-47-5"><a id="__codelineno-47-5" name="__codelineno-47-5" href="#__codelineno-47-5"></a>atlas<span class="w"> </span>init
+</span><span id="__span-47-6"><a id="__codelineno-47-6" name="__codelineno-47-6" href="#__codelineno-47-6"></a>
+</span><span id="__span-47-7"><a id="__codelineno-47-7" name="__codelineno-47-7" href="#__codelineno-47-7"></a><span class="c1"># 3. Add a project</span>
+</span><span id="__span-47-8"><a id="__codelineno-47-8" name="__codelineno-47-8" href="#__codelineno-47-8"></a>atlas<span class="w"> </span>project<span class="w"> </span>add
+</span><span id="__span-47-9"><a id="__codelineno-47-9" name="__codelineno-47-9" href="#__codelineno-47-9"></a>
+</span><span id="__span-47-10"><a id="__codelineno-47-10" name="__codelineno-47-10" href="#__codelineno-47-10"></a><span class="c1"># 4. Start working</span>
+</span><span id="__span-47-11"><a id="__codelineno-47-11" name="__codelineno-47-11" href="#__codelineno-47-11"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span><span id="__span-47-12"><a id="__codelineno-47-12" name="__codelineno-47-12" href="#__codelineno-47-12"></a>
+</span><span id="__span-47-13"><a id="__codelineno-47-13" name="__codelineno-47-13" href="#__codelineno-47-13"></a><span class="c1"># 5. Launch dashboard</span>
+</span><span id="__span-47-14"><a id="__codelineno-47-14" name="__codelineno-47-14" href="#__codelineno-47-14"></a>atlas<span class="w"> </span>dash
+</span></code></pre></div>
+<h3 id="common-patterns">Common Patterns</h3>
+<p><strong>Start your day:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>atlas<span class="w"> </span>where<span class="w">              </span><span class="c1"># Context check</span>
+</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>atlas<span class="w"> </span>dash<span class="w">              </span><span class="c1"># Launch dashboard</span>
+</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="c1"># Press &#39;d&#39; for &quot;what to work on?&quot;</span>
+</span><span id="__span-48-4"><a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="c1"># Press &#39;s&#39; to start session</span>
+</span></code></pre></div></p>
+<p><strong>During work:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>atlas<span class="w"> </span>catch<span class="w"> </span><span class="s2">&quot;idea&quot;</span><span class="w">      </span><span class="c1"># Capture thoughts</span>
+</span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;note&quot;</span><span class="w">      </span><span class="c1"># Leave breadcrumbs</span>
+</span><span id="__span-49-3"><a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>atlas<span class="w"> </span>focus<span class="w"> </span><span class="s2">&quot;task&quot;</span><span class="w">      </span><span class="c1"># Update focus</span>
+</span></code></pre></div></p>
+<p><strong>Handling interrupts:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>atlas<span class="w"> </span>park<span class="w"> </span><span class="s2">&quot;reason&quot;</span><span class="w">     </span><span class="c1"># Save state</span>
+</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="c1"># Handle interrupt...</span>
+</span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>atlas<span class="w"> </span>unpark<span class="w">           </span><span class="c1"># Restore state</span>
+</span></code></pre></div></p>
+<p><strong>End of day:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w">      </span><span class="c1"># Stop working</span>
+</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>atlas<span class="w"> </span>inbox<span class="w">           </span><span class="c1"># Review captures</span>
+</span><span id="__span-51-3"><a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>atlas<span class="w"> </span>trail<span class="w"> </span>--days<span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># Review today&#39;s notes</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="no-projects-found">"No projects found"</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="c1"># Register your current directory</span>
+</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>atlas<span class="w"> </span>project<span class="w"> </span>add
+</span><span id="__span-52-3"><a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>
+</span><span id="__span-52-4"><a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a><span class="c1"># Or sync from .STATUS files</span>
+</span><span id="__span-52-5"><a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>add-path<span class="w"> </span>~/projects
+</span><span id="__span-52-6"><a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>atlas<span class="w"> </span>sync
+</span></code></pre></div>
+<h3 id="no-active-session">"No active session"</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1"># Start one!</span>
+</span><span id="__span-53-2"><a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span></code></pre></div>
+<h3 id="configuration-not-loading">Configuration not loading</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="c1"># Check config exists</span>
+</span><span id="__span-54-2"><a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>ls<span class="w"> </span>~/.atlas/config.json
+</span><span id="__span-54-3"><a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>
+</span><span id="__span-54-4"><a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a><span class="c1"># Reset if needed</span>
+</span><span id="__span-54-5"><a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>reset
+</span></code></pre></div>
+<h3 id="dashboard-looks-weird">Dashboard looks weird</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="c1"># Terminal too small</span>
+</span><span id="__span-55-2"><a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="c1"># Resize terminal to at least 80x24</span>
+</span><span id="__span-55-3"><a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>
+</span><span id="__span-55-4"><a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a><span class="c1"># Try different theme (v0.9.1)</span>
+</span><span id="__span-55-5"><a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a><span class="c1"># Press &#39;t&#39; in dashboard to cycle themes</span>
+</span><span id="__span-55-6"><a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a><span class="c1"># &#39;mono&#39; theme works best on limited-color terminals</span>
+</span><span id="__span-55-7"><a id="__codelineno-55-7" name="__codelineno-55-7" href="#__codelineno-55-7"></a><span class="c1"># &#39;high-contrast&#39; theme helps in bright rooms</span>
+</span></code></pre></div>
+<h3 id="lost-parked-context">Lost parked context?</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="c1"># List all parked contexts</span>
+</span><span id="__span-56-2"><a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>atlas<span class="w"> </span>parked
+</span><span id="__span-56-3"><a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a>
+</span><span id="__span-56-4"><a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a><span class="c1"># They&#39;re stored in ~/.atlas/parked/</span>
+</span><span id="__span-56-5"><a id="__codelineno-56-5" name="__codelineno-56-5" href="#__codelineno-56-5"></a>ls<span class="w"> </span>~/.atlas/parked/
+</span></code></pre></div>
+<hr />
+<h2 id="whats-next">What's Next?</h2>
+<h3 id="learn-more">Learn More</h3>
+<ul>
+<li><a href="../CLI-REFERENCE/">CLI Reference</a> - Complete command documentation</li>
+<li><a href="../CONFIGURATION/">Configuration</a> - All settings explained</li>
+<li><a href="../API-GUIDE/">API Guide</a> - Use Atlas in your code</li>
+<li><a href="../ARCHITECTURE/">Architecture</a> - How it works</li>
+<li><a href="../WHAT-S-NEW/">What's New</a> - Release highlights</li>
+</ul>
+<h3 id="integration-ideas">Integration Ideas</h3>
+<p><strong>Alfred workflow:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="c1"># Quick capture from anywhere</span>
+</span><span id="__span-57-2"><a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>alfred<span class="w"> </span><span class="s2">&quot;atlas catch {query}&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Git hooks:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="c1"># Auto-breadcrumb on commit</span>
+</span><span id="__span-58-2"><a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;atlas crumb &quot;committed: $(git log -1 --oneline)&quot;&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>.git/hooks/post-commit
+</span><span id="__span-58-3"><a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a>chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/post-commit
+</span></code></pre></div></p>
+<hr />
+<h3 id="zellij-integration-recommended">Zellij Integration (Recommended)</h3>
+<p>Zellij is a modern terminal multiplexer with session persistence. Combined with Atlas, you get both mental AND terminal context preservation.</p>
+<p><strong>Install:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>brew<span class="w"> </span>install<span class="w"> </span>zellij
+</span></code></pre></div></p>
+<p><strong>Why Zellij + Atlas:</strong>
+| Zellij              | Atlas            | Combined Benefit                |
+| ------------------- | ---------------- | ------------------------------- |
+| Session persistence | Park/unpark      | Full context survival           |
+| Visual keybindings  | ADHD helpers     | Less to remember                |
+| Named sessions      | Project registry <em>(atlas's list of every project it knows about)</em> | One command restores everything |</p>
+<p><strong>The Perfect Layout:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>┌─────────────────────────────────────────────────────────────┐
+</span><span id="__span-60-2"><a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>│  Zellij (myproject)                                         │
+</span><span id="__span-60-3"><a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a>├─────────────────────────────┬───────────────────────────────┤
+</span><span id="__span-60-4"><a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a>│  ❯ vim src/index.js         │  ❯ npm run test:watch         │
+</span><span id="__span-60-5"><a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a>│                             │  PASS ✓✓✓                     │
+</span><span id="__span-60-6"><a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a>├─────────────────────────────┴───────────────────────────────┤
+</span><span id="__span-60-7"><a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a>│  ❯ atlas dash                                               │
+</span><span id="__span-60-8"><a id="__codelineno-60-8" name="__codelineno-60-8" href="#__codelineno-60-8"></a>│  🎯 Active: myproject (45m) │ 🔥 5-day streak               │
+</span><span id="__span-60-9"><a id="__codelineno-60-9" name="__codelineno-60-9" href="#__codelineno-60-9"></a>├─────────────────────────────────────────────────────────────┤
+</span><span id="__span-60-10"><a id="__codelineno-60-10" name="__codelineno-60-10" href="#__codelineno-60-10"></a>│ Alt+←→↑↓: Navigate │ Ctrl+P: Pane │ Ctrl+O,D: Detach        │
+</span><span id="__span-60-11"><a id="__codelineno-60-11" name="__codelineno-60-11" href="#__codelineno-60-11"></a>└─────────────────────────────────────────────────────────────┘
+</span></code></pre></div></p>
+<p><strong>Quick Start Workflow:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="c1"># Start a project session</span>
+</span><span id="__span-61-2"><a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>zellij<span class="w"> </span>--session<span class="w"> </span>myproject
+</span><span id="__span-61-3"><a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a>
+</span><span id="__span-61-4"><a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a><span class="c1"># Create layout (inside Zellij)</span>
+</span><span id="__span-61-5"><a id="__codelineno-61-5" name="__codelineno-61-5" href="#__codelineno-61-5"></a>Ctrl+P,<span class="w"> </span>D<span class="w">                      </span><span class="c1"># Split down for dashboard</span>
+</span><span id="__span-61-6"><a id="__codelineno-61-6" name="__codelineno-61-6" href="#__codelineno-61-6"></a>Alt+↓<span class="w">                          </span><span class="c1"># Move to bottom pane</span>
+</span><span id="__span-61-7"><a id="__codelineno-61-7" name="__codelineno-61-7" href="#__codelineno-61-7"></a>atlas<span class="w"> </span>dash<span class="w">                     </span><span class="c1"># Start dashboard</span>
+</span><span id="__span-61-8"><a id="__codelineno-61-8" name="__codelineno-61-8" href="#__codelineno-61-8"></a>Alt+↑<span class="w">                          </span><span class="c1"># Back to top</span>
+</span><span id="__span-61-9"><a id="__codelineno-61-9" name="__codelineno-61-9" href="#__codelineno-61-9"></a>Ctrl+P,<span class="w"> </span>R<span class="w">                      </span><span class="c1"># Split right for tests</span>
+</span><span id="__span-61-10"><a id="__codelineno-61-10" name="__codelineno-61-10" href="#__codelineno-61-10"></a>Alt+→<span class="w">                          </span><span class="c1"># Move to right pane</span>
+</span><span id="__span-61-11"><a id="__codelineno-61-11" name="__codelineno-61-11" href="#__codelineno-61-11"></a>npm<span class="w"> </span>run<span class="w"> </span>test:watch<span class="w">             </span><span class="c1"># Start tests</span>
+</span><span id="__span-61-12"><a id="__codelineno-61-12" name="__codelineno-61-12" href="#__codelineno-61-12"></a>Alt+←<span class="w">                          </span><span class="c1"># Back to editor pane</span>
+</span><span id="__span-61-13"><a id="__codelineno-61-13" name="__codelineno-61-13" href="#__codelineno-61-13"></a>vim<span class="w"> </span>src/index.js<span class="w">               </span><span class="c1"># Start coding!</span>
+</span></code></pre></div></p>
+<p><strong>Detach &amp; Reattach (The Magic):</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="c1"># End of day - close terminal or:</span>
+</span><span id="__span-62-2"><a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>Ctrl+O,<span class="w"> </span>D
+</span><span id="__span-62-3"><a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>
+</span><span id="__span-62-4"><a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="c1"># Next day - everything is exactly where you left it:</span>
+</span><span id="__span-62-5"><a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a>zellij<span class="w"> </span>attach<span class="w"> </span>myproject
+</span></code></pre></div></p>
+<p><strong>Zellij Cheatsheet:</strong>
+| Keys         | Action                  |
+| ------------ | ----------------------- |
+| <code>Alt + ←→↑↓</code> | Navigate between panes  |
+| <code>Ctrl+P, D</code>  | Split pane down         |
+| <code>Ctrl+P, R</code>  | Split pane right        |
+| <code>Ctrl+P, X</code>  | Close pane              |
+| <code>Ctrl+P, Z</code>  | Zoom (fullscreen pane)  |
+| <code>Ctrl+P, F</code>  | Floating pane (overlay) |
+| <code>Ctrl+O, D</code>  | Detach session          |
+| <code>Ctrl+O, W</code>  | Session manager         |</p>
+<p><strong>Auto-Start Zellij (optional):</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="c1"># Add to ~/.zshrc</span>
+</span><span id="__span-63-2"><a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$ZELLIJ</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-63-3"><a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a><span class="w">    </span>zellij<span class="w"> </span>attach<span class="w"> </span>--create<span class="w"> </span>default
+</span><span id="__span-63-4"><a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a><span class="k">fi</span>
+</span></code></pre></div></p>
+<p><strong>Pro Tip:</strong> Use Zellij sessions named after your Atlas projects:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>zellij<span class="w"> </span>--session<span class="w"> </span>atlas-dev<span class="w">     </span><span class="c1"># For atlas project</span>
+</span><span id="__span-64-2"><a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>zellij<span class="w"> </span>--session<span class="w"> </span>myapp<span class="w">         </span><span class="c1"># For myapp project</span>
+</span><span id="__span-64-3"><a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>zellij<span class="w"> </span>list-sessions<span class="w">           </span><span class="c1"># See all sessions</span>
+</span></code></pre></div></p>
+<h3 id="advanced-features">Advanced Features</h3>
+<p><strong>Programmatic API:</strong>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Atlas</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@data-wise/atlas&#39;</span><span class="p">;</span>
+</span><span id="__span-65-2"><a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>
+</span><span id="__span-65-3"><a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">atlas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Atlas</span><span class="p">({</span><span class="w"> </span><span class="nx">storage</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;sqlite&#39;</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-65-4"><a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">projects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">atlas</span><span class="p">.</span><span class="nx">projects</span><span class="p">.</span><span class="nx">list</span><span class="p">({</span><span class="w"> </span><span class="nx">status</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-65-5"><a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">atlas</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="s1">&#39;myproject&#39;</span><span class="p">);</span>
+</span></code></pre></div></p>
+<p><strong>Custom templates with logic:</strong>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="nn">---</span>
+</span><span id="__span-66-2"><a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Advanced Template</span>
+</span><span id="__span-66-3"><a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="nt">extends</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base</span>
+</span><span id="__span-66-4"><a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a><span class="nn">---</span>
+</span><span id="__span-66-5"><a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a><span class="p p-Indicator">{{</span><span class="nv">parent</span><span class="p p-Indicator">}}</span>
+</span><span id="__span-66-6"><a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a>
+</span><span id="__span-66-7"><a id="__codelineno-66-7" name="__codelineno-66-7" href="#__codelineno-66-7"></a><span class="c1">## Project: {{name}}</span>
+</span><span id="__span-66-8"><a id="__codelineno-66-8" name="__codelineno-66-8" href="#__codelineno-66-8"></a><span class="nt">Author</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">author</span><span class="p p-Indicator">}}</span>
+</span><span id="__span-66-9"><a id="__codelineno-66-9" name="__codelineno-66-9" href="#__codelineno-66-9"></a><span class="nt">Created</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="nv">date</span><span class="p p-Indicator">}}</span>
+</span></code></pre></div></p>
+<p><strong>Multiple storage backends:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a><span class="c1"># Work backend</span>
+</span><span id="__span-67-2"><a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a><span class="nv">ATLAS_CONFIG</span><span class="o">=</span>~/.atlas-work<span class="w"> </span>atlas<span class="w"> </span>dash
+</span><span id="__span-67-3"><a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a>
+</span><span id="__span-67-4"><a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a><span class="c1"># Personal backend</span>
+</span><span id="__span-67-5"><a id="__codelineno-67-5" name="__codelineno-67-5" href="#__codelineno-67-5"></a><span class="nv">ATLAS_CONFIG</span><span class="o">=</span>~/.atlas-personal<span class="w"> </span>atlas<span class="w"> </span>dash
+</span></code></pre></div></p>
+<hr />
+<h2 id="final-tips">Final Tips</h2>
+<h3 id="for-adhd-users">For ADHD Users</h3>
+<ol>
+<li><strong>Use breadcrumbs liberally</strong> - They're cheap, capture them</li>
+<li><strong>Park before context switches</strong> - Every time, no exceptions</li>
+<li><strong>Let Atlas celebrate you</strong> - Positive reinforcement works</li>
+<li><strong>Trust the inbox</strong> - Get it out of your head</li>
+<li><strong>Dashboard over CLI</strong> - Visual &gt; Text for many ADHD brains</li>
+</ol>
+<h3 id="for-everyone">For Everyone</h3>
+<ol>
+<li><strong>Session start/end is the core</strong> - Build this habit first</li>
+<li><strong>Capture &gt; Organize</strong> - Don't triage immediately</li>
+<li><strong>Templates save time</strong> - Invest 30 min, save hours</li>
+<li><strong>Sync if you have .STATUS files</strong> - Don't double-maintain</li>
+<li><strong>Dashboard decision helper</strong> - Use when overwhelmed</li>
+</ol>
+<h3 id="habit-formation">Habit Formation</h3>
+<p><strong>Week 1:</strong> Just session start/end
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>start
+</span><span id="__span-68-2"><a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a><span class="c1"># work...</span>
+</span><span id="__span-68-3"><a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a>atlas<span class="w"> </span>session<span class="w"> </span>end
+</span></code></pre></div></p>
+<p><strong>Week 2:</strong> Add quick capture
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">c</span><span class="o">=</span><span class="s1">&#39;atlas catch&#39;</span>
+</span><span id="__span-69-2"><a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a>c<span class="w"> </span><span class="s2">&quot;idea text&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Week 3:</strong> Add breadcrumbs
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="nb">alias</span><span class="w"> </span><span class="nv">crumb</span><span class="o">=</span><span class="s1">&#39;atlas crumb&#39;</span>
+</span><span id="__span-70-2"><a id="__codelineno-70-2" name="__codelineno-70-2" href="#__codelineno-70-2"></a>crumb<span class="w"> </span><span class="s2">&quot;stuck on X&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Week 4:</strong> Use park/unpark
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-71-1"><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>atlas<span class="w"> </span>park<span class="w"> </span><span class="s2">&quot;lunch break&quot;</span>
+</span><span id="__span-71-2"><a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>atlas<span class="w"> </span>unpark
+</span></code></pre></div></p>
+<p><strong>Week 5:</strong> Master the dashboard
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-72-1"><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>atlas<span class="w"> </span>dash<span class="w">  </span><span class="c1"># live here</span>
+</span></code></pre></div></p>
+<h3 id="remember">Remember</h3>
+<ul>
+<li><strong>Perfect is the enemy of done</strong> - Atlas helps you track "good enough"</li>
+<li><strong>Streaks are motivating</strong> - But missing a day is fine</li>
+<li><strong>Context restoration is magic</strong> - Trust it</li>
+<li><strong>The inbox is not a todo list</strong> - It's a brain dump</li>
+</ul>
+<hr />
+<h2 id="get-help">Get Help</h2>
+<ul>
+<li><strong>GitHub Issues:</strong> https://github.com/Data-Wise/atlas/issues</li>
+<li><strong>Discussions:</strong> https://github.com/Data-Wise/atlas/discussions</li>
+</ul>
+<p><strong>Welcome to Atlas!</strong></p>
+<p>Start with <code>atlas session start</code> and build from there. The rest will follow naturally.</p>
+<hr />
+<p><strong>Now what?</strong> → <a href="../user-guide/workflows/SCENARIOS/">Scenarios: five moments in a real day</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../assets/javascripts/scroll-progress.js"></script>
+      
+        <script src="../assets/javascripts/reading-time.js"></script>
+      
+        <script src="../assets/javascripts/section-toc.js"></script>
+      
+        <script src="../assets/javascripts/section-nav.js"></script>
+      
+    
+  </body>
+</html>

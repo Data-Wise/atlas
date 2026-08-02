@@ -1,0 +1,852 @@
+/* ============================================================
+   Atlas Documentation — Fonts & Typography
+   ============================================================ */
+
+/* ============================================================
+   Font Loading (preconnect + preload for performance)
+   ============================================================ */
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v17/VdGPAYmXi2gqQ3OIivPEW7PZWx16.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/dmsans/v21/rP2Hp2ywxg089UriOZya4Hqz.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v23/tDbD2oWUg0MKq8nT6KfvoK-VhM0x.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ============================================================
+   Atlas Design System — Complete Design Tokens
+   ============================================================ */
+
+/* ── Color Palette (WCAG AA+ Compliant) ───────────────────── */
+:root {
+  /* Section Colors (Light Mode) */
+  --atlas-learn: #2e7d32;       /* Green 800 - Getting Started */
+  --atlas-do: #5e35b1;          /* Deep Purple 800 - User Guide */
+  --atlas-build: #e65100;       /* Orange 900 - Architecture */
+  --atlas-code: #1565c0;        /* Blue 800 - Developer */
+
+  /* Semantic Colors (Light) */
+  --atlas-primary: #00695c;        /* Teal 800 - Primary brand */
+  --atlas-primary-light: #26a69a;  /* Teal 400 */
+  --atlas-primary-lighter: #b2dfdb; /* Teal 100 */
+  --atlas-accent: #ffb300;         /* Amber 700 - Attention/CTA */
+  --atlas-success: #2e7d32;        /* Green 800 */
+  --atlas-warning: #e65100;        /* Orange 900 */
+  --atlas-error: #c62828;          /* Red 800 */
+  --atlas-info: #1565c0;           /* Blue 800 */
+
+  /* Neutrals (Light) — off-white/near-black, not pure white/black:
+     easier on the eyes for long reading sessions (ADHD hyperfocus
+     often means hours on this page without a break). */
+  --atlas-surface: #fafaf8;
+  --atlas-surface-variant: #f2f1ee;
+  --atlas-surface-elevated: #ffffff;
+  --atlas-on-surface: #1a1a18;
+  --atlas-on-surface-variant: #444444;
+  --atlas-outline: #d0d0d0;
+  --atlas-outline-variant: #e0e0e0;
+
+  /* Functional */
+  --atlas-active: #00838f;
+  --atlas-focus-ring: rgba(0, 131, 143, 0.3);
+  --atlas-focus-ring-strong: rgba(0, 131, 143, 0.5);
+
+  /* Breathing room */
+  --atlas-space-1: 4px;
+  --atlas-space-2: 8px;
+  --atlas-space-3: 16px;
+  --atlas-space-4: 24px;
+  --atlas-space-5: 32px;
+  --atlas-space-6: 48px;
+  --atlas-space-7: 64px;
+
+  /* Typography Scale */
+  --atlas-font-display: 'Space Grotesk', system-ui, sans-serif;
+  --atlas-font-body: 'DM Sans', system-ui, sans-serif;
+  --atlas-font-mono: 'JetBrains Mono', monospace;
+  --atlas-font-ui: 'DM Sans', system-ui, sans-serif;
+
+  /* Display */
+  --atlas-text-display: clamp(2.5rem, 5vw, 4rem);
+  --atlas-text-display-weight: 700;
+  --atlas-text-display-line: 1.1;
+
+  /* H1-H6 */
+  --atlas-text-h1: 2.25rem;
+  --atlas-text-h1-weight: 700;
+  --atlas-text-h1-line: 1.2;
+  --atlas-text-h2: 1.75rem;
+  --atlas-text-h2-weight: 600;
+  --atlas-text-h2-line: 1.3;
+  --atlas-text-h3: 1.375rem;
+  --atlas-text-h3-weight: 600;
+  --atlas-text-h3-line: 1.4;
+
+  /* Body — 16.5px/1.65 for readability during long ADHD reading sessions */
+  --atlas-text-body: 1.03125rem;
+  --atlas-text-body-weight: 400;
+  --atlas-text-body-line: 1.65;
+  --atlas-text-body-small: 0.875rem;
+  --atlas-text-body-small-weight: 400;
+  --atlas-text-body-small-line: 1.6;
+
+  /* Code */
+  --atlas-text-code: 0.875em;
+  --atlas-text-code-weight: 400;
+  --atlas-text-code-line: 1.5;
+
+  /* Caption */
+  --atlas-text-caption: 0.75rem;
+  --atlas-text-caption-weight: 500;
+  --atlas-text-caption-line: 1.5;
+
+  /* Border Radius */
+  --atlas-radius-sm: 0.25rem;
+  --atlas-radius-md: 0.5rem;
+  --atlas-radius-lg: 0.75rem;
+  --atlas-radius-full: 9999px;
+
+  /* Shadows */
+  --atlas-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --atlas-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --atlas-shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
+  --atlas-shadow-focus: 0 0 0 3px var(--atlas-focus-ring);
+}
+
+/* Dark Mode Overrides */
+[data-md-color-scheme="slate"] {
+  /* Section Colors (Dark) */
+  --atlas-learn: #66bb6a;
+  --atlas-do: #b39ddb;
+  --atlas-build: #ffb74d;
+  --atlas-code: #64b5f6;
+
+  /* Semantic Colors (Dark) */
+  --atlas-primary: #4db6ac;
+  --atlas-primary-light: #80cbc4;
+  --atlas-primary-lighter: #26a69a;
+  --atlas-accent: #ffd54f;
+  --atlas-success: #66bb6a;
+  --atlas-warning: #ffb74d;
+  --atlas-error: #ef5350;
+  --atlas-info: #64b5f6;
+
+  /* Neutrals (Dark) */
+  --atlas-surface: #1e1e1e;
+  --atlas-surface-variant: #2d2d2d;
+  --atlas-surface-elevated: #2d2d2d;
+  --atlas-on-surface: #e0e0e0;
+  --atlas-on-surface-variant: #b0b0b0;
+  --atlas-outline: #444444;
+  --atlas-outline-variant: #333333;
+
+  /* Functional */
+  --atlas-active: #4dd0e1;
+  --atlas-focus-ring: rgba(77, 208, 225, 0.3);
+  --atlas-focus-ring-strong: rgba(77, 208, 225, 0.5);
+
+  /* Shadows (Dark) */
+  --atlas-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --atlas-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --atlas-shadow-lg: 0 12px 24px rgba(0,0,0,0.4);
+  --atlas-shadow-focus: 0 0 0 3px var(--atlas-focus-ring);
+}
+
+/* ============================================================
+   Base Typography Application
+   ============================================================ */
+
+html {
+  font-family: var(--atlas-font-body);
+  font-size: var(--atlas-text-body);
+  line-height: var(--atlas-text-body-line);
+  color: var(--atlas-on-surface);
+  background-color: var(--atlas-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings */
+h1, .md-typeset h1 {
+  font-family: var(--atlas-font-display);
+  font-size: var(--atlas-text-h1);
+  font-weight: var(--atlas-text-h1-weight);
+  line-height: var(--atlas-text-h1-line);
+  color: var(--atlas-on-surface);
+  margin-top: calc(var(--atlas-space-6) + var(--atlas-space-2));
+  margin-bottom: var(--atlas-space-3);
+  letter-spacing: -0.02em;
+}
+
+h2, .md-typeset h2 {
+  font-family: var(--atlas-font-display);
+  font-size: var(--atlas-text-h2);
+  font-weight: var(--atlas-text-h2-weight);
+  line-height: var(--atlas-text-h2-line);
+  color: var(--atlas-on-surface);
+  margin-top: calc(var(--atlas-space-5) + var(--atlas-space-2));
+  margin-bottom: var(--atlas-space-3);
+  letter-spacing: -0.01em;
+}
+
+h3, .md-typeset h3 {
+  font-family: var(--atlas-font-display);
+  font-size: var(--atlas-text-h3);
+  font-weight: var(--atlas-text-h3-weight);
+  line-height: var(--atlas-text-h3-line);
+  color: var(--atlas-on-surface);
+  margin-top: var(--atlas-space-5);
+  margin-bottom: var(--atlas-space-2);
+  letter-spacing: -0.005em;
+}
+
+h4, .md-typeset h4 {
+  font-family: var(--atlas-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--atlas-on-surface);
+  margin-top: var(--atlas-space-4);
+  margin-bottom: var(--atlas-space-2);
+}
+
+h5, .md-typeset h5,
+h6, .md-typeset h6 {
+  font-family: var(--atlas-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--atlas-on-surface-variant);
+  margin-top: var(--atlas-space-3);
+  margin-bottom: var(--atlas-space-2);
+}
+
+/* Body text */
+p, .md-typeset p {
+  font-family: var(--atlas-font-body);
+  font-size: var(--atlas-text-body);
+  font-weight: var(--atlas-text-body-weight);
+  line-height: var(--atlas-text-body-line);
+  color: var(--atlas-on-surface);
+  margin-top: var(--atlas-space-3);
+  margin-bottom: var(--atlas-space-3);
+  max-width: 75ch;
+}
+
+.md-typeset p:first-child {
+  margin-top: 0;
+}
+
+.md-typeset p:last-child {
+  margin-bottom: 0;
+}
+
+/* Small text */
+small, .md-typeset small {
+  font-size: var(--atlas-text-body-small);
+  font-weight: var(--atlas-text-body-small-weight);
+  line-height: var(--atlas-text-body-small-line);
+  color: var(--atlas-on-surface-variant);
+}
+
+/* Links */
+a, .md-typeset a {
+  color: var(--atlas-primary);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+a:hover, .md-typeset a:hover {
+  color: var(--atlas-primary-light);
+  text-decoration: underline;
+}
+
+[data-md-color-scheme="slate"] a:hover,
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+  color: var(--atlas-primary-light);
+}
+
+/* Code */
+code, .md-typeset code {
+  font-family: var(--atlas-font-mono);
+  font-size: var(--atlas-text-code);
+  font-weight: var(--atlas-text-code-weight);
+  line-height: var(--atlas-text-code-line);
+  background-color: var(--atlas-surface-variant);
+  padding: 0.15em 0.35em;
+  border-radius: var(--atlas-radius-sm);
+  color: var(--atlas-primary);
+}
+
+.md-typeset pre > code {
+  background-color: var(--atlas-surface-variant);
+  border: 1px solid var(--atlas-outline-variant);
+  border-radius: var(--atlas-radius-md);
+  padding: var(--atlas-space-3) var(--atlas-space-4);
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+[data-md-color-scheme="slate"] .md-typeset pre > code {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+/* Blockquotes */
+blockquote, .md-typeset blockquote {
+  border-left: 4px solid var(--atlas-primary);
+  background-color: var(--atlas-primary-lighter);
+  padding: var(--atlas-space-3) var(--atlas-space-4);
+  border-radius: 0 var(--atlas-radius-md) var(--atlas-radius-md) 0;
+  margin: var(--atlas-space-4) 0;
+  font-style: italic;
+  color: var(--atlas-on-surface-variant);
+}
+
+[data-md-color-scheme="slate"] blockquote,
+[data-md-color-scheme="slate"] .md-typeset blockquote {
+  background-color: rgba(0, 105, 92, 0.12);
+  border-left-color: var(--atlas-primary-light);
+}
+
+/* Horizontal rules */
+hr, .md-typeset hr {
+  border: none;
+  border-top: 1px solid var(--atlas-outline-variant);
+  margin: var(--atlas-space-6) 0;
+}
+
+/* ============================================================
+   Spacing Utilities
+   ============================================================ */
+
+.atlas-space-1 { margin: var(--atlas-space-1) 0; }
+.atlas-space-2 { margin: var(--atlas-space-2) 0; }
+.atlas-space-3 { margin: var(--atlas-space-3) 0; }
+.atlas-space-4 { margin: var(--atlas-space-4) 0; }
+.atlas-space-5 { margin: var(--atlas-space-5) 0; }
+.atlas-space-6 { margin: var(--atlas-space-6) 0; }
+.atlas-space-7 { margin: var(--atlas-space-7) 0; }
+
+.atlas-p-1 { padding: var(--atlas-space-1); }
+.atlas-p-2 { padding: var(--atlas-space-2); }
+.atlas-p-3 { padding: var(--atlas-space-3); }
+.atlas-p-4 { padding: var(--atlas-space-4); }
+.atlas-p-5 { padding: var(--atlas-space-5); }
+.atlas-p-6 { padding: var(--atlas-space-6); }
+
+/* ============================================================
+   Component Library — ADHD-Friendly Components
+   ============================================================ */
+
+/* ── Reading Time Estimate ────────────────────────────────── */
+.atlas-reading-time {
+  font-family: var(--atlas-font-ui);
+  font-size: var(--atlas-text-caption);
+  font-weight: var(--atlas-text-caption-weight);
+  line-height: var(--atlas-text-caption-line);
+  color: var(--atlas-on-surface-variant);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--atlas-space-1);
+  padding: var(--atlas-space-1) var(--atlas-space-2);
+  background-color: var(--atlas-surface-variant);
+  border-radius: var(--atlas-radius-full);
+  margin-bottom: var(--atlas-space-4);
+}
+
+.atlas-reading-time::before {
+  content: "⏱";
+  font-size: 1em;
+}
+
+.atlas-reading-time[data-minutes]:not([data-minutes="0"])::after {
+  content: attr(data-minutes) " min read";
+}
+
+/* ── Scroll Progress Bar ──────────────────────────────────── */
+.atlas-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--atlas-primary);
+  transform-origin: left;
+  transform: scaleX(0);
+  z-index: 1000;
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+.atlas-scroll-progress--visible {
+  transform: scaleX(1);
+}
+
+/* ── Section Table of Contents ────────────────────────────── */
+.atlas-section-toc {
+  font-family: var(--atlas-font-ui);
+  font-size: var(--atlas-text-body-small);
+  line-height: 1.6;
+  background-color: var(--atlas-surface-variant);
+  border: 1px solid var(--atlas-outline-variant);
+  border-radius: var(--atlas-radius-md);
+  padding: var(--atlas-space-4);
+  margin: var(--atlas-space-5) 0;
+}
+
+.atlas-section-toc summary {
+  font-family: var(--atlas-font-display);
+  font-weight: 600;
+  font-size: var(--atlas-text-body);
+  color: var(--atlas-on-surface);
+  cursor: pointer;
+  padding: var(--atlas-space-1) 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.atlas-section-toc summary::-webkit-details-marker {
+  display: none;
+}
+
+.atlas-section-toc summary::after {
+  content: "▸";
+  font-size: 0.7em;
+  transition: transform 0.2s ease;
+  color: var(--atlas-active);
+}
+
+.atlas-section-toc[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.atlas-section-toc ul {
+  margin: var(--atlas-space-3) 0 0;
+  padding-left: var(--atlas-space-4);
+}
+
+.atlas-section-toc li {
+  margin: var(--atlas-space-1) 0;
+}
+
+.atlas-section-toc a {
+  color: var(--atlas-on-surface-variant);
+  font-size: var(--atlas-text-body-small);
+  transition: color 0.15s ease;
+}
+
+.atlas-section-toc a:hover {
+  color: var(--atlas-primary);
+}
+
+/* ── Code Block Enhancements ──────────────────────────────── */
+.md-typeset pre {
+  position: relative;
+  margin: var(--atlas-space-4) 0;
+  border-radius: var(--atlas-radius-md);
+  overflow: hidden;
+  box-shadow: var(--atlas-shadow-md);
+}
+
+.md-typeset pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-family: var(--atlas-font-ui);
+  font-size: var(--atlas-text-caption);
+  font-weight: var(--atlas-text-caption-weight);
+  color: var(--atlas-on-surface-variant);
+  background-color: var(--atlas-surface-variant);
+  padding: var(--atlas-space-1) var(--atlas-space-2);
+  border-bottom-left-radius: var(--atlas-radius-md);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+
+.md-typeset pre > code {
+  font-family: var(--atlas-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  display: block;
+  padding: var(--atlas-space-4);
+  overflow-x: auto;
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: var(--atlas-space-2);
+  right: var(--atlas-space-2);
+  font-family: var(--atlas-font-ui);
+  font-size: var(--atlas-text-caption);
+  font-weight: 500;
+  color: var(--atlas-on-surface-variant);
+  background: var(--atlas-surface);
+  border: 1px solid var(--atlas-outline);
+  border-radius: var(--atlas-radius-sm);
+  padding: var(--atlas-space-1) var(--atlas-space-2);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.15s ease;
+  z-index: 10;
+}
+
+.md-typeset pre:hover .copy-code-btn {
+  opacity: 1;
+}
+
+.copy-code-btn:hover {
+  color: var(--atlas-primary);
+  border-color: var(--atlas-primary);
+}
+
+.copy-code-btn.copied {
+  color: var(--atlas-success);
+  border-color: var(--atlas-success);
+}
+
+/* ── Admonitions — ADHD Personality ───────────────────────── */
+
+/* Tip (green) — encouragement */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #4caf50;
+  border-left-width: 4px;
+  background-color: rgba(76, 175, 80, 0.06);
+  border-radius: var(--atlas-radius-md);
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  font-weight: 600;
+  padding: var(--atlas-space-2) var(--atlas-space-3);
+  border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Warning (amber) — gentle nudge */
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: #ff9800;
+  border-left-width: 4px;
+  background-color: rgba(255, 152, 0, 0.06);
+  border-radius: var(--atlas-radius-md);
+}
+
+.md-typeset .warning > .admonition-title,
+.md-typeset .warning > summary {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #e65100;
+  font-weight: 600;
+  padding: var(--atlas-space-2) var(--atlas-space-3);
+  border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
+  border-bottom: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+/* Note (blue) — information */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: #2196f3;
+  border-left-width: 4px;
+  background-color: rgba(33, 150, 243, 0.06);
+  border-radius: var(--atlas-radius-md);
+}
+
+.md-typeset .note > .admonition-title,
+.md-typeset .note > summary {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1565c0;
+  font-weight: 600;
+  padding: var(--atlas-space-2) var(--atlas-space-3);
+  border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
+  border-bottom: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+/* Danger (red) — stop and think */
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-color: #f44336;
+  border-left-width: 4px;
+  background-color: rgba(244, 67, 54, 0.06);
+  border-radius: var(--atlas-radius-md);
+}
+
+.md-typeset .danger > .admonition-title,
+.md-typeset .danger > summary {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+  font-weight: 600;
+  padding: var(--atlas-space-2) var(--atlas-space-3);
+  border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
+  border-bottom: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+/* ADHD tip — purple accent (signature) */
+.md-typeset .admonition.adhd,
+.md-typeset details.adhd {
+  border-color: var(--atlas-primary);
+  border-left-width: 4px;
+  background-color: rgba(0, 105, 92, 0.06);
+  border-radius: var(--atlas-radius-md);
+}
+
+.md-typeset .adhd > .admonition-title,
+.md-typeset .adhd > summary {
+  background-color: rgba(0, 105, 92, 0.1);
+  color: var(--atlas-primary);
+  font-weight: 600;
+  padding: var(--atlas-space-2) var(--atlas-space-3);
+  border-radius: var(--atlas-radius-md) var(--atlas-radius-md) 0 0;
+  border-bottom: 1px solid rgba(0, 105, 92, 0.2);
+}
+
+/* ── Tables — Scannable ────────────────────────────────────── */
+.md-typeset table:not([class]) {
+  font-size: 0.84em;
+  border-radius: var(--atlas-radius-md);
+  overflow: hidden;
+  border-collapse: collapse;
+  width: 100%;
+  margin: var(--atlas-space-4) 0;
+  box-shadow: var(--atlas-shadow-sm);
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--atlas-surface-variant);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.78em;
+  letter-spacing: 0.03em;
+  padding: var(--atlas-space-3) var(--atlas-space-4);
+  border-bottom: 2px solid var(--atlas-outline-variant);
+  color: var(--atlas-on-surface);
+  font-family: var(--atlas-font-display);
+  font-weight: 700;
+  text-align: left;
+}
+
+.md-typeset table:not([class]) td {
+  padding: var(--atlas-space-2) var(--atlas-space-4);
+  border-bottom: 1px solid var(--atlas-outline-variant);
+  color: var(--atlas-on-surface);
+}
+
+.md-typeset table:not([class]) tr:last-child td {
+  border-bottom: none;
+}
+
+/* Zebra striping */
+.md-typeset table:not([class]) tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Keyboard Focus — Visible ──────────────────────────────── */
+.md-nav__link:focus-visible,
+.md-tabs__link:focus-visible,
+.md-search__input:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--atlas-primary);
+  outline-offset: 2px;
+  border-radius: var(--atlas-radius-sm);
+}
+
+/* ── Reduced Motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .md-nav__link,
+  .md-nav__item--nested > .md-nav__link::before,
+  .md-tabs__link,
+  .md-search__form,
+  .md-typeset .feature-card,
+  .atlas-scroll-progress,
+  .atlas-section-toc summary::after,
+  .md-typeset .feature-card,
+  .copy-code-btn,
+  .md-nav__link:hover {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .atlas-scroll-progress {
+    transition: none !important;
+  }
+}
+
+/* ── Print Styles ──────────────────────────────────────────── */
+@media print {
+  .md-sidebar,
+  .md-header,
+  .md-footer,
+  .atlas-scroll-progress,
+  .atlas-reading-time,
+  .copy-code-btn,
+  .atlas-section-toc summary::after,
+  .md-nav__toggle,
+  .md-search,
+  .md-tabs {
+    display: none !important;
+  }
+
+  .md-content {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .md-typeset {
+    max-width: none !important;
+  }
+
+  .md-typeset code,
+  .md-typeset pre {
+    background: none !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  a, .md-typeset a {
+    color: inherit !important;
+    text-decoration: underline !important;
+  }
+
+  .md-typeset pre {
+    page-break-inside: avoid;
+  }
+}
+
+/* ============================================================
+   Footer — Clean
+   ============================================================ */
+.md-footer {
+  border-top: 1px solid var(--atlas-outline-variant);
+  padding: var(--atlas-space-5) var(--atlas-space-4);
+  background-color: var(--atlas-surface-variant);
+}
+
+.md-footer-copyright {
+  font-size: var(--atlas-text-caption);
+  color: var(--atlas-on-surface-variant);
+}
+
+/* ============================================================
+   Custom Scrollbar
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--atlas-surface-variant);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--atlas-outline);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--atlas-primary);
+}
+
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+[data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--atlas-primary-light);
+}
+
+/* ============================================================
+   Utility Classes for Content Authors
+   ============================================================ */
+
+.atlas-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--atlas-font-ui);
+  font-size: var(--atlas-text-caption);
+  font-weight: 600;
+  padding: var(--atlas-space-1) var(--atlas-space-2);
+  border-radius: var(--atlas-radius-full);
+  white-space: nowrap;
+}
+
+.atlas-badge--new {
+  background-color: #4caf50;
+  color: white;
+}
+
+.atlas-badge--adhd {
+  background-color: var(--atlas-primary);
+  color: white;
+}
+
+.atlas-badge--beta {
+  background-color: var(--atlas-warning);
+  color: var(--atlas-on-surface);
+}
+
+.atlas-badge--deprecated {
+  background-color: var(--atlas-on-surface-variant);
+  color: var(--atlas-on-surface);
+  opacity: 0.7;
+}
+
+/* Text alignment helpers */
+.atlas-text-center { text-align: center; }
+.atlas-text-left { text-align: left; }
+.atlas-text-right { text-align: right; }
+
+/* Visibility helpers */
+.atlas-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   End of Atlas Design System
+   ============================================================ */

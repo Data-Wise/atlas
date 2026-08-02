@@ -1,0 +1,3654 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow">
+      
+      
+      
+        <link rel="canonical" href="https://data-wise.github.io/atlas/DIAGRAMS/">
+      
+      
+        <link rel="prev" href="../ARCHITECTURE/">
+      
+      
+        <link rel="next" href="../INTEGRATIONS/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Diagrams - Atlas</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/fonts.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#atlas-cli-architecture-diagrams" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      <!-- Scroll Progress Bar -->
+<div class="md-scroll-progress" data-md-component="scroll-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Page scroll progress">
+  <div class="md-scroll-progress__bar"></div>
+</div>
+
+
+  <header class="md-header" data-md-component="header">
+    <nav class="md-header__inner md-grid" aria-label="Header">
+      <a href="" title="Atlas" class="md-header__button md-logo" aria-label="Atlas" data-md-component="logo">
+        
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93c-3.72-.49-7-3.85-7-7.93 0-4.42 3.58-8 8-8s8 3.58 8 8-3.58 8-8 8zm0-2c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm0-10c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+        
+      </a>
+      <label class="md-header__button md-icon" for="__drawer" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      </label>
+      <div class="md-header__title" data-md-component="header-title">
+        <a href="" class="md-header__ellipsis" title="Atlas">
+          Atlas
+        </a>
+      </div>
+      <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5-.79.28v-.79l-.28.27C12.59 15.41 11.11 16 9.5 16S6 13.09 6 9.5 8.91 3 11.5 3 16 5.91 16 9.5c0 .76-.11 1.5-.29 2.2L19 19.79l-1.41 1.41L13.5 14.5h-.79z"/></svg>
+      </label>
+      
+        
+          <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+        
+      
+      
+        <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      
+      <div class="md-header__source">
+        
+          <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" class="md-button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        
+      </div>
+    </nav>
+  </header>
+
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs atlas-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list atlas-pill-list">
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link atlas-pill atlas-pill--home">
+          Home
+        </a>
+      </li>
+      
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../getting-started/installation/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="do">
+                Get Started
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../user-guide/adhd-guide/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="learn">
+                Guide
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../ARCHITECTURE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="build">
+                Architecture
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../CLI-REFERENCE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="code">
+                Reference
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li class="md-tabs__item">
+            <a href="../WHAT-S-NEW/"
+               class="md-tabs__link atlas-pill atlas-pill--muted">
+              Changelog
+            </a>
+          </li>
+        
+      
+      <li class="md-tabs__item atlas-pill-search-item">
+        <input type="search"
+               class="atlas-pill-search"
+               placeholder="Filter sidebar…"
+               aria-label="Filter sidebar navigation">
+      </li>
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Atlas" class="md-nav__button md-logo" aria-label="Atlas" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Atlas
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Data-Wise/atlas" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/atlas
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TUTORIAL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEMOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recording
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADHD Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADHD Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/core-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/quick-wins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Wins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/time-blindness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Time Blindness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/hyperfocus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hyperfocus Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/accessibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accessibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/visual-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/research-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/SCENARIOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WEEKLY-REVIEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weekly Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/MULTI-PROJECT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/AUTOMATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/cookbook/COOKBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../VISUAL-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/swiftbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SwiftBar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../STATUS-SCHEMA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .STATUS Schema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/MIGRATION-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CLI-REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REFCARD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference Card
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-RECIPES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MCP-SERVER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-system-architecture-clean-architecture-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. System Architecture (Clean Architecture Layers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-flow-complete-session-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data Flow - Complete Session Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-entity-relationship-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Entity Relationship Diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-session-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Session State Machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cli-command-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CLI Command Tree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-repository-pattern-storage-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Repository Pattern &amp; Storage Abstraction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-event-system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Event System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-configuration-adhd-friendly-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Configuration &amp; ADHD-Friendly Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-template-system-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Template System Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-project-scanning-registry-synchronization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Project Scanning &amp; Registry Synchronization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-presenter-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Presenter Layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-dashboard-state-machine-ink-v09x" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Dashboard State Machine (Ink v0.9.x)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-ink-dashboard-component-tree-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Ink Dashboard Component Tree (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-visual-pipeline-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Visual Pipeline (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-real-data-pipeline-v092" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Real Data Pipeline (v0.9.2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagram-reference-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagram Reference Guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rendering-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Changelog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WHAT-S-NEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-system-architecture-clean-architecture-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. System Architecture (Clean Architecture Layers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-flow-complete-session-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Data Flow - Complete Session Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-entity-relationship-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Entity Relationship Diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-session-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Session State Machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cli-command-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CLI Command Tree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-repository-pattern-storage-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Repository Pattern &amp; Storage Abstraction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-event-system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Event System Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-configuration-adhd-friendly-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Configuration &amp; ADHD-Friendly Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-template-system-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Template System Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-project-scanning-registry-synchronization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Project Scanning &amp; Registry Synchronization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-presenter-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Presenter Layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-dashboard-state-machine-ink-v09x" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Dashboard State Machine (Ink v0.9.x)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-ink-dashboard-component-tree-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Ink Dashboard Component Tree (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-visual-pipeline-v091" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Visual Pipeline (v0.9.1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-real-data-pipeline-v092" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Real Data Pipeline (v0.9.2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagram-reference-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagram Reference Guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rendering-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../ARCHITECTURE/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="atlas-cli-architecture-diagrams">Atlas CLI - Architecture Diagrams</h1>
+<p>This document contains comprehensive Mermaid diagrams visualizing the Atlas CLI architecture, data flows, and system interactions.</p>
+<hr />
+<h2 id="1-system-architecture-clean-architecture-layers">1. System Architecture (Clean Architecture Layers)</h2>
+<pre class="mermaid"><code>graph TB
+    subgraph "CLI / Presentation Layer"
+        CLI["CLI Entry Point&lt;br/&gt;bin/atlas.js&lt;br/&gt;(Commander.js)"]
+        Dashboard["TUI Dashboard&lt;br/&gt;src/cli/dashboard-ink/"]
+        API["Programmatic API&lt;br/&gt;src/index.js"]
+        MCP["MCP Server&lt;br/&gt;src/mcp/index.js"]
+    end
+
+    subgraph "Controller / Adapter Layer"
+        StatusCtl["Status Controller&lt;br/&gt;CLI Output Formatting"]
+        Presenters["Presenters&lt;br/&gt;ProjectPresenter&lt;br/&gt;TuiPresenter"]
+        FSGateway["Status File Gateway&lt;br/&gt;.STATUS Parser"]
+        EventPub["Event Publisher&lt;br/&gt;Event Dispatch"]
+    end
+
+    subgraph "Use Case / Application Logic Layer"
+        ProjectUC["Project Use Cases&lt;br/&gt;Scan, Status,&lt;br/&gt;Recent, Register"]
+        SessionUC["Session Use Cases&lt;br/&gt;Create, End"]
+        CaptureUC["Capture Use Cases&lt;br/&gt;Capture, Triage&lt;br/&gt;Get Inbox"]
+        ContextUC["Context Use Cases&lt;br/&gt;Log Breadcrumb,&lt;br/&gt;Get Trail,&lt;br/&gt;Park/Unpark"]
+        RegistryUC["Registry Use Cases&lt;br/&gt;Sync, Register"]
+        StatusUC["Status Use Cases&lt;br/&gt;Update Status&lt;br/&gt;Update Status File"]
+    end
+
+    subgraph "Domain / Entity Layer"
+        Project["Project&lt;br/&gt;Core Entity"]
+        Session["Session&lt;br/&gt;Core Entity"]
+        Capture["Capture&lt;br/&gt;Core Entity"]
+        Breadcrumb["Breadcrumb&lt;br/&gt;Core Entity"]
+        Task["Task&lt;br/&gt;Core Entity"]
+        RepoIface["Repository&lt;br/&gt;Interfaces&lt;br/&gt;IProject, ISession,&lt;br/&gt;ICapture, IBreadcrumb"]
+        BizRules["BusinessRules&lt;br/&gt;Constants"]
+        ValueObj["Value Objects&lt;br/&gt;ProjectType,&lt;br/&gt;SessionState"]
+        Validators["Domain Validators&lt;br/&gt;StatusFileValidator"]
+    end
+
+    subgraph "Repository / Infrastructure Layer"
+        FSRepo["FileSystem&lt;br/&gt;Repositories&lt;br/&gt;JSON Storage"]
+        SQLiteRepo["SQLite&lt;br/&gt;Repositories&lt;br/&gt;DB Storage"]
+        Config["Configuration&lt;br/&gt;Config Management"]
+    end
+
+    CLI --&gt; StatusCtl
+    CLI --&gt; ProjectUC
+    CLI --&gt; SessionUC
+    CLI --&gt; CaptureUC
+    Dashboard --&gt; Presenters
+    Dashboard --&gt; ProjectUC
+    Dashboard --&gt; SessionUC
+    API --&gt; ProjectUC
+    API --&gt; SessionUC
+    MCP --&gt; ProjectUC
+    MCP --&gt; SessionUC
+    MCP --&gt; CaptureUC
+    MCP --&gt; ContextUC
+
+    ProjectUC --&gt; Project
+    SessionUC --&gt; Session
+    CaptureUC --&gt; Capture
+    ContextUC --&gt; Breadcrumb
+    ProjectUC --&gt; RepoIface
+    SessionUC --&gt; RepoIface
+    CaptureUC --&gt; RepoIface
+
+    FSGateway --&gt; Validators
+    FSGateway --&gt; Project
+    EventPub --&gt; ProjectUC
+    EventPub --&gt; SessionUC
+
+    RepoIface -.-&gt;|implements| FSRepo
+    RepoIface -.-&gt;|implements| SQLiteRepo
+
+    FSRepo --&gt; Config
+    SQLiteRepo --&gt; Config
+    ProjectUC --&gt; ValueObj
+    SessionUC --&gt; ValueObj
+
+    style CLI fill:#e1f5ff
+    style Dashboard fill:#e1f5ff
+    style MCP fill:#e1f5ff
+    style API fill:#e1f5ff
+    style ProjectUC fill:#f3e5f5
+    style SessionUC fill:#f3e5f5
+    style CaptureUC fill:#f3e5f5
+    style ContextUC fill:#f3e5f5
+    style Project fill:#e8f5e9
+    style BizRules fill:#e8f5e9
+    style Session fill:#e8f5e9
+    style Capture fill:#e8f5e9
+    style FSRepo fill:#fff3e0
+    style SQLiteRepo fill:#fff3e0</code></pre>
+<p><strong>Layers Explained:</strong></p>
+<ul>
+<li><strong>Presentation:</strong> CLI, Dashboard, and programmatic API interfaces</li>
+<li><strong>Controllers/Adapters:</strong> Convert between presentation and business logic</li>
+<li><strong>Presenters:</strong> Format data for display (UI-agnostic and TUI-specific)</li>
+<li><strong>Use Cases:</strong> Atomic application operations (Session Start, Capture Idea, etc.)</li>
+<li><strong>Domain:</strong> Core entities and business rules</li>
+<li><strong>Infrastructure:</strong> Storage backends (Filesystem JSON or SQLite) and configuration</li>
+</ul>
+<hr />
+<h2 id="2-data-flow-complete-session-lifecycle">2. Data Flow - Complete Session Lifecycle</h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant CLI as CLI
+    participant SessionUC as Session&lt;br/&gt;Use Case
+    participant ProjectRepo as Project&lt;br/&gt;Repository
+    participant SessionRepo as Session&lt;br/&gt;Repository
+    participant BreadcrumbRepo as Breadcrumb&lt;br/&gt;Repository
+    participant CaptureRepo as Capture&lt;br/&gt;Repository
+    participant EventPub as Event&lt;br/&gt;Publisher
+    participant FSOrDB as Storage&lt;br/&gt;FileSystem/SQLite
+
+    User-&gt;&gt;CLI: atlas session start project-name
+
+    CLI-&gt;&gt;SessionUC: execute({ project: 'project-name' })
+
+    SessionUC-&gt;&gt;SessionRepo: findActive()
+    SessionRepo-&gt;&gt;FSOrDB: load sessions.json / query db
+    FSOrDB--&gt;&gt;SessionRepo: current sessions
+    SessionRepo--&gt;&gt;SessionUC: null or active session
+
+    alt No active session
+        SessionUC-&gt;&gt;ProjectRepo: findByName('project-name')
+        ProjectRepo-&gt;&gt;FSOrDB: load projects.json / query db
+        FSOrDB--&gt;&gt;ProjectRepo: project data
+        ProjectRepo--&gt;&gt;SessionUC: Project entity
+
+        SessionUC-&gt;&gt;SessionUC: Create Session entity&lt;br/&gt;state: ACTIVE, startTime: now
+
+        SessionUC-&gt;&gt;SessionRepo: save(session)
+        SessionRepo-&gt;&gt;FSOrDB: write to storage
+        FSOrDB--&gt;&gt;SessionRepo: ✓ saved
+
+        SessionUC-&gt;&gt;ProjectRepo: update(project.touch())
+        ProjectRepo-&gt;&gt;FSOrDB: write updated project
+
+        SessionUC-&gt;&gt;EventPub: publish(SessionStarted)
+        EventPub--&gt;&gt;EventPub: Notify handlers&lt;br/&gt;Streak, Notification, etc.
+
+        SessionUC--&gt;&gt;CLI: session object
+        CLI--&gt;&gt;User: Session started for project-name
+    else Active session exists
+        CLI--&gt;&gt;User: Session already active
+    end
+
+    User-&gt;&gt;CLI: atlas context breadcrumb "working on feature X"
+    CLI-&gt;&gt;BreadcrumbRepo: save(breadcrumb)
+    BreadcrumbRepo-&gt;&gt;FSOrDB: append to breadcrumbs.json / insert db
+
+    User-&gt;&gt;CLI: atlas capture "idea for refactoring"
+    CLI-&gt;&gt;CaptureUC: execute({ text: 'idea...', type: 'idea' })
+    CaptureUC-&gt;&gt;CaptureRepo: save(capture)
+    CaptureRepo-&gt;&gt;FSOrDB: write to storage
+    EventPub-&gt;&gt;EventPub: publish(CaptureCreated)
+
+    User-&gt;&gt;CLI: atlas session end "completed feature"
+    CLI-&gt;&gt;SessionUC: execute({ outcome: 'completed feature' })
+
+    SessionUC-&gt;&gt;SessionRepo: findActive()
+    SessionRepo--&gt;&gt;SessionUC: active session
+
+    SessionUC-&gt;&gt;SessionUC: Update session&lt;br/&gt;state: ENDED, endTime: now, outcome: text
+
+    SessionUC-&gt;&gt;SessionRepo: save(session)
+    SessionRepo-&gt;&gt;FSOrDB: write updated session
+
+    SessionUC-&gt;&gt;ProjectRepo: update(project.recordSession(duration))
+    ProjectRepo-&gt;&gt;FSOrDB: write updated project stats
+
+    SessionUC-&gt;&gt;EventPub: publish(SessionEnded)
+    EventPub--&gt;&gt;EventPub: Streak calculation&lt;br/&gt;Celebration notification
+
+    SessionUC--&gt;&gt;CLI: session summary
+    CLI--&gt;&gt;User: Session ended. Awesome work!</code></pre>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Session lifecycle flows through Use Cases → Domain Entities → Repositories</li>
+<li>Each write operation persists to storage (Filesystem JSON or SQLite)</li>
+<li>Domain events trigger cross-cutting concerns (streak, notifications, etc.)</li>
+<li>Breadcrumbs and Captures are logged independently during session</li>
+</ul>
+<hr />
+<h2 id="3-entity-relationship-diagram">3. Entity Relationship Diagram</h2>
+<pre class="mermaid"><code>erDiagram
+    PROJECT ||--o{ SESSION : has
+    PROJECT ||--o{ CAPTURE : receives
+    PROJECT ||--o{ BREADCRUMB : logs
+    PROJECT ||--o{ TASK : contains
+    PROJECT ||--o{ SCHEDULE_RECORD : schedules
+
+    SESSION ||--o{ BREADCRUMB : "logs during"
+    SESSION ||--o{ CAPTURE : "may create"
+
+    PROJECT {
+        string id PK
+        string name UK
+        string type
+        string path UK
+        string description
+        string[] tags
+        object metadata
+        datetime createdAt
+        datetime lastAccessedAt
+        number totalSessions
+        number totalDuration
+    }
+
+    SESSION {
+        string id PK
+        string project FK
+        string task
+        string branch
+        datetime startTime
+        datetime endTime
+        datetime pausedAt
+        string state
+        string outcome
+        object context
+    }
+
+    CAPTURE {
+        string id PK
+        string text
+        string type
+        string status
+        string project FK
+        string[] tags
+        object context
+        datetime createdAt
+        datetime triagedAt
+    }
+
+    BREADCRUMB {
+        string id PK
+        string sessionId FK
+        string text
+        string project FK
+        object context
+        datetime createdAt
+    }
+
+    TASK {
+        string id PK
+        string project FK
+        string description
+        string status
+        string priority
+        datetime dueDate
+        string assignee
+    }
+
+    SCHEDULE_RECORD {
+        string id PK
+        string project FK
+        string label
+        string date
+        string type
+        string source
+        string priority
+    }</code></pre>
+<p><strong>Relationships:</strong></p>
+<ul>
+<li><strong>1:N (Project → Session):</strong> Each project has multiple sessions</li>
+<li><strong>1:N (Project → Capture):</strong> Each project receives multiple captures</li>
+<li><strong>1:N (Project → Breadcrumb):</strong> Each project logs multiple breadcrumbs</li>
+<li><strong>1:N (Project → Task):</strong> Each project contains multiple tasks</li>
+<li><strong>1:N (Project → ScheduleRecord):</strong> Each project has multiple scheduled records</li>
+<li><strong>1:N (Session → Breadcrumb):</strong> Each session logs multiple breadcrumbs</li>
+<li><strong>1:N (Session → Capture):</strong> Sessions may trigger captures</li>
+</ul>
+<hr />
+<h2 id="4-session-state-machine">4. Session State Machine</h2>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Idle
+
+    Idle --&gt; Active: start()
+
+    Active --&gt; Paused: pause()
+    Active --&gt; Ended: end(outcome)
+    Active --&gt; Active: logBreadcrumb()&lt;br/&gt;captureIdea()
+
+    Paused --&gt; Active: resume()
+    Paused --&gt; Ended: end(outcome)
+    Paused --&gt; Idle: abandon()
+
+    Ended --&gt; [*]
+
+    Idle --&gt; Parked: park()
+    Parked --&gt; Idle: unpark()
+    Parked --&gt; [*]
+
+    note right of Idle
+        No active session
+        Ready to start new work
+    end note
+
+    note right of Active
+        Session in progress
+        Can log breadcrumbs,
+        capture ideas, pause
+    end note
+
+    note right of Paused
+        Session temporarily paused
+        Can resume or end
+    end note
+
+    note right of Ended
+        Session completed
+        Final state - immutable
+    end note
+
+    note right of Parked
+        Context preserved
+        Session suspended
+        Can be unparked later
+    end note</code></pre>
+<p><strong>State Transitions:</strong></p>
+<ul>
+<li><strong>Idle → Active:</strong> Start work session</li>
+<li><strong>Active → Paused:</strong> Take a break (preserves start time)</li>
+<li><strong>Active → Ended:</strong> Complete work (calculates duration)</li>
+<li><strong>Paused → Active:</strong> Resume work</li>
+<li><strong>Active/Paused → Parked:</strong> Save context for later</li>
+<li><strong>Parked → Unparked:</strong> Restore context</li>
+</ul>
+<hr />
+<h2 id="5-cli-command-tree">5. CLI Command Tree</h2>
+<pre class="mermaid"><code>graph TD
+    Atlas["atlas&lt;br/&gt;CLI Root"]
+
+    %% Project Commands
+    Atlas --&gt;|project| Project["project&lt;br/&gt;Project registry"]
+    Project --&gt;|add| PAdd["add [PATH]&lt;br/&gt;Register project&lt;br/&gt;-t tags, -s status"]
+    Project --&gt;|list| PList["list&lt;br/&gt;List projects&lt;br/&gt;-s status, -t tag, --kind&lt;br/&gt;--count, --suggest, --format"]
+    Project --&gt;|show| PShow["show NAME&lt;br/&gt;Project details&lt;br/&gt;--format json|shell"]
+    Project --&gt;|remove| PRm["remove NAME&lt;br/&gt;Unregister project"]
+
+    %% Session Commands
+    Atlas --&gt;|session| Session["session&lt;br/&gt;Session management"]
+    Session --&gt;|start| SStart["start [PROJECT]&lt;br/&gt;Begin session&lt;br/&gt;-t task, -e estimate, --energy"]
+    Session --&gt;|end| SEnd["end [NOTE]&lt;br/&gt;End session"]
+    Session --&gt;|status| SStatus["status&lt;br/&gt;Active session&lt;br/&gt;--format json"]
+    Session --&gt;|export| SExport["export [FILE]&lt;br/&gt;iCal/JSON export&lt;br/&gt;-d days, -p project, --format"]
+
+    %% Status &amp; Focus
+    Atlas --&gt;|status| Status["status [PROJECT]&lt;br/&gt;Get/update status&lt;br/&gt;--set, --progress, --focus&lt;br/&gt;--next, --complete, --then&lt;br/&gt;--increment, --create"]
+    Atlas --&gt;|focus| Focus["focus PROJECT [TEXT]&lt;br/&gt;Get/set focus"]
+
+    %% Capture Commands
+    Atlas --&gt;|catch| Catch["catch TEXT&lt;br/&gt;Quick capture&lt;br/&gt;-p project, -t type"]
+    Atlas --&gt;|inbox| Inbox["inbox&lt;br/&gt;View captures&lt;br/&gt;-p project, --type, --limit&lt;br/&gt;--stats, --count, --triage"]
+
+    %% Context Commands
+    Atlas --&gt;|where| Where["where [PROJECT]&lt;br/&gt;Show context"]
+    Atlas --&gt;|crumb| Crumb["crumb TEXT&lt;br/&gt;Leave breadcrumb&lt;br/&gt;-p project"]
+    Atlas --&gt;|trail| Trail["trail [PROJECT]&lt;br/&gt;Breadcrumb trail&lt;br/&gt;-d days, --limit"]
+    Atlas --&gt;|park| Park["park [NOTE]&lt;br/&gt;Save context&lt;br/&gt;-f force, -k keep-session"]
+    Atlas --&gt;|unpark| Unpark["unpark [ID]&lt;br/&gt;Restore context"]
+    Atlas --&gt;|parked| Parked["parked&lt;br/&gt;List parked contexts"]
+
+    %% Task Commands
+    Atlas --&gt;|task| TaskCmd["task&lt;br/&gt;Task management"]
+    TaskCmd --&gt;|add| TAdd["add DESC&lt;br/&gt;Add task&lt;br/&gt;-p priority, --due, --project"]
+    TaskCmd --&gt;|list| TList["list&lt;br/&gt;List tasks&lt;br/&gt;--completed, --incomplete&lt;br/&gt;--overdue, --due-soon&lt;br/&gt;--project, --format"]
+    TaskCmd --&gt;|done| TDone["done ID&lt;br/&gt;Complete task"]
+    TaskCmd --&gt;|rm| TRm["rm ID&lt;br/&gt;Delete task"]
+
+    %% Schedule &amp; Agenda
+    Atlas --&gt;|schedule| ScheduleCmd["schedule&lt;br/&gt;Schedule sync"]
+    ScheduleCmd --&gt;|push| SPush["push&lt;br/&gt;Push records&lt;br/&gt;--data json, --format"]
+    Atlas --&gt;|agenda| Agenda["agenda [DAYS]&lt;br/&gt;Merged view&lt;br/&gt;--format json"]
+
+    %% Analytics
+    Atlas --&gt;|stats| Stats["stats [PERIOD]&lt;br/&gt;Session analytics&lt;br/&gt;-d days, -p project&lt;br/&gt;--format, -e export&lt;br/&gt;--velocity, --patterns&lt;br/&gt;--calibrate, --minutes"]
+
+    %% Planning
+    Atlas --&gt;|plan| Plan["plan&lt;br/&gt;Morning ritual&lt;br/&gt;--ecosystem, --json"]
+
+    %% Setup &amp; Diagnostics
+    Atlas --&gt;|init| Init["init&lt;br/&gt;Initialize atlas&lt;br/&gt;-g global, -t template&lt;br/&gt;-n name, --list-templates"]
+    Atlas --&gt;|doctor| Doctor["doctor&lt;br/&gt;Audit projects&lt;br/&gt;--kind, --all, --fix&lt;br/&gt;--write, --format"]
+    Atlas --&gt;|sync| Sync["sync&lt;br/&gt;Sync registry&lt;br/&gt;-d dry-run, -w watch&lt;br/&gt;-p paths, --remove-orphans&lt;br/&gt;--from-status, --research"]
+    Atlas --&gt;|migrate| Migrate["migrate&lt;br/&gt;Storage migration&lt;br/&gt;-f from, -t to, --dry-run"]
+
+    %% Configuration
+    Atlas --&gt;|config| Config["config&lt;br/&gt;Configuration"]
+    Config --&gt;|paths| CPaths["paths&lt;br/&gt;Show scan paths"]
+    Config --&gt;|add-path| CAdd["add-path PATH&lt;br/&gt;Add scan path"]
+    Config --&gt;|remove-path| CRm["remove-path PATH&lt;br/&gt;Remove scan path"]
+    Config --&gt;|show| CShow["show&lt;br/&gt;Show config"]
+    Config --&gt;|setup| CSetup["setup&lt;br/&gt;Interactive wizard"]
+    Config --&gt;|prefs| CPrefs["prefs&lt;br/&gt;Manage preferences&lt;br/&gt;show/get/set/reset/defaults"]
+
+    %% Templates
+    Atlas --&gt;|template| Template["template&lt;br/&gt;Template management"]
+    Template --&gt;|list| TList2["list&lt;br/&gt;List templates"]
+    Template --&gt;|show| TShow["show ID&lt;br/&gt;Template content"]
+    Template --&gt;|create| TCreate["create ID&lt;br/&gt;Create template&lt;br/&gt;-f from, -e extends"]
+    Template --&gt;|export| TExport["export ID&lt;br/&gt;Export built-in"]
+    Template --&gt;|delete| TDelete["delete ID&lt;br/&gt;Delete custom"]
+    Template --&gt;|dir| TDir["dir&lt;br/&gt;Templates directory"]
+
+    %% Dashboard &amp; Completions
+    Atlas --&gt;|dashboard| Dashboard["dashboard / dash&lt;br/&gt;TUI Dashboard"]
+    Atlas --&gt;|completions| Completions["completions [SHELL]&lt;br/&gt;zsh | bash | fish"]
+
+    style Atlas fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style Project fill:#f3e5f5,stroke:#4a148c
+    style Session fill:#f3e5f5,stroke:#4a148c
+    style Status fill:#f3e5f5,stroke:#4a148c
+    style Focus fill:#f3e5f5,stroke:#4a148c
+    style Catch fill:#f3e5f5,stroke:#4a148c
+    style Inbox fill:#f3e5f5,stroke:#4a148c
+    style Where fill:#f3e5f5,stroke:#4a148c
+    style TaskCmd fill:#f3e5f5,stroke:#4a148c
+    style ScheduleCmd fill:#f3e5f5,stroke:#4a148c
+    style Stats fill:#f3e5f5,stroke:#4a148c
+    style Config fill:#f3e5f5,stroke:#4a148c
+    style Template fill:#f3e5f5,stroke:#4a148c
+    style SStart fill:#e8f5e9,stroke:#1b5e20
+    style SEnd fill:#e8f5e9,stroke:#1b5e20
+    style PAdd fill:#e8f5e9,stroke:#1b5e20
+    style PList fill:#e8f5e9,stroke:#1b5e20
+    style Catch fill:#e8f5e9,stroke:#1b5e20
+    style Inbox fill:#e8f5e9,stroke:#1b5e20
+    style Plan fill:#e8f5e9,stroke:#1b5e20
+    style Stats fill:#e8f5e9,stroke:#1b5e20
+    style TaskCmd fill:#e8f5e9,stroke:#1b5e20
+    style Agenda fill:#e8f5e9,stroke:#1b5e20
+    style Sync fill:#fff3e0,stroke:#e65100
+    style Doctor fill:#fff3e0,stroke:#e65100</code></pre>
+<p><strong>Command Groups:</strong></p>
+<ol>
+<li><strong>Project</strong> (<code>project add/list/show/remove</code>) — Project registry management</li>
+<li><strong>Session</strong> (<code>session start/end/status/export</code>) — Work session lifecycle</li>
+<li><strong>Status</strong> (<code>status</code>, <code>focus</code>) — Project status and focus tracking</li>
+<li><strong>Capture</strong> (<code>catch</code>, <code>inbox</code>) — Quick capture and inbox management</li>
+<li><strong>Context</strong> (<code>where</code>, <code>crumb</code>, <code>trail</code>, <code>park</code>, <code>unpark</code>, <code>parked</code>) — Breadcrumb trail and context switching</li>
+<li><strong>Task</strong> (<code>task add/list/done/rm</code>) — Task CRUD with priority, due dates, project filters</li>
+<li><strong>Schedule</strong> (<code>schedule push</code>, <code>agenda</code>) — External schedule sync and merged chronological view</li>
+<li><strong>Analytics</strong> (<code>stats</code>) — Session analytics with velocity, patterns, and calibration</li>
+<li><strong>Planning</strong> (<code>plan</code>) — Morning ritual daily planning</li>
+<li><strong>Setup</strong> (<code>init</code>, <code>doctor</code>, <code>sync</code>, <code>migrate</code>) — Initialization, audit, registry sync, migration</li>
+<li><strong>Config</strong> (<code>config paths/add-path/remove-path/show/setup/prefs</code>) — Configuration management</li>
+<li><strong>Templates</strong> (<code>template list/show/create/export/delete/dir</code>) — Project template management</li>
+<li><strong>Dashboard</strong> (<code>dashboard</code>/<code>dash</code>) — Interactive TUI</li>
+<li><strong>Completions</strong> (<code>completions</code>) — Shell completion scripts</li>
+</ol>
+<hr />
+<h2 id="6-repository-pattern-storage-abstraction">6. Repository Pattern &amp; Storage Abstraction</h2>
+<pre class="mermaid"><code>graph TB
+    subgraph "Use Case Layer"
+        UC["Use Cases&lt;br/&gt;ProjectUC, SessionUC,&lt;br/&gt;CaptureUC, etc."]
+    end
+
+    subgraph "Domain Layer"
+        IRepo["Repository Interfaces&lt;br/&gt;IProjectRepository&lt;br/&gt;ISessionRepository&lt;br/&gt;ICaptureRepository&lt;br/&gt;IBreadcrumbRepository&lt;br/&gt;ITaskRepository&lt;br/&gt;IScheduleRecordRepository"]
+    end
+
+    subgraph "Adapter Layer - Filesystem"
+        FSProj["FileSystemProjectRepository&lt;br/&gt;~/.atlas/projects.json"]
+        FSSess["FileSystemSessionRepository&lt;br/&gt;~/.atlas/sessions.json"]
+        FSCap["FileSystemCaptureRepository&lt;br/&gt;~/.atlas/captures.json"]
+        FSBread["FileSystemBreadcrumbRepository&lt;br/&gt;~/.atlas/breadcrumbs.json"]
+        FSTask["FileSystemTaskRepository&lt;br/&gt;~/.atlas/tasks.json"]
+        FSSched["FileSystemScheduleRecordRepository&lt;br/&gt;~/.atlas/schedule-records.json"]
+    end
+
+    subgraph "Adapter Layer - SQLite"
+        SQLProj["SQLiteProjectRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;projects table"]
+        SQLSess["SQLiteSessionRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;sessions table"]
+        SQLCap["SQLiteCaptureRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;captures table"]
+        SQLBread["SQLiteBreadcrumbRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;breadcrumbs table"]
+        SQLTask["SQLiteTaskRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;tasks table"]
+        SQLSched["SQLiteScheduleRecordRepository&lt;br/&gt;~/.atlas/atlas.db&lt;br/&gt;schedule_records table"]
+    end
+
+    subgraph "Infrastructure Layer"
+        FS["FileSystem&lt;br/&gt;read/write JSON files"]
+        DB["SQLite Database&lt;br/&gt;SQL queries"]
+    end
+
+    subgraph "Dependency Injection"
+        Container["Container&lt;br/&gt;storage: 'filesystem'|'sqlite'&lt;br/&gt;resolve(name) → instance"]
+    end
+
+    UC --&gt;|depends on| IRepo
+    IRepo -.-&gt;|implements| FSProj
+    IRepo -.-&gt;|implements| FSSess
+    IRepo -.-&gt;|implements| FSCap
+    IRepo -.-&gt;|implements| FSBread
+    IRepo -.-&gt;|implements| FSTask
+    IRepo -.-&gt;|implements| FSSched
+    IRepo -.-&gt;|implements| SQLProj
+    IRepo -.-&gt;|implements| SQLSess
+    IRepo -.-&gt;|implements| SQLCap
+    IRepo -.-&gt;|implements| SQLBread
+    IRepo -.-&gt;|implements| SQLTask
+    IRepo -.-&gt;|implements| SQLSched
+
+    FSProj --&gt; FS
+    FSSess --&gt; FS
+    FSCap --&gt; FS
+    FSBread --&gt; FS
+    FSTask --&gt; FS
+    FSSched --&gt; FS
+
+    SQLProj --&gt; DB
+    SQLSess --&gt; DB
+    SQLCap --&gt; DB
+    SQLBread --&gt; DB
+    SQLTask --&gt; DB
+    SQLSched --&gt; DB
+
+    Container --&gt;|creates| FSProj
+    Container --&gt;|creates| FSSess
+    Container --&gt;|creates| FSTask
+    Container --&gt;|creates| FSSched
+    Container --&gt;|creates| SQLProj
+    Container --&gt;|creates| SQLSess
+    Container --&gt;|creates| SQLTask
+    Container --&gt;|creates| SQLSched
+
+    style UC fill:#f3e5f5
+    style IRepo fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style FSProj fill:#fff3e0
+    style FSSess fill:#fff3e0
+    style SQLProj fill:#fff3e0
+    style SQLSess fill:#fff3e0
+    style Container fill:#e1f5ff</code></pre>
+<p><strong>Key Pattern Elements:</strong></p>
+<ul>
+<li><strong>Repositories:</strong> Abstract interface between Use Cases and storage</li>
+<li><strong>Multiple Implementations:</strong> Filesystem (JSON) and SQLite backends both implement the same interface</li>
+<li><strong>Dependency Injection:</strong> Container decides which implementation to instantiate</li>
+<li><strong>Storage Agnostic:</strong> Use Cases don't care about storage backend</li>
+</ul>
+<hr />
+<h2 id="7-event-system-architecture">7. Event System Architecture</h2>
+<pre class="mermaid"><code>graph LR
+    subgraph "Event Sources"
+        ProjectUC["Project&lt;br/&gt;Use Cases"]
+        SessionUC["Session&lt;br/&gt;Use Cases"]
+        CaptureUC["Capture&lt;br/&gt;Use Cases"]
+        ContextUC["Context&lt;br/&gt;Use Cases"]
+    end
+
+    subgraph "Event Publication"
+        EventPub["Event Publisher&lt;br/&gt;SimpleEventPublisher"]
+        EventTypes["Event Types&lt;br/&gt;SessionStarted&lt;br/&gt;SessionEnded&lt;br/&gt;SessionPaused&lt;br/&gt;CaptureCreated&lt;br/&gt;ProjectUpdated"]
+    end
+
+    subgraph "Event Handlers"
+        StreakHandler["Streak Handler&lt;br/&gt;Calculate streaks&lt;br/&gt;Update metrics"]
+        NotifyHandler["Notification Handler&lt;br/&gt;User notifications&lt;br/&gt;Celebrations"]
+        MetricsHandler["Metrics Handler&lt;br/&gt;Track usage&lt;br/&gt;Statistics"]
+        ContextHandler["Context Handler&lt;br/&gt;Preserve context&lt;br/&gt;Restore on unpark"]
+    end
+
+    ProjectUC --&gt;|publishes| EventPub
+    SessionUC --&gt;|publishes| EventPub
+    CaptureUC --&gt;|publishes| EventPub
+    ContextUC --&gt;|publishes| EventPub
+
+    EventPub --&gt;|emits| EventTypes
+    EventTypes --&gt;|notifies| StreakHandler
+    EventTypes --&gt;|notifies| NotifyHandler
+    EventTypes --&gt;|notifies| MetricsHandler
+    EventTypes --&gt;|notifies| ContextHandler
+
+    StreakHandler --&gt;|updates| DB1["Domain State"]
+    NotifyHandler --&gt;|displays| UI["User Interface"]
+    MetricsHandler --&gt;|logs| DB2["Analytics"]
+    ContextHandler --&gt;|preserves| DB3["Context State"]
+
+    style EventPub fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style SessionUC fill:#f3e5f5
+    style ProjectUC fill:#f3e5f5
+    style StreakHandler fill:#e8f5e9
+    style NotifyHandler fill:#e8f5e9</code></pre>
+<p><strong>Publish-Subscribe Pattern:</strong></p>
+<ul>
+<li>Use Cases publish domain events asynchronously</li>
+<li>Multiple handlers subscribe to events independently</li>
+<li>Decouples use cases from cross-cutting concerns (metrics, notifications, streak tracking)</li>
+<li>Events fire after entity state changes are persisted</li>
+</ul>
+<hr />
+<h2 id="8-configuration-adhd-friendly-features">8. Configuration &amp; ADHD-Friendly Features</h2>
+<pre class="mermaid"><code>graph TB
+    subgraph "Configuration System"
+        Config["Configuration&lt;br/&gt;Config.js"]
+        ConfigFile["~/.atlas/config.json&lt;br/&gt;User preferences"]
+        Defaults["Default Config&lt;br/&gt;Built-in defaults"]
+    end
+
+    subgraph "ADHD Helper Utilities"
+        Streak["StreakCalculator&lt;br/&gt;Track work streaks&lt;br/&gt;Celebrate consistency"]
+        TimeBlind["TimeBlindnessHelper&lt;br/&gt;Visible timers&lt;br/&gt;Time awareness"]
+        Celebrate["CelebrationHelper&lt;br/&gt;Positive feedback&lt;br/&gt;Encouragement"]
+        Context["ContextRestoration&lt;br/&gt;Quick context switch&lt;br/&gt;Preserve state"]
+        Complete["SessionCompletion&lt;br/&gt;Guided end-of-session&lt;br/&gt;Reflections"]
+    end
+
+    subgraph "Integration Points"
+        SessionStart["Session Start Flow"]
+        SessionEnd["Session End Flow"]
+        Dashboard["Dashboard Display"]
+        Capture["Capture System"]
+    end
+
+    Config --&gt;|loads| ConfigFile
+    Config --&gt;|provides| Defaults
+    Config --&gt;|supplies| Streak
+    Config --&gt;|supplies| TimeBlind
+    Config --&gt;|supplies| Celebrate
+
+    SessionStart --&gt;|activates| Context
+    SessionStart --&gt;|activates| Streak
+    SessionStart --&gt;|displays| Dashboard
+
+    SessionEnd --&gt;|triggers| Celebrate
+    SessionEnd --&gt;|triggers| Complete
+    SessionEnd --&gt;|updates| Streak
+
+    Dashboard --&gt;|shows| Streak
+    Dashboard --&gt;|shows| TimeBlind
+    Dashboard --&gt;|shows| Celebrate
+
+    Capture --&gt;|preserves| Context
+
+    style Config fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style Streak fill:#c8e6c9
+    style TimeBlind fill:#c8e6c9
+    style Celebrate fill:#c8e6c9
+    style Context fill:#c8e6c9
+    style Complete fill:#c8e6c9</code></pre>
+<p><strong>Configuration &amp; Helpers:</strong></p>
+<ul>
+<li>Central <code>Config.js</code> manages all user preferences</li>
+<li>ADHD-friendly helpers integrate at key lifecycle points</li>
+<li>Helpers are optional and can be toggled via configuration</li>
+<li>Dashboard displays time awareness and streak information</li>
+</ul>
+<hr />
+<h2 id="9-template-system-flow">9. Template System Flow</h2>
+<pre class="mermaid"><code>graph TD
+    subgraph "Template Sources"
+        BuiltIn["Built-in Templates&lt;br/&gt;src/templates/"]
+        Custom["Custom Templates&lt;br/&gt;~/.atlas/templates/"]
+        User["User Selection"]
+    end
+
+    subgraph "Template Processing"
+        Load["Load Template File&lt;br/&gt;Markdown + Frontmatter"]
+        Parse["Parse Frontmatter&lt;br/&gt;Extract metadata,&lt;br/&gt;config, inheritance"]
+        Inherit["Apply Inheritance&lt;br/&gt;Load parent template&lt;br/&gt;if specified"]
+        Variables["Replace Variables&lt;br/&gt;{{name}}, {{author}},&lt;br/&gt;{{date}}, etc."]
+    end
+
+    subgraph "Output"
+        Status[".STATUS File&lt;br/&gt;Project root"]
+    end
+
+    subgraph "Registry Update"
+        Register["Register in&lt;br/&gt;Project Registry"]
+        Sync["Sync Registry&lt;br/&gt;Discover .STATUS"]
+    end
+
+    User --&gt;|chooses| BuiltIn
+    User --&gt;|chooses| Custom
+
+    BuiltIn --&gt; Load
+    Custom --&gt; Load
+
+    Load --&gt; Parse
+    Parse --&gt; Inherit
+    Inherit --&gt; Variables
+    Variables --&gt; Status
+
+    Status --&gt; Register
+    Status --&gt; Sync
+
+    style BuiltIn fill:#fff3e0
+    style Custom fill:#fff3e0
+    style Load fill:#f3e5f5
+    style Parse fill:#f3e5f5
+    style Variables fill:#f3e5f5
+    style Status fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px</code></pre>
+<p><strong>Template Variables:</strong></p>
+<ul>
+<li><code>{{name}}</code> - Project name</li>
+<li><code>{{date}}</code> - Current date (YYYY-MM-DD)</li>
+<li><code>{{author}}</code> - From config</li>
+<li><code>{{github_user}}</code> - From config</li>
+<li><code>{{parent}}</code> - Parent template content (inheritance)</li>
+</ul>
+<hr />
+<h2 id="10-project-scanning-registry-synchronization">10. Project Scanning &amp; Registry Synchronization</h2>
+<pre class="mermaid"><code>graph TD
+    User["User"]
+    CLI["atlas sync"]
+    ScanPaths["Scan Paths&lt;br/&gt;[paths from config]"]
+
+    subgraph "Scanning Phase"
+        Scanner["Directory Scanner"]
+        FindStatus["Find .STATUS files&lt;br/&gt;Recursive scan"]
+        Cache["Project Scan Cache&lt;br/&gt;5-minute TTL"]
+    end
+
+    subgraph "Processing Phase"
+        Gateway["StatusFile Gateway&lt;br/&gt;.STATUS Parser"]
+        Entities["Create/Update&lt;br/&gt;Project Entities"]
+        Validation["Validate&lt;br/&gt;Domain Rules"]
+    end
+
+    subgraph "Persistence Phase"
+        Repo["Project Repository&lt;br/&gt;FileSystem/SQLite"]
+        Storage["Storage Backend&lt;br/&gt;projects.json / DB"]
+    end
+
+    subgraph "Result"
+        Summary["Summary&lt;br/&gt;Added: N&lt;br/&gt;Updated: M&lt;br/&gt;Unchanged: P"]
+    end
+
+    User --&gt;|runs| CLI
+    CLI --&gt; ScanPaths
+
+    ScanPaths --&gt;|scan each path| Scanner
+    Scanner --&gt;|find .STATUS| FindStatus
+    FindStatus --&gt;|cache results| Cache
+    Cache --&gt;|load from cache| Scanner
+
+    Scanner --&gt;|for each .STATUS| Gateway
+    Gateway --&gt;|parse YAML| Entities
+    Entities --&gt;|validate| Validation
+    Validation --&gt;|save| Repo
+    Repo --&gt;|write| Storage
+
+    Storage --&gt;|aggregate| Summary
+    Summary --&gt;|display| CLI
+    CLI --&gt;|output| User
+
+    style CLI fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style FindStatus fill:#fff3e0
+    style Cache fill:#e3f2fd
+    style Gateway fill:#f3e5f5
+    style Validation fill:#f3e5f5
+    style Storage fill:#fff3e0
+    style Summary fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px</code></pre>
+<hr />
+<h2 id="11-presenter-layer">11. Presenter Layer</h2>
+<pre class="mermaid"><code>graph TB
+    subgraph "Dashboard TUI"
+        Dashboard["dashboard-blessed.js&lt;br/&gt;(legacy)"]
+        Helpers["helpers.js&lt;br/&gt;(re-exports)"]
+        Constants["constants.js&lt;br/&gt;(config values)"]
+    end
+
+    subgraph "Presenters (src/adapters/presenters/)"
+        ProjectPres["ProjectPresenter&lt;br/&gt;(UI-agnostic)"]
+        TuiPres["TuiPresenter&lt;br/&gt;(blessed-specific)"]
+    end
+
+    subgraph "Functions"
+        UIAgnostic["formatTimeAgo()&lt;br/&gt;formatDuration()&lt;br/&gt;truncateText()&lt;br/&gt;formatProjectType()&lt;br/&gt;getStatusCategory()"]
+        BlessedSpec["sparkline()&lt;br/&gt;progressBar()&lt;br/&gt;getStatusIcon()&lt;br/&gt;formatProjectName()&lt;br/&gt;formatStreak()"]
+    end
+
+    Dashboard --&gt; Helpers
+    Dashboard --&gt; Constants
+    Helpers --&gt; TuiPres
+    Helpers --&gt; ProjectPres
+    TuiPres --&gt; ProjectPres
+
+    ProjectPres --&gt; UIAgnostic
+    TuiPres --&gt; BlessedSpec
+
+    style Dashboard fill:#e1f5ff
+    style ProjectPres fill:#e8f5e9
+    style TuiPres fill:#f3e5f5
+    style UIAgnostic fill:#e8f5e9
+    style BlessedSpec fill:#f3e5f5</code></pre>
+<p><strong>Presenter Pattern Benefits:</strong></p>
+<ul>
+<li><strong>Separation of Concerns:</strong> UI formatting separate from business logic</li>
+<li><strong>Testability:</strong> Pure functions easy to unit test (65 tests)</li>
+<li><strong>Reusability:</strong> ProjectPresenter can be used by future web/API interfaces</li>
+<li><strong>Maintainability:</strong> Changes to blessed tags isolated to TuiPresenter</li>
+</ul>
+<hr />
+<hr />
+<h2 id="12-dashboard-state-machine-ink-v09x">12. Dashboard State Machine (Ink v0.9.x)</h2>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; BROWSE
+    BROWSE --&gt; DETAIL: Enter on project
+    BROWSE --&gt; FOCUS: f key
+    BROWSE --&gt; ZEN: z key
+    BROWSE --&gt; TIMELINE: T key
+    BROWSE --&gt; ECOSYSTEM: e key
+    BROWSE --&gt; PLAN: p key
+    BROWSE --&gt; ANALYTICS: a key
+
+    DETAIL --&gt; BROWSE: Escape
+    DETAIL --&gt; FOCUS: f key
+    DETAIL --&gt; ANALYTICS: a key
+
+    FOCUS --&gt; BROWSE: Escape
+    FOCUS --&gt; ZEN: z key
+    FOCUS --&gt; ANALYTICS: a key
+
+    ZEN --&gt; BROWSE: Escape
+    ZEN --&gt; FOCUS: f key
+    ZEN --&gt; ANALYTICS: a key
+
+    TIMELINE --&gt; BROWSE: Escape
+    TIMELINE --&gt; ANALYTICS: a key
+
+    ECOSYSTEM --&gt; BROWSE: Escape
+    ECOSYSTEM --&gt; DETAIL: Enter
+    ECOSYSTEM --&gt; ANALYTICS: a key
+
+    PLAN --&gt; BROWSE: Escape
+    PLAN --&gt; FOCUS: Start session
+    PLAN --&gt; ANALYTICS: a key
+
+    ANALYTICS --&gt; BROWSE: Escape
+    ANALYTICS --&gt; DETAIL: Enter on project
+    ANALYTICS --&gt; FOCUS: f key</code></pre>
+<p><strong>States:</strong> BROWSE (card list), DETAIL (project), FOCUS (Pomodoro), ZEN (minimal), TIMELINE (time blocks), ECOSYSTEM (multi-project), PLAN (morning ritual), ANALYTICS (velocity + patterns)</p>
+<p><strong>Implementation:</strong> <code>src/cli/dashboard-ink/lib/stateMachine.ts</code></p>
+<hr />
+<h2 id="13-ink-dashboard-component-tree-v091">13. Ink Dashboard Component Tree (v0.9.1)</h2>
+<pre class="mermaid"><code>graph TB
+    App["App.tsx&lt;br/&gt;(state + data)"]
+    LM["LayoutManager.tsx&lt;br/&gt;(SINGLE / SPLIT / TRIPLE)"]
+    SP["SidebarPanel.tsx&lt;br/&gt;(25-28%)"]
+    IP["InspectorPanel.tsx&lt;br/&gt;(28%)"]
+    Views["View Layer&lt;br/&gt;(Main, Detail, Focus,&lt;br/&gt;Zen, Timeline,&lt;br/&gt;Ecosystem, Plan)"]
+
+    App --&gt; LM
+    LM --&gt; SP
+    LM --&gt; Views
+    LM --&gt; IP
+    SP --&gt;|onSelectProject| App
+    Views --&gt;|onTransition| App
+
+    style App fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    style LM fill:#f3e5f5,stroke:#4a148c
+    style SP fill:#e8f5e9
+    style IP fill:#e8f5e9</code></pre>
+<p><strong>Layout Modes (Tab cycles):</strong></p>
+<ul>
+<li><strong>SINGLE:</strong> Main view only (100%)</li>
+<li><strong>SPLIT:</strong> Sidebar (28%) + Main (72%)</li>
+<li><strong>TRIPLE:</strong> Sidebar (25%) + Main (47%) + Inspector (28%)</li>
+</ul>
+<h2 id="14-visual-pipeline-v091">14. Visual Pipeline (v0.9.1)</h2>
+<p>Shows how session data flows through the visual enhancement layers:</p>
+<pre class="mermaid"><code>flowchart TB
+    subgraph Data["Data Sources"]
+        Sessions["Session History"]
+        Streak["Streak Calculator"]
+    end
+
+    subgraph Domain["Domain Layer"]
+        FocusCalc["calculateFocusScore()&lt;br/&gt;GetSessionStatsUseCase"]
+    end
+
+    subgraph Presenters["Presenter Layer"]
+        FocusPres["FocusScorePresenter&lt;br/&gt;formatFocusScore() · focusTierIcon()"]
+        SparkPres["StatsPresenter&lt;br/&gt;projectSparklineData()"]
+        HeatPres["StatsPresenter&lt;br/&gt;formatHeatmapGrid()"]
+    end
+
+    subgraph Theme["Theme System"]
+        ThemeCtx["ThemeContext.tsx&lt;br/&gt;ThemeProvider · useTheme()"]
+        Themes["5 Themes&lt;br/&gt;default · nord · solarized&lt;br/&gt;mono · high-contrast"]
+    end
+
+    subgraph UI["Dashboard Components"]
+        Sidebar["SidebarPanel&lt;br/&gt;Focus tier icon + sparkline"]
+        Inspector["InspectorPanel&lt;br/&gt;Focus score + heatmap"]
+        Ecosystem["EcosystemView&lt;br/&gt;Compact heatmap"]
+        Stats["atlas stats CLI&lt;br/&gt;Focus score line"]
+    end
+
+    Sessions --&gt; FocusCalc
+    Streak --&gt; FocusCalc
+    Sessions --&gt; SparkPres
+    Sessions --&gt; HeatPres
+    FocusCalc --&gt; FocusPres
+
+    FocusPres --&gt; Sidebar
+    FocusPres --&gt; Inspector
+    FocusPres --&gt; Stats
+    SparkPres --&gt; Sidebar
+    HeatPres --&gt; Inspector
+    HeatPres --&gt; Ecosystem
+
+    ThemeCtx --&gt; Sidebar
+    ThemeCtx --&gt; Inspector
+    ThemeCtx --&gt; Ecosystem
+    Themes --&gt; ThemeCtx
+
+    style Data fill:#fff3cd
+    style Domain fill:#f3e5f5
+    style Presenters fill:#e8f5e9
+    style Theme fill:#e1f5ff
+    style UI fill:#fce4ec</code></pre>
+<p><strong>Key design decisions:</strong></p>
+<ul>
+<li>Theme is pure React Context — no prop drilling</li>
+<li>Presenters are framework-agnostic (used by both CLI and TUI)</li>
+<li>All visual data derived from one <code>GetSessionStatsUseCase</code> fetch</li>
+<li>Never use red — ADHD-friendly design principle</li>
+</ul>
+<hr />
+<h2 id="15-real-data-pipeline-v092">15. Real Data Pipeline (v0.9.2)</h2>
+<p>Shows how the Ink dashboard fetches, filters, enriches, and renders real data from <code>~/.atlas</code>:</p>
+<pre class="mermaid"><code>flowchart TB
+    subgraph Storage["~/.atlas (Filesystem / SQLite)"]
+        ProjStore[("projects/\n*.json")]
+        SessStore[("sessions/\n*.json")]
+        CapStore[("captures/\n*.json")]
+        CrumbStore[("breadcrumbs/\n*.json")]
+    end
+
+    subgraph Container["DI Container (Container.js)"]
+        ProjRepo["getProjectRepository()"]
+        SessRepo["getSessionRepository()"]
+        CapRepo["getCaptureRepository()"]
+        CrumbRepo["getBreadcrumbRepository()"]
+        StatsUC["getGetSessionStatsUseCase()"]
+    end
+
+    subgraph Context["React Context"]
+        AtlasCtx["AtlasContext.tsx\nAtlasProvider wraps App\nuseAtlas() → Container"]
+    end
+
+    subgraph Hooks["Data Hooks (polling)"]
+        direction TB
+        HP["useProjects\n⏱ 5s poll"]
+        HA["useActiveSession\n⏱ 5s poll + 1s tick"]
+        HS["useProjectStats\n⏱ 10s poll"]
+        HC["usePendingCaptures\n⏱ 10s poll"]
+    end
+
+    subgraph Filter["useProjects Pipeline"]
+        direction TB
+        FetchAll["findAll()  →  196 raw"]
+        FilterJunk["isDisplayableProject()\nremove tmp.* + archived"]
+        Dedup["deduplicateByName()\nkeep most recent"]
+        Enrich["Enrich each project:\n• focusScore via StatsUseCase\n• focusTier via FocusScorePresenter\n• sparkline via StatsPresenter"]
+        Extract["Extract primitives:\n• ProjectType → string\n• metadata.status → string\n• metadata.progress → number"]
+        Result["59 enriched Project[]"]
+    end
+
+    subgraph Presenters["Presenter Functions"]
+        FocusPres["getTierFromScore()\nFocusScorePresenter.js"]
+        SparkPres["projectSparklineData()\nStatsPresenter.js"]
+        HeatPres["formatHeatmapGrid()\nStatsPresenter.js"]
+    end
+
+    subgraph UI["Dashboard Components"]
+        App["App.tsx\n(orchestrates hooks)"]
+        Sidebar["SidebarPanel\nproject list + sparklines\n+ focus tier icons"]
+        Inspector["InspectorPanel\nheatmap + streak\n+ session timer\n+ breadcrumbs"]
+        Main["MainView / DetailView\nproject cards"]
+    end
+
+    %% Storage → Container
+    ProjStore --&gt; ProjRepo
+    SessStore --&gt; SessRepo
+    CapStore --&gt; CapRepo
+    CrumbStore --&gt; CrumbRepo
+    SessStore --&gt; StatsUC
+
+    %% Container → Context → Hooks
+    Container --&gt; AtlasCtx
+    AtlasCtx --&gt; HP &amp; HA &amp; HS &amp; HC
+
+    %% useProjects pipeline
+    HP --&gt; FetchAll
+    FetchAll --&gt; FilterJunk
+    FilterJunk --&gt; Dedup
+    Dedup --&gt; Enrich
+    Enrich --&gt; Extract
+    Extract --&gt; Result
+
+    %% Enrichment uses presenters
+    Enrich -.-&gt; FocusPres
+    Enrich -.-&gt; SparkPres
+
+    %% Other hooks use repos
+    HA --&gt;|"findActive()"| SessRepo
+    HS --&gt;|"execute({ days: 90 })"| StatsUC
+    HS --&gt;|"findRecent()"| CrumbRepo
+    HS -.-&gt; HeatPres
+    HC --&gt;|"getInbox()"| CapRepo
+
+    %% Hooks → UI
+    Result --&gt; App
+    HA --&gt; App
+    HS --&gt; App
+    HC --&gt; App
+
+    App --&gt; Sidebar
+    App --&gt; Inspector
+    App --&gt; Main
+
+    %% Styles
+    style Storage fill:#fff3e0,stroke:#e65100
+    style Container fill:#e1f5ff,stroke:#01579b
+    style Context fill:#e1f5ff,stroke:#01579b
+    style Hooks fill:#f3e5f5,stroke:#4a148c
+    style Filter fill:#fce4ec,stroke:#880e4f
+    style Presenters fill:#e8f5e9,stroke:#1b5e20
+    style UI fill:#e8eaf6,stroke:#283593</code></pre>
+<p><strong>Key design decisions (v0.9.2):</strong></p>
+<ul>
+<li><strong>AtlasContext</strong> injects the DI Container via React Context — hooks call <code>useAtlas()</code> instead of importing Container directly</li>
+<li><strong>Polling hierarchy</strong>: Projects 5s, Session 5s + 1s tick, Stats/Captures 10s — balances freshness vs load</li>
+<li><strong>Stale-while-revalidate</strong>: All hooks keep <code>useRef</code> for last-good data; on error, return stale data with error state</li>
+<li><strong>Project filtering</strong>: <code>isDisplayableProject()</code> removes <code>tmp.*</code> junk and archived entries, <code>deduplicateByName()</code> keeps the most recently accessed copy — reduces 196 raw entries to ~59 displayable projects</li>
+<li><strong>Value object extraction</strong>: Domain <code>ProjectType</code> is a value object (<code>{_value: "node"}</code>); hooks extract to primitive strings before passing to React to avoid "Objects are not valid as a React child" crashes</li>
+<li><strong>Cross-validated dogfood tests</strong>: Each pipeline stage is independently verified using dual-path testing (code-under-test vs filesystem oracle)</li>
+</ul>
+<hr />
+<h2 id="diagram-reference-guide">Diagram Reference Guide</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Diagram</th>
+<th>Purpose</th>
+<th>Key Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>System Architecture</td>
+<td>Shows Clean Architecture layers</td>
+<td>Understanding overall structure</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Data Flow</td>
+<td>Complete session lifecycle</td>
+<td>How data moves through system</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Entity Relationships</td>
+<td>Database schema and cardinality</td>
+<td>Understanding data model</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Session State Machine</td>
+<td>Possible session states</td>
+<td>Session lifecycle management</td>
+</tr>
+<tr>
+<td>5</td>
+<td>CLI Command Tree</td>
+<td>Command hierarchy (14 groups)</td>
+<td>CLI navigation and usage</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Repository Pattern</td>
+<td>Storage abstraction</td>
+<td>Understanding backend switching</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Event System</td>
+<td>Publish-subscribe pattern</td>
+<td>Cross-cutting concerns</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Configuration &amp; ADHD Features</td>
+<td>User preferences integration</td>
+<td>ADHD-friendly features</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Template System</td>
+<td>Project template processing</td>
+<td>Creating new projects</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Scanning &amp; Registry</td>
+<td>Project discovery</td>
+<td>Project synchronization</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Presenter Layer</td>
+<td>UI formatting separation</td>
+<td>Dashboard TUI formatting</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Dashboard State Machine</td>
+<td>Ink view state transitions</td>
+<td>Dashboard navigation</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Ink Component Tree</td>
+<td>React Ink component hierarchy</td>
+<td>TUI architecture</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Visual Pipeline</td>
+<td>Theme + focus + sparkline + heatmap flow</td>
+<td>v0.9.1 visual features</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Real Data Pipeline</td>
+<td>Container → hooks → filter → enrich → render</td>
+<td>v0.9.2 real data wiring</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="rendering-notes">Rendering Notes</h2>
+<p>All diagrams use standard Mermaid syntax and should render correctly in:</p>
+<ul>
+<li>GitHub markdown (<code>.md</code> files)</li>
+<li>GitLab markdown</li>
+<li>Notion</li>
+<li>Mermaid Live Editor (mermaid.live)</li>
+</ul>
+<p>To render locally, install Mermaid CLI:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@mermaid-js/mermaid-cli
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Then convert diagrams to PNG/SVG:</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>mmdc<span class="w"> </span>-i<span class="w"> </span>docs/DIAGRAMS.md<span class="w"> </span>-o<span class="w"> </span>docs/diagrams-output.svg
+</span></code></pre></div></p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../ARCHITECTURE/">ARCHITECTURE.md</a> - Detailed architecture explanation</li>
+<li><a href="../CLI-REFERENCE/">CLI-REFERENCE.md</a> - Complete CLI command reference</li>
+<li><a href="../API-GUIDE/">API-GUIDE.md</a> - Programmatic API usage</li>
+<li><a href="../CONFIGURATION/">CONFIGURATION.md</a> - Configuration options</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../assets/javascripts/scroll-progress.js"></script>
+      
+        <script src="../assets/javascripts/reading-time.js"></script>
+      
+        <script src="../assets/javascripts/section-toc.js"></script>
+      
+        <script src="../assets/javascripts/section-nav.js"></script>
+      
+    
+  </body>
+</html>

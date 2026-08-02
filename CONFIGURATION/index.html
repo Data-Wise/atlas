@@ -1,0 +1,4223 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow">
+      
+      
+      
+        <link rel="canonical" href="https://data-wise.github.io/atlas/CONFIGURATION/">
+      
+      
+        <link rel="prev" href="../STATUS-SCHEMA/">
+      
+      
+        <link rel="next" href="../user-guide/MIGRATION-GUIDE/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Configuration - Atlas</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/fonts.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#atlas-configuration-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      <!-- Scroll Progress Bar -->
+<div class="md-scroll-progress" data-md-component="scroll-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Page scroll progress">
+  <div class="md-scroll-progress__bar"></div>
+</div>
+
+
+  <header class="md-header" data-md-component="header">
+    <nav class="md-header__inner md-grid" aria-label="Header">
+      <a href="" title="Atlas" class="md-header__button md-logo" aria-label="Atlas" data-md-component="logo">
+        
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93c-3.72-.49-7-3.85-7-7.93 0-4.42 3.58-8 8-8s8 3.58 8 8-3.58 8-8 8zm0-2c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm0-10c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+        
+      </a>
+      <label class="md-header__button md-icon" for="__drawer" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      </label>
+      <div class="md-header__title" data-md-component="header-title">
+        <a href="" class="md-header__ellipsis" title="Atlas">
+          Atlas
+        </a>
+      </div>
+      <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5-.79.28v-.79l-.28.27C12.59 15.41 11.11 16 9.5 16S6 13.09 6 9.5 8.91 3 11.5 3 16 5.91 16 9.5c0 .76-.11 1.5-.29 2.2L19 19.79l-1.41 1.41L13.5 14.5h-.79z"/></svg>
+      </label>
+      
+        
+          <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+        
+      
+      
+        <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      
+      <div class="md-header__source">
+        
+          <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" class="md-button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        
+      </div>
+    </nav>
+  </header>
+
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs atlas-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list atlas-pill-list">
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link atlas-pill atlas-pill--home">
+          Home
+        </a>
+      </li>
+      
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../getting-started/installation/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="do">
+                Get Started
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../user-guide/adhd-guide/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="learn">
+                Guide
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../ARCHITECTURE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="build">
+                Architecture
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../CLI-REFERENCE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="code">
+                Reference
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li class="md-tabs__item">
+            <a href="../WHAT-S-NEW/"
+               class="md-tabs__link atlas-pill atlas-pill--muted">
+              Changelog
+            </a>
+          </li>
+        
+      
+      <li class="md-tabs__item atlas-pill-search-item">
+        <input type="search"
+               class="atlas-pill-search"
+               placeholder="Filter sidebar…"
+               aria-label="Filter sidebar navigation">
+      </li>
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Atlas" class="md-nav__button md-logo" aria-label="Atlas" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Atlas
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Data-Wise/atlas" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/atlas
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TUTORIAL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEMOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recording
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADHD Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADHD Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/core-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/quick-wins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Wins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/time-blindness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Time Blindness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/hyperfocus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hyperfocus Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/adhd-guide/accessibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accessibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/visual-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/tutorials/research-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/SCENARIOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/WEEKLY-REVIEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weekly Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/MULTI-PROJECT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/workflows/AUTOMATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/cookbook/COOKBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../VISUAL-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/swiftbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SwiftBar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../STATUS-SCHEMA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .STATUS Schema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-config-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Override Config Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migrating-to-the-xdg-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating to the XDG location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scanpaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scanPaths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scandepth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scanDepth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-project-scan-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-project scan markers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Per-project scan markers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#atlas-scan-children" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .atlas-scan-children
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preferences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preferences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preferences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#display-preferences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display Preferences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Display Preferences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        theme
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showemoji" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showEmoji
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compactmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compactMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adhd-friendly-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADHD-Friendly Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ADHD-Friendly Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#showstreak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showStreak
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showtimecues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showTimeCues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showcelebrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showCelebrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showcontextrestore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showContextRestore
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flowthresholdminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flowThresholdMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeblindnessinterval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeBlindnessInterval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#celebrationlevel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        celebrationLevel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defaultdurationminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        defaultDurationMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoendafterminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        autoEndAfterMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pomodorolength" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pomodoroLength
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaklength" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        breakLength
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dashboard Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#refreshinterval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        refreshInterval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showprojectcards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showProjectCards
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maxrecentprojects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        maxRecentProjects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zenmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        zenMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultlayout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        defaultLayout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-settings-v080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Settings (v0.8.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-configuration-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Configuration Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Configuration Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#view-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modify-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modify Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interactive-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage Backends
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Storage Backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filesystem (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migrating" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .STATUS File Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=".STATUS File Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recognized-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recognized Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reset-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reset Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/MIGRATION-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CLI-REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REFCARD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference Card
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-RECIPES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MCP-SERVER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DIAGRAMS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Changelog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WHAT-S-NEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration File
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-config-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Override Config Directory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migrating-to-the-xdg-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating to the XDG location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scanpaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scanPaths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scandepth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scanDepth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-project-scan-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-project scan markers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Per-project scan markers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#atlas-scan-children" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .atlas-scan-children
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preferences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preferences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preferences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#display-preferences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display Preferences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Display Preferences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        theme
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showemoji" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showEmoji
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compactmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compactMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adhd-friendly-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADHD-Friendly Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ADHD-Friendly Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#showstreak" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showStreak
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showtimecues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showTimeCues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showcelebrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showCelebrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showcontextrestore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showContextRestore
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flowthresholdminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flowThresholdMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeblindnessinterval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeBlindnessInterval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#celebrationlevel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        celebrationLevel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Session Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defaultdurationminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        defaultDurationMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoendafterminutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        autoEndAfterMinutes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pomodorolength" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pomodoroLength
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaklength" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        breakLength
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboard-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dashboard Settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dashboard Settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#refreshinterval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        refreshInterval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showprojectcards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        showProjectCards
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maxrecentprojects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        maxRecentProjects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#zenmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        zenMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultlayout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        defaultLayout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-server-settings-v080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Server Settings (v0.8.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#template-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-configuration-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Configuration Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Configuration Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#view-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modify-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modify Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interactive-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interactive Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#storage-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Storage Backends
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Storage Backends">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filesystem (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#migrating" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Templates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom Templates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#template-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#template-inheritance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Template Inheritance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing Templates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .STATUS File Format
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=".STATUS File Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recognized-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recognized Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#config-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reset-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reset Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permission Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../user-guide/adhd-guide/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Guide
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="atlas-configuration-reference">Atlas Configuration Reference</h1>
+<p>Complete reference for Atlas configuration options, preferences, and customization.</p>
+<h2 id="configuration-file">Configuration File</h2>
+<p>Atlas stores configuration and data in a single directory, <code>config.json</code>
+alongside the JSON/SQLite data stores. Where that directory lives depends on
+your install:</p>
+<ul>
+<li><strong>New installs</strong> default to the XDG location:
+  <code>$XDG_CONFIG_HOME/atlas</code> (or <code>~/.config/atlas</code> if <code>XDG_CONFIG_HOME</code> isn't
+  set).</li>
+<li><strong>Existing installs</strong> keep using <code>~/.atlas</code> until you explicitly migrate —
+  atlas never silently relocates your data. See
+  <a href="#migrating-to-the-xdg-location">Migrating to the XDG location</a> below.</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;scanPaths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;~/projects&quot;</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;storage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;scanDepth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="configuration-location">Configuration Location</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Path (XDG default)</th>
+<th>Path (legacy, pre-migration)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Config Directory</td>
+<td><code>~/.config/atlas/</code></td>
+<td><code>~/.atlas/</code></td>
+</tr>
+<tr>
+<td>Config File</td>
+<td><code>~/.config/atlas/config.json</code></td>
+<td><code>~/.atlas/config.json</code></td>
+</tr>
+<tr>
+<td>Projects Data</td>
+<td><code>~/.config/atlas/projects.json</code></td>
+<td><code>~/.atlas/projects.json</code></td>
+</tr>
+<tr>
+<td>Sessions Data</td>
+<td><code>~/.config/atlas/sessions.json</code></td>
+<td><code>~/.atlas/sessions.json</code></td>
+</tr>
+<tr>
+<td>Captures Data</td>
+<td><code>~/.config/atlas/captures.json</code></td>
+<td><code>~/.atlas/captures.json</code></td>
+</tr>
+<tr>
+<td>Breadcrumbs Data</td>
+<td><code>~/.config/atlas/breadcrumbs.json</code></td>
+<td><code>~/.atlas/breadcrumbs.json</code></td>
+</tr>
+<tr>
+<td>SQLite Database</td>
+<td><code>~/.config/atlas/atlas.db</code></td>
+<td><code>~/.atlas/atlas.db</code></td>
+</tr>
+<tr>
+<td>Custom Templates</td>
+<td><code>~/.config/atlas/templates/</code></td>
+<td><code>~/.atlas/templates/</code></td>
+</tr>
+</tbody>
+</table>
+<p>Run <code>atlas doctor</code> at any time to see which location atlas is currently
+using and whether a migration is available.</p>
+<h3 id="override-config-directory">Override Config Directory</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ATLAS_CONFIG</span><span class="o">=</span>/custom/path
+</span></code></pre></div>
+<p><code>ATLAS_CONFIG</code> (and its alias <code>ATLAS_DATA_DIR</code>) always take precedence over
+both the XDG default and the legacy path — set either one and atlas uses
+exactly that directory, no detection logic involved.</p>
+<blockquote>
+<p><strong>Not the same as <code>ATLAS_DIR</code>.</strong> <code>install.sh</code>'s <code>ATLAS_DIR</code> environment
+variable controls where the <em>atlas binary itself</em> gets installed
+(default <code>~/.local/share/atlas</code>) — a completely different, unrelated
+setting from <code>ATLAS_CONFIG</code>/<code>ATLAS_DATA_DIR</code>/<code>XDG_CONFIG_HOME</code>, which
+control where your <em>data</em> lives. Setting one does not affect the other.</p>
+</blockquote>
+<h3 id="migrating-to-the-xdg-location">Migrating to the XDG location</h3>
+<p>If atlas is still using the legacy <code>~/.atlas</code> path, <code>atlas doctor</code> will
+mention it. To move your data:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--xdg<span class="w">              </span><span class="c1"># dry-run — shows what would move</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--xdg<span class="w"> </span>--apply<span class="w">      </span><span class="c1"># actually move it</span>
+</span></code></pre></div>
+<p>This is always your choice — atlas doesn't require it and doesn't nag. The
+move is a single directory relocation with a small <code>.atlas-migration.json</code>
+marker left at the new location recording where it came from and when.</p>
+<p><strong>If <code>atlas-mcp</code> or <code>atlas dash</code> is running</strong>, <code>--apply</code> refuses (your data
+could be actively in use) unless you pass <code>--force</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--xdg<span class="w"> </span>--apply<span class="w"> </span>--force<span class="w">   </span><span class="c1"># only if you&#39;re sure that&#39;s a stale lock</span>
+</span></code></pre></div>
+<p><strong>To reverse a migration</strong> (there's no dedicated rollback command — this is
+just a directory move):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mv<span class="w"> </span>~/.config/atlas<span class="w"> </span>~/.atlas
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>rm<span class="w"> </span>-f<span class="w"> </span>~/.atlas/.atlas-migration.json
+</span></code></pre></div>
+<hr />
+<h2 id="core-settings">Core Settings</h2>
+<h3 id="scanpaths"><code>scanPaths</code></h3>
+<p>Directories to scan for projects with <code>.STATUS</code> files.</p>
+<p><strong>Type:</strong> <code>string[]</code>
+<strong>Default:</strong> <code>["~/projects"]</code></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;scanPaths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="s2">&quot;~/projects&quot;</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="s2">&quot;~/work&quot;</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="s2">&quot;~/personal&quot;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>CLI:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>paths<span class="w">                      </span><span class="c1"># Show paths</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>add-path<span class="w"> </span>~/new-projects<span class="w">    </span><span class="c1"># Add path</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>atlas<span class="w"> </span>config<span class="w"> </span>remove-path<span class="w"> </span>~/old<span class="w">          </span><span class="c1"># Remove path</span>
+</span></code></pre></div></p>
+<h3 id="storage"><code>storage</code></h3>
+<p>Storage backend for Atlas data.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>"filesystem"</code>
+<strong>Options:</strong> <code>"filesystem"</code>, <code>"sqlite"</code></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;storage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sqlite&quot;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>CLI:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>atlas<span class="w"> </span>--storage<span class="w"> </span>sqlite<span class="w"> </span>status<span class="w">           </span><span class="c1"># Use SQLite for command</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>sqlite<span class="w">               </span><span class="c1"># Migrate to SQLite</span>
+</span></code></pre></div></p>
+<h3 id="scandepth"><code>scanDepth</code></h3>
+<p>How many directory levels deep to scan for projects.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>3</code></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;scanDepth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="per-project-scan-markers">Per-project scan markers</h2>
+<h3 id="atlas-scan-children"><code>.atlas-scan-children</code></h3>
+<p>By default the scanner treats a project directory as a <strong>leaf</strong> — when a directory is itself a project
+(has <code>.STATUS</code> / <code>package.json</code> / etc.), atlas records it and does <strong>not</strong> descend into its children. This keeps
+an "umbrella" directory (a monorepo that is itself a project) from sprawling its child repos into the registry.</p>
+<p>To opt an umbrella in to having its child repos scanned too, drop an empty marker file in it:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>touch<span class="w"> </span>~/projects/dev-tools/mcp-servers/.atlas-scan-children
+</span></code></pre></div>
+<p>The scanner then records the umbrella <strong>and</strong> its children (still bounded by <code>scanDepth</code>). Policy:
+docs-standards <strong>ADR-003</strong>.</p>
+<hr />
+<h2 id="preferences">Preferences</h2>
+<p>All preferences are under the <code>preferences</code> key.</p>
+<h3 id="display-preferences">Display Preferences</h3>
+<h4 id="theme"><code>theme</code></h4>
+<p>Dashboard color theme (v0.9.1). Controls all panel borders, text, sparklines, heatmap, and focus tier colors.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>"default"</code>
+<strong>Options:</strong> <code>"default"</code>, <code>"nord"</code>, <code>"solarized"</code>, <code>"mono"</code>, <code>"high-contrast"</code></p>
+<table>
+<thead>
+<tr>
+<th>Theme</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Purple accents, warm grays — general use</td>
+</tr>
+<tr>
+<td><code>nord</code></td>
+<td>Arctic blue palette — dark terminals</td>
+</tr>
+<tr>
+<td><code>solarized</code></td>
+<td>Warm tans and blues — light or dark</td>
+</tr>
+<tr>
+<td><code>mono</code></td>
+<td>Pure grayscale — minimal distraction</td>
+</tr>
+<tr>
+<td><code>high-contrast</code></td>
+<td>Maximum readability — accessibility</td>
+</tr>
+</tbody>
+</table>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nt">&quot;theme&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nord&quot;</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<h4 id="showemoji"><code>showEmoji</code></h4>
+<p>Show emoji in CLI output.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<h4 id="compactmode"><code>compactMode</code></h4>
+<p>Use compact display mode.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>false</code></p>
+<hr />
+<h2 id="adhd-friendly-settings">ADHD-Friendly Settings</h2>
+<p>All under <code>preferences.adhd</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">&quot;adhd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nt">&quot;showStreak&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="nt">&quot;showTimeCues&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">      </span><span class="nt">&quot;showCelebrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">      </span><span class="nt">&quot;showContextRestore&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">      </span><span class="nt">&quot;flowThresholdMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">      </span><span class="nt">&quot;timeBlindnessInterval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">      </span><span class="nt">&quot;celebrationLevel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="showstreak"><code>showStreak</code></h3>
+<p>Display consecutive day streak in dashboard and CLI.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.showStreak<span class="w"> </span><span class="nb">false</span>
+</span></code></pre></div>
+<h3 id="showtimecues"><code>showTimeCues</code></h3>
+<p>Show gentle time awareness reminders.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<h3 id="showcelebrations"><code>showCelebrations</code></h3>
+<p>Display positive reinforcement on achievements.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<h3 id="showcontextrestore"><code>showContextRestore</code></h3>
+<p>Show "last time you were..." messages on session start.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<h3 id="flowthresholdminutes"><code>flowThresholdMinutes</code></h3>
+<p>Minutes of continuous work before considered "in flow".</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>15</code></p>
+<h3 id="timeblindnessinterval"><code>timeBlindnessInterval</code></h3>
+<p>Minutes between time awareness reminders.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>30</code></p>
+<h3 id="celebrationlevel"><code>celebrationLevel</code></h3>
+<p>Intensity of celebration messages.</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>"normal"</code>
+<strong>Options:</strong> <code>"minimal"</code>, <code>"normal"</code>, <code>"enthusiastic"</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.celebrationLevel<span class="w"> </span>enthusiastic
+</span></code></pre></div>
+<hr />
+<h2 id="session-settings">Session Settings</h2>
+<p>All under <code>preferences.session</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">      </span><span class="nt">&quot;defaultDurationMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">      </span><span class="nt">&quot;autoEndAfterMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">      </span><span class="nt">&quot;pomodoroLength&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">      </span><span class="nt">&quot;breakLength&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="defaultdurationminutes"><code>defaultDurationMinutes</code></h3>
+<p>Default session duration (null = no default).</p>
+<p><strong>Type:</strong> <code>number | null</code>
+<strong>Default:</strong> <code>null</code></p>
+<h3 id="autoendafterminutes"><code>autoEndAfterMinutes</code></h3>
+<p>Automatically end sessions after this duration (null = disabled).</p>
+<p><strong>Type:</strong> <code>number | null</code>
+<strong>Default:</strong> <code>null</code></p>
+<h3 id="pomodorolength"><code>pomodoroLength</code></h3>
+<p>Pomodoro work period in minutes.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>25</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>session.pomodoroLength<span class="w"> </span><span class="m">30</span>
+</span></code></pre></div>
+<h3 id="breaklength"><code>breakLength</code></h3>
+<p>Pomodoro break period in minutes.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>5</code></p>
+<hr />
+<h2 id="dashboard-settings">Dashboard Settings</h2>
+<p>All under <code>preferences.dashboard</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="nt">&quot;dashboard&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">      </span><span class="nt">&quot;refreshInterval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">      </span><span class="nt">&quot;showProjectCards&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">      </span><span class="nt">&quot;maxRecentProjects&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">      </span><span class="nt">&quot;zenMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="refreshinterval"><code>refreshInterval</code></h3>
+<p>Dashboard refresh interval in milliseconds.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>1000</code></p>
+<h3 id="showprojectcards"><code>showProjectCards</code></h3>
+<p>Display project cards in dashboard.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>true</code></p>
+<h3 id="maxrecentprojects"><code>maxRecentProjects</code></h3>
+<p>Maximum projects to show in recent list.</p>
+<p><strong>Type:</strong> <code>number</code>
+<strong>Default:</strong> <code>5</code></p>
+<h3 id="zenmode"><code>zenMode</code></h3>
+<p>Enable minimal distraction mode by default.</p>
+<p><strong>Type:</strong> <code>boolean</code>
+<strong>Default:</strong> <code>false</code></p>
+<h3 id="defaultlayout"><code>defaultLayout</code></h3>
+<p>Default layout mode for the Ink dashboard (v0.9.1).</p>
+<p><strong>Type:</strong> <code>string</code>
+<strong>Default:</strong> <code>"single"</code>
+<strong>Options:</strong> <code>"single"</code>, <code>"split"</code>, <code>"triple"</code></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nt">&quot;dashboard&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">      </span><span class="nt">&quot;defaultLayout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;triple&quot;</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="mcp-server-settings-v080">MCP Server Settings (v0.8.0)</h2>
+<p>The MCP server reads configuration from environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ATLAS_DATA_DIR</code></td>
+<td>Override data directory</td>
+<td>XDG default, or legacy <code>~/.atlas</code> if already present — see <a href="#configuration-location">Configuration Location</a></td>
+</tr>
+<tr>
+<td><code>ATLAS_STORAGE</code></td>
+<td>Override storage backend</td>
+<td><code>filesystem</code></td>
+</tr>
+</tbody>
+</table>
+<p>No additional configuration needed beyond the standard config file at
+whichever location applies (see above).</p>
+<hr />
+<h2 id="template-variables">Template Variables</h2>
+<p>Variables for project templates under <code>preferences.templateVariables</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">&quot;templateVariables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Your Name&quot;</span><span class="p">,</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">      </span><span class="nt">&quot;github_user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;username&quot;</span><span class="p">,</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">      </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;you@example.com&quot;</span><span class="p">,</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">      </span><span class="nt">&quot;company&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Company Name&quot;</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>These are replaced as <code>{{variable_name}}</code> in templates.</p>
+<p><strong>CLI:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>templateVariables.author<span class="w"> </span><span class="s2">&quot;John Doe&quot;</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>templateVariables.github_user<span class="w"> </span>johndoe
+</span></code></pre></div></p>
+<p><strong><code>{{user}}</code> resolution (v0.14.0+):</strong> <code>atlas init -t &lt;template&gt;</code> only passes <code>{name}</code>, so
+<code>{{user}}</code> is resolved automatically in this order: <code>preferences.templateVariables.user</code> →
+<code>git config user.name</code> → <code>$USER</code> → the literal string <code>user</code>. Set
+<code>templateVariables.user</code> explicitly if you want a value other than your git identity:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>templateVariables.user<span class="w"> </span><span class="s2">&quot;Jane Researcher&quot;</span>
+</span></code></pre></div>
+<p>All 6 builtin templates now emit canonical <code>.STATUS</code> YAML frontmatter (schema <code>atlas/v1</code> — see
+<a href="../STATUS-SCHEMA/">STATUS-SCHEMA.md</a>), not the old <code>## Key:</code> markdown headers.</p>
+<p><strong>Built-in Variables:</strong></p>
+<ul>
+<li><code>{{name}}</code> - Project name (from --name option)</li>
+<li><code>{{date}}</code> - Current date</li>
+</ul>
+<hr />
+<h2 id="environment-variables">Environment Variables</h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ATLAS_CONFIG</code></td>
+<td>Override config directory</td>
+<td>XDG default, or legacy <code>~/.atlas</code> if already present</td>
+</tr>
+<tr>
+<td><code>ATLAS_DATA_DIR</code></td>
+<td>Override data directory (alias of <code>ATLAS_CONFIG</code>, honored by the MCP server too)</td>
+<td>same as above</td>
+</tr>
+<tr>
+<td><code>XDG_CONFIG_HOME</code></td>
+<td>Base for the XDG default (<code>$XDG_CONFIG_HOME/atlas</code>)</td>
+<td><code>~/.config</code></td>
+</tr>
+<tr>
+<td><code>ATLAS_STORAGE</code></td>
+<td>Override storage backend</td>
+<td><code>filesystem</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>ATLAS_CONFIG</code>/<code>ATLAS_DATA_DIR</code> set an exact directory and skip all
+detection logic. <code>XDG_CONFIG_HOME</code> only changes where the <em>default</em>
+resolves to — see <a href="#configuration-location">Configuration Location</a> for
+the full precedence and how existing <code>~/.atlas</code> installs are handled.</p>
+<p><strong>Example:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ATLAS_CONFIG</span><span class="o">=</span>/custom/path
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ATLAS_STORAGE</span><span class="o">=</span>sqlite
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>atlas<span class="w"> </span>status
+</span></code></pre></div></p>
+<hr />
+<h2 id="cli-configuration-commands">CLI Configuration Commands</h2>
+<h3 id="view-configuration">View Configuration</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Show all configuration</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>show
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Show scan paths</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>paths
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1"># Show all preferences</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>show
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>
+</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="c1"># Get specific preference</span>
+</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>get<span class="w"> </span>adhd.showStreak
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>get<span class="w"> </span>session.pomodoroLength
+</span></code></pre></div>
+<h3 id="modify-configuration">Modify Configuration</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Add scan path</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>add-path<span class="w"> </span>~/new-projects
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Remove scan path</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>atlas<span class="w"> </span>config<span class="w"> </span>remove-path<span class="w"> </span>~/old-projects
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1"># Set preference</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>adhd.celebrationLevel<span class="w"> </span>enthusiastic
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span><span class="nb">set</span><span class="w"> </span>session.pomodoroLength<span class="w"> </span><span class="m">30</span>
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>
+</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="c1"># Reset all preferences to defaults</span>
+</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>reset
+</span></code></pre></div>
+<h3 id="interactive-setup">Interactive Setup</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>atlas<span class="w"> </span>config<span class="w"> </span>setup
+</span></code></pre></div>
+<p>This launches an interactive wizard for common settings.</p>
+<hr />
+<h2 id="default-configuration">Default Configuration</h2>
+<p>Full default configuration:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">&quot;scanPaths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;~/projects&quot;</span><span class="p">],</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span><span class="nt">&quot;storage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span><span class="p">,</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="nt">&quot;scanDepth&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="nt">&quot;preferences&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="nt">&quot;theme&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="nt">&quot;showEmoji&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="nt">&quot;compactMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="nt">&quot;adhd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">      </span><span class="nt">&quot;showStreak&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">      </span><span class="nt">&quot;showTimeCues&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">      </span><span class="nt">&quot;showCelebrations&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">      </span><span class="nt">&quot;showContextRestore&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">      </span><span class="nt">&quot;flowThresholdMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span>
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">      </span><span class="nt">&quot;timeBlindnessInterval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="w">      </span><span class="nt">&quot;celebrationLevel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;normal&quot;</span>
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="w">    </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a><span class="w">      </span><span class="nt">&quot;defaultDurationMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a><span class="w">      </span><span class="nt">&quot;autoEndAfterMinutes&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-26-21"><a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a><span class="w">      </span><span class="nt">&quot;pomodoroLength&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span>
+</span><span id="__span-26-22"><a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a><span class="w">      </span><span class="nt">&quot;breakLength&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+</span><span id="__span-26-23"><a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-26-24"><a id="__codelineno-26-24" name="__codelineno-26-24" href="#__codelineno-26-24"></a><span class="w">    </span><span class="nt">&quot;dashboard&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-25"><a id="__codelineno-26-25" name="__codelineno-26-25" href="#__codelineno-26-25"></a><span class="w">      </span><span class="nt">&quot;refreshInterval&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+</span><span id="__span-26-26"><a id="__codelineno-26-26" name="__codelineno-26-26" href="#__codelineno-26-26"></a><span class="w">      </span><span class="nt">&quot;showProjectCards&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-26-27"><a id="__codelineno-26-27" name="__codelineno-26-27" href="#__codelineno-26-27"></a><span class="w">      </span><span class="nt">&quot;maxRecentProjects&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-26-28"><a id="__codelineno-26-28" name="__codelineno-26-28" href="#__codelineno-26-28"></a><span class="w">      </span><span class="nt">&quot;zenMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-26-29"><a id="__codelineno-26-29" name="__codelineno-26-29" href="#__codelineno-26-29"></a><span class="w">      </span><span class="nt">&quot;defaultLayout&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;single&quot;</span>
+</span><span id="__span-26-30"><a id="__codelineno-26-30" name="__codelineno-26-30" href="#__codelineno-26-30"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-26-31"><a id="__codelineno-26-31" name="__codelineno-26-31" href="#__codelineno-26-31"></a><span class="w">    </span><span class="nt">&quot;templateVariables&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+</span><span id="__span-26-32"><a id="__codelineno-26-32" name="__codelineno-26-32" href="#__codelineno-26-32"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-26-33"><a id="__codelineno-26-33" name="__codelineno-26-33" href="#__codelineno-26-33"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="storage-backends">Storage Backends</h2>
+<h3 id="filesystem-default">Filesystem (Default)</h3>
+<p>Data stored as JSON files:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>~/.atlas/
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>├── config.json        # Configuration
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>├── projects.json      # Project registry
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>├── sessions.json      # Session history
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>├── captures.json      # Captured items
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>└── breadcrumbs.json   # Breadcrumb trail
+</span></code></pre></div>
+<p><strong>Pros:</strong></p>
+<ul>
+<li>Human-readable</li>
+<li>Easy to backup/edit</li>
+<li>No dependencies</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul>
+<li>Slower for large datasets</li>
+<li>No concurrent access</li>
+</ul>
+<h3 id="sqlite">SQLite</h3>
+<p>Data stored in single database:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>~/.atlas/
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>└── atlas.db
+</span></code></pre></div>
+<p><strong>Pros:</strong></p>
+<ul>
+<li>Better performance</li>
+<li>ACID transactions</li>
+<li>Supports concurrent access</li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul>
+<li>Requires native module (better-sqlite3)</li>
+<li>Binary format</li>
+</ul>
+<h3 id="migrating">Migrating</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Preview migration</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>sqlite<span class="w"> </span>--dry-run
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># Migrate to SQLite</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>sqlite
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="c1"># Migrate back to filesystem</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>atlas<span class="w"> </span>migrate<span class="w"> </span>--to<span class="w"> </span>filesystem
+</span></code></pre></div>
+<hr />
+<h2 id="custom-templates">Custom Templates</h2>
+<p>Custom templates are stored in <code>~/.atlas/templates/</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>~/.atlas/templates/
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>├── my-template.md
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>└── custom-node.md
+</span></code></pre></div>
+<h3 id="template-format">Template Format</h3>
+<p>Templates use YAML frontmatter:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>---
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>name: My Custom Template
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>description: Template for my projects
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="gu">extends: node</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="gu">---</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="gu">## Project: {{name}}</span>
+</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>
+</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>{{parent}}
+</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>
+</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="gu">## Custom Section</span>
+</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>
+</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a>Created by {{author}}
+</span></code></pre></div>
+<h3 id="template-inheritance">Template Inheritance</h3>
+<p>Use <code>extends</code> to inherit from another template:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nn">---</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="nt">extends</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">node</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="nn">---</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="p p-Indicator">{{</span><span class="nv">parent</span><span class="p p-Indicator">}}</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="c1">## Additional Content</span>
+</span></code></pre></div>
+<p>The <code>{{parent}}</code> placeholder is replaced with the parent template content.</p>
+<h3 id="managing-templates">Managing Templates</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># List templates</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>atlas<span class="w"> </span>template<span class="w"> </span>list
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="c1"># Show template content</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>atlas<span class="w"> </span>template<span class="w"> </span>show<span class="w"> </span>my-template
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="c1"># Create template</span>
+</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>my-template
+</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a>
+</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="c1"># Create from existing</span>
+</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>my-node<span class="w"> </span>--from<span class="w"> </span>node
+</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a>
+</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="c1"># Create with inheritance</span>
+</span><span id="__span-33-14"><a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a>atlas<span class="w"> </span>template<span class="w"> </span>create<span class="w"> </span>custom-node<span class="w"> </span>--extends<span class="w"> </span>node
+</span><span id="__span-33-15"><a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a>
+</span><span id="__span-33-16"><a id="__codelineno-33-16" name="__codelineno-33-16" href="#__codelineno-33-16"></a><span class="c1"># Export built-in for editing</span>
+</span><span id="__span-33-17"><a id="__codelineno-33-17" name="__codelineno-33-17" href="#__codelineno-33-17"></a>atlas<span class="w"> </span>template<span class="w"> </span><span class="nb">export</span><span class="w"> </span>node
+</span><span id="__span-33-18"><a id="__codelineno-33-18" name="__codelineno-33-18" href="#__codelineno-33-18"></a>
+</span><span id="__span-33-19"><a id="__codelineno-33-19" name="__codelineno-33-19" href="#__codelineno-33-19"></a><span class="c1"># Delete custom template</span>
+</span><span id="__span-33-20"><a id="__codelineno-33-20" name="__codelineno-33-20" href="#__codelineno-33-20"></a>atlas<span class="w"> </span>template<span class="w"> </span>delete<span class="w"> </span>my-template
+</span><span id="__span-33-21"><a id="__codelineno-33-21" name="__codelineno-33-21" href="#__codelineno-33-21"></a>
+</span><span id="__span-33-22"><a id="__codelineno-33-22" name="__codelineno-33-22" href="#__codelineno-33-22"></a><span class="c1"># Show templates directory</span>
+</span><span id="__span-33-23"><a id="__codelineno-33-23" name="__codelineno-33-23" href="#__codelineno-33-23"></a>atlas<span class="w"> </span>template<span class="w"> </span>dir
+</span></code></pre></div>
+<hr />
+<h2 id="status-file-format">.STATUS File Format</h2>
+<p>Projects use <code>.STATUS</code> files for metadata. As of v0.14.0, atlas writes canonical <strong>atlas/v1 YAML frontmatter</strong>:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>---
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>schema: atlas/v1
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>status: active
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>progress: 50
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>type: node
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>priority: medium
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>focus: Current focus text here
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>next:
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>First task
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="gu">  - Second task</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="gu">---</span>
+</span><span id="__span-34-12"><a id="__codelineno-34-12" name="__codelineno-34-12" href="#__codelineno-34-12"></a>
+</span><span id="__span-34-13"><a id="__codelineno-34-13" name="__codelineno-34-13" href="#__codelineno-34-13"></a><span class="gh"># My Project</span>
+</span><span id="__span-34-14"><a id="__codelineno-34-14" name="__codelineno-34-14" href="#__codelineno-34-14"></a>
+</span><span id="__span-34-15"><a id="__codelineno-34-15" name="__codelineno-34-15" href="#__codelineno-34-15"></a>Additional notes here
+</span></code></pre></div>
+<h3 id="recognized-fields">Recognized Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td><code>active</code>, <code>paused</code>, <code>blocked</code>, <code>planning</code>, <code>stable</code>, <code>complete</code>, <code>archived</code></td>
+<td>Project status</td>
+</tr>
+<tr>
+<td><code>progress</code></td>
+<td><code>0-100</code></td>
+<td>Completion percentage</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>r-package</code>, <code>quarto</code>, <code>node</code>, <code>python</code>, etc.</td>
+<td>Project type</td>
+</tr>
+<tr>
+<td><code>focus</code></td>
+<td>text</td>
+<td>Current focus/checkpoint</td>
+</tr>
+<tr>
+<td><code>next</code></td>
+<td>YAML list</td>
+<td>Next actions, first = next up</td>
+</tr>
+</tbody>
+</table>
+<p>Full reference: <a href="../STATUS-SCHEMA/">.STATUS Schema (atlas/v1)</a>.</p>
+<blockquote>
+<p><strong>Legacy format:</strong> <code>## Status:</code> / <code>## Progress:</code> markdown headers still parse (read-only compatibility) — atlas never rewrites them without <code>atlas migrate --status --apply</code>. See <a href="../user-guide/MIGRATION-GUIDE/">Migration Guide</a>.</p>
+</blockquote>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<blockquote>
+<p>The commands below use <code>~/.atlas</code> for brevity. If you've migrated to the
+XDG location, substitute <code>~/.config/atlas</code> (or run <code>atlas doctor</code> first
+if you're not sure which one is active).</p>
+</blockquote>
+<h3 id="config-not-loading">Config Not Loading</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="c1"># Check config file exists</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>ls<span class="w"> </span>-la<span class="w"> </span>~/.atlas/config.json
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="c1"># Validate JSON</span>
+</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a>cat<span class="w"> </span>~/.atlas/config.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>json.tool
+</span></code></pre></div>
+<h3 id="reset-configuration">Reset Configuration</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="c1"># Reset preferences only</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>atlas<span class="w"> </span>config<span class="w"> </span>prefs<span class="w"> </span>reset
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="c1"># Full reset (backup first!)</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>mv<span class="w"> </span>~/.atlas<span class="w"> </span>~/.atlas.backup
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a>atlas<span class="w"> </span>init
+</span></code></pre></div>
+<h3 id="permission-issues">Permission Issues</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># Fix permissions</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>~/.atlas
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>chmod<span class="w"> </span><span class="m">644</span><span class="w"> </span>~/.atlas/*.json
+</span></code></pre></div>
+<hr />
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../CLI-REFERENCE/">CLI Reference</a></li>
+<li><a href="../ARCHITECTURE/">Architecture</a></li>
+<li><a href="../API-GUIDE/">API Guide</a></li>
+</ul>
+<hr />
+<p><strong>Now what?</strong> → <a href="../STATUS-SCHEMA/">.STATUS Schema</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../assets/javascripts/scroll-progress.js"></script>
+      
+        <script src="../assets/javascripts/reading-time.js"></script>
+      
+        <script src="../assets/javascripts/section-toc.js"></script>
+      
+        <script src="../assets/javascripts/section-nav.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3188 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Project state engine - registry, sessions, capture, and context management for ADHD-friendly workflow">
+      
+      
+      
+        <link rel="canonical" href="https://data-wise.github.io/atlas/user-guide/adhd-guide/hyperfocus/">
+      
+      
+        <link rel="prev" href="../time-blindness/">
+      
+      
+        <link rel="next" href="../accessibility/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Hyperfocus Management - Atlas</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/fonts.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hyperfocus-management" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      <!-- Scroll Progress Bar -->
+<div class="md-scroll-progress" data-md-component="scroll-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Page scroll progress">
+  <div class="md-scroll-progress__bar"></div>
+</div>
+
+
+  <header class="md-header" data-md-component="header">
+    <nav class="md-header__inner md-grid" aria-label="Header">
+      <a href="" title="Atlas" class="md-header__button md-logo" aria-label="Atlas" data-md-component="logo">
+        
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93c-3.72-.49-7-3.85-7-7.93 0-4.42 3.58-8 8-8s8 3.58 8 8-3.58 8-8 8zm0-2c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm0-10c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+        
+      </a>
+      <label class="md-header__button md-icon" for="__drawer" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+      </label>
+      <div class="md-header__title" data-md-component="header-title">
+        <a href="" class="md-header__ellipsis" title="Atlas">
+          Atlas
+        </a>
+      </div>
+      <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5-.79.28v-.79l-.28.27C12.59 15.41 11.11 16 9.5 16S6 13.09 6 9.5 8.91 3 11.5 3 16 5.91 16 9.5c0 .76-.11 1.5-.29 2.2L19 19.79l-1.41 1.41L13.5 14.5h-.79z"/></svg>
+      </label>
+      
+        
+          <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+        
+      
+      
+        <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+      
+      <div class="md-header__source">
+        
+          <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" class="md-button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        
+      </div>
+    </nav>
+  </header>
+
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs atlas-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list atlas-pill-list">
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link atlas-pill atlas-pill--home">
+          Home
+        </a>
+      </li>
+      
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../../../getting-started/installation/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="do">
+                Get Started
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../"
+                 class="md-tabs__link atlas-pill"
+                 data-section="learn">
+                Guide
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../../../ARCHITECTURE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="build">
+                Architecture
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <li class="md-tabs__item">
+              <a href="../../../CLI-REFERENCE/"
+                 class="md-tabs__link atlas-pill"
+                 data-section="code">
+                Reference
+              </a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li class="md-tabs__item">
+            <a href="../../../WHAT-S-NEW/"
+               class="md-tabs__link atlas-pill atlas-pill--muted">
+              Changelog
+            </a>
+          </li>
+        
+      
+      <li class="md-tabs__item atlas-pill-search-item">
+        <input type="search"
+               class="atlas-pill-search"
+               placeholder="Filter sidebar…"
+               aria-label="Filter sidebar navigation">
+      </li>
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Atlas" class="md-nav__button md-logo" aria-label="Atlas" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Atlas
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Data-Wise/atlas" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/atlas
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../TUTORIAL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../DEMOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recording
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADHD Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADHD Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-wins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Wins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time-blindness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Time Blindness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hyperfocus Management
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hyperfocus Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-hyperfocus-feels-like" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Hyperfocus Feels Like
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-recognize-the-signs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Recognize the Signs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-hyperfocus-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Hyperfocus Protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The Hyperfocus Protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#during-hyperfocus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        During Hyperfocus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-hyperfocus-recovery-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The Hyperfocus Recovery Protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. The Hyperfocus Recovery Protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-0-30-min-post-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate (0-30 min post-crash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery-30-min-2-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery (30 min - 2 hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-session-when-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Session (when ready)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-hyperfocus-hangover-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Hyperfocus Hangover Protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-preventing-the-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Preventing the Trap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Preventing the Trap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#time-box-the-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Box the Entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-focus-mode-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Focus Mode (Dashboard)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#body-doubling-virtual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Body Doubling (Virtual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-the-just-one-more-thing-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. The "Just One More Thing" Trap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45-the-flow-state-vs-hyperfocus-distinction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 The "Flow State" vs "Hyperfocus" Distinction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-the-stuck-in-hyperfocus-emergency-kit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. The "Stuck in Hyperfocus" Emergency Kit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. The &#34;Stuck in Hyperfocus&#34; Emergency Kit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#physical-interrupt-strongest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Physical Interrupt (strongest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environmental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environmental
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#digital" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Digital
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-post-hyperfocus-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Post-Hyperfocus Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-hyperfocus-as-a-tool-not-a-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Hyperfocus as a Tool (Not a Trap)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Hyperfocus as a Tool (Not a Trap)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-lean-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Lean In
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-avoid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Avoid
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-hyperfocus-recovery-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The Hyperfocus Recovery Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#75-the-good-hyperfocus-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The "Good Hyperfocus" Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-the-hyperfocus-compact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary: The Hyperfocus Compact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../accessibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accessibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/visual-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/research-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/SCENARIOS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/WEEKLY-REVIEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weekly Review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/MULTI-PROJECT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/AUTOMATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbook/COOKBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../VISUAL-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../swiftbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SwiftBar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../STATUS-SCHEMA/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .STATUS Schema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CLI-REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../REFCARD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference Card
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API-RECIPES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../MCP-SERVER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../DIAGRAMS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../INTEGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Changelog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../WHAT-S-NEW/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-hyperfocus-feels-like" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Hyperfocus Feels Like
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-recognize-the-signs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Recognize the Signs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-hyperfocus-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Hyperfocus Protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The Hyperfocus Protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#during-hyperfocus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        During Hyperfocus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-hyperfocus-recovery-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The Hyperfocus Recovery Protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. The Hyperfocus Recovery Protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-0-30-min-post-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate (0-30 min post-crash)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery-30-min-2-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery (30 min - 2 hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-session-when-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Session (when ready)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-hyperfocus-hangover-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Hyperfocus Hangover Protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-preventing-the-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Preventing the Trap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Preventing the Trap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#time-box-the-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Box the Entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-focus-mode-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use Focus Mode (Dashboard)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#body-doubling-virtual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Body Doubling (Virtual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-the-just-one-more-thing-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. The "Just One More Thing" Trap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45-the-flow-state-vs-hyperfocus-distinction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 The "Flow State" vs "Hyperfocus" Distinction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-the-stuck-in-hyperfocus-emergency-kit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. The "Stuck in Hyperfocus" Emergency Kit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. The &#34;Stuck in Hyperfocus&#34; Emergency Kit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#physical-interrupt-strongest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Physical Interrupt (strongest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environmental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environmental
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#digital" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Digital
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-post-hyperfocus-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Post-Hyperfocus Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-hyperfocus-as-a-tool-not-a-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Hyperfocus as a Tool (Not a Trap)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Hyperfocus as a Tool (Not a Trap)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-lean-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Lean In
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-avoid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Avoid
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-hyperfocus-recovery-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The Hyperfocus Recovery Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#75-the-good-hyperfocus-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 The "Good Hyperfocus" Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary-the-hyperfocus-compact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary: The Hyperfocus Compact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Guide
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    ADHD Guide
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="hyperfocus-management">Hyperfocus Management</h1>
+<blockquote>
+<p><strong>Ride the wave. Survive the crash.</strong></p>
+</blockquote>
+<hr />
+<h2 id="what-hyperfocus-feels-like">What Hyperfocus Feels Like</h2>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Experience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Entry</strong></td>
+<td>"Just one more thing..." → 4 hours later</td>
+</tr>
+<tr>
+<td><strong>During</strong></td>
+<td>World disappears. Needs? What needs?</td>
+</tr>
+<tr>
+<td><strong>Exit</strong></td>
+<td>Sudden crash. Exhaustion. Shame. "What did I even do?"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hyperfocus isn't a superpower. It's a loan.</strong> You borrow energy from tomorrow. Atlas helps you repay it gently.</p>
+<hr />
+<h2 id="1-recognize-the-signs">1. Recognize the Signs</h2>
+<blockquote>
+<p><strong>Catch it early. Or at least, not too late.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Early Signs</th>
+<th>You're In Deep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Just one more thing..."</td>
+<td>Forgot to eat</td>
+</tr>
+<tr>
+<td>Lost track of time</td>
+<td>Forgot to pee</td>
+</tr>
+<tr>
+<td>Ignored notifications</td>
+<td>Forgot to sleep</td>
+</tr>
+<tr>
+<td>"Just 5 more minutes"</td>
+<td>4 hours ago</td>
+</tr>
+<tr>
+<td>Tuned out world</td>
+<td>Physical pain when stopping</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Your tells:</strong> What are yours? Write them down. <code>atlas catch "hyperfocus tell: ignore Slack when coding" --type=note</code></p>
+<hr />
+<h2 id="2-the-hyperfocus-protocol">2. The Hyperfocus Protocol</h2>
+<blockquote>
+<p><strong>When you realize you're in it.</strong></p>
+</blockquote>
+<h3 id="during-hyperfocus">During Hyperfocus</h3>
+<table>
+<thead>
+<tr>
+<th>Do</th>
+<th>Don't</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>atlas catch "hyperfocus: auth refactor"</code></td>
+<td>Stop to organize</td>
+</tr>
+<tr>
+<td>Keep water nearby</td>
+<td>Skip meals</td>
+</tr>
+<tr>
+<td>Set a <em>soft</em> timer (90 min max)</td>
+<td>Push past body signals</td>
+</tr>
+<tr>
+<td><code>atlas crumb "deep in auth, OAuth flow"</code></td>
+<td>Ignore body signals</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The 90-minute rule:</strong> Hyperfocus &gt; 90 min = guaranteed crash. Set a soft alarm.</p>
+<hr />
+<h2 id="3-the-hyperfocus-recovery-protocol">3. The Hyperfocus Recovery Protocol</h2>
+<blockquote>
+<p><strong>When you crash. Don't fight it. Recover.</strong></p>
+</blockquote>
+<h3 id="immediate-0-30-min-post-crash">Immediate (0-30 min post-crash)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;hyperfocus crash: completed auth refactor&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;CRASH: exhausted after 4h hyperfocus. Need recovery.&quot;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Physical: stand, stretch, water, bathroom</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># NO screens for 20 min</span>
+</span></code></pre></div>
+<h3 id="recovery-30-min-2-hours">Recovery (30 min - 2 hours)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>atlas<span class="w"> </span>stats<span class="w">          </span><span class="c1"># See what you ACTUALLY did (usually impressive)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>atlas<span class="w"> </span>trail<span class="w">          </span><span class="c1"># Review breadcrumbs</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Physical: walk, shower, food, nap</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># NO new work</span>
+</span></code></pre></div>
+<h3 id="next-session-when-ready">Next Session (when ready)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span><span class="s2">&quot;recovery: light tasks only&quot;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>atlas<span class="w"> </span>task<span class="w"> </span>list<span class="w"> </span>--overdue<span class="w">  </span><span class="c1"># Handle fires only</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>atlas<span class="w"> </span>plan<span class="w">                 </span><span class="c1"># Gentle replan</span>
+</span></code></pre></div>
+<hr />
+<h2 id="2-the-hyperfocus-hangover-protocol">2. The Hyperfocus Hangover Protocol</h2>
+<blockquote>
+<p><strong>After long hyperfocus. Your brain is fried.</strong></p>
+</blockquote>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 1. End session honestly</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;4h hyperfocus on auth. Exhausted.&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># 2. Leave a DETAILED crumb for tomorrow</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;HYPERFOCUS HANGOVER: Completed OAuth flow. Exhausted. Tomorrow: START SLOW. Review tests first. No new features.&quot;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># 3. Check the damage</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>atlas<span class="w"> </span>stats<span class="w">  </span><span class="c1"># Usually: &quot;Whoa, I DID do a lot&quot;</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># 4. MANDATORY: Physical reset</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># - Walk outside (10 min minimum)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># - Protein + water</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="c1"># - No screens 30 min</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># - Sleep if tired</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="c1"># 5. Tomorrow: START SLOW</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>atlas<span class="w"> </span>plan<span class="w">  </span><span class="c1"># Will suggest light start</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span><span class="s2">&quot;recovery: review tests only&quot;</span>
+</span></code></pre></div>
+<p><strong>Warning:</strong> After 4h+ hyperfocus, next session MUST be short (&lt;60 min) and low-cognitive-load.</p>
+<hr />
+<h2 id="3-preventing-the-trap">3. Preventing the Trap</h2>
+<blockquote>
+<p><strong>Design against hyperfocus traps.</strong></p>
+</blockquote>
+<h3 id="time-box-the-entry">Time-Box the Entry</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span><span class="s2">&quot;feature: new auth&quot;</span><span class="w"> </span>--estimated-minutes<span class="o">=</span><span class="m">90</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># Dashboard shows countdown</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># Soft alert at 90 min</span>
+</span></code></pre></div>
+<h3 id="use-focus-mode-dashboard">Use Focus Mode (Dashboard)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>atlas<span class="w"> </span>dash
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Press &#39;f&#39; → Focus mode</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># Enter: &quot;OAuth callback handler&quot;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># 25 min timer + forced break</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1"># Outcome: c / p / n</span>
+</span></code></pre></div>
+<h3 id="body-doubling-virtual">Body Doubling (Virtual)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>atlas<span class="w"> </span>dash
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># Split layout (Tab) → Sidebar visible</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># Keep dashboard visible = body double</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># See timer, see streak, see &quot;you&#39;re in flow&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="4-the-just-one-more-thing-trap">4. The "Just One More Thing" Trap</h2>
+<blockquote>
+<p><strong>The most dangerous phrase in ADHD.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Thought</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Just fix this one bug"</td>
+<td><code>atlas catch "bug: fix later" --type=task</code></td>
+</tr>
+<tr>
+<td>"Just add this feature"</td>
+<td><code>atlas catch "feature: add later" --type=idea</code></td>
+</tr>
+<tr>
+<td>"Just refactor this"</td>
+<td><code>atlas crumb "refactor candidate: X" --project=current</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rule:</strong> Capture → Continue. Never interrupt flow for "quick" things.</p>
+<hr />
+<h2 id="45-the-flow-state-vs-hyperfocus-distinction">4.5 The "Flow State" vs "Hyperfocus" Distinction</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Flow State</th>
+<th>Hyperfocus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Control</strong></td>
+<td>Can stop</td>
+<td>Can't stop</td>
+</tr>
+<tr>
+<td><strong>Awareness</strong></td>
+<td>Present</td>
+<td>Tunnel vision</td>
+</tr>
+<tr>
+<td><strong>Energy</strong></td>
+<td>Energizing</td>
+<td>Draining</td>
+</tr>
+<tr>
+<td><strong>Exit</strong></td>
+<td>Natural pause</td>
+<td>Crash</td>
+</tr>
+<tr>
+<td><strong>Aftermath</strong></td>
+<td>Satisfied</td>
+<td>Exhausted/shame</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Atlas helps:</strong> Dashboard shows session duration. Soft alerts at 60/90 min. <code>atlas crumb</code> captures context for recovery.</p>
+<hr />
+<h2 id="5-the-stuck-in-hyperfocus-emergency-kit">5. The "Stuck in Hyperfocus" Emergency Kit</h2>
+<blockquote>
+<p><strong>When you CAN'T stop but NEED to.</strong></p>
+</blockquote>
+<h3 id="physical-interrupt-strongest">Physical Interrupt (strongest)</h3>
+<ol>
+<li><strong>Phone alarm</strong> (across room) — physical movement required</li>
+<li><strong>Smartwatch vibration</strong> — haptic, harder to ignore</li>
+<li><strong>Timer with sound</strong> — different from gentle cues</li>
+</ol>
+<h3 id="environmental">Environmental</h3>
+<ol>
+<li><strong>Light change</strong> — smart bulb shifts color at 90 min</li>
+<li><strong>Sound change</strong> — playlist ends, silence = signal</li>
+<li><strong>Body double</strong> — coworking (virtual or IRL) = external accountability</li>
+</ol>
+<h3 id="digital">Digital</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Hard stop</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;forced stop: hyperfocus limit reached&quot;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;FORCED STOP: was in hyperfocus on X. Context saved.&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="6-post-hyperfocus-integration">6. Post-Hyperfocus Integration</h2>
+<blockquote>
+<p><strong>Make it count. Don't let it vanish.</strong></p>
+</blockquote>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 1. End session honestly</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>atlas<span class="w"> </span>session<span class="w"> </span>end<span class="w"> </span><span class="s2">&quot;4h hyperfocus: completed X, Y, Z&quot;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 2. Capture wins (dopamine)</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>atlas<span class="w"> </span>catch<span class="w"> </span><span class="s2">&quot;shipped OAuth PKCE flow&quot;</span><span class="w"> </span>--type<span class="o">=</span>win
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>atlas<span class="w"> </span>catch<span class="w"> </span><span class="s2">&quot;solved 3-day bug in 4h&quot;</span><span class="w"> </span>--type<span class="o">=</span>win
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># 3. Detailed crumb for integration</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>atlas<span class="w"> </span>crumb<span class="w"> </span><span class="s2">&quot;HYPERFOCUS: Completed OAuth PKCE + tests. Mental model: JWT in cookie, PKCE prevents replay. Next: refresh token rotation.&quot;</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="c1"># 4. Physical reset (MANDATORY)</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="c1"># Walk, water, protein, no screens 20 min</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="c1"># 5. Next session: LIGHT</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>atlas<span class="w"> </span>session<span class="w"> </span>start<span class="w"> </span><span class="s2">&quot;integration: write docs for OAuth&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="6-hyperfocus-as-a-tool-not-a-trap">6. Hyperfocus as a Tool (Not a Trap)</h2>
+<blockquote>
+<p><strong>Channel it. Don't fight it.</strong></p>
+</blockquote>
+<h3 id="when-to-lean-in">When to Lean In</h3>
+<ul>
+<li><strong>Greenfield projects</strong> — New code, high creativity</li>
+<li><strong>Deep debugging</strong> — Complex, single-threaded</li>
+<li><strong>Learning</strong> — New language/framework deep dive</li>
+<li><strong>Creative work</strong> — Writing, design, architecture</li>
+</ul>
+<h3 id="when-to-avoid">When to Avoid</h3>
+<ul>
+<li><strong>Routine tasks</strong> — Use Pomodoro instead</li>
+<li><strong>Meetings/coordination</strong> — Time-box strictly</li>
+<li><strong>Admin/email</strong> — Time-box + batch</li>
+<li><strong>When tired</strong> — Hyperfocus borrows from tomorrow</li>
+</ul>
+<hr />
+<h2 id="7-the-hyperfocus-recovery-checklist">7. The Hyperfocus Recovery Checklist</h2>
+<blockquote>
+<p><strong>Post-crash. Check each box.</strong></p>
+</blockquote>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>[ ] Session ended honestly
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>[ ] Wins captured (atlas catch --type=win)
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>[ ] Detailed crumb written
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>[ ] Stats reviewed (celebrate what DID happen)
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>[ ] Physical reset: walk + water + protein
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>[ ] No screens 20+ min
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>[ ] Sleep if tired
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>[ ] Next session: LIGHT + SHORT (&lt;60 min)
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>[ ] Next session: LOW COGNITIVE LOAD
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>[ ] Communicate if needed (&quot;recovering from deep work&quot;)
+</span></code></pre></div>
+<hr />
+<h2 id="75-the-good-hyperfocus-checklist">7.5 The "Good Hyperfocus" Checklist</h2>
+<blockquote>
+<p><strong>When hyperfocus serves you.</strong></p>
+</blockquote>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>[ ] Intentional entry (atlas session start + estimate)
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>[ ] Soft timer set (90 min max)
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>[ ] Physical needs met (water, snacks nearby)
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>[ ] Exit criteria defined (&quot;done when tests pass&quot;)
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>[ ] Recovery planned (what&#39;s next after?)
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>[ ] Wins captured during/after
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>[ ] Integration time scheduled
+</span></code></pre></div>
+<hr />
+<h2 id="summary-the-hyperfocus-compact">Summary: The Hyperfocus Compact</h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>┌────────────────────────────────────────────────────────────┐
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>│  HYPERFOCUS IS A LOAN. REPAY IT GENTLY.                   │
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>├────────────────────────────────────────────────────────────┤
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>│  ENTRY:    Intentional? Timer set? Body ready?            │
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>│  DURING:   90 min max. Water. Crumbs. Soft alerts.        │
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>│  EXIT:     Intentional &gt; Forced. Crumb + wins + stats.    │
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>│  RECOVERY: Physical reset &gt; screen time. Light next session.│
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>│  INTEGRATION: Crumb + wins + stats = compound value.      │
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>└────────────────────────────────────────────────────────────┘
+</span></code></pre></div>
+<hr />
+<h2 id="quick-reference">Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start intentional hyperfocus</td>
+<td><code>atlas session start "task" --estimated-minutes=90</code></td>
+</tr>
+<tr>
+<td>Soft alert at 90 min</td>
+<td>Dashboard auto-alert</td>
+</tr>
+<tr>
+<td>Capture context mid-flow</td>
+<td><code>atlas crumb "context note"</code></td>
+</tr>
+<tr>
+<td>Capture win</td>
+<td><code>atlas catch "shipped X" --type=win</code></td>
+</tr>
+<tr>
+<td>End honestly</td>
+<td><code>atlas session end "honest note"</code></td>
+</tr>
+<tr>
+<td>Post-crash reset</td>
+<td>Walk + water + protein + no screens</td>
+</tr>
+<tr>
+<td>Next session</td>
+<td>Light, short, low cognitive load</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><a href="../core-principles/">Core Principles</a> — Mental models</li>
+<li><a href="../time-blindness/">Time Blindness</a> — Gentle time awareness</li>
+<li><a href="../quick-wins/">Quick Wins</a> — 5-minute setup</li>
+<li><a href="../accessibility/">Accessibility</a> — Keyboard, screen readers, reduced motion</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Data-Wise/atlas" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../../../assets/javascripts/scroll-progress.js"></script>
+      
+        <script src="../../../assets/javascripts/reading-time.js"></script>
+      
+        <script src="../../../assets/javascripts/section-toc.js"></script>
+      
+        <script src="../../../assets/javascripts/section-nav.js"></script>
+      
+    
+  </body>
+</html>
