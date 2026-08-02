@@ -2,6 +2,20 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Fixed
+- **Bare-YAML `.STATUS` parsing: nested keys no longer warn or overwrite top-level fields** —
+  `_parseYAMLFormat`'s flat line scan was indentation-blind, so nested keys inside structured
+  blocks (e.g. a `backlog:` sequence of mappings, each legitimately carrying its own `priority:`)
+  tripped the duplicate-key watchlist (13 false warnings on a real ecosystem file) and polluted
+  top-level fields via last-occurrence-wins (the project's `priorityLabel` became the last backlog
+  item's value). Only column-0 keys are now parsed as project fields; `tasks:` block items are
+  unaffected (handled via the `inTasks` path first). Verified against all 36 ecosystem `.STATUS`
+  files: no file relies on indented top-level keys, so extraction behavior is unchanged for real
+  files. Includes regression tests (nested backlog block → zero warnings + top-level values
+  preserved; indented duplicates ignored; tasks block still parses).
+
 ## [0.18.1] - 2026-08-02
 
 ### Fixed
