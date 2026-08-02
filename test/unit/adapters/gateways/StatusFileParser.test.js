@@ -122,6 +122,51 @@ checkpoint: Strategic refocus complete
     })
   })
 
+  describe('parse() - Frontmatter format', () => {
+    test('parses YAML frontmatter .STATUS file', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `---
+schema: atlas/v1
+name: test-project
+status: active
+progress: 75
+priority: 1
+type: node-package
+next: Implement feature X
+---
+
+# test-project
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.format).toBe('frontmatter')
+      expect(result.name).toBe('test-project')
+      expect(result.status).toBe('active')
+      expect(result.progress).toBe(75)
+      expect(result.priority).toBe(1)
+      expect(result.next).toEqual(['Implement feature X'])
+    })
+
+    test('coerces non-numeric priority to default 3', async () => {
+      const statusPath = join(testDir, '.STATUS')
+      await writeFile(statusPath, `---
+schema: atlas/v1
+name: test-project
+status: active
+priority: P1
+---
+
+# test-project
+`)
+
+      const result = await parser.parse(statusPath)
+
+      expect(result.format).toBe('frontmatter')
+      expect(result.priority).toBe(3)
+    })
+  })
+
   describe('parse() - Markdown edge cases', () => {
     test('parses version and updated fields', async () => {
       const statusPath = join(testDir, '.STATUS')
@@ -445,6 +490,18 @@ priority: invalid
 
       // 0 is treated as "no priority specified" → defaults to 3
       expect(summary.byPriority[3]).toHaveLength(1)
+    })
+
+    test('buckets non-numeric priority under 3 without throwing', async () => {
+      const scanResults = [
+        { path: '/a', parsed: { status: 'active', progress: 50, priority: 'P1' } }
+      ]
+
+      const summary = parser.summarize(scanResults)
+
+      expect(summary.total).toBe(1)
+      expect(summary.byPriority[3]).toHaveLength(1)
+      expect(summary.byPriority[3][0].path).toBe('/a')
     })
 
     test('handles missing priority values', async () => {

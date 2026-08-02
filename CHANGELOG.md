@@ -2,6 +2,23 @@
 
 All notable changes to Atlas are documented here.
 
+## [Unreleased]
+
+### Fixed
+- **`atlas sync --from-status` crash on non-numeric `priority:`** — a frontmatter-format `.STATUS`
+  with a non-numeric priority (e.g. `priority: P1`) stored the raw string, and `summarize()`'s
+  `Math.max(1, "P1")` produced `NaN`, crashing with `TypeError: Cannot read properties of undefined
+  (reading 'push')`. The frontmatter parser now coerces priority exactly like the markdown and
+  bare-YAML formats already did (`parseInt || 3`, with the raw label preserved as `priorityLabel`),
+  and `summarize()` guards non-numeric values so they bucket to default priority 3 instead of throwing.
+
+### Added
+- **Regression coverage for `sync --from-status`** — a new frontmatter-parse unit describe plus a
+  `summarize()` non-numeric-priority test in `StatusFileParser.test.js`; a new end-to-end suite
+  (`test/e2e/sync-from-status.e2e.test.js`, 4 tests: frontmatter `P1`, mixed formats, `--report`,
+  empty root); and a new isolated-HOME dogfood script (`test/dogfood/sync-from-status.sh`, 5 checks,
+  wired as `npm run test:dogfood:sync`).
+
 ## [0.18.0] - 2026-08-01
 
 ### Added

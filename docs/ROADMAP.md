@@ -2,7 +2,7 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-08-01
+**Last Updated:** 2026-08-02
 
 ---
 
@@ -88,7 +88,9 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 ## ⏳ v0.19.0 Candidates (Planned)
 
 Not yet started — priority order, top first (renumbered from "v0.18.0 Candidates": v0.18.0 was
-used for #115's dashboard nudge awareness instead — none of the items below shipped).
+used for #115's dashboard nudge awareness instead — none of the items below shipped). `dev`
+already carries, unreleased, a `sync --from-status` robustness fix (frontmatter non-numeric
+`priority:` crash) plus expanded e2e/dogfood regression coverage for that path.
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).
