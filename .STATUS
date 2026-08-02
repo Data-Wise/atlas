@@ -83,7 +83,7 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - **Session Tracking**: Work sessions with duration and notes
 - **Quick Capture**: Ideas, tasks, bugs with triage workflow
 - **Breadcrumb Trail**: Context markers for "where was I?"
-- **MCP Server**: 10 tools for Claude integration
+- **MCP Server**: 11 tools for Claude integration
 - **Ink TUI Dashboard**: Multi-panel React Ink dashboard with real data
 - **Real Data Pipeline**: AtlasContext + 4 hooks (useProjects, useActiveSession, useProjectStats, usePendingCaptures)
 - **Visual Enhancements**: Focus score, sparklines, heatmap, 5 themes
