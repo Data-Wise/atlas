@@ -31,7 +31,7 @@ atlas dash                       # Launch TUI (3 views: Now/Timer/Plan)
 | Attribute | Value |
 |-----------|-------|
 | **Type** | Node.js CLI (ESM) |
-| **Version** | 0.17.0 |
+| **Version** | 0.18.0 |
 | **Architecture** | Clean Architecture |
 | **Storage** | FileSystem (default) / SQLite |
 | **Tests** | ~2,000 (Jest + Vitest) |
@@ -298,6 +298,7 @@ See [docs/prompts/DEMO-WORKFLOWS.md](docs/prompts/DEMO-WORKFLOWS.md) for reusabl
 
 ## Version History
 
+- **v0.18.0** - Dashboard nudge awareness: `atlas dash`'s Now view surfaces fired-but-unacked wall-clock nudges without a separate `atlas nudge ls` — a bordered banner (up to 3 fired + `+N more`), `●N`/`○N` fired/pending badges on the sidebar, and a fired-count chip on the status bar visible from every view. Press `a` in Now to ack every fired nudge in one keystroke (sequential, partial-failure-tolerant, never touches pending). New `useNudges` hook is the dashboard's first hook to return a write action, guarded against a poll already in flight resurrecting a just-cleared badge.
 - **v0.17.0** - Wall-clock nudges + multi-repo day activity: `atlas nudge {add,fire,ack,rm,ls}` fires reminders via macOS `launchd`, even with every Claude surface closed, delivered as an OS notification via `osascript` (argv-safe against injection); state shared cross-surface through `~/.claude/guards.json`'s `nudges.wall-clock` key via a new `GuardsFileNudgeStore` gateway (lock-protected against concurrent writers). `atlas day [--date] [--format table|json]` provides multi-repo commit + `.STATUS`-diff + session-minutes activity across the four project trees. `atlas doctor` gained nudge-drift reconciliation.
 - **v0.16.0** - ADHD-friendly docs-site redesign: nav collapsed to Home + 4 color pills (Learn/Do/Build/Code) + sidebar search filter (`overrides/partials/tabs.html`); section-color theming wired into the sidebar via a `data-atlas-section` body attribute (`docs/assets/javascripts/section-nav.js`); single-open sidebar accordion with item-count badges; homepage grid rebalanced to 6 cards (added ADHD Guide), ADHD-principles table replaced with a chip row; off-white/near-black surface tokens + 16.5px/1.65 body type; reduced-motion coverage extended to nav-arrow and tabs-link transitions.
 - **v0.15.0** - XDG Base Directory support: `resolveConfigDir()` centralizes config-dir resolution (env override → legacy `~/.atlas` → XDG default) across all 8 call sites; guarded `atlas migrate --xdg [--apply] [--force]` (PID-lock guard, hard existing-target refusal, EXDEV-safe move, migration marker); `doctor`/`doctor --fix` XDG nudge through the same guarded path.

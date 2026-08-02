@@ -988,7 +988,7 @@ atlas nudge ls --outstanding
 atlas nudge ls --format json
 ```
 
-### Dashboard awareness (unreleased)
+### Dashboard awareness (v0.18.0+)
 
 `atlas dash`'s Now view surfaces fired-but-unacked nudges without running
 `atlas nudge ls` — a banner lists up to 3 (time + message, `+N more` beyond

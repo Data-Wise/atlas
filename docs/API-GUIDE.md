@@ -1063,7 +1063,7 @@ const { data, velocityLoading, patternLoading, velocityError, patternError }
 // Returns loading:false with data:null when projectId is null
 ```
 
-**`useNudges()`** — Fired/pending wall-clock nudges + ack (10s poll, added #115, unreleased)
+**`useNudges()`** — Fired/pending wall-clock nudges + ack (10s poll, added #115, v0.18.0)
 
 ```typescript
 import { useNudges } from '../hooks/useNudges';

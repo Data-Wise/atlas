@@ -6,7 +6,26 @@
 
 ---
 
-## Current Version: v0.17.0 ✅ SHIPPED
+## Current Version: v0.18.0 ✅ SHIPPED
+
+Dashboard nudge awareness — closes the gap left by v0.17.0's wall-clock nudges: `atlas dash`'s Now
+view surfaces fired-but-unacked nudges without a separate `atlas nudge ls`.
+
+- [x] **Fired/pending nudge banner** — `NowView` shows up to 3 fired nudges (time + message) plus
+  `+N more`, distinct from pending (informational-only, never shown as a call to action)
+- [x] **`●N`/`○N` badges** on the sidebar project list and a fired-count chip on the status bar,
+  visible from every view
+- [x] **`a` keybinding** — ack all fired nudges in one keystroke (sequential, partial-failure-tolerant,
+  never touches a pending nudge)
+- [x] **`useNudges` hook** — the dashboard's first hook to expose a write action, not just data;
+  guarded against a poll already in flight resurrecting a just-cleared badge (verified with a
+  planted-defect test)
+
+See `docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md` for the full spec. PR #118, merged `2099a2b`.
+
+---
+
+## v0.17.0 - Wall-Clock Nudges & Multi-Repo Day Activity ✅ COMPLETE
 
 Wall-clock nudges + multi-repo day activity — not on the v0.17.0 Candidates list below; shipped
 ad hoc from issue #114, same pattern as v0.16.0's docs-site redesign.
@@ -17,18 +36,6 @@ ad hoc from issue #114, same pattern as v0.16.0's docs-site redesign.
 - Two real bugs found via live E2E (not just unit tests): a `launchd` PATH resolution issue (`process.execPath` now invoked directly, bypassing the `#!/usr/bin/env node` shebang) and a macOS Notification Alert Style gotcha (documented as a setup prerequisite)
 
 See `docs/specs/SPEC-cross-surface-nudges-and-day-activity-2026-08-01.md` for the full spec.
-
----
-
-## Merged to `dev`, not yet released
-
-- [x] **Dashboard nudge awareness** (#115) — `atlas dash`'s Now view surfaces fired-but-unacked
-  nudges without a separate `atlas nudge ls`: a banner (up to 3 fired + `+N more`), `●N`/`○N`
-  fired/pending badges on the sidebar, a status-bar chip visible from every view, and an `a`
-  keybinding to ack all fired nudges in one keystroke. New `useNudges` hook — the dashboard's
-  first hook to expose a write action, not just data. PR #118, merged `2099a2b`.
-
-See `docs/specs/SPEC-dashboard-nudge-awareness-2026-08-01.md` for the full spec.
 
 ---
 
@@ -78,13 +85,10 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 
 ---
 
-## ⏳ v0.18.0 Candidates (Planned)
+## ⏳ v0.19.0 Candidates (Planned)
 
-Not yet started — priority order, top first (renumbered from "v0.17.0 Candidates": v0.17.0 was
-used for the ad-hoc wall-clock nudges + `atlas day` feature instead — none of the items below
-shipped). #115 (surface fired-but-unacked nudges in `atlas dash`'s NowView) has since been merged
-to `dev` — see "Merged to `dev`, not yet released" above — so it's no longer listed as a candidate
-here.
+Not yet started — priority order, top first (renumbered from "v0.18.0 Candidates": v0.18.0 was
+used for #115's dashboard nudge awareness instead — none of the items below shipped).
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).
