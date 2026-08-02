@@ -1,11 +1,36 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.17.0 RELEASED (2026-08-01 — wall-clock nudges + `atlas day`, PR #116 → dev, PR #117 dev→main, tagged/deployed/tap-synced same session; issue #114 auto-closed on merge); v0.16.0 RELEASED (2026-07-20 — XDG Base Directory migration v0.15.0 via PR #105, then ADHD-friendly docs-site redesign v0.16.0 via PR #107); demos.yml branch-protection bug fixed and E2E-verified 2026-07-21 (PRs #109-112)
+## Phase: #115 dashboard nudge awareness MERGED TO DEV (2026-08-01, PR #118, not yet released — see v0.17.0 line below for what's actually live); v0.17.0 RELEASED (2026-08-01 — wall-clock nudges + `atlas day`, PR #116 → dev, PR #117 dev→main, tagged/deployed/tap-synced same session; issue #114 auto-closed on merge); v0.16.0 RELEASED (2026-07-20 — XDG Base Directory migration v0.15.0 via PR #105, then ADHD-friendly docs-site redesign v0.16.0 via PR #107); demos.yml branch-protection bug fixed and E2E-verified 2026-07-21 (PRs #109-112)
 ## Priority: 1
 ## Progress: 100
 
-## Resume Context (2026-08-01 Session — #114 wall-clock nudges + `atlas day`, v0.17.0 RELEASED)
+## Resume Context (2026-08-01 Session, part 2 — #115 dashboard nudge awareness, MERGED to dev)
+
+Continued the same day's session past the v0.17.0 release below. Fixed #115's stale "Blocked on"
+metadata (dependency shipped in v0.17.0), wrote `SPEC-dashboard-nudge-awareness-2026-08-01.md`
+in Plan Mode, then `/agent-skills:build auto` through all 8 tasks in `feature/dash-nudge-awareness`:
+`DashboardNudge` type, `useNudges` hook (poll + ack), `keymap.ts` binding, `ProjectList`/`StatusBar`
+badges, `NowView` banner + layout reparent, `App.tsx` wiring, docs. Self-review (`/review 118`)
+found one real gap (a doc's `(v0.18.0+)` version tag was a premature guess) — fixed before merge.
+
+**Two verification practices worth noting for future dashboard-hook work:** (1) a planted-defect
+check on the freshly-written `useNudges` test suite found it did NOT actually cover the poll/ack
+race it claimed to (a plausibly-named test exercised a different failure path) — added a real race
+test using `jest.useFakeTimers()` scoped to that one test only (advances the 10s `setInterval`
+deterministically while manual `Promise` control still orders the resolution), confirmed it fails
+against the planted defect and passes against the fix. (2) A live E2E (`atlas nudge add` → real
+`launchd` fire → real `atlas dash` render → real `a` keypress → `atlas nudge ls` confirms acked)
+caught nothing new this time, but is what caught both of #114's real bugs originally — this is now
+the dashboard's first write path, so the same standard applied here.
+
+PR #118 merged to `dev` (`2099a2b`), worktree/branch cleaned up. Doc audit afterward found 4 real
+gaps the PR itself didn't touch (`ARCHITECTURE.md` hooks tree, `REFCARD.md`/`TUTORIAL.md` keymap
+table mirrors, `ROADMAP.md`'s stale "unblocked candidate" framing) — fixed, committed `37f71d4`.
+
+Not yet released — `dev` is 2 commits ahead of the last `main` merge (`2099a2b`, `37f71d4`).
+
+## Resume Context (2026-08-01 Session, part 1 — #114 wall-clock nudges + `atlas day`, v0.17.0 RELEASED)
 
 Session closed out: v0.17.0 published (PR #117 merged `ede0d5c`), Homebrew tap PR #198 auto-merged and verified (correct SHA256), docs site confirmed serving v0.17.0 content, CI green on `main`, `dev` fast-forward-synced. Session report generated and published as an Artifact: `.remember/session-reports/session-report-2026-08-01.html`.
 
@@ -22,7 +47,7 @@ Along the way, also found and fixed a real git bug: a bare `git log --since=YYYY
 
 93 suites / 1597 tests passing, lint clean. Issue #114 will auto-close on the next `dev → main` release (GitHub only auto-closes linked issues on merge to the *default* branch, not `dev`). Fast-follow already filed: #115 (surface fired-but-unacked nudges in `atlas dash`'s `NowView`, deferred deliberately — v1's delivery guarantee is the OS notification, not the dashboard).
 
-## Next: `dev → main` release for v0.17.0 (wall-clock nudges + `atlas day`, PR #116) whenever a release session is convenient — closes #114 on merge | #115 fast-follow (nudge awareness in `atlas dash` NowView) — unblocked now that #114's `Nudge`/`INudgeStore` exist | `feature/catch-obs-bridge` P1 ecosystem scaffold still held — release from hold when obs ships `write` | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate onto obs research board vs. coexist) before it can close
+## Next: `dev → main` release whenever convenient — `dev` carries #115 (dashboard nudge awareness, PR #118, unreleased, two commits ahead of the last main sync) | `feature/catch-obs-bridge` P1 ecosystem scaffold still held — release from hold when obs ships `write` | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate onto obs research board vs. coexist) before it can close
 
 ## Resume Context (2026-07-21 Session — demos.yml branch-protection fix, PRs #109-112)
 Docs-site sidebar/theme redesign work from the prior session (PR #108) surfaced a pre-existing bug: `demos.yml`'s "Update GIFs in Repository" job did a direct `git push` to protected `main`. Fixed in two real-world-verified layers (each layer's failure was only discoverable by actually running the workflow, not by review): (1) PR #109 — bot-branch + `gh pr create` + `gh pr merge --auto`, mirroring the pattern already used for `homebrew-release.yml`; this alone still failed in production because the default `GITHUB_TOKEN` cannot open PRs on this repo (`can_approve_pull_request_reviews: false`). (2) PR #110 — added a GitHub App token (`actions/create-github-app-token@v1`, scoped to `repositories: atlas`) to mint the PR-creation credential, chosen over flipping the repo-wide permission setting. Real E2E run (29803662526) confirmed the App token works (opened PR #111) but surfaced a third bug: `gh pr merge --auto` errors with "Pull request is in clean status" when there are no pending checks left to wait for by the time the step runs. (3) PR #112 — falls back to a plain `gh pr merge --squash` when `--auto` fails. PR #111 (the auto-generated demo GIFs from the E2E run) merged directly. All four PRs (#109-112) CI-green, leak-scanned, merged dev→main same session; `dev`/`main` confirmed in sync (main's tip is a merge commit with dev's tip as ancestor). Next real E2E of the PR #112 fallback path itself will only occur on a future tape-file or workflow-file change.
@@ -69,7 +94,7 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 2,026 passing (Jest, 95 suites) — verified this session
+- Total: 2,002 passing (Jest, 114 suites) + 20 (Vitest e2e) — verified 2026-08-01 (#115 session)
 - E2E/Dogfood: covered within the full suite above (Vitest + ink-testing-library + Playwright + shell dogfood)
 
 ## Links

@@ -313,3 +313,11 @@ Implementation in a feature worktree, following this repo's standard pre-PR rule
 in the tree the PR ships from, plus a live `atlas dash` exercise (schedule a nudge, let it fire,
 confirm the banner appears and `a` clears it) — a TUI write path is exactly the kind of change
 `lastFrame()` assertions cannot fully verify.
+
+---
+
+## Status: Shipped (2026-08-01)
+
+Implemented in `feature/dash-nudge-awareness`, all 8 tasks + the live `atlas dash` exercise called
+for above. Merged via PR #118 (`2099a2b`). See `.STATUS`'s 2026-08-01 Resume Context entry for the
+session narrative. Not yet in a tagged release as of this merge.
