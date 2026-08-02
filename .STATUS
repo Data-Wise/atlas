@@ -1,9 +1,36 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
-## Phase: v0.18.0 release PREPPED (2026-08-01 — #115 dashboard nudge awareness, version bump + CHANGELOG/CLAUDE.md/ROADMAP/REFCARD/WHAT-S-NEW updated, `dev → main` PR pending); v0.17.0 RELEASED (2026-08-01 — wall-clock nudges + `atlas day`, PR #116 → dev, PR #117 dev→main, tagged/deployed/tap-synced same session; issue #114 auto-closed on merge); v0.16.0 RELEASED (2026-07-20 — XDG Base Directory migration v0.15.0 via PR #105, then ADHD-friendly docs-site redesign v0.16.0 via PR #107); demos.yml branch-protection bug fixed and E2E-verified 2026-07-21 (PRs #109-112)
+## Phase: v0.18.1 RELEASED (2026-08-02 — `sync --from-status` non-numeric-priority crash fix, PR dev→main merged, tagged/GitHub-released/tap-synced same session); v0.18.0 RELEASED (2026-08-01 — #115 dashboard nudge awareness, PR #119 dev→main merged `7b8ca30`, tagged/GitHub-released/tap-synced same session; issue #115 auto-closed on merge); v0.17.0 RELEASED (2026-08-01 — wall-clock nudges + `atlas day`, PR #116 → dev, PR #117 dev→main, tagged/deployed/tap-synced same session; issue #114 auto-closed on merge); v0.16.0 RELEASED (2026-07-20 — XDG Base Directory migration v0.15.0 via PR #105, then ADHD-friendly docs-site redesign v0.16.0 via PR #107); demos.yml branch-protection bug fixed and E2E-verified 2026-07-21 (PRs #109-112)
 ## Priority: 1
 ## Progress: 100
+
+## Resume Context (2026-08-02 Session, part 6 — v0.18.1 release)
+
+Released v0.18.1 (patch — the `sync --from-status` non-numeric-priority crash fix). Pipeline per the
+v0.18.0 pattern: bumped `package.json`/`package-lock.json` to 0.18.1, moved CHANGELOG `[Unreleased]`
+→ `[0.18.1] - 2026-08-02`, converted WHAT-S-NEW `Unreleased` → `v0.18.1`, promoted ROADMAP Current
+Version banner v0.18.0 → v0.18.1 (v0.18.0 section demoted to past release), updated CLAUDE.md version
+table + added v0.18.1 version-history entry, REFCARD footer → v0.18.1, prepended Phase line. Left
+CLI-REFERENCE `(v0.18.0+)` + API-GUIDE `v0.18.0` feature anchors untouched. Verified `npm test`
+(2,009/2,009, 115 suites) + `mkdocs build --strict` before committing.
+
+## Resume Context (2026-08-02 Session, part 5 — sync --from-status crash fix + test coverage)
+
+Fixed a real crash in `atlas sync --from-status`: a frontmatter-format `.STATUS` with a non-numeric
+`priority:` (e.g. `priority: P1` — found live in `scribe/.STATUS` and
+`_worktrees/scribe-fix-vitest-watch/.STATUS`) stored the raw string, and `summarize()`'s
+`Math.max(1, "P1")` → `NaN` → `byPriority[NaN]` undefined → `TypeError: Cannot read properties of
+undefined (reading 'push')`. Fix in `StatusFileParser.js` (2 layers): frontmatter `priority` now
+coerces like the markdown/bare-YAML formats (`parseInt || 3`, raw label preserved as `priorityLabel`),
+and `summarize()` buckets any non-finite priority to 3. Regression coverage added: +57 lines in
+`test/unit/adapters/gateways/StatusFileParser.test.js` (new `parse() - Frontmatter format` describe +
+summarize non-numeric-priority test), new `test/e2e/sync-from-status.e2e.test.js` (4 CLI tests), new
+`test/dogfood/sync-from-status.sh` (5 isolated-HOME checks, wired as `test:dogfood:sync`). Verified:
+gateway suites 112/112, e2e 117/117, dogfood 5/5, real-world rescan of `~/projects/dev-tools` → 36
+files, zero NaN priority keys; eslint clean. Docs updated (CHANGELOG `[Unreleased]`, WHAT-S-NEW,
+STATUS-SCHEMA, CLI-REFERENCE, ARCHITECTURE, ROADMAP). Committed on `dev` (parser + tests + e2e +
+dogfood + package.json + docs).
 
 ## Resume Context (2026-08-01 Session, part 3 — v0.18.0 release prep)
 
@@ -17,7 +44,10 @@ docs that had gone stale in the last two doc-audit passes with a placeholder ("u
 entry), `docs/ROADMAP.md` (Current Version banner promoted, candidates section renumbered
 v0.18.0→v0.19.0), `docs/REFCARD.md` (footer), `docs/WHAT-S-NEW.md` (new v0.18.0 entry),
 `docs/CLI-REFERENCE.md` + `docs/API-GUIDE.md` (`(unreleased)`→`(v0.18.0+)`). `mkdocs build --strict`
-confirmed clean. `dev → main` PR next.
+confirmed clean. PR #119 opened, CI green (8/8), merged `7b8ca30`; CI on `main` green (Tests +
+Deploy Docs); `dev` fast-forward-synced to `main`; tagged `v0.18.0` + GitHub release published;
+`homebrew-release.yml` fired, tap PR #199 auto-merged same session, verified formula
+url/sha256 point at v0.18.0.
 
 ## Resume Context (2026-08-01 Session, part 2 — #115 dashboard nudge awareness, MERGED to dev)
 
@@ -61,7 +91,7 @@ Along the way, also found and fixed a real git bug: a bare `git log --since=YYYY
 
 93 suites / 1597 tests passing, lint clean. Issue #114 will auto-close on the next `dev → main` release (GitHub only auto-closes linked issues on merge to the *default* branch, not `dev`). Fast-follow already filed: #115 (surface fired-but-unacked nudges in `atlas dash`'s `NowView`, deferred deliberately — v1's delivery guarantee is the OS notification, not the dashboard).
 
-## Next: `dev → main` release whenever convenient — `dev` carries #115 (dashboard nudge awareness, PR #118, unreleased, two commits ahead of the last main sync) | `feature/catch-obs-bridge` P1 ecosystem scaffold still held — release from hold when obs ships `write` | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate onto obs research board vs. coexist) before it can close
+## Next: v0.18.0 shipped, `dev`/`main` in sync — no release work pending | `feature/catch-obs-bridge` P1 ecosystem scaffold still held — release from hold when obs ships `write` | #63 needs a design decision (golden-match MediationVerse_Dashboard.md vs. migrate onto obs research board vs. coexist) before it can close
 
 ## Resume Context (2026-07-21 Session — demos.yml branch-protection fix, PRs #109-112)
 Docs-site sidebar/theme redesign work from the prior session (PR #108) surfaced a pre-existing bug: `demos.yml`'s "Update GIFs in Repository" job did a direct `git push` to protected `main`. Fixed in two real-world-verified layers (each layer's failure was only discoverable by actually running the workflow, not by review): (1) PR #109 — bot-branch + `gh pr create` + `gh pr merge --auto`, mirroring the pattern already used for `homebrew-release.yml`; this alone still failed in production because the default `GITHUB_TOKEN` cannot open PRs on this repo (`can_approve_pull_request_reviews: false`). (2) PR #110 — added a GitHub App token (`actions/create-github-app-token@v1`, scoped to `repositories: atlas`) to mint the PR-creation credential, chosen over flipping the repo-wide permission setting. Real E2E run (29803662526) confirmed the App token works (opened PR #111) but surfaced a third bug: `gh pr merge --auto` errors with "Pull request is in clean status" when there are no pending checks left to wait for by the time the step runs. (3) PR #112 — falls back to a plain `gh pr merge --squash` when `--auto` fails. PR #111 (the auto-generated demo GIFs from the E2E run) merged directly. All four PRs (#109-112) CI-green, leak-scanned, merged dev→main same session; `dev`/`main` confirmed in sync (main's tip is a merge commit with dev's tip as ancestor). Next real E2E of the PR #112 fallback path itself will only occur on a future tape-file or workflow-file change.
@@ -108,8 +138,9 @@ Adversarially reviewed PR #85 (TOC-overlap claim was a false alarm, 59px clearan
 - **Doctor**: `atlas doctor` — read-only Project Settings Contract audit (`.STATUS`/`CLAUDE.md`/`.obs/sync.yml`) with `--fix`
 
 ## Test Stats
-- Total: 2,002 passing (Jest, 114 suites) + 20 (Vitest e2e) — verified 2026-08-01 (#115 session)
+- Total: 2,009 passing (Jest, 115 suites) + 20 (Vitest e2e) — verified 2026-08-02 (sync --from-status fix session; +7 tests: frontmatter-parse describe, summarize regression, sync e2e 4, dogfood 5)
 - E2E/Dogfood: covered within the full suite above (Vitest + ink-testing-library + Playwright + shell dogfood)
+- 2026-08-02 (`sync --from-status` coverage): gateways 112/112 (7 suites), e2e 117/117 (5 suites), dogfood sync 5/5
 
 ## Links
 - **Docs**: https://data-wise.github.io/atlas/

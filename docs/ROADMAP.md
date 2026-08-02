@@ -2,11 +2,31 @@
 
 > Living document tracking planned features and improvements.
 
-**Last Updated:** 2026-08-01
+**Last Updated:** 2026-08-02
 
 ---
 
-## Current Version: v0.18.0 ✅ SHIPPED
+## Current Version: v0.18.1 ✅ SHIPPED
+
+`sync --from-status` hardened against non-numeric priorities — a frontmatter-format `.STATUS` with
+`priority: P1` (found live in `scribe/.STATUS` and `_worktrees/scribe-fix-vitest-watch/.STATUS`)
+crashed sync with a `TypeError`; priorities now normalize across all three formats (`parseInt || 3`,
+raw label preserved as `priorityLabel`), and the sync gained unit, e2e, and dogfood regression
+coverage.
+
+- [x] **Frontmatter priority coercion** — `priority: P1` (or any non-numeric string) → `3`, raw label
+  preserved as `priorityLabel`, matching the markdown and bare-YAML formats
+- [x] **`summarize()` NaN guard** — any non-finite priority buckets to default tier 3 instead of
+  throwing `TypeError: Cannot read properties of undefined (reading 'push')`
+- [x] **Regression coverage** — frontmatter-parse unit describe + summarize test, 4-test e2e suite
+  (`test/e2e/sync-from-status.e2e.test.js`), 5-check isolated-HOME dogfood script
+  (`test/dogfood/sync-from-status.sh`, `npm run test:dogfood:sync`)
+
+Fix commit `6cc7163` on `dev`. Shipped in v0.18.1 (2026-08-02).
+
+---
+
+## v0.18.0 - Dashboard Nudge Awareness ✅ SHIPPED
 
 Dashboard nudge awareness — closes the gap left by v0.17.0's wall-clock nudges: `atlas dash`'s Now
 view surfaces fired-but-unacked nudges without a separate `atlas nudge ls`.
@@ -88,7 +108,9 @@ See `docs/specs/SPEC-tui-consolidation-2026-07-19.md` and `docs/specs/SPEC-statu
 ## ⏳ v0.19.0 Candidates (Planned)
 
 Not yet started — priority order, top first (renumbered from "v0.18.0 Candidates": v0.18.0 was
-used for #115's dashboard nudge awareness instead — none of the items below shipped).
+used for #115's dashboard nudge awareness instead — none of the items below shipped). `dev`
+already carries, unreleased, a `sync --from-status` robustness fix (frontmatter non-numeric
+`priority:` crash) plus expanded e2e/dogfood regression coverage for that path.
 
 1. **Ecosystem Integration / `catch-obs-bridge` (P0)** — `atlas catch` write-through to Obsidian (`obs write`) + `atlas flush` offline queue. Gated on obsidian-cli-ops v4.2.0 (vault CRUD via IPC bridge). Needs a feature worktree; see `docs/specs/SPEC-ecosystem-integration-gaps-2026-06-20.md`.
 2. **Legacy `.STATUS` read-path sunset warning** — surfaces a nudge (not a block) when atlas reads a legacy-format file, per the compatibility note in [.STATUS Schema](STATUS-SCHEMA.md).

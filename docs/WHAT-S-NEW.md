@@ -4,6 +4,16 @@ Release highlights for each version. See the [full changelog](https://github.com
 
 ---
 
+## v0.18.1 — `sync --from-status` hardened against non-numeric priorities
+
+!!! success "Non-numeric `priority:` values no longer crash the sync"
+    A `.STATUS` file written in YAML frontmatter with a non-numeric `priority:` (e.g. `priority: P1`)
+    used to crash the sync with a `TypeError`. Non-numeric priorities are now normalized to the
+    numeric 1-3 scale (default `3`, with the raw label preserved), and the sync gained end-to-end
+    and dogfood regression coverage.
+
+---
+
 ## v0.18.0 — Dashboard Nudge Awareness
 
 !!! success "See fired reminders without leaving `atlas dash`"

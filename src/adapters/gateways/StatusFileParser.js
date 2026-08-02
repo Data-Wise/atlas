@@ -279,7 +279,8 @@ export class StatusFileParser {
           data.kind = String(rawValue ?? '').toLowerCase()
           break
         case 'priority':
-          data.priority = rawValue
+          data.priority = parseInt(rawValue, 10) || 3
+          data.priorityLabel = rawValue
           break
         case 'focus':
           data.focus = rawValue
@@ -658,8 +659,11 @@ export class StatusFileParser {
       }
       summary.byKind[kind].push({ path, ...parsed })
 
-      // Group by priority
-      const priorityKey = Math.min(3, Math.max(1, priority))
+      // Group by priority (non-numeric values fall back to 3)
+      const numericPriority = Number(priority)
+      const priorityKey = Number.isFinite(numericPriority)
+        ? Math.min(3, Math.max(1, numericPriority))
+        : 3
       summary.byPriority[priorityKey].push({ path, ...parsed })
 
       // Group by progress

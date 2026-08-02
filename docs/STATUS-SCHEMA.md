@@ -120,6 +120,10 @@ metadata — it parses and updates `kind`/`target`/`cranState`/`tasks`/`priority
 sync` (packages-only) preserves existing research metadata but does not re-parse it — re-run
 `--from-status` after editing a manuscript's `.STATUS`.
 
+Non-numeric `priority:` values in any format (e.g. `P1`) are normalized on read to the numeric
+1-3 scale: unparseable labels default to `3` and the raw label is preserved as `priorityLabel` on
+the project, so a hand-edited file can never crash `sync --from-status`.
+
 ### Querying
 
 ```bash
