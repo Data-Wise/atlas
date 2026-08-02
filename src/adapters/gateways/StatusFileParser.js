@@ -466,6 +466,14 @@ export class StatusFileParser {
         inTasks = false
       }
 
+      // Only column-0 keys are project fields. Indented keys belong to
+      // nested blocks (e.g. a `backlog:` sequence of mappings where every
+      // item legitimately carries its own `priority:`) — they must not
+      // trip the duplicate-key watchlist, nor overwrite top-level fields
+      // via last-occurrence-wins. (Task items are handled above via the
+      // inTasks path, which matches `- ` lines before this guard.)
+      if (/^\s/.test(line)) continue
+
       // Match key: value pattern (split on first colon only)
       const colonIndex = trimmed.indexOf(':')
       if (colonIndex > 0 && /^\w+$/.test(trimmed.slice(0, colonIndex))) {
