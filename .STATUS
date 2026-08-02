@@ -1,6 +1,16 @@
 ## Project: atlas
 ## Type: node-package
 ## Status: active
+## Resume Context (2026-08-02 Session, part 10 — /done wrapup)
+
+Wrapped the session after the `.STATUS` vs JSON/TOML policy thread. Stayed with the current decision: keep
+`.STATUS` canonical, use strict `schema: atlas/v1` validation, and treat JSON only as a generated
+schema/validation artifact. I read local `CLAUDE.md` plus global `~/.config/opencode/{CLAUDE,AGENTS}.md`;
+local `AGENTS.md` is absent, and `~/.Codex/aria-knowledge.local.md` is also absent, so knowledge sync and
+`/extract` are blocked until `/setup` configures ARIA. No code changed in this wrapup, the tree stayed clean on
+`dev`, and there was no active Atlas session. Next session can either set up ARIA for knowledge sync or turn
+the `.STATUS` policy into a concrete repo rule/spec.
+
 ## Phase: v0.18.1 RELEASED (2026-08-02 — `sync --from-status` non-numeric-priority crash fix, PR dev→main merged, tagged/GitHub-released/tap-synced same session); v0.18.0 RELEASED (2026-08-01 — #115 dashboard nudge awareness, PR #119 dev→main merged `7b8ca30`, tagged/GitHub-released/tap-synced same session; issue #115 auto-closed on merge); v0.17.0 RELEASED (2026-08-01 — wall-clock nudges + `atlas day`, PR #116 → dev, PR #117 dev→main, tagged/deployed/tap-synced same session; issue #114 auto-closed on merge); v0.16.0 RELEASED (2026-07-20 — XDG Base Directory migration v0.15.0 via PR #105, then ADHD-friendly docs-site redesign v0.16.0 via PR #107); demos.yml branch-protection bug fixed and E2E-verified 2026-07-21 (PRs #109-112)
 ## Priority: 1
 ## Progress: 100
